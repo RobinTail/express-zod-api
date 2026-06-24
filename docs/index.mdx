@@ -1,0 +1,150 @@
+---
+title: "Express Zod API"
+description: "Build type-safe Express APIs with I/O schema validation in minutes"
+---
+
+<div className="flex flex-col items-center justify-center py-12">
+  <h1 className="text-5xl font-bold text-center mb-6" style={{ color: 'rgb(var(--primary))' }}>
+    Express Zod API
+  </h1>
+  <p className="text-xl text-gray-600 text-center max-w-2xl mb-8">
+    A TypeScript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.
+  </p>
+  <div className="flex gap-4">
+    <a href="/quickstart" className="px-6 py-3 rounded text-white font-semibold" style={{ backgroundColor: 'rgb(var(--primary))' }}>
+      Get Started
+    </a>
+    <a href="https://github.com/robintail/express-zod-api" className="px-6 py-3 rounded border-2 font-semibold" style={{ borderColor: 'rgb(var(--primary))', color: 'rgb(var(--primary))' }}>
+      View on GitHub
+    </a>
+  </div>
+</div>
+
+## Key Features
+
+Express Zod API integrates Express.js, Zod validation, and TypeScript to provide a complete framework for building robust APIs.
+
+<CardGroup cols={2}>
+  <Card title="Type-Safe Validation" icon="shield-check" href="/features/schema-validation">
+    Validate request and response data with Zod schemas for complete type safety
+  </Card>
+  <Card title="Auto-Generated Docs" icon="book" href="/integration/documentation">
+    Generate OpenAPI 3.1 documentation automatically from your endpoint definitions
+  </Card>
+  <Card title="Custom Middleware" icon="plug" href="/concepts/middleware">
+    Build reusable middleware with context passing and authentication support
+  </Card>
+  <Card title="End-to-End Types" icon="code" href="/integration/end-to-end-type-safety">
+    Export TypeScript types to your frontend for full type safety across your stack
+  </Card>
+  <Card title="File Uploads" icon="file-arrow-up" href="/advanced/file-uploads">
+    Handle file uploads with built-in validation and size limits
+  </Card>
+  <Card title="Testing Utilities" icon="vial" href="/advanced/testing">
+    Test endpoints and middleware easily with provided testing helpers
+  </Card>
+</CardGroup>
+
+## Quick Example
+
+Here's how simple it is to create a type-safe endpoint:
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const helloEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    name: z.string().optional(),
+  }),
+  output: z.object({
+    greetings: z.string(),
+  }),
+  handler: async ({ input: { name } }) => {
+    return { greetings: `Hello, ${name || "World"}!` };
+  },
+});
+```
+
+## Why Express Zod API?
+
+<CardGroup cols={3}>
+  <Card title="TypeScript First" icon="code">
+    Built with TypeScript for complete type safety throughout your API
+  </Card>
+  <Card title="Express Compatible" icon="server">
+    Built on Express v5 with full compatibility with the Express ecosystem
+  </Card>
+  <Card title="Zero Boilerplate" icon="wand-magic-sparkles">
+    Focus on business logic while the framework handles validation and errors
+  </Card>
+  <Card title="Flexible Routing" icon="route">
+    Support for nested routes, path parameters, and method-based routing
+  </Card>
+  <Card title="Production Ready" icon="rocket">
+    Built-in HTTPS, compression, CORS, and production mode optimizations
+  </Card>
+  <Card title="Developer Friendly" icon="heart">
+    Clear error messages, comprehensive testing utilities, and detailed docs
+  </Card>
+</CardGroup>
+
+## Get Started
+
+<Steps>
+  <Step title="Install the framework">
+    Install Express Zod API and its peer dependencies
+    
+    ```bash
+    pnpm add express-zod-api express zod http-errors
+    pnpm add -D @types/express @types/node @types/http-errors
+    ```
+  </Step>
+  
+  <Step title="Create your first endpoint">
+    Define input/output schemas and handler logic
+    
+    ```typescript
+    import { defaultEndpointsFactory, createConfig } from "express-zod-api";
+    import { z } from "zod";
+    
+    const endpoint = defaultEndpointsFactory.build({
+      input: z.object({ name: z.string() }),
+      output: z.object({ greeting: z.string() }),
+      handler: async ({ input }) => ({ greeting: `Hello ${input.name}` }),
+    });
+    ```
+  </Step>
+  
+  <Step title="Start your server">
+    Configure and launch your API server
+    
+    ```typescript
+    import { createServer, Routing } from "express-zod-api";
+    
+    const routing: Routing = {
+      v1: { hello: endpoint },
+    };
+    
+    createServer(createConfig({ http: { listen: 8090 } }), routing);
+    ```
+  </Step>
+</Steps>
+
+## Learn More
+
+<CardGroup cols={2}>
+  <Card title="Core Concepts" icon="book-open" href="/concepts/endpoints">
+    Understand endpoints, routing, middleware, and result handlers
+  </Card>
+  <Card title="API Reference" icon="code" href="/api/create-config">
+    Explore the complete API documentation
+  </Card>
+  <Card title="Integration Guide" icon="puzzle-piece" href="/integration/documentation">
+    Generate documentation and type-safe clients
+  </Card>
+  <Card title="Examples & Guides" icon="lightbulb" href="/guides/authentication">
+    Learn from real-world examples and best practices
+  </Card>
+</CardGroup>

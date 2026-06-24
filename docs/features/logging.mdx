@@ -1,0 +1,427 @@
+---
+title: Logging
+description: Configure and customize logging in Express Zod API
+---
+
+Express Zod API includes a built-in logger with colorful output and inspection, and supports custom loggers like Winston and Pino. Logging is essential for debugging, monitoring, and understanding your API's behavior.
+
+## Built-in Logger
+
+The framework includes a console logger with sensible defaults:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  logger: {
+    level: "debug", // or "info", "warn", "silent"
+    color: true,    // Enable colorful output
+    depth: 2,       // How deeply to inspect objects
+  },
+});
+```
+
+## Log Levels
+
+The built-in logger supports four levels:
+
+| Level | When to Use | Default (Dev) | Default (Prod) |
+|-------|-------------|---------------|----------------|
+| `debug` | Detailed debugging info | ✅ | ❌ |
+| `info` | General information | ✅ | ❌ |
+| `warn` | Warnings, non-critical issues | ✅ | ✅ |
+| `error` | Errors, critical issues | ✅ | ✅ |
+| `silent` | Disable all logging | ❌ | ❌ |
+
+The default level is:
+- **`debug`** in development (`NODE_ENV !== "production"`)
+- **`warn`** in production (`NODE_ENV === "production"`)
+
+## Configuration Options
+
+### Level
+
+```ts
+const config = createConfig({
+  logger: {
+    level: "warn", // Only show warnings and errors
+  },
+});
+```
+
+### Color
+
+Colors are auto-detected but can be forced:
+
+```ts
+const config = createConfig({
+  logger: {
+    color: true, // Force enable colors
+    // color: false, // Force disable colors
+    // color: undefined, // Auto-detect (default)
+  },
+});
+```
+
+### Depth
+
+Control how deeply objects are inspected:
+
+```ts
+const config = createConfig({
+  logger: {
+    depth: 4, // Inspect 4 levels deep
+    // depth: null, // Unlimited depth
+    // depth: Infinity, // Unlimited depth
+  },
+});
+```
+
+## Using the Logger
+
+The logger is available in handlers, middlewares, and result handlers:
+
+```ts
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const endpoint = defaultEndpointsFactory.build({
+  input: z.object({ userId: z.string() }),
+  output: z.object({ success: z.boolean() }),
+  handler: async ({ input, logger }) => {
+    logger.debug("Fetching user", { userId: input.userId });
+    
+    const user = await db.users.findById(input.userId);
+    
+    if (!user) {
+      logger.warn("User not found", { userId: input.userId });
+      throw createHttpError(404, "User not found");
+    }
+    
+    logger.info("User retrieved successfully", { userId: input.userId });
+    return { success: true };
+  },
+});
+```
+
+## Log Output Format
+
+The built-in logger outputs in this format:
+
+```
+2024-03-08T12:34:56.789Z debug: Fetching user { userId: '123' }
+2024-03-08T12:34:56.790Z info: User retrieved successfully { userId: '123' }
+```
+
+With colors enabled:
+- **debug** - gray
+- **info** - blue
+- **warn** - yellow
+- **error** - red
+
+## Custom Logger
+
+You can use any logger with `info()`, `debug()`, `error()`, and `warn()` methods:
+
+### Winston
+
+```ts
+import { createConfig } from "express-zod-api";
+import winston from "winston";
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
+  ],
+});
+
+const config = createConfig({
+  http: { listen: 8090 },
+  logger, // Use Winston
+});
+
+// Enable TypeScript support
+declare module "express-zod-api" {
+  interface LoggerOverrides extends winston.Logger {}
+}
+```
+
+### Pino
+
+```ts
+import { createConfig } from "express-zod-api";
+import pino, { Logger } from "pino";
+
+const logger = pino({
+  transport: {
+    target: "pino-pretty",
+    options: { colorize: true },
+  },
+});
+
+const config = createConfig({
+  http: { listen: 8090 },
+  logger,
+});
+
+// Enable TypeScript support
+declare module "express-zod-api" {
+  interface LoggerOverrides extends Logger {}
+}
+```
+
+## Child Logger
+
+Create request-specific loggers with additional context:
+
+```ts
+import { createConfig, BuiltinLogger } from "express-zod-api";
+import { randomUUID } from "node:crypto";
+
+// Enable .child() method
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+
+const config = createConfig({
+  http: { listen: 8090 },
+  childLoggerProvider: ({ parent, request }) =>
+    parent.child({
+      requestId: randomUUID(),
+      ip: request.ip,
+    }),
+});
+```
+
+Now every log includes the request ID:
+
+```
+2024-03-08T12:34:56.789Z abc-123-def { requestId: 'abc-123-def', ip: '192.168.1.1' } debug: Processing request
+```
+
+## Access Logging
+
+Log all incoming requests:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  accessLogger: ({ method, path }, logger) => {
+    logger.debug(`${method}: ${path}`);
+  },
+  // Or disable:
+  // accessLogger: null,
+});
+```
+
+Output:
+
+```
+2024-03-08T12:34:56.789Z debug: GET: /v1/users
+2024-03-08T12:34:57.123Z debug: POST: /v1/users
+```
+
+## Profiling
+
+Measure execution time of operations:
+
+```ts
+import { BuiltinLogger } from "express-zod-api";
+
+// Enable .profile() method
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+
+const endpoint = defaultEndpointsFactory.build({
+  handler: async ({ logger }) => {
+    const done = logger.profile("Database query");
+    
+    const users = await db.users.find();
+    
+    done(); // Logs duration
+    
+    return { users };
+  },
+});
+```
+
+Output:
+
+```
+2024-03-08T12:34:56.789Z debug: Database query 123.45ms
+```
+
+### Advanced Profiling
+
+```ts
+const done = logger.profile({
+  message: "Expensive operation",
+  severity: (ms) => (ms > 1000 ? "warn" : "debug"),
+  formatter: (ms) => `${ms.toFixed(2)}ms`,
+});
+
+const result = await expensiveOperation();
+
+done(); // Logs as warn if > 1000ms
+```
+
+## Implementation Details
+
+Here's the built-in logger implementation:
+
+```ts
+import { inspect } from "node:util";
+import ansis from "ansis";
+
+export class BuiltinLogger {
+  constructor({
+    color = ansis.isSupported(),
+    level = isProduction() ? "warn" : "debug",
+    depth = 2,
+    ctx = {},
+  } = {}) {
+    this.config = { color, level, depth, ctx };
+  }
+
+  protected format(subject: unknown) {
+    return inspect(subject, {
+      depth: this.config.depth,
+      colors: this.config.color,
+      breakLength: this.config.level === "debug" ? 80 : Infinity,
+      compact: this.config.level === "debug" ? 3 : true,
+    });
+  }
+
+  debug(message: string, meta?: unknown) {
+    this.print("debug", message, meta);
+  }
+
+  info(message: string, meta?: unknown) {
+    this.print("info", message, meta);
+  }
+
+  warn(message: string, meta?: unknown) {
+    this.print("warn", message, meta);
+  }
+
+  error(message: string, meta?: unknown) {
+    this.print("error", message, meta);
+  }
+
+  child(ctx: Context) {
+    return new BuiltinLogger({ ...this.config, ctx });
+  }
+}
+```
+
+## Best Practices
+
+<Card title="Use Appropriate Levels" icon="layer-group">
+- `debug`: Detailed flow information
+- `info`: Important events (user actions)
+- `warn`: Unexpected but handled situations
+- `error`: Failures requiring attention
+</Card>
+
+<Card title="Include Context" icon="fingerprint">
+Always include relevant data with logs for easier debugging.
+</Card>
+
+<Card title="Don't Log Secrets" icon="eye-slash">
+Never log passwords, tokens, API keys, or sensitive user data.
+</Card>
+
+<Card title="Use Structured Logging" icon="table">
+Log objects, not concatenated strings: `logger.info("User login", { userId })` not `logger.info(\`User ${userId} login\`)`
+</Card>
+
+## Common Patterns
+
+### Request/Response Logging
+
+```ts
+const endpoint = defaultEndpointsFactory.build({
+  handler: async ({ input, logger }) => {
+    logger.debug("Request received", { input });
+    
+    const result = await processRequest(input);
+    
+    logger.debug("Response prepared", { result });
+    
+    return result;
+  },
+});
+```
+
+### Error Logging
+
+```ts
+const endpoint = defaultEndpointsFactory.build({
+  handler: async ({ input, logger }) => {
+    try {
+      return await riskyOperation(input);
+    } catch (error) {
+      logger.error("Operation failed", {
+        error: error.message,
+        stack: error.stack,
+        input,
+      });
+      throw error;
+    }
+  },
+});
+```
+
+### Performance Logging
+
+```ts
+const endpoint = defaultEndpointsFactory.build({
+  handler: async ({ logger }) => {
+    const start = Date.now();
+    
+    const result = await operation();
+    
+    const duration = Date.now() - start;
+    
+    if (duration > 1000) {
+      logger.warn("Slow operation", { duration });
+    }
+    
+    return result;
+  },
+});
+```
+
+## Troubleshooting
+
+### No Logs Appearing
+
+Check:
+1. Log level isn't set to `silent`
+2. Level allows the messages (`warn` won't show `debug`)
+3. Custom logger implements all required methods
+
+### Colors Not Working
+
+Ensure:
+1. Terminal supports colors
+2. `color: true` is set (or auto-detect works)
+3. Output is to a TTY (colors disabled when piping)
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Middlewares" icon="layer-group" href="/essentials/middlewares">
+    Use logger in middlewares
+  </Card>
+  <Card title="Error Handling" icon="triangle-exclamation" href="/essentials/error-handling">
+    Log errors effectively
+  </Card>
+</CardGroup>

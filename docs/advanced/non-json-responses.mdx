@@ -1,0 +1,287 @@
+---
+title: Non-JSON Responses
+description: Learn how to serve files, images, and other non-JSON content types from your API endpoints.
+---
+
+## Overview
+
+While Express Zod API is optimized for JSON APIs, it fully supports serving non-JSON responses such as images, PDFs, or other binary files. This is accomplished through custom `ResultHandler` configurations.
+
+## Setting MIME Types
+
+To configure a non-JSON response, specify the MIME type in your `ResultHandler`:
+
+```typescript
+import { ResultHandler, ez } from "express-zod-api";
+import { z } from "zod";
+
+const imageHandler = new ResultHandler({
+  positive: { schema: ez.buffer(), mimeType: "image/*" },
+  negative: { schema: z.string(), mimeType: "text/plain" },
+  handler: ({ response, error, output }) => {
+    if (error) {
+      return void response.status(400).send(error.message);
+    }
+    // Handle image response
+  },
+});
+```
+
+## Response Schemas
+
+For non-JSON responses, use appropriate schemas in your documentation:
+
+- `z.string()` - For text content
+- `z.base64()` - For base64-encoded data
+- `ez.buffer()` - For binary data (recommended for files)
+
+## File Streaming
+
+Streaming files is more efficient than loading them entirely into memory:
+
+```typescript
+import { EndpointsFactory, ResultHandler, ez } from "express-zod-api";
+import { createReadStream } from "node:fs";
+import { z } from "zod";
+
+const fileStreamingHandler = new ResultHandler({
+  positive: { schema: ez.buffer(), mimeType: "image/*" },
+  negative: { schema: z.string(), mimeType: "text/plain" },
+  handler: ({ response, error, output }) => {
+    if (error) {
+      return void response.status(400).send(error.message);
+    }
+
+    if ("filename" in output && typeof output.filename === "string") {
+      createReadStream(output.filename).pipe(
+        response.attachment(output.filename),
+      );
+    } else {
+      response.status(400).send("Filename is missing");
+    }
+  },
+});
+
+const fileStreamingFactory = new EndpointsFactory(fileStreamingHandler);
+```
+
+### Complete Streaming Example
+
+```typescript
+import { stat } from "node:fs/promises";
+
+const streamAvatarEndpoint = fileStreamingFactory.build({
+  shortDescription: "Streams a file content.",
+  tag: ["users", "files"],
+  input: z.object({
+    userId: z
+      .string()
+      .regex(/\d+/)
+      .transform((str) => parseInt(str, 10)),
+  }),
+  output: z.object({
+    filename: z.string(),
+  }),
+  handler: async ({ input }) => {
+    // Determine file path based on userId
+    return { filename: `uploads/avatar-${input.userId}.png` };
+  },
+});
+```
+
+## File Sending (In-Memory)
+
+For smaller files, you can send them directly without streaming:
+
+```typescript
+import { EndpointsFactory, ResultHandler } from "express-zod-api";
+import { readFile } from "node:fs/promises";
+import { z } from "zod";
+
+const fileSendingHandler = new ResultHandler({
+  positive: { schema: z.string(), mimeType: "image/svg+xml" },
+  negative: { schema: z.string(), mimeType: "text/plain" },
+  handler: ({ response, error, output }) => {
+    if (error) {
+      return void response.status(400).send(error.message);
+    }
+
+    if ("data" in output && typeof output.data === "string") {
+      response.type("svg").send(output.data);
+    } else {
+      response.status(400).send("Data is missing");
+    }
+  },
+});
+
+const fileSendingFactory = new EndpointsFactory(fileSendingHandler);
+
+const sendAvatarEndpoint = fileSendingFactory.build({
+  input: z.object({ userId: z.string() }),
+  output: z.object({ data: z.string() }),
+  handler: async ({ input }) => {
+    const data = await readFile(`uploads/avatar-${input.userId}.svg`, "utf-8");
+    return { data };
+  },
+});
+```
+
+## HEAD Request Support
+
+Support HEAD requests to provide content length without sending the body:
+
+```typescript
+import { stat } from "node:fs/promises";
+import { createReadStream } from "node:fs";
+
+const streamingHandler = new ResultHandler({
+  positive: { schema: ez.buffer(), mimeType: "image/*" },
+  negative: { schema: z.string(), mimeType: "text/plain" },
+  handler: async ({ response, error, output, request: { method } }) => {
+    if (error) {
+      return void response.status(400).send(error.message);
+    }
+
+    if ("filename" in output && typeof output.filename === "string") {
+      const target = response.attachment(output.filename);
+
+      if (method === "HEAD") {
+        const { size } = await stat(output.filename);
+        return void target.set("Content-Length", `${size}`).end();
+      }
+
+      createReadStream(output.filename).pipe(target);
+    } else {
+      response.status(400).send("Filename is missing");
+    }
+  },
+});
+```
+
+## PDF Downloads
+
+```typescript
+const pdfDownloadEndpoint = fileStreamingFactory.build({
+  method: "get",
+  shortDescription: "Download a PDF report.",
+  input: z.object({
+    reportId: z.string(),
+  }),
+  output: z.object({
+    filename: z.string(),
+  }),
+  handler: async ({ input }) => {
+    const filename = `reports/report-${input.reportId}.pdf`;
+    return { filename };
+  },
+});
+```
+
+## CSV Export
+
+```typescript
+const csvHandler = new ResultHandler({
+  positive: { schema: z.string(), mimeType: "text/csv" },
+  negative: { schema: z.string(), mimeType: "text/plain" },
+  handler: ({ response, error, output }) => {
+    if (error) {
+      return void response.status(400).send(error.message);
+    }
+
+    if ("csv" in output && typeof output.csv === "string") {
+      response
+        .type("csv")
+        .attachment("export.csv")
+        .send(output.csv);
+    } else {
+      response.status(400).send("CSV data is missing");
+    }
+  },
+});
+
+const csvFactory = new EndpointsFactory(csvHandler);
+
+const exportUsersEndpoint = csvFactory.build({
+  method: "get",
+  input: z.object({}),
+  output: z.object({ csv: z.string() }),
+  handler: async () => {
+    const users = await db.getUsers();
+    const csv = convertToCSV(users);
+    return { csv };
+  },
+});
+```
+
+## Multiple MIME Types
+
+Support content negotiation with multiple MIME types:
+
+```typescript
+const multiFormatHandler = new ResultHandler({
+  positive: {
+    schema: z.union([z.string(), ez.buffer()]),
+    mimeType: ["application/json", "application/pdf", "text/csv"],
+  },
+  negative: { schema: z.string(), mimeType: "text/plain" },
+  handler: ({ response, error, output, request }) => {
+    if (error) {
+      return void response.status(400).send(error.message);
+    }
+
+    const format = request.query.format || "json";
+
+    switch (format) {
+      case "pdf":
+        response.type("pdf").send(output.pdfBuffer);
+        break;
+      case "csv":
+        response.type("csv").send(output.csvString);
+        break;
+      default:
+        response.json(output.data);
+    }
+  },
+});
+```
+
+## Image Responses with Compression
+
+When serving images with compression enabled:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  compression: true, // Enable gzip/brotli compression
+  // ... other config
+});
+
+// Images will be automatically compressed if the client supports it
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use Streaming for Large Files">
+    Always use file streaming for large files to avoid loading the entire file into memory. This improves performance and reduces memory usage.
+  </Accordion>
+
+  <Accordion title="Set Appropriate MIME Types">
+    Always set the correct MIME type for your responses. This helps clients handle the content appropriately.
+  </Accordion>
+
+  <Accordion title="Handle Errors Gracefully">
+    Always check if the file exists and handle errors appropriately before attempting to send or stream it.
+  </Accordion>
+
+  <Accordion title="Use Appropriate Schemas">
+    Use `ez.buffer()` for binary data, `z.string()` for text, and `z.base64()` for base64-encoded content in your output schemas.
+  </Accordion>
+</AccordionGroup>
+
+## Related Topics
+
+- [Response Customization](/advanced/response-customization) - Creating custom result handlers
+- [File Uploads](/advanced/file-uploads) - Handling file uploads
+- [Configuration](/core-concepts/configuration) - Enabling compression

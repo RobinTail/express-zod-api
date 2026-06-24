@@ -1,0 +1,298 @@
+---
+title: "Quickstart"
+description: "Build your first Express Zod API in 5 minutes"
+---
+
+Get a working API server up and running with I/O validation in just a few minutes.
+
+<Note>
+  **Already installed Express Zod API?** If not, follow the [installation guide](/installation) first.
+</Note>
+
+## Step 1: Configure TypeScript
+
+Make sure your `tsconfig.json` has strict mode enabled:
+
+```json tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
+```
+
+## Step 2: Create Configuration
+
+Create a configuration file for your server:
+
+```typescript config.ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: true,
+});
+
+export default config;
+```
+
+<ParamField path="http.listen" type="number">
+  Port number for the HTTP server
+</ParamField>
+
+<ParamField path="cors" type="boolean">
+  Enable cross-origin resource sharing
+</ParamField>
+
+## Step 3: Create Your First Endpoint
+
+Create an endpoint that responds with a greeting:
+
+```typescript endpoints.ts
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+export const helloEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    name: z.string().optional(),
+  }),
+  output: z.object({
+    greetings: z.string(),
+  }),
+  handler: async ({ input: { name }, logger }) => {
+    logger.debug(`Greeting ${name || "World"}`);
+    return { greetings: `Hello, ${name || "World"}. Happy coding!` };
+  },
+});
+```
+
+### What's Happening Here?
+
+<Steps>
+  <Step title="Input Schema">
+    The `input` defines what data the endpoint accepts. Here, an optional `name` string from the query parameters.
+  </Step>
+  
+  <Step title="Output Schema">
+    The `output` defines what data the endpoint returns. The response is validated against this schema.
+  </Step>
+  
+  <Step title="Handler Function">
+    The async `handler` receives validated input and returns validated output. TypeScript knows the exact types!
+  </Step>
+</Steps>
+
+## Step 4: Set Up Routing
+
+Connect your endpoint to a URL path:
+
+```typescript routing.ts
+import { Routing } from "express-zod-api";
+import { helloEndpoint } from "./endpoints";
+
+const routing: Routing = {
+  v1: {
+    hello: helloEndpoint,
+  },
+};
+
+export default routing;
+```
+
+This creates the route `GET /v1/hello`.
+
+## Step 5: Start the Server
+
+Create your server entry point:
+
+```typescript index.ts
+import { createServer } from "express-zod-api";
+import config from "./config";
+import routing from "./routing";
+
+createServer(config, routing);
+```
+
+## Step 6: Test Your API
+
+Start your server:
+
+```bash
+tsx index.ts
+# or: node --loader tsx index.ts
+# or: ts-node index.ts
+```
+
+Test with curl:
+
+```bash
+curl "http://localhost:8090/v1/hello?name=Rick"
+```
+
+You should see:
+
+```json
+{
+  "status": "success",
+  "data": {
+    "greetings": "Hello, Rick. Happy coding!"
+  }
+}
+```
+
+## Complete Example
+
+Here's everything in one file:
+
+```typescript server.ts
+import { createServer, createConfig, defaultEndpointsFactory, Routing } from "express-zod-api";
+import { z } from "zod";
+
+// Configuration
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: true,
+});
+
+// Endpoint
+const helloEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    name: z.string().optional(),
+  }),
+  output: z.object({
+    greetings: z.string(),
+  }),
+  handler: async ({ input: { name } }) => ({
+    greetings: `Hello, ${name || "World"}. Happy coding!`,
+  }),
+});
+
+// Routing
+const routing: Routing = {
+  v1: {
+    hello: helloEndpoint,
+  },
+};
+
+// Start server
+createServer(config, routing);
+```
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="Create More Endpoints" icon="code" href="/concepts/endpoints">
+    Learn about input validation, transformations, and advanced endpoint features
+  </Card>
+  <Card title="Add Authentication" icon="lock" href="/guides/authentication">
+    Protect your endpoints with middleware-based authentication
+  </Card>
+  <Card title="Generate Documentation" icon="book" href="/integration/documentation">
+    Automatically generate OpenAPI documentation from your endpoints
+  </Card>
+  <Card title="Test Your API" icon="vial" href="/advanced/testing">
+    Write tests for your endpoints with built-in testing utilities
+  </Card>
+</CardGroup>
+
+## Common Next Steps
+
+### Add a POST Endpoint
+
+```typescript
+const createUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    name: z.string().min(1),
+    email: z.string().email(),
+  }),
+  output: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+  }),
+  handler: async ({ input }) => {
+    // Save to database
+    const user = await db.users.create(input);
+    return user;
+  },
+});
+```
+
+### Add Path Parameters
+
+```typescript
+const routing: Routing = {
+  v1: {
+    users: {
+      ":id": getUserEndpoint, // GET /v1/users/:id
+    },
+  },
+};
+
+const getUserEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    id: z.string(), // from path parameter
+  }),
+  output: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  handler: async ({ input: { id } }) => {
+    return await db.users.findById(id);
+  },
+});
+```
+
+### Handle Errors
+
+```typescript
+import createHttpError from "http-errors";
+
+const endpoint = defaultEndpointsFactory.build({
+  handler: async ({ input }) => {
+    const user = await db.users.findById(input.id);
+    
+    if (!user) {
+      throw createHttpError(404, "User not found");
+    }
+    
+    return user;
+  },
+});
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Port already in use">
+    If port 8090 is already in use, change it in your config:
+    ```typescript
+    const config = createConfig({
+      http: { listen: 3000 }, // Use a different port
+      cors: true,
+    });
+    ```
+  </Accordion>
+  
+  <Accordion title="TypeScript errors">
+    Make sure you have `strict: true` in your `tsconfig.json` and all required dependencies installed:
+    ```bash
+    pnpm add -D @types/express @types/node @types/http-errors
+    ```
+  </Accordion>
+  
+  <Accordion title="CORS errors in browser">
+    Enable CORS in your configuration:
+    ```typescript
+    const config = createConfig({
+      http: { listen: 8090 },
+      cors: true, // Enable CORS
+    });
+    ```
+  </Accordion>
+</AccordionGroup>

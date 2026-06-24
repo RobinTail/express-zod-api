@@ -1,0 +1,263 @@
+---
+title: Transformations
+description: Transform input data during validation with Zod schemas
+---
+
+Transformations allow you to modify data as it flows through validation. This is especially useful for converting string parameters to numbers, parsing dates, normalizing data, and more.
+
+## Basic Transformations
+
+Use `.transform()` to convert validated data into a different format:
+
+```ts
+import { z } from "zod";
+
+const getUserEndpoint = endpointsFactory.buildVoid({
+  input: z.object({
+    id: z.string().transform((id) => parseInt(id, 10)),
+  }),
+  handler: async ({ input: { id }, logger }) => {
+    logger.debug("id", typeof id); // number
+    // id is now a number, not a string
+  },
+});
+```
+
+## Why Transformations?
+
+Query parameters and path parameters always arrive as strings. Transformations let you convert them to the types your code expects:
+
+```ts
+// GET /api/users?page=2&limit=50
+
+const listUsersEndpoint = endpointsFactory.build({
+  method: "get",
+  input: z.object({
+    page: z.string().transform(Number),
+    limit: z.string().transform(Number),
+  }),
+  output: z.object({
+    users: z.array(userSchema),
+    page: z.number(),
+    limit: z.number(),
+  }),
+  handler: async ({ input }) => {
+    // page and limit are numbers, not strings
+    const users = await db.users.find({
+      skip: (input.page - 1) * input.limit,
+      limit: input.limit,
+    });
+    return { users, page: input.page, limit: input.limit };
+  },
+});
+```
+
+## Common Transformation Patterns
+
+### String to Number
+
+```ts
+z.object({
+  id: z.string().transform((val) => parseInt(val, 10)),
+  price: z.string().transform((val) => parseFloat(val)),
+})
+```
+
+<Tip>
+For coercion without explicit transformation, use `z.coerce.number()` which handles both strings and numbers.
+</Tip>
+
+### String to Boolean
+
+```ts
+z.object({
+  active: z.string().transform((val) => val === "true"),
+})
+```
+
+### Trimming and Normalizing
+
+```ts
+z.object({
+  email: z.string().transform((val) => val.trim().toLowerCase()),
+  username: z.string().transform((val) => val.trim()),
+})
+```
+
+### Parsing JSON Strings
+
+```ts
+z.object({
+  metadata: z.string().transform((val) => JSON.parse(val)),
+})
+```
+
+## Combining Validation and Transformation
+
+You can chain validators before and after transformations:
+
+```ts
+import { z } from "zod";
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const updateUserEndpoint = defaultEndpointsFactory.build({
+  method: "patch",
+  input: z.object({
+    id: z
+      .string()
+      .regex(/^\d+$/, "ID must be numeric")
+      .transform((id) => parseInt(id, 10))
+      .refine((id) => id >= 0, "ID must be non-negative"),
+  }),
+  output: z.object({
+    success: z.boolean(),
+  }),
+  handler: async ({ input }) => {
+    // id is validated as string, transformed to number, then validated as number
+    return { success: true };
+  },
+});
+```
+
+## Top-Level Transformations
+
+You can transform the entire input object, useful for renaming fields or changing naming conventions:
+
+```ts
+import camelize from "camelize-ts";
+import { z } from "zod";
+
+const endpoint = endpointsFactory.build({
+  input: z
+    .object({ user_id: z.string() })
+    .transform((inputs) => camelize(inputs, /* shallow: */ true)),
+  output: z.object({
+    success: z.boolean(),
+  }),
+  handler: async ({ input: { userId }, logger }) => {
+    logger.debug("user_id became userId", userId);
+    return { success: true };
+  },
+});
+```
+
+<Warning>
+For output transformations that need to appear in API documentation, use [`.remap()`](/features/transformations#remapping-for-documentation) instead of `.transform()`.
+</Warning>
+
+## Remapping for Documentation
+
+The `.remap()` method (part of the [Zod Plugin](https://www.npmjs.com/package/@express-zod-api/zod-plugin)) transforms data while preserving schema information for documentation generation:
+
+```ts
+import camelize from "camelize-ts";
+import snakify from "snakify-ts";
+import { z } from "zod";
+
+const endpoint = endpointsFactory.build({
+  input: z
+    .object({ user_id: z.string() })
+    .transform((inputs) => camelize(inputs, /* shallow: */ true)),
+  output: z
+    .object({ userName: z.string() })
+    .remap((outputs) => snakify(outputs, /* shallow: */ true)),
+  handler: async ({ input: { userId }, logger }) => {
+    logger.debug("user_id became userId", userId);
+    return { userName: "Agneta" }; // becomes "user_name" in response
+  },
+});
+```
+
+### Custom Field Mapping
+
+You can also use `.remap()` with explicit field mappings:
+
+```ts
+z.object({ user_name: z.string(), id: z.number() }).remap({
+  user_name: "weHAVEreallyWEIRDnamingSTANDARDS",
+  // "id" remains intact (partial mapping)
+});
+```
+
+## Real-World Example
+
+Here's a complete example from the Express Zod API source showing transformation in action:
+
+```ts
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
+
+const updateUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    // Path parameter arrives as string
+    id: z
+      .string()
+      .example("12")
+      .transform((value) => parseInt(value, 10))
+      .refine((value) => value >= 0, "should be greater than or equal to 0"),
+    name: z.string().nonempty(),
+    birthday: ez.dateIn(), // Transforms ISO string to Date
+  }),
+  output: z.object({
+    name: z.string(),
+    createdAt: ez.dateOut(), // Transforms Date to ISO string
+  }),
+  handler: async ({ input }) => {
+    // input.id is a number
+    // input.birthday is a Date
+    return {
+      name: input.name,
+      createdAt: new Date("2022-01-22"),
+    };
+  },
+});
+```
+
+## Type Safety with Transformations
+
+TypeScript automatically infers the transformed types:
+
+```ts
+const schema = z.object({
+  id: z.string().transform(Number),
+  tags: z.string().transform((s) => s.split(",")),
+});
+
+type Input = z.input<typeof schema>;
+// { id: string; tags: string }
+
+type Output = z.output<typeof schema>;
+// { id: number; tags: string[] }
+```
+
+In your handler, `input` has the output type with all transformations applied.
+
+## Best Practices
+
+<Card title="Transform at the Schema Level" icon="filter">
+Transformations in schemas are validated and documented. Avoid manual transformations in handlers.
+</Card>
+
+<Card title="Keep Transformations Simple" icon="square-check">
+Complex logic should go in the handler, not in transformations.
+</Card>
+
+<Card title="Use Coercion When Appropriate" icon="wand-magic">
+`z.coerce.number()` is cleaner than `.transform(Number)` for simple type coercion.
+</Card>
+
+<Card title="Validate Before and After" icon="shield">
+Add validation both before transformation (on the raw input) and after (on the transformed value).
+</Card>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Dates" icon="calendar" href="/features/dates">
+    Learn about date handling with ez.dateIn() and ez.dateOut()
+  </Card>
+  <Card title="Refinements" icon="filter" href="/features/refinements">
+    Add custom validation logic
+  </Card>
+</CardGroup>

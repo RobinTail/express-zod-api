@@ -1,0 +1,460 @@
+---
+title: Context
+description: Learn how to provide shared state and dependencies to your endpoints
+---
+
+## Overview
+
+Context in Express Zod API is the mechanism for passing data from middlewares to endpoint handlers. It enables dependency injection, authentication state sharing, and access to shared resources like database connections. Context is type-safe and accumulated through the middleware chain.
+
+## How Context Works
+
+Context flows through your application in this order:
+
+1. **Middlewares execute** in the order they were added to the factory
+2. **Each middleware returns** an object that becomes part of the context
+3. **Context accumulates** by merging all middleware returns
+4. **Endpoint handler receives** the complete context object
+
+```typescript
+// Middleware 1 returns { user }
+// Middleware 2 returns { db }
+// Middleware 3 returns { startTime }
+// Handler receives ctx = { user, db, startTime }
+```
+
+## Providing Context via Middleware
+
+The most common way to provide context is through middleware:
+
+```typescript
+import { Middleware, defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const authMiddleware = new Middleware({
+  input: z.object({
+    apiKey: z.string(),
+  }),
+  handler: async ({ input }) => {
+    const user = await db.users.findByApiKey(input.apiKey);
+    if (!user) throw createHttpError(401);
+    
+    // This object becomes part of ctx
+    return { user };
+  },
+});
+
+const factory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware);
+
+const endpoint = factory.build({
+  handler: async ({ ctx }) => {
+    // ctx.user is available and type-safe
+    return { userId: ctx.user.id };
+  },
+});
+```
+
+## Request-Independent Context
+
+For context that doesn't depend on the request, use `addContext()`:
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import { readFile } from "node:fs/promises";
+
+const factory = defaultEndpointsFactory.addContext(async () => {
+  // Runs for every request
+  const config = JSON.parse(
+    await readFile("config.json", "utf-8")
+  );
+  
+  return { config };
+});
+
+const endpoint = factory.build({
+  handler: async ({ ctx }) => {
+    // ctx.config is available
+    const apiUrl = ctx.config.apiUrl;
+  },
+});
+```
+
+<Warning>
+  `addContext()` runs on **every request**. For expensive operations like database connections, consider using singletons or connection pools instead.
+</Warning>
+
+## Type-Safe Context
+
+TypeScript automatically infers the context type from your middlewares:
+
+```typescript
+const authMw = new Middleware({
+  handler: async () => ({
+    user: { id: 1, name: "Alice" },
+  }),
+});
+
+const dbMw = new Middleware({
+  handler: async () => ({
+    db: await createDbConnection(),
+  }),
+});
+
+const factory = defaultEndpointsFactory
+  .addMiddleware(authMw)
+  .addMiddleware(dbMw);
+
+const endpoint = factory.build({
+  handler: async ({ ctx }) => {
+    // TypeScript knows:
+    // ctx.user: { id: number; name: string }
+    // ctx.db: DbConnection
+    
+    const userName: string = ctx.user.name; // ✅ Type-safe
+    const result = await ctx.db.query(); // ✅ Autocomplete works
+  },
+});
+```
+
+## Context Accumulation
+
+Context from multiple middlewares is merged:
+
+```typescript
+const mw1 = new Middleware({
+  handler: async () => ({ a: 1 }),
+});
+
+const mw2 = new Middleware({
+  handler: async () => ({ b: 2 }),
+});
+
+const mw3 = new Middleware({
+  handler: async () => ({ c: 3 }),
+});
+
+const factory = defaultEndpointsFactory
+  .addMiddleware(mw1)
+  .addMiddleware(mw2)
+  .addMiddleware(mw3);
+
+const endpoint = factory.build({
+  handler: async ({ ctx }) => {
+    // ctx = { a: 1, b: 2, c: 3 }
+    return ctx;
+  },
+});
+```
+
+## Accessing Previous Context
+
+Middlewares can access context from previously executed middlewares:
+
+```typescript
+const authMiddleware = new Middleware({
+  handler: async () => ({
+    user: { id: 1, role: "admin" },
+  }),
+});
+
+const permissionMiddleware = new Middleware({
+  handler: async ({ ctx }) => {
+    // ctx.user is available from authMiddleware
+    if (ctx.user.role !== "admin") {
+      throw createHttpError(403, "Admin required");
+    }
+    
+    return { isAdmin: true };
+  },
+});
+
+const factory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware)
+  .addMiddleware(permissionMiddleware);
+```
+
+<Info>
+  Context is accumulated in order. Later middlewares can access context from earlier ones, but not vice versa.
+</Info>
+
+## Shared Resources
+
+### Database Connections
+
+For persistent database connections, use a singleton pattern instead of creating connections per request:
+
+```typescript
+// db.ts - Create once
+import mongoose from "mongoose";
+
+export const db = mongoose.connect("mongodb://localhost/mydb");
+
+// endpoints.ts - Import and use
+import { db } from "./db";
+
+const endpoint = factory.build({
+  handler: async () => {
+    const users = await db.collection("users").find();
+    return { users };
+  },
+});
+```
+
+For connection pools or per-request connections:
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import { createPool } from "generic-pool";
+
+const pool = createPool({
+  create: async () => await createDbConnection(),
+  destroy: async (conn) => await conn.close(),
+}, { max: 10 });
+
+const factory = defaultEndpointsFactory.addContext(async () => {
+  const db = await pool.acquire();
+  return { db };
+});
+```
+
+### Configuration
+
+For static configuration, use imports instead of context:
+
+```typescript
+// config.ts
+export const config = {
+  apiUrl: process.env.API_URL,
+  apiKey: process.env.API_KEY,
+};
+
+// endpoint.ts
+import { config } from "./config";
+
+const endpoint = factory.build({
+  handler: async () => {
+    // Use config directly
+    return { apiUrl: config.apiUrl };
+  },
+});
+```
+
+For dynamic configuration that changes per request:
+
+```typescript
+const factory = defaultEndpointsFactory.addContext(async () => {
+  const config = await loadDynamicConfig();
+  return { config };
+});
+```
+
+## Resource Cleanup
+
+Clean up resources in a custom Result Handler:
+
+```typescript
+import { ResultHandler, EndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const resultHandlerWithCleanup = new ResultHandler({
+  positive: (output) => z.object({ data: output }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ error, output, response, ctx }) => {
+    // Cleanup: check if db connection exists
+    if ("db" in ctx && ctx.db) {
+      ctx.db.release(); // Return to pool
+      // or ctx.db.close() for direct connections
+    }
+    
+    if (error) {
+      return void response.status(500).json({ error: error.message });
+    }
+    response.json({ data: output });
+  },
+});
+
+const factory = new EndpointsFactory(resultHandlerWithCleanup);
+```
+
+## Common Patterns
+
+### Authentication Context
+
+```typescript
+const authMiddleware = new Middleware({
+  security: { type: "header", name: "authorization" },
+  input: z.object({
+    authorization: z.string().regex(/^Bearer .+$/),
+  }),
+  handler: async ({ input }) => {
+    const token = input.authorization.replace("Bearer ", "");
+    const user = await verifyJWT(token);
+    
+    if (!user) {
+      throw createHttpError(401, "Invalid token");
+    }
+    
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  },
+});
+```
+
+### Request Metadata
+
+```typescript
+const requestMetadataMiddleware = new Middleware({
+  handler: async ({ request }) => {
+    return {
+      requestId: request.headers["x-request-id"] || generateId(),
+      startTime: Date.now(),
+      userAgent: request.headers["user-agent"],
+      ip: request.ip,
+    };
+  },
+});
+```
+
+### Feature Flags
+
+```typescript
+const featureFlagsMiddleware = new Middleware({
+  handler: async ({ ctx }) => {
+    const flags = await featureFlagService.getFlags(ctx.user?.id);
+    
+    return {
+      features: {
+        newUI: flags.includes("new-ui"),
+        betaFeatures: flags.includes("beta"),
+      },
+    };
+  },
+});
+
+const endpoint = factory
+  .addMiddleware(authMiddleware)
+  .addMiddleware(featureFlagsMiddleware)
+  .build({
+    handler: async ({ ctx }) => {
+      if (ctx.features.newUI) {
+        return { ui: "new" };
+      }
+      return { ui: "classic" };
+    },
+  });
+```
+
+### Tenant Isolation
+
+```typescript
+const tenantMiddleware = new Middleware({
+  input: z.object({
+    tenantId: z.string(),
+  }),
+  handler: async ({ input, ctx }) => {
+    const tenant = await db.tenants.findById(input.tenantId);
+    
+    if (!tenant) {
+      throw createHttpError(404, "Tenant not found");
+    }
+    
+    // Verify user has access to tenant
+    if (!tenant.userIds.includes(ctx.user.id)) {
+      throw createHttpError(403, "Access denied");
+    }
+    
+    return {
+      tenant,
+      db: createTenantDb(tenant.id),
+    };
+  },
+});
+```
+
+## Context in Result Handlers
+
+Result handlers receive context but it may be partial if middleware execution was interrupted:
+
+```typescript
+const resultHandler = new ResultHandler({
+  positive: (output) => z.object({ data: output }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ error, output, response, ctx }) => {
+    // ctx may be incomplete if an error occurred in middleware
+    // Always check for property existence
+    
+    if ("user" in ctx && ctx.user) {
+      response.set("X-User-Id", ctx.user.id);
+    }
+    
+    if (error) {
+      return void response.status(500).json({ error: error.message });
+    }
+    
+    response.json({ data: output });
+  },
+});
+```
+
+<Warning>
+  Always use the `in` operator to check if context properties exist in Result Handlers, since context may be incomplete if middleware execution was interrupted by an error.
+</Warning>
+
+## Best Practices
+
+<Tip>
+  1. **Use singletons for persistent resources**: Database connections, configuration, etc.
+  2. **Keep context minimal**: Only include what endpoints actually need
+  3. **Type your context**: Let TypeScript infer types from middleware returns
+  4. **Order middlewares carefully**: Authentication before authorization, etc.
+  5. **Clean up resources**: Use Result Handlers to release connections
+  6. **Avoid expensive operations**: Don't create new database connections per request
+  7. **Check property existence**: Always verify context properties exist in Result Handlers
+</Tip>
+
+## Performance Considerations
+
+### ❌ Anti-pattern: Creating connections per request
+
+```typescript
+// Don't do this
+const factory = defaultEndpointsFactory.addContext(async () => {
+  const db = await mongoose.connect("mongodb://localhost/mydb");
+  return { db };
+});
+```
+
+### ✅ Better: Use a singleton
+
+```typescript
+// db.ts
+export const db = mongoose.connect("mongodb://localhost/mydb");
+
+// endpoint.ts
+import { db } from "./db";
+```
+
+### ✅ Better: Use a connection pool
+
+```typescript
+const pool = createConnectionPool();
+
+const factory = defaultEndpointsFactory.addContext(async () => {
+  const db = await pool.acquire();
+  return { db };
+});
+
+// Don't forget cleanup in Result Handler
+```
+
+## See Also
+
+- [Middleware](/concepts/middleware) - Create and chain middlewares
+- [Endpoints](/concepts/endpoints) - Use context in endpoint handlers
+- [Result Handlers](/concepts/result-handlers) - Clean up resources

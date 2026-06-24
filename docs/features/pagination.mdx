@@ -1,0 +1,371 @@
+---
+title: Pagination
+description: Implement offset and cursor-based pagination with ez.paginated()
+---
+
+Express Zod API provides built-in helpers for implementing pagination with consistent input and output schemas. The `ez.paginated()` function generates ready-to-use schemas for both offset-based and cursor-based pagination.
+
+## Quick Start
+
+```ts
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
+
+const userSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+
+const pagination = ez.paginated({
+  style: "offset",
+  itemSchema: userSchema,
+  itemsName: "users",
+  maxLimit: 100,
+  defaultLimit: 20,
+});
+
+const listUsersEndpoint = defaultEndpointsFactory.build({
+  input: pagination.input,
+  output: pagination.output,
+  handler: async ({ input: { limit, offset } }) => {
+    const { users, total } = await db.getUsers(limit, offset);
+    return { users, total, limit, offset };
+  },
+});
+```
+
+## Offset-Based Pagination
+
+Offset pagination uses `limit` and `offset` parameters to navigate through results:
+
+```ts
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
+
+const roleSchema = z.enum(["manager", "operator", "admin"]);
+
+const userSchema = z.object({
+  name: z.string(),
+  role: roleSchema,
+});
+
+const paginatedUsers = ez.paginated({
+  style: "offset",
+  itemSchema: userSchema,
+  itemsName: "users",
+  maxLimit: 100,
+  defaultLimit: 20,
+});
+
+const listUsersPaginatedEndpoint = defaultEndpointsFactory.build({
+  tag: "users",
+  shortDescription: "Lists users with pagination.",
+  input: paginatedUsers.input,
+  output: paginatedUsers.output,
+  handler: async ({ input: { limit, offset } }) => {
+    const users = await db.users.find({ skip: offset, limit });
+    const total = await db.users.count();
+    
+    return { users, total, limit, offset };
+  },
+});
+```
+
+### Request Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `limit` | number | `defaultLimit` | Number of items per page |
+| `offset` | number | `0` | Number of items to skip |
+
+### Response Shape
+
+```json
+{
+  "status": "success",
+  "data": {
+    "users": [
+      { "name": "Maria Merian", "role": "manager" },
+      { "name": "Mary Anning", "role": "operator" }
+    ],
+    "total": 25,
+    "limit": 20,
+    "offset": 0
+  }
+}
+```
+
+## Cursor-Based Pagination
+
+Cursor pagination uses an opaque cursor token to navigate through results:
+
+```ts
+const paginatedProducts = ez.paginated({
+  style: "cursor",
+  itemSchema: productSchema,
+  itemsName: "products",
+  maxLimit: 50,
+  defaultLimit: 10,
+});
+
+const listProductsEndpoint = defaultEndpointsFactory.build({
+  input: paginatedProducts.input,
+  output: paginatedProducts.output,
+  handler: async ({ input: { cursor, limit } }) => {
+    const { products, nextCursor } = await db.getProducts({ cursor, limit });
+    
+    return {
+      products,
+      nextCursor, // null if no more pages
+      limit,
+    };
+  },
+});
+```
+
+### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cursor` | string | No | Cursor for next page; omit for first page |
+| `limit` | number | No | Number of items per page (default: `defaultLimit`) |
+
+### Response Shape
+
+```json
+{
+  "status": "success",
+  "data": {
+    "products": [
+      { "id": 1, "name": "Widget" },
+      { "id": 2, "name": "Gadget" }
+    ],
+    "nextCursor": "eyJpZCI6Mn0=",
+    "limit": 10
+  }
+}
+```
+
+## Configuration Options
+
+The `ez.paginated()` function accepts the following configuration:
+
+```ts
+interface PaginationConfig {
+  style: "offset" | "cursor";     // Pagination style
+  itemSchema: z.ZodType;          // Schema for each item
+  itemsName?: string;             // Property name for items array (default: "items")
+  maxLimit?: number;              // Maximum page size (default: 100)
+  defaultLimit?: number;          // Default page size (default: 20)
+}
+```
+
+## Composing with Other Parameters
+
+You can combine pagination schemas with additional filters using `.and()`:
+
+```ts
+const pagination = ez.paginated({
+  style: "offset",
+  itemSchema: userSchema,
+  itemsName: "users",
+});
+
+const listUsersEndpoint = defaultEndpointsFactory.build({
+  input: pagination.input.and(
+    z.object({
+      roles: z.array(roleSchema).optional(),
+      search: z.string().optional(),
+    }),
+  ),
+  output: pagination.output,
+  handler: async ({ input: { limit, offset, roles, search } }) => {
+    const query = {};
+    if (roles) query.role = { $in: roles };
+    if (search) query.name = { $regex: search, $options: "i" };
+    
+    const users = await db.users.find(query, { skip: offset, limit });
+    const total = await db.users.count(query);
+    
+    return { users, total, limit, offset };
+  },
+});
+```
+
+## Complete Example
+
+Here's a full example from the Express Zod API source:
+
+```ts
+import { z } from "zod";
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+
+const roleSchema = z.enum(["manager", "operator", "admin"]);
+
+const userSchema = z.object({
+  name: z.string(),
+  role: roleSchema,
+});
+
+const paginatedUsers = ez.paginated({
+  style: "offset",
+  itemSchema: userSchema,
+  itemsName: "users",
+  maxLimit: 100,
+  defaultLimit: 20,
+});
+
+const users = [
+  { name: "Maria Merian", role: "manager" },
+  { name: "Mary Anning", role: "operator" },
+  { name: "Marie Skłodowska Curie", role: "admin" },
+  { name: "Henrietta Leavitt", role: "manager" },
+  { name: "Lise Meitner", role: "operator" },
+  { name: "Alice Ball", role: "admin" },
+  { name: "Gerty Cori", role: "manager" },
+  { name: "Helen Taussig", role: "operator" },
+];
+
+export const listUsersPaginatedEndpoint = defaultEndpointsFactory.build({
+  tag: "users",
+  shortDescription: "Lists users with pagination.",
+  description:
+    "Returns a page of users. Optionally filter by roles. Uses offset-based pagination (limit and offset).",
+  input: paginatedUsers.input.and(
+    z.object({
+      roles: z
+        .array(roleSchema)
+        .optional()
+        .describe("Filter by roles; omit for all"),
+    }),
+  ),
+  output: paginatedUsers.output,
+  handler: async ({ input: { limit, offset, roles } }) => {
+    const filtered = roles
+      ? users.filter(({ role }) => roles.includes(role))
+      : users;
+    const total = filtered.length;
+    const page = filtered.slice(offset, offset + limit);
+    return { users: page, total, limit, offset };
+  },
+});
+```
+
+## Client-Side Usage
+
+When you generate a TypeScript client, pagination endpoints get special helper methods:
+
+```ts
+import { Client } from "./generated-client";
+
+const client = new Client();
+
+// First page
+const page1 = await client.provide("get /v1/users", {
+  limit: 20,
+  offset: 0,
+});
+
+// Check if more pages available
+if (client.hasMore(page1)) {
+  // Fetch next page
+  const page2 = await client.provide("get /v1/users", {
+    limit: 20,
+    offset: 20,
+  });
+}
+```
+
+## Offset vs Cursor: Which to Use?
+
+### Offset Pagination
+
+**Pros:**
+- Simple to implement
+- Supports jumping to arbitrary pages
+- Shows total count of items
+- Familiar UX (page numbers)
+
+**Cons:**
+- Can miss or duplicate items if data changes between requests
+- Performance degrades with large offsets
+- Not suitable for real-time data
+
+**Use when:**
+- Data is relatively static
+- Users need to jump to specific pages
+- Total count is important
+- Dataset is small to medium sized
+
+### Cursor Pagination
+
+**Pros:**
+- Consistent results even if data changes
+- Performs well with large datasets
+- Ideal for infinite scroll
+- Good for real-time data
+
+**Cons:**
+- Can't jump to arbitrary pages
+- No total count (without extra query)
+- More complex to implement
+
+**Use when:**
+- Implementing infinite scroll
+- Data changes frequently
+- Dataset is very large
+- Page jumping isn't needed
+
+## Best Practices
+
+<Card title="Set Reasonable Limits" icon="gauge">
+Set `maxLimit` to prevent clients from requesting too much data. 100-1000 is typical.
+</Card>
+
+<Card title="Use Cursor for Large Datasets" icon="database">
+For tables with millions of rows, cursor pagination performs much better than offset.
+</Card>
+
+<Card title="Include Total Count" icon="hashtag">
+For offset pagination, always return the total count so clients can show page numbers.
+</Card>
+
+<Card title="Document Cursor Format" icon="book">
+If using cursor pagination, document what the cursor represents (even if it's opaque).
+</Card>
+
+## Common Issues
+
+### Reserved Property Names
+
+The `itemsName` parameter cannot conflict with pagination metadata:
+
+- **Offset style reserves:** `total`, `limit`, `offset`
+- **Cursor style reserves:** `nextCursor`, `limit`
+
+```ts
+// ❌ Will throw error
+ez.paginated({
+  style: "offset",
+  itemsName: "total", // Reserved!
+  itemSchema,
+});
+
+// ✅ Use a different name
+ez.paginated({
+  style: "offset",
+  itemsName: "items",
+  itemSchema,
+});
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="CORS" icon="globe" href="/features/cors">
+    Enable cross-origin requests
+  </Card>
+  <Card title="Compression" icon="file-zipper" href="/features/compression">
+    Compress API responses
+  </Card>
+</CardGroup>

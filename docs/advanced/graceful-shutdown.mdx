@@ -1,0 +1,442 @@
+---
+title: Graceful Shutdown
+description: Implement graceful shutdown to handle server termination cleanly and avoid dropping active requests.
+---
+
+## Overview
+
+Graceful shutdown ensures that when your server receives a termination signal (like SIGTERM or SIGINT), it:
+
+1. Stops accepting new requests
+2. Waits for active requests to complete (with a timeout)
+3. Cleans up resources
+4. Shuts down cleanly
+
+This prevents dropped connections and data loss during deployments or restarts.
+
+## Configuration
+
+Enable graceful shutdown in your configuration:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  gracefulShutdown: {
+    timeout: 30000, // Wait up to 30 seconds for requests to complete
+    events: ["SIGTERM", "SIGINT"], // Signals to listen for
+    beforeExit: async () => {
+      // Optional cleanup function
+      console.log("Cleaning up before exit...");
+    },
+  },
+  // ... other config
+});
+```
+
+## Configuration Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `timeout` | `number` | Maximum time (in milliseconds) to wait for active requests to complete before forcefully shutting down |
+| `events` | `string[]` | Array of process signals to listen for (e.g., `["SIGTERM", "SIGINT"]`) |
+| `beforeExit` | `function` | Optional async function to run before shutting down (for cleanup tasks) |
+
+## How It Works
+
+When a shutdown signal is received:
+
+1. **New Requests Rejected**: The server stops accepting new connections and responds to new requests with errors
+2. **Active Requests Complete**: The server waits for in-flight requests to finish, up to the configured timeout
+3. **Cleanup Execution**: If configured, the `beforeExit` function runs
+4. **Server Closes**: HTTP/HTTPS servers are closed
+5. **Process Exits**: The Node.js process terminates
+
+## Complete Example
+
+```typescript
+import { createConfig, createServer } from "express-zod-api";
+import { routing } from "./routing";
+
+const config = createConfig({
+  http: { listen: 8080 },
+  gracefulShutdown: {
+    timeout: 30000, // 30 seconds
+    events: ["SIGTERM", "SIGINT", "SIGUSR2"], // Common signals
+    beforeExit: async () => {
+      console.log("Graceful shutdown initiated...");
+
+      // Close database connections
+      await database.close();
+
+      // Close Redis connection
+      await redis.quit();
+
+      // Flush logs
+      await logger.flush();
+
+      console.log("Cleanup completed");
+    },
+  },
+});
+
+await createServer(config, routing);
+
+console.log("Server started with graceful shutdown enabled");
+```
+
+## Common Signals
+
+<AccordionGroup>
+  <Accordion title="SIGTERM (Termination Signal)">
+    Sent by orchestration systems (Kubernetes, Docker, systemd) to request graceful shutdown. This is the most common signal for production deployments.
+  </Accordion>
+
+  <Accordion title="SIGINT (Interrupt Signal)">
+    Sent when pressing Ctrl+C in the terminal. Useful for local development.
+  </Accordion>
+
+  <Accordion title="SIGUSR2 (User-Defined Signal)">
+    Sometimes used by process managers like nodemon for graceful restarts.
+  </Accordion>
+</AccordionGroup>
+
+## Resource Cleanup
+
+Use the `beforeExit` function to clean up resources:
+
+### Database Connections
+
+```typescript
+const config = createConfig({
+  gracefulShutdown: {
+    timeout: 30000,
+    events: ["SIGTERM", "SIGINT"],
+    beforeExit: async () => {
+      // Close database pool
+      await database.end();
+      console.log("Database connections closed");
+    },
+  },
+});
+```
+
+### External Services
+
+```typescript
+const config = createConfig({
+  gracefulShutdown: {
+    timeout: 30000,
+    events: ["SIGTERM", "SIGINT"],
+    beforeExit: async () => {
+      // Close Redis
+      await redis.quit();
+
+      // Close message queue connections
+      await messageQueue.disconnect();
+
+      // Stop background jobs
+      await jobScheduler.shutdown();
+
+      console.log("External services disconnected");
+    },
+  },
+});
+```
+
+### File Handles and Streams
+
+```typescript
+const config = createConfig({
+  gracefulShutdown: {
+    timeout: 30000,
+    events: ["SIGTERM", "SIGINT"],
+    beforeExit: async () => {
+      // Close file streams
+      await fileStream.end();
+
+      // Flush buffered logs
+      await logger.flush();
+
+      console.log("File handles closed");
+    },
+  },
+});
+```
+
+## Timeout Behavior
+
+The `timeout` determines how long to wait for active requests:
+
+```typescript
+const config = createConfig({
+  gracefulShutdown: {
+    timeout: 10000, // Wait max 10 seconds
+    events: ["SIGTERM"],
+  },
+});
+```
+
+- **Before timeout**: Server waits for all active requests to complete naturally
+- **After timeout**: Server forcefully closes all remaining connections and exits
+
+<Warning>
+Choose a timeout that's longer than your longest typical request, but short enough to meet deployment requirements.
+</Warning>
+
+## Kubernetes Integration
+
+When deploying to Kubernetes, configure grace periods appropriately:
+
+### Kubernetes Deployment Example
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-api
+spec:
+  template:
+    spec:
+      containers:
+      - name: api
+        image: my-api:latest
+        # Kubernetes sends SIGTERM and waits for this period
+        terminationGracePeriodSeconds: 40
+```
+
+### Express Zod API Configuration
+
+```typescript
+const config = createConfig({
+  gracefulShutdown: {
+    // Shorter than Kubernetes grace period
+    timeout: 35000, // 35 seconds
+    events: ["SIGTERM"],
+  },
+});
+```
+
+<Note>
+Set your application timeout shorter than Kubernetes' `terminationGracePeriodSeconds` to ensure cleanup completes before Kubernetes force-kills the pod.
+</Note>
+
+## Docker Integration
+
+### Dockerfile
+
+```dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --production
+
+COPY . .
+
+# Use exec form to properly handle signals
+CMD ["node", "dist/index.js"]
+```
+
+### Docker Compose
+
+```yaml
+version: '3.8'
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    # Allow time for graceful shutdown
+    stop_grace_period: 40s
+    environment:
+      - NODE_ENV=production
+```
+
+## Logging During Shutdown
+
+Log the shutdown process for observability:
+
+```typescript
+import { createConfig, BuiltinLogger } from "express-zod-api";
+
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+
+const config = createConfig({
+  gracefulShutdown: {
+    timeout: 30000,
+    events: ["SIGTERM", "SIGINT"],
+    beforeExit: async () => {
+      const logger = config.logger;
+
+      logger.info("Graceful shutdown initiated");
+
+      try {
+        logger.info("Closing database connections...");
+        await database.close();
+        logger.info("Database closed successfully");
+
+        logger.info("Disconnecting from Redis...");
+        await redis.quit();
+        logger.info("Redis disconnected successfully");
+
+        logger.info("Cleanup completed successfully");
+      } catch (error) {
+        logger.error("Error during cleanup:", error);
+        throw error; // Re-throw to prevent clean exit
+      }
+    },
+  },
+});
+```
+
+## Health Checks
+
+Implement health checks that respect shutdown state:
+
+```typescript
+import { createConfig } from "express-zod-api";
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+let isShuttingDown = false;
+
+const healthEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({}),
+  output: z.object({
+    status: z.enum(["ok", "shutting_down"]),
+    timestamp: z.string(),
+  }),
+  handler: async () => ({
+    status: isShuttingDown ? "shutting_down" : "ok",
+    timestamp: new Date().toISOString(),
+  }),
+});
+
+const config = createConfig({
+  gracefulShutdown: {
+    timeout: 30000,
+    events: ["SIGTERM", "SIGINT"],
+    beforeExit: async () => {
+      isShuttingDown = true;
+      // Cleanup...
+    },
+  },
+});
+```
+
+## Testing Graceful Shutdown
+
+### Manual Testing
+
+```bash
+# Start your server
+node dist/index.js
+
+# In another terminal, send SIGTERM
+kill -TERM <pid>
+
+# Or press Ctrl+C for SIGINT
+```
+
+### Automated Testing
+
+```typescript
+import { spawn } from "node:child_process";
+
+test("should handle graceful shutdown", async () => {
+  // Start server
+  const server = spawn("node", ["dist/index.js"]);
+
+  // Wait for server to start
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  // Make a request
+  const fetchPromise = fetch("http://localhost:8080/health");
+
+  // Send SIGTERM while request is in flight
+  server.kill("SIGTERM");
+
+  // Request should complete
+  const response = await fetchPromise;
+  expect(response.status).toBe(200);
+
+  // Server should exit cleanly
+  await new Promise((resolve) => {
+    server.on("exit", (code) => {
+      expect(code).toBe(0);
+      resolve();
+    });
+  });
+}, 10000);
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Set Appropriate Timeouts">
+    Choose a timeout longer than your typical request duration but short enough for deployment requirements. Consider your 99th percentile response time.
+  </Accordion>
+
+  <Accordion title="Clean Up Resources">
+    Always close database connections, file handles, and external service connections in the `beforeExit` function.
+  </Accordion>
+
+  <Accordion title="Log the Process">
+    Add comprehensive logging during shutdown to diagnose issues in production.
+  </Accordion>
+
+  <Accordion title="Test Regularly">
+    Include graceful shutdown scenarios in your testing to ensure it works correctly.
+  </Accordion>
+
+  <Accordion title="Coordinate with Orchestration">
+    Ensure your timeout is shorter than your orchestration system's grace period (Kubernetes, Docker, etc.).
+  </Accordion>
+</AccordionGroup>
+
+## Common Issues
+
+### Issue: Requests Still Dropped
+
+**Cause**: Timeout too short for slow requests
+
+**Solution**: Increase the timeout or optimize slow endpoints
+
+```typescript
+const config = createConfig({
+  gracefulShutdown: {
+    timeout: 60000, // Increase to 60 seconds
+  },
+});
+```
+
+### Issue: Process Hangs on Shutdown
+
+**Cause**: Resource not properly closed in `beforeExit`
+
+**Solution**: Ensure all async operations complete and resources are released
+
+```typescript
+const config = createConfig({
+  gracefulShutdown: {
+    beforeExit: async () => {
+      await Promise.all([
+        database.close(),
+        redis.quit(),
+        messageQueue.disconnect(),
+      ]);
+    },
+  },
+});
+```
+
+## Related Topics
+
+- [Production Mode](/advanced/production-mode) - Production optimizations
+- [Configuration](/core-concepts/configuration) - Server configuration
+- [Error Handling](/core-concepts/error-handling) - Handling errors during shutdown

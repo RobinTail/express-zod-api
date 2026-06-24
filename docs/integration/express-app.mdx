@@ -1,0 +1,519 @@
+---
+title: Express App Integration
+description: Integrate Express Zod API with your existing Express application
+---
+
+If you already have an Express application or need more control over your server configuration, you can integrate Express Zod API into your existing setup.
+
+## Why Integrate?
+
+You might want to integrate Express Zod API with your own Express app when:
+
+- You have an existing Express application
+- You need custom middleware not provided by the framework
+- You want to mix Express Zod API endpoints with traditional Express routes
+- You need fine-grained control over server configuration
+- You're migrating an existing API gradually
+
+## Basic Integration
+
+Use `attachRouting()` to connect your endpoints to an existing Express app:
+
+```typescript
+import express from "express";
+import { createConfig, attachRouting, Routing } from "express-zod-api";
+import { routing } from "./routing";
+
+const app = express();
+
+const config = createConfig({
+  app, // Provide your Express app
+  cors: true,
+  logger: { level: "debug" },
+});
+
+const { notFoundHandler, logger } = attachRouting(config, routing);
+
+// Optional: Handle 404 errors
+app.use(notFoundHandler);
+
+// Start your server
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  logger.info(`Server listening on port ${PORT}`);
+});
+```
+
+<Warning>
+When using your own Express app, you need to:
+- Parse `request.body` yourself (e.g., with `express.json()`)
+- Call `app.listen()` yourself
+- Handle 404 errors yourself (using the provided `notFoundHandler`)
+</Warning>
+
+## With Express Router
+
+You can also attach routing to an Express Router:
+
+```typescript
+import express from "express";
+import { createConfig, attachRouting } from "express-zod-api";
+import { apiRouting } from "./api-routing";
+
+const app = express();
+const apiRouter = express.Router();
+
+const config = createConfig({ 
+  app: apiRouter, // Attach to router instead
+});
+
+attachRouting(config, apiRouting);
+
+// Mount the router on a prefix
+app.use("/api", apiRouter);
+
+app.listen(8080);
+```
+
+## Request Body Parsing
+
+Express Zod API needs parsed request bodies. Set up parsers before attaching routing:
+
+```typescript
+import express from "express";
+import { createConfig, attachRouting } from "express-zod-api";
+
+const app = express();
+
+// Parse JSON bodies
+app.use(express.json());
+
+// Parse URL-encoded bodies (for forms)
+app.use(express.urlencoded({ extended: true }));
+
+// Parse raw bodies (for binary data)
+app.use(express.raw({ type: "application/octet-stream" }));
+
+const config = createConfig({ app });
+const { notFoundHandler } = attachRouting(config, routing);
+
+app.use(notFoundHandler);
+app.listen(8080);
+```
+
+<Tip>
+If you don't provide an `app` in config, Express Zod API automatically sets up these parsers for you.
+</Tip>
+
+## Mixing with Traditional Routes
+
+Combine Express Zod API endpoints with traditional Express routes:
+
+```typescript
+import express from "express";
+import { createConfig, attachRouting } from "express-zod-api";
+import { apiRouting } from "./api-routing";
+
+const app = express();
+app.use(express.json());
+
+// Traditional Express route
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", timestamp: Date.now() });
+});
+
+// Express Zod API routes
+const config = createConfig({ app });
+const { notFoundHandler } = attachRouting(config, apiRouting);
+
+// More traditional routes
+app.get("/version", (req, res) => {
+  res.json({ version: "1.0.0" });
+});
+
+// 404 handler should be last
+app.use(notFoundHandler);
+
+app.listen(8080);
+```
+
+## Static File Serving
+
+Serve static files alongside your API:
+
+```typescript
+import express from "express";
+import { createConfig, attachRouting, Routing, ServeStatic } from "express-zod-api";
+import path from "path";
+
+const app = express();
+
+// Serve static files from public directory
+app.use("/static", express.static(path.join(__dirname, "public")));
+
+// You can also use ServeStatic in routing
+const routing: Routing = {
+  api: {
+    // Your API endpoints
+  },
+  // Serve files from ./assets at /public
+  public: new ServeStatic("assets", {
+    dotfiles: "deny",
+    index: false,
+  }),
+};
+
+const config = createConfig({ app });
+attachRouting(config, routing);
+
+app.listen(8080);
+```
+
+## Custom Middleware
+
+Add middleware that runs before Express Zod API routes:
+
+```typescript
+import express from "express";
+import { createConfig, attachRouting } from "express-zod-api";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+
+const app = express();
+
+// Security middleware
+app.use(helmet());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
+
+// Request logging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
+const config = createConfig({ app });
+attachRouting(config, routing);
+
+app.listen(8080);
+```
+
+## Using beforeRouting Option
+
+For middleware that needs access to the logger or should run right before routing:
+
+```typescript
+import { createConfig, attachRouting } from "express-zod-api";
+import swaggerUi from "swagger-ui-express";
+import { readFileSync } from "fs";
+import YAML from "yaml";
+
+const spec = YAML.parse(readFileSync("openapi.yaml", "utf-8"));
+
+const config = createConfig({
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    
+    // Serve API documentation
+    logger.info("Serving API docs at /docs");
+    app.use("/docs", swaggerUi.serve, swaggerUi.setup(spec));
+    
+    // Custom middleware with logger access
+    app.use("/api", (req, res, next) => {
+      logger.debug(`API request: ${req.method} ${req.path}`);
+      next();
+    });
+  },
+});
+
+attachRouting(config, routing);
+```
+
+## Error Handling
+
+Implement custom error handling:
+
+```typescript
+import express from "express";
+import { createConfig, attachRouting } from "express-zod-api";
+
+const app = express();
+app.use(express.json());
+
+const config = createConfig({ app });
+const { notFoundHandler, logger } = attachRouting(config, routing);
+
+// 404 handler
+app.use(notFoundHandler);
+
+// Global error handler (must be last)
+app.use((err, req, res, next) => {
+  logger.error("Unhandled error:", err);
+  
+  res.status(err.statusCode || 500).json({
+    status: "error",
+    message: process.env.NODE_ENV === "production" 
+      ? "Internal server error"
+      : err.message,
+  });
+});
+
+app.listen(8080);
+```
+
+## HTTPS with Custom Server
+
+Create an HTTPS server with your own configuration:
+
+```typescript
+import express from "express";
+import https from "https";
+import { readFileSync } from "fs";
+import { createConfig, attachRouting } from "express-zod-api";
+
+const app = express();
+app.use(express.json());
+
+const config = createConfig({ app });
+const { logger } = attachRouting(config, routing);
+
+const httpsOptions = {
+  key: readFileSync("privkey.pem"),
+  cert: readFileSync("fullchain.pem"),
+};
+
+const server = https.createServer(httpsOptions, app);
+
+server.listen(443, () => {
+  logger.info("HTTPS server running on port 443");
+});
+```
+
+## WebSocket Support
+
+Combine with WebSocket libraries:
+
+```typescript
+import express from "express";
+import { createServer } from "http";
+import { WebSocketServer } from "ws";
+import { createConfig, attachRouting } from "express-zod-api";
+
+const app = express();
+const server = createServer(app);
+const wss = new WebSocketServer({ server });
+
+app.use(express.json());
+
+const config = createConfig({ app });
+attachRouting(config, routing);
+
+// WebSocket handling
+wss.on("connection", (ws) => {
+  console.log("WebSocket client connected");
+  
+  ws.on("message", (data) => {
+    console.log("Received:", data.toString());
+  });
+});
+
+server.listen(8080);
+```
+
+<Note>
+For a fully type-safe WebSocket solution, consider [Zod Sockets](https://github.com/RobinTail/zod-sockets), a companion framework by the same author.
+</Note>
+
+## Database Connections
+
+Initialize database connections before starting the server:
+
+```typescript
+import express from "express";
+import mongoose from "mongoose";
+import { createConfig, attachRouting } from "express-zod-api";
+
+const app = express();
+app.use(express.json());
+
+async function start() {
+  // Connect to database
+  await mongoose.connect(process.env.MONGODB_URI!);
+  console.log("Connected to MongoDB");
+  
+  const config = createConfig({ app });
+  const { logger } = attachRouting(config, routing);
+  
+  app.listen(8080, () => {
+    logger.info("Server started on port 8080");
+  });
+}
+
+start().catch(console.error);
+```
+
+## Gradual Migration
+
+Migrate an existing API gradually:
+
+```typescript
+import express from "express";
+import { createConfig, attachRouting } from "express-zod-api";
+import { legacyRoutes } from "./legacy-routes";
+import { newApiRouting } from "./new-api-routing";
+
+const app = express();
+app.use(express.json());
+
+// Mount legacy routes
+app.use("/api/v1", legacyRoutes);
+
+// Mount new Express Zod API routes
+const config = createConfig({ app });
+const { notFoundHandler } = attachRouting(config, newApiRouting);
+
+app.use(notFoundHandler);
+app.listen(8080);
+```
+
+Your routing file:
+
+```typescript new-api-routing.ts
+import { Routing } from "express-zod-api";
+import { getUserEndpoint, updateUserEndpoint } from "./endpoints";
+
+export const newApiRouting: Routing = {
+  api: {
+    v2: { // New version
+      user: {
+        ":id": {
+          get: getUserEndpoint,
+          patch: updateUserEndpoint,
+        },
+      },
+    },
+  },
+};
+```
+
+## Testing
+
+Test your integrated application:
+
+```typescript
+import request from "supertest";
+import express from "express";
+import { createConfig, attachRouting } from "express-zod-api";
+import { routing } from "./routing";
+
+describe("API Integration", () => {
+  let app: express.Application;
+  
+  beforeEach(() => {
+    app = express();
+    app.use(express.json());
+    
+    const config = createConfig({ 
+      app,
+      logger: { level: "silent" }, // Silence logs during tests
+    });
+    
+    attachRouting(config, routing);
+  });
+  
+  it("should respond to health check", async () => {
+    const response = await request(app)
+      .get("/health")
+      .expect(200);
+    
+    expect(response.body).toEqual({ status: "ok" });
+  });
+  
+  it("should handle API endpoint", async () => {
+    const response = await request(app)
+      .get("/api/user/123")
+      .expect(200);
+    
+    expect(response.body.data).toHaveProperty("id", "123");
+  });
+});
+```
+
+## Complete Example
+
+Here's a complete integration example with many features:
+
+```typescript server.ts
+import express from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yaml";
+import { readFileSync } from "fs";
+import { createConfig, attachRouting } from "express-zod-api";
+import { apiRouting } from "./routing";
+
+const app = express();
+
+// Security
+app.use(helmet());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+app.use("/api", limiter);
+
+// Body parsing
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+// Serve documentation
+const spec = YAML.parse(readFileSync("openapi.yaml", "utf-8"));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(spec));
+
+// Health check
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", timestamp: Date.now() });
+});
+
+// Attach Express Zod API routing
+const config = createConfig({ 
+  app,
+  cors: true,
+  logger: { level: "info" },
+});
+
+const { notFoundHandler, logger } = attachRouting(config, apiRouting);
+
+// 404 handler
+app.use(notFoundHandler);
+
+// Error handler
+app.use((err, req, res, next) => {
+  logger.error("Error:", err);
+  res.status(500).json({ 
+    status: "error",
+    message: "Internal server error",
+  });
+});
+
+// Start server
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  logger.info(`🚀 Server running on http://localhost:${PORT}`);
+  logger.info(`📚 Documentation at http://localhost:${PORT}/docs`);
+});
+```
+
+## Next Steps
+
+- Learn about [OpenAPI documentation](/integration/openapi) generation
+- Explore [end-to-end type safety](/integration/end-to-end-type-safety)
+- Check out [middleware options](/essentials/middlewares)

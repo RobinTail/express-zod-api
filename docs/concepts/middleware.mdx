@@ -1,0 +1,546 @@
+---
+title: Middleware
+description: Learn how to use middleware for authentication, validation, and context management
+---
+
+## Overview
+
+Middleware in Express Zod API allows you to execute code before your endpoint handler runs. Common use cases include authentication, authorization, request validation, and providing context to endpoints. Middlewares can validate their own inputs and return context objects that become available to subsequent middlewares and endpoint handlers.
+
+## Middleware Structure
+
+Middlewares consist of:
+- **Input schema** (optional): Validates request data
+- **Security declaration** (optional): Documents authentication requirements
+- **Handler function**: Business logic that returns context
+
+## Creating Middleware
+
+Basic middleware example:
+
+```typescript
+import { Middleware } from "express-zod-api";
+import { z } from "zod";
+import createHttpError from "http-errors";
+
+const authMiddleware = new Middleware({
+  input: z.object({
+    apiKey: z.string().min(1),
+  }),
+  handler: async ({ input, request, logger }) => {
+    logger.debug("Authenticating request");
+    
+    const user = await db.users.findByApiKey(input.apiKey);
+    
+    if (!user) {
+      throw createHttpError(401, "Invalid API key");
+    }
+    
+    // Return context for endpoints
+    return { user };
+  },
+});
+```
+
+## Handler Function
+
+The middleware handler receives several parameters:
+
+```typescript
+type Handler<IN, CTX, RET> = (params: {
+  input: IN;           // Validated input
+  ctx: CTX;            // Context from previous middlewares
+  request: Request;    // Express request object
+  response: Response;  // Express response object  
+  logger: ActualLogger; // Logger instance
+}) => Promise<RET>;
+```
+
+<ParamField path="input" type="IN">
+  Validated input data from the configured input sources
+</ParamField>
+
+<ParamField path="ctx" type="CTX">
+  Accumulated context from previously executed middlewares in the chain
+</ParamField>
+
+<ParamField path="request" type="Request">
+  Express request object with full access to headers, cookies, etc.
+</ParamField>
+
+<ParamField path="response" type="Response">
+  Express response object for setting headers or cookies
+</ParamField>
+
+<ParamField path="logger" type="ActualLogger">
+  Configured logger instance
+</ParamField>
+
+## Using Middleware
+
+Attach middleware to an endpoints factory:
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const protectedFactory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware);
+
+const endpoint = protectedFactory.build({
+  handler: async ({ ctx }) => {
+    // ctx.user is available from authMiddleware
+    return { userId: ctx.user.id };
+  },
+});
+```
+
+### Inline Middleware
+
+Use shorthand syntax for simple middleware:
+
+```typescript
+const factory = defaultEndpointsFactory
+  .addMiddleware({
+    handler: async ({ request }) => {
+      const startTime = Date.now();
+      return { startTime };
+    },
+  });
+```
+
+## Chaining Middlewares
+
+Middlewares execute in the order they're added:
+
+```typescript
+const factory = defaultEndpointsFactory
+  .addMiddleware(loggingMiddleware)    // Runs first
+  .addMiddleware(authMiddleware)       // Runs second, has access to logging ctx
+  .addMiddleware(permissionMiddleware); // Runs third, has access to both contexts
+
+const endpoint = factory.build({
+  handler: async ({ ctx }) => {
+    // ctx contains all middleware returns merged:
+    // { ...loggingContext, ...authContext, ...permissionContext }
+  },
+});
+```
+
+Each middleware can access context from previous middlewares:
+
+```typescript
+const authMiddleware = new Middleware({
+  handler: async () => {
+    return { user: { id: 1, role: "admin" } };
+  },
+});
+
+const permissionMiddleware = new Middleware({
+  handler: async ({ ctx }) => {
+    // ctx.user is available from authMiddleware
+    if (ctx.user.role !== "admin") {
+      throw createHttpError(403, "Admin access required");
+    }
+    return { isAdmin: true };
+  },
+});
+
+const factory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware)
+  .addMiddleware(permissionMiddleware);
+```
+
+## Security Declaration
+
+Document authentication requirements for API documentation:
+
+```typescript
+const tokenAuthMiddleware = new Middleware({
+  security: {
+    type: "header",
+    name: "authorization",
+  },
+  input: z.object({
+    // Note: headers are lowercase
+    authorization: z.string().regex(/^Bearer .+$/),
+  }),
+  handler: async ({ input }) => {
+    const token = input.authorization.replace("Bearer ", "");
+    const user = await verifyToken(token);
+    return { user };
+  },
+});
+```
+
+### Security Types
+
+```typescript
+// Header-based
+security: {
+  type: "header",
+  name: "x-api-key",
+}
+
+// Input field (query param or body)
+security: {
+  type: "input",
+  name: "apiKey",
+}
+
+// Cookie
+security: {
+  type: "cookie",
+  name: "session",
+}
+
+// Combined requirements (AND)
+security: {
+  and: [
+    { type: "header", name: "authorization" },
+    { type: "input", name: "apiKey" },
+  ],
+}
+
+// Alternative requirements (OR)
+security: {
+  or: [
+    { type: "header", name: "authorization" },
+    { type: "cookie", name: "session" },
+  ],
+}
+```
+
+## Context Provider
+
+For context that doesn't depend on the request, use `addContext()`:
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import mongoose from "mongoose";
+
+const factory = defaultEndpointsFactory.addContext(async () => {
+  // This runs for every request
+  const db = await mongoose.connect("mongodb://localhost/mydb");
+  return { db };
+});
+
+const endpoint = factory.build({
+  handler: async ({ ctx }) => {
+    // ctx.db is available
+    const users = await ctx.db.collection("users").find();
+    return { users };
+  },
+});
+```
+
+<Warning>
+  `addContext()` creates a new connection per request. For persistent connections, use a singleton pattern and import it directly in handlers.
+</Warning>
+
+## Express Middleware
+
+Wrap native Express middleware:
+
+```typescript
+import { ExpressMiddleware } from "express-zod-api";
+import { auth } from "express-oauth2-jwt-bearer";
+import createHttpError from "http-errors";
+
+const oauthMiddleware = new ExpressMiddleware(
+  auth({ audience: "https://api.example.com" }),
+  {
+    // Optional: provide context from request
+    provider: (req) => ({ 
+      auth: req.auth,
+      userId: req.auth.sub,
+    }),
+    
+    // Optional: transform errors
+    transformer: (err) => 
+      createHttpError(401, err.message),
+  }
+);
+
+const factory = defaultEndpointsFactory
+  .addExpressMiddleware(oauthMiddleware);
+  
+// Or use the alias
+const factory2 = defaultEndpointsFactory
+  .use(auth(), {
+    provider: (req) => ({ auth: req.auth }),
+  });
+```
+
+<Info>
+  Express middlewares run for all HTTP methods including OPTIONS. Regular middlewares are skipped during OPTIONS (CORS preflight) requests.
+</Info>
+
+## Input Validation
+
+Middlewares validate their input schemas just like endpoints:
+
+```typescript
+const rateLimitMiddleware = new Middleware({
+  input: z.object({
+    // Validate specific header
+    "x-client-id": z.string().uuid(),
+  }),
+  handler: async ({ input, logger }) => {
+    const limit = await checkRateLimit(input["x-client-id"]);
+    
+    if (limit.exceeded) {
+      throw createHttpError(429, "Too many requests");
+    }
+    
+    return { rateLimit: limit };
+  },
+});
+```
+
+Inputs from all middlewares are merged and available to the endpoint:
+
+```typescript
+const mw = new Middleware({
+  input: z.object({ apiKey: z.string() }),
+  handler: async ({ input }) => ({ user: "..." }),
+});
+
+const endpoint = factory
+  .addMiddleware(mw)
+  .build({
+    input: z.object({ name: z.string() }),
+    handler: async ({ input }) => {
+      // input has both apiKey and name
+      console.log(input.apiKey, input.name);
+    },
+  });
+```
+
+## Response Manipulation
+
+Middlewares can set response headers or cookies:
+
+```typescript
+const corsMiddleware = new Middleware({
+  handler: async ({ response }) => {
+    response.set({
+      "Access-Control-Allow-Origin": "*",
+      "X-Frame-Options": "DENY",
+    });
+    return {};
+  },
+});
+
+const sessionMiddleware = new Middleware({
+  handler: async ({ response }) => {
+    const sessionId = generateSessionId();
+    response.cookie("session", sessionId, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 3600000,
+    });
+    return { sessionId };
+  },
+});
+```
+
+<Warning>
+  If a middleware calls `response.end()` or sends a response, the chain stops. The endpoint handler won't execute. A warning is logged with accumulated context.
+</Warning>
+
+## Error Handling
+
+Throw HTTP errors to stop execution:
+
+```typescript
+const requireAdminMiddleware = new Middleware({
+  handler: async ({ ctx }) => {
+    if (!ctx.user) {
+      throw createHttpError(401, "Authentication required");
+    }
+    
+    if (ctx.user.role !== "admin") {
+      throw createHttpError(403, "Admin privileges required");
+    }
+    
+    return { isAdmin: true };
+  },
+});
+```
+
+Validation errors are automatically handled:
+
+```typescript
+const middleware = new Middleware({
+  input: z.object({
+    count: z.string().transform((s) => parseInt(s, 10)),
+  }),
+  handler: async ({ input }) => {
+    // If input.count is "abc", InputValidationError is thrown
+    // Automatically returns 400 Bad Request
+  },
+});
+```
+
+## OAuth2 Scopes
+
+Declare OAuth2 scopes for documentation:
+
+```typescript
+const oauthMiddleware = new Middleware({
+  security: {
+    type: "oauth2",
+    flows: {
+      authorizationCode: {
+        authorizationUrl: "https://auth.example.com/authorize",
+        tokenUrl: "https://auth.example.com/token",
+        scopes: {
+          "read:users": "Read user data",
+          "write:users": "Modify user data",
+        },
+      },
+    },
+  },
+  handler: async ({ request }) => {
+    const token = extractToken(request);
+    const claims = await verifyToken(token);
+    return { claims };
+  },
+});
+
+const endpoint = factory
+  .addMiddleware(oauthMiddleware)
+  .build({
+    scope: "read:users", // Requires this scope
+    // Or multiple scopes
+    scope: ["read:users", "write:users"],
+    handler: async ({ ctx }) => {
+      // ctx.claims available
+    },
+  });
+```
+
+## Testing Middlewares
+
+Test middlewares in isolation:
+
+```typescript
+import { testMiddleware } from "express-zod-api";
+import { z } from "zod";
+
+const middleware = new Middleware({
+  input: z.object({ token: z.string() }),
+  handler: async ({ input }) => {
+    const user = await verifyToken(input.token);
+    return { user };
+  },
+});
+
+test("should authenticate user", async () => {
+  const { output, responseMock, loggerMock } = await testMiddleware({
+    middleware,
+    requestProps: {
+      method: "POST",
+      body: { token: "valid-token" },
+    },
+  });
+  
+  expect(output.user).toBeDefined();
+  expect(loggerMock._getLogs().error).toHaveLength(0);
+});
+```
+
+Test with accumulated context from previous middlewares:
+
+```typescript
+const permissionMw = new Middleware({
+  handler: async ({ ctx }) => {
+    // Expects ctx.user from previous middleware
+    if (ctx.user.role !== "admin") {
+      throw createHttpError(403);
+    }
+    return { isAdmin: true };
+  },
+});
+
+test("should require admin", async () => {
+  const { output } = await testMiddleware({
+    middleware: permissionMw,
+    ctx: { user: { role: "admin" } }, // Mock previous context
+  });
+  
+  expect(output.isAdmin).toBe(true);
+});
+```
+
+## Best Practices
+
+<Tip>
+  1. **Single responsibility**: Each middleware should do one thing
+  2. **Order matters**: Add middlewares from general to specific (logging → auth → permissions)
+  3. **Document security**: Always use `security` property for auth middlewares
+  4. **Return typed context**: TypeScript infers the context shape for endpoints
+  5. **Handle errors explicitly**: Throw `createHttpError` with appropriate status codes
+  6. **Avoid side effects**: Don't modify global state or external resources without cleanup
+  7. **Test in isolation**: Use `testMiddleware` to verify behavior
+</Tip>
+
+## Common Patterns
+
+### Authentication
+
+```typescript
+const authMiddleware = new Middleware({
+  security: { type: "header", name: "authorization" },
+  input: z.object({
+    authorization: z.string().regex(/^Bearer .+$/),
+  }),
+  handler: async ({ input }) => {
+    const token = input.authorization.replace("Bearer ", "");
+    const user = await verifyJWT(token);
+    if (!user) throw createHttpError(401, "Invalid token");
+    return { user };
+  },
+});
+```
+
+### Request Logging
+
+```typescript
+const loggingMiddleware = new Middleware({
+  handler: async ({ request, logger }) => {
+    const startTime = Date.now();
+    logger.info("Request started", {
+      method: request.method,
+      path: request.path,
+    });
+    return { startTime };
+  },
+});
+```
+
+### Rate Limiting
+
+```typescript
+const rateLimitMiddleware = new Middleware({
+  handler: async ({ request }) => {
+    const clientIp = request.ip;
+    const limit = await redis.get(`ratelimit:${clientIp}`);
+    
+    if (limit && parseInt(limit) > 100) {
+      throw createHttpError(429, "Too many requests");
+    }
+    
+    await redis.incr(`ratelimit:${clientIp}`);
+    await redis.expire(`ratelimit:${clientIp}`, 3600);
+    
+    return {};
+  },
+});
+```
+
+## See Also
+
+- [Endpoints](/concepts/endpoints) - Create endpoint handlers
+- [Context](/concepts/context) - Manage shared application state
+- [Error Handling](/concepts/error-handling) - Handle middleware errors

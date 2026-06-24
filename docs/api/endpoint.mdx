@@ -1,0 +1,195 @@
+---
+title: "Endpoint"
+description: "Individual API endpoints with input/output validation"
+---
+
+## Overview
+
+Endpoints are created using `EndpointsFactory.build()` and represent individual API routes with typed input/output schemas and handler functions.
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const getUser = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    id: z.string(),
+  }),
+  output: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string().email(),
+  }),
+  handler: async ({ input, logger }) => {
+    logger.info(`Fetching user ${input.id}`);
+    return await db.users.findById(input.id);
+  },
+});
+```
+
+## Configuration Options
+
+### method
+
+**Type**: `Method | Method[]`
+
+**Default**: `"get"`
+
+HTTP method(s) the endpoint handles.
+
+```typescript
+method: "post"
+method: ["get", "post"]
+```
+
+### input
+
+**Type**: `ZodObject`
+
+**Default**: `z.object({})`
+
+Input validation schema.
+
+### output
+
+**Type**: `ZodType`
+
+**Required**: Yes
+
+Output validation schema.
+
+### handler
+
+**Type**: `Handler<Input, Output, Context>`
+
+**Required**: Yes
+
+Async function that processes the request.
+
+```typescript
+handler: async ({ input, ctx, logger, request, response }) => {
+  return { result: "success" };
+}
+```
+
+### shortDescription
+
+**Type**: `string`
+
+Brief summary for OpenAPI documentation (max 50 characters).
+
+### description
+
+**Type**: `string`
+
+Detailed description for OpenAPI documentation.
+
+### operationId
+
+**Type**: `string | ((method: ClientMethod) => string)`
+
+Unique operation identifier for documentation.
+
+### tag
+
+**Type**: `Tag | Tag[]`
+
+Tags for organizing documentation.
+
+### scope
+
+**Type**: `string | string[]`
+
+OAuth2 scopes required for the endpoint.
+
+### deprecated
+
+**Type**: `boolean`
+
+Marks the endpoint as deprecated in documentation.
+
+## Handler Parameters
+
+The handler function receives an object with:
+
+<ParamField path="input" type="Input">
+  Validated input from request (query, body, params, etc.)
+</ParamField>
+
+<ParamField path="ctx" type="Context">
+  Context accumulated from middleware
+</ParamField>
+
+<ParamField path="logger" type="Logger">
+  Logger instance (child logger if configured)
+</ParamField>
+
+<ParamField path="request" type="Request">
+  Express request object
+</ParamField>
+
+<ParamField path="response" type="Response">
+  Express response object
+</ParamField>
+
+## Examples
+
+### Basic GET Endpoint
+
+```typescript
+const listUsers = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    limit: z.string().transform(Number).pipe(z.number().int().positive()),
+    offset: z.string().transform(Number).pipe(z.number().int().nonnegative()).optional(),
+  }),
+  output: z.object({
+    users: z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+    })),
+    total: z.number(),
+  }),
+  handler: async ({ input }) => {
+    const users = await db.users.find().limit(input.limit).skip(input.offset || 0);
+    const total = await db.users.count();
+    return { users, total };
+  },
+});
+```
+
+### POST Endpoint with Authentication
+
+```typescript
+const createPost = authFactory.build({
+  method: "post",
+  input: z.object({
+    title: z.string().min(1).max(200),
+    content: z.string().min(1),
+    tags: z.array(z.string()).optional(),
+  }),
+  output: z.object({
+    id: z.string(),
+    createdAt: ez.dateOut(),
+  }),
+  handler: async ({ input, ctx: { user } }) => {
+    const post = await db.posts.create({
+      ...input,
+      authorId: user.id,
+    });
+    return { id: post.id, createdAt: post.createdAt };
+  },
+});
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="EndpointsFactory" href="/api/endpoints-factory">
+    Create endpoint factories
+  </Card>
+  <Card title="Routing" href="/api/routing">
+    Attach endpoints to routes
+  </Card>
+</CardGroup>

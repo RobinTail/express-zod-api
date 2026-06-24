@@ -1,0 +1,169 @@
+---
+title: "Routing"
+description: "Define routes and attach endpoints to your API"
+---
+
+## Overview
+
+The `Routing` type defines the URL structure of your API by mapping paths to endpoints.
+
+```typescript
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  v1: {
+    users: {
+      get: listUsers,
+      post: createUser,
+      ":id": {
+        get: getUser,
+        patch: updateUser,
+        delete: deleteUser,
+      },
+    },
+  },
+};
+```
+
+## Routing Syntax
+
+### Nested Objects
+
+```typescript
+const routing: Routing = {
+  api: {
+    v1: {
+      users: listUsersEndpoint,
+    },
+  },
+};
+// Route: GET /api/v1/users
+```
+
+### Flat Paths
+
+```typescript
+const routing: Routing = {
+  "/api/v1/users": listUsersEndpoint,
+};
+// Route: GET /api/v1/users
+```
+
+### Path Parameters
+
+```typescript
+const routing: Routing = {
+  users: {
+    ":id": getUserEndpoint,
+  },
+};
+// Route: GET /users/:id
+```
+
+### Method-Based Routing
+
+```typescript
+const routing: Routing = {
+  users: {
+    get: listUsers,
+    post: createUser,
+  },
+};
+// Routes: GET /users, POST /users
+```
+
+### Explicit Method in Path
+
+```typescript
+const routing: Routing = {
+  "post /users": createUserEndpoint,
+  "get /users/:id": getUserEndpoint,
+};
+```
+
+### Static File Serving
+
+```typescript
+import { ServeStatic } from "express-zod-api";
+
+const routing: Routing = {
+  public: new ServeStatic("./assets", {
+    dotfiles: "deny",
+    index: false,
+  }),
+};
+// Serves files from ./assets at /public
+```
+
+## Complex Example
+
+```typescript
+import { Routing, ServeStatic } from "express-zod-api";
+
+const routing: Routing = {
+  // Flat syntax
+  "/health": healthCheckEndpoint,
+  
+  // Nested API structure
+  api: {
+    v1: {
+      // Method-based
+      users: {
+        get: listUsers,
+        post: createUser,
+        ":id": {
+          get: getUser,
+          patch: updateUser,
+          delete: deleteUser,
+        },
+      },
+      
+      // Posts with nested comments
+      posts: {
+        get: listPosts,
+        ":postId": {
+          get: getPost,
+          comments: {
+            get: listComments,
+            post: createComment,
+          },
+        },
+      },
+      
+      // Explicit method
+      "post /auth/login": loginEndpoint,
+      "post /auth/logout": logoutEndpoint,
+    },
+  },
+  
+  // Static files
+  static: new ServeStatic("./public"),
+};
+```
+
+## Endpoint Nesting
+
+Endpoints can handle both their own path and sub-paths:
+
+```typescript
+const parentEndpoint = defaultEndpointsFactory.build({ ... });
+const childEndpoint = defaultEndpointsFactory.build({ ... });
+
+const routing: Routing = {
+  parent: parentEndpoint.nest({
+    child: childEndpoint,
+  }),
+};
+// Routes: /parent and /parent/child
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="Routing Concept" href="/concepts/routing">
+    Routing patterns and best practices
+  </Card>
+  <Card title="createServer" href="/api/server">
+    Start server with routing
+  </Card>
+</CardGroup>

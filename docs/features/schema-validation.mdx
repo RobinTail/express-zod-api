@@ -1,0 +1,217 @@
+---
+title: Schema Validation
+description: Use Zod schemas to validate input and output data with Express Zod API
+---
+
+Express Zod API uses [Zod](https://zod.dev) schemas to validate both incoming request data and outgoing response data. This ensures type safety throughout your API and prevents common bugs caused by invalid data.
+
+## How Validation Works
+
+The framework validates:
+- **Input data**: Combined from request properties (`query`, `body`, `params`, `files`, `headers`)
+- **Output data**: The object returned by your endpoint handler
+
+All validation happens automatically before your handler executes (for input) and before the response is sent (for output).
+
+## Defining Input Schemas
+
+Input schemas describe the shape of data your endpoint expects to receive:
+
+```ts
+import { z } from "zod";
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const getUserEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    id: z.string().min(1),
+    includeProfile: z.boolean().optional(),
+  }),
+  output: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  handler: async ({ input }) => {
+    // input is fully typed and validated
+    const { id, includeProfile } = input;
+    return { id, name: "John Doe" };
+  },
+});
+```
+
+## Defining Output Schemas
+
+Output schemas ensure your endpoint returns consistent, validated responses:
+
+```ts
+const createUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    name: z.string().min(1),
+    email: z.string().email(),
+  }),
+  output: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    createdAt: z.string(),
+  }),
+  handler: async ({ input }) => {
+    const user = await db.users.create(input);
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: new Date().toISOString(),
+    };
+  },
+});
+```
+
+## Validation Errors
+
+When validation fails, the framework automatically responds with a `400 Bad Request` status and detailed error information:
+
+<CodeGroup>
+```json Request
+{
+  "name": "",
+  "email": "not-an-email"
+}
+```
+
+```json Response (400)
+{
+  "status": "error",
+  "error": {
+    "message": "Invalid input: name must be at least 1 character, email must be valid"
+  }
+}
+```
+</CodeGroup>
+
+## Input Sources
+
+By default, input is combined from different request properties based on the HTTP method:
+
+| Method | Sources (priority order) |
+|--------|-------------------------|
+| GET    | `query`, `params` |
+| POST   | `body`, `params`, `files` |
+| PUT    | `body`, `params` |
+| PATCH  | `body`, `params` |
+| DELETE | `query`, `params` |
+
+You can customize this in your [configuration](/essentials/configuration):
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  inputSources: {
+    get: ["query", "params"],
+    post: ["body", "params", "files"],
+    // customize other methods as needed
+  },
+});
+```
+
+## Type Safety
+
+One of the key benefits of schema validation is automatic TypeScript type inference:
+
+```ts
+const endpoint = defaultEndpointsFactory.build({
+  input: z.object({
+    userId: z.string(),
+    amount: z.number(),
+  }),
+  output: z.object({
+    success: z.boolean(),
+    transactionId: z.string(),
+  }),
+  handler: async ({ input }) => {
+    // TypeScript knows the exact type of input
+    input.userId;  // string
+    input.amount;  // number
+    
+    // Return type is also validated
+    return {
+      success: true,
+      transactionId: "txn_123",
+    };
+  },
+});
+```
+
+## Common Validation Patterns
+
+### Optional Fields
+
+```ts
+z.object({
+  name: z.string(),
+  nickname: z.string().optional(),
+})
+```
+
+### Default Values
+
+```ts
+z.object({
+  page: z.number().default(1),
+  limit: z.number().default(20),
+})
+```
+
+### Arrays
+
+```ts
+z.object({
+  tags: z.array(z.string()),
+  userIds: z.array(z.number()).min(1),
+})
+```
+
+### Nested Objects
+
+```ts
+z.object({
+  user: z.object({
+    name: z.string(),
+    address: z.object({
+      street: z.string(),
+      city: z.string(),
+    }),
+  }),
+})
+```
+
+## Best Practices
+
+<Card title="Keep Schemas Focused" icon="crosshairs">
+Define only the fields your endpoint needs. Don't include fields that won't be used.
+</Card>
+
+<Card title="Add Descriptions" icon="comment">
+Use `.describe()` to document your schemas - these descriptions appear in generated API documentation.
+</Card>
+
+<Card title="Reuse Common Schemas" icon="recycle">
+Extract common validation patterns into reusable schema constants.
+</Card>
+
+<Card title="Use Refinements for Complex Validation" icon="filter">
+For advanced validation logic, use [refinements](/features/refinements).
+</Card>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Refinements" icon="filter" href="/features/refinements">
+    Add custom validation logic
+  </Card>
+  <Card title="Transformations" icon="wand-magic-sparkles" href="/features/transformations">
+    Transform input data during validation
+  </Card>
+</CardGroup>

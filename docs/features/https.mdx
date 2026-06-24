@@ -1,0 +1,401 @@
+---
+title: Enabling HTTPS
+description: Configure SSL/TLS certificates for secure HTTPS connections
+---
+
+HTTPS is essential for modern APIs, providing encryption and security for data in transit. Express Zod API makes it easy to configure HTTPS with TLS/SSL certificates.
+
+## Basic HTTPS Configuration
+
+To enable HTTPS, provide your certificate and key in the configuration:
+
+```ts
+import { createConfig, createServer } from "express-zod-api";
+import fs from "node:fs";
+
+const config = createConfig({
+  https: {
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"),
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+    },
+    listen: 443, // Standard HTTPS port
+  },
+  cors: true,
+});
+
+const { app, servers, logger } = await createServer(config, routing);
+```
+
+<Info>
+You need `@types/node` installed for TypeScript support of HTTPS options.
+</Info>
+
+## Running Both HTTP and HTTPS
+
+You can run HTTP and HTTPS servers simultaneously:
+
+```ts
+import { createConfig } from "express-zod-api";
+import fs from "node:fs";
+
+const config = createConfig({
+  http: {
+    listen: 80, // HTTP on port 80
+  },
+  https: {
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"),
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+    },
+    listen: 443, // HTTPS on port 443
+  },
+  cors: true,
+});
+```
+
+This is useful for:
+- Redirecting HTTP to HTTPS
+- Supporting legacy clients
+- Health check endpoints on HTTP
+
+## Certificate Options
+
+Express Zod API uses Node.js's HTTPS module, which supports all standard TLS options:
+
+```ts
+import { createConfig } from "express-zod-api";
+import fs from "node:fs";
+
+const config = createConfig({
+  https: {
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"),
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+      ca: fs.readFileSync("ca.pem", "utf-8"), // Certificate authority chain
+      passphrase: process.env.KEY_PASSPHRASE, // If key is encrypted
+    },
+    listen: 443,
+  },
+});
+```
+
+## Using UNIX Sockets
+
+You can use UNIX sockets instead of ports:
+
+```ts
+const config = createConfig({
+  https: {
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"),
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+    },
+    listen: "/var/run/api.sock",
+  },
+});
+```
+
+## Advanced Listen Options
+
+For more control, use Node.js `ListenOptions`:
+
+```ts
+import { ListenOptions } from "node:net";
+
+const listenOptions: ListenOptions = {
+  port: 443,
+  host: "0.0.0.0",
+  backlog: 511,
+  exclusive: false,
+};
+
+const config = createConfig({
+  https: {
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"),
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+    },
+    listen: listenOptions,
+  },
+});
+```
+
+## Obtaining SSL Certificates
+
+### Let's Encrypt (Free)
+
+[Let's Encrypt](https://letsencrypt.org/) provides free TLS certificates:
+
+```bash
+# Install certbot
+sudo apt-get install certbot
+
+# Obtain certificate
+sudo certbot certonly --standalone -d api.example.com
+
+# Certificates are saved to:
+# /etc/letsencrypt/live/api.example.com/fullchain.pem
+# /etc/letsencrypt/live/api.example.com/privkey.pem
+```
+
+Then configure Express Zod API:
+
+```ts
+const config = createConfig({
+  https: {
+    options: {
+      cert: fs.readFileSync(
+        "/etc/letsencrypt/live/api.example.com/fullchain.pem",
+        "utf-8"
+      ),
+      key: fs.readFileSync(
+        "/etc/letsencrypt/live/api.example.com/privkey.pem",
+        "utf-8"
+      ),
+    },
+    listen: 443,
+  },
+});
+```
+
+### Self-Signed Certificates (Development)
+
+For local development, create self-signed certificates:
+
+```bash
+# Generate private key
+openssl genrsa -out key.pem 2048
+
+# Generate certificate
+openssl req -new -x509 -key key.pem -out cert.pem -days 365
+```
+
+```ts
+const config = createConfig({
+  https: {
+    options: {
+      cert: fs.readFileSync("cert.pem", "utf-8"),
+      key: fs.readFileSync("key.pem", "utf-8"),
+    },
+    listen: 3443,
+  },
+});
+```
+
+<Warning>
+Self-signed certificates will trigger browser warnings. Only use them for local development.
+</Warning>
+
+## Certificate Renewal
+
+Let's Encrypt certificates expire after 90 days. Automate renewal:
+
+```bash
+# Test renewal
+sudo certbot renew --dry-run
+
+# Add to crontab for automatic renewal
+0 0 * * * certbot renew --quiet && systemctl restart your-api-service
+```
+
+Or handle graceful reload in your application:
+
+```ts
+import { createServer } from "express-zod-api";
+
+const { servers } = await createServer(config, routing);
+
+// Watch for certificate changes
+fs.watch("/etc/letsencrypt/live/api.example.com", async () => {
+  // Reload certificates
+  const newConfig = createConfig({
+    https: {
+      options: {
+        cert: fs.readFileSync("fullchain.pem", "utf-8"),
+        key: fs.readFileSync("privkey.pem", "utf-8"),
+      },
+      listen: 443,
+    },
+  });
+  
+  // Gracefully restart (requires additional logic)
+});
+```
+
+## HTTP to HTTPS Redirect
+
+Redirect HTTP traffic to HTTPS using the `beforeRouting` hook:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: {
+    listen: 80,
+  },
+  https: {
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"),
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+    },
+    listen: 443,
+  },
+  beforeRouting: ({ app }) => {
+    app.use((req, res, next) => {
+      if (req.secure) {
+        next();
+      } else {
+        res.redirect(301, `https://${req.headers.host}${req.url}`);
+      }
+    });
+  },
+});
+```
+
+## Security Headers
+
+Add security headers for HTTPS:
+
+```ts
+const config = createConfig({
+  https: {
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"),
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+    },
+    listen: 443,
+  },
+  beforeRouting: ({ app }) => {
+    app.use((req, res, next) => {
+      // HSTS - force HTTPS for 1 year
+      res.setHeader(
+        "Strict-Transport-Security",
+        "max-age=31536000; includeSubDomains"
+      );
+      next();
+    });
+  },
+});
+```
+
+## Behind a Reverse Proxy
+
+If using nginx or another reverse proxy that handles SSL:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: {
+    listen: 3000, // Internal port, nginx forwards here
+  },
+  beforeRouting: ({ app }) => {
+    // Trust proxy headers
+    app.set("trust proxy", true);
+  },
+});
+```
+
+nginx configuration:
+
+```nginx
+server {
+  listen 443 ssl http2;
+  server_name api.example.com;
+  
+  ssl_certificate /etc/letsencrypt/live/api.example.com/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/api.example.com/privkey.pem;
+  
+  location / {
+    proxy_pass http://localhost:3000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}
+```
+
+## Testing HTTPS
+
+Test your HTTPS setup:
+
+```bash
+# Basic test
+curl https://api.example.com/health
+
+# Verbose output with certificate info
+curl -v https://api.example.com/health
+
+# Test specific TLS version
+curl --tlsv1.2 https://api.example.com/health
+```
+
+Online tools:
+- [SSL Labs](https://www.ssllabs.com/ssltest/) - Comprehensive SSL/TLS testing
+- [Why No Padlock?](https://www.whynopadlock.com/) - Check for mixed content
+
+## Best Practices
+
+<Card title="Use Strong Cipher Suites" icon="lock">
+Configure Node.js to use modern, secure cipher suites.
+</Card>
+
+<Card title="Enable HTTP/2" icon="gauge-high">
+HTTP/2 improves performance. Node.js supports it with HTTPS.
+</Card>
+
+<Card title="Automate Certificate Renewal" icon="rotate">
+Let's Encrypt certificates expire every 90 days. Automate renewal.
+</Card>
+
+<Card title="Monitor Certificate Expiry" icon="bell">
+Set up monitoring to alert you before certificates expire.
+</Card>
+
+## Common Issues
+
+### EACCES: Permission Denied (Port 443)
+
+Ports below 1024 require root privileges:
+
+```bash
+# Option 1: Run with sudo (not recommended)
+sudo node server.js
+
+# Option 2: Use authbind
+sudo apt-get install authbind
+authbind --deep node server.js
+
+# Option 3: Use iptables redirect
+sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 3443
+```
+
+### Certificate Errors
+
+If you see "unable to get local issuer certificate":
+
+```ts
+// Include the full certificate chain
+const config = createConfig({
+  https: {
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"), // Not just cert.pem
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+    },
+    listen: 443,
+  },
+});
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Compression" icon="file-zipper" href="/features/compression">
+    Enable response compression
+  </Card>
+  <Card title="CORS" icon="globe" href="/features/cors">
+    Configure cross-origin access
+  </Card>
+</CardGroup>

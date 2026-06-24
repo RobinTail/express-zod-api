@@ -1,0 +1,479 @@
+---
+title: Express Middleware Integration
+description: Integrate native Express middlewares with Express Zod API
+---
+
+## Overview
+
+Express Zod API provides two approaches for integrating native Express middlewares, depending on their purpose and scope. This guide shows you how to use both methods effectively.
+
+## Two Integration Methods
+
+### 1. Global Middlewares with `beforeRouting`
+
+Use this for middlewares that:
+- Establish their own routes (like Swagger UI)
+- Globally modify behavior
+- Parse additional request formats (like cookies)
+- Need to run before all API routes
+
+### 2. Endpoint-Specific with `addExpressMiddleware()`
+
+Use this for middlewares that:
+- Process specific endpoints
+- Need to provide context to handlers
+- Require error transformation
+- Should be tested with your endpoints
+
+## Global Middlewares: `beforeRouting`
+
+The `beforeRouting` option runs code before your routing is established.
+
+### Basic Usage
+
+```ts
+import { createConfig } from "express-zod-api";
+import cookieParser from "cookie-parser";
+
+const config = createConfig({
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    
+    // Add cookie parser
+    app.use(cookieParser());
+    
+    logger.info("Cookie parser enabled");
+  },
+});
+```
+
+### Serving Documentation
+
+Serve your API documentation using Swagger UI:
+
+```ts
+import { createConfig } from "express-zod-api";
+import ui from "swagger-ui-express";
+import { documentation } from "./documentation";
+
+const config = createConfig({
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    
+    logger.info("Serving API docs at https://example.com/docs");
+    app.use("/docs", ui.serve, ui.setup(documentation));
+  },
+});
+```
+
+### Custom Routes
+
+Add custom routes outside your main routing structure:
+
+```ts
+const config = createConfig({
+  beforeRouting: ({ app }) => {
+    // Health check endpoint
+    app.get("/health", (req, res) => {
+      res.json({ status: "ok", timestamp: Date.now() });
+    });
+    
+    // Metrics endpoint
+    app.get("/metrics", async (req, res) => {
+      const metrics = await collectMetrics();
+      res.json(metrics);
+    });
+  },
+});
+```
+
+### Using Child Logger
+
+Access request-specific child loggers when configured:
+
+```ts
+import { createConfig } from "express-zod-api";
+import { randomUUID } from "node:crypto";
+
+const config = createConfig({
+  childLoggerProvider: ({ parent, request }) =>
+    parent.child({ requestId: randomUUID() }),
+    
+  beforeRouting: ({ app, getLogger }) => {
+    app.use("/custom", (req, res, next) => {
+      const childLogger = getLogger(req);
+      childLogger.info("Custom route accessed");
+      res.send("OK");
+    });
+  },
+});
+```
+
+## Endpoint-Specific: `addExpressMiddleware()`
+
+For middlewares that need to interact with specific endpoints, use the `addExpressMiddleware()` method (alias: `use()`).
+
+### Basic Usage
+
+```ts
+import { defaultEndpointsFactory } from "express-zod-api";
+import rateLimit from "express-rate-limit";
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+const rateLimitedFactory = defaultEndpointsFactory
+  .addExpressMiddleware(limiter);
+
+const endpoint = rateLimitedFactory.build({
+  method: "post",
+  input: z.object({ data: z.string() }),
+  output: z.object({ success: z.boolean() }),
+  handler: async () => ({ success: true }),
+});
+```
+
+### OAuth2 Integration
+
+Integrate OAuth2 JWT bearer authentication:
+
+```ts
+import { defaultEndpointsFactory } from "express-zod-api";
+import createHttpError from "http-errors";
+import { auth } from "express-oauth2-jwt-bearer";
+
+const jwtCheck = auth({
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: process.env.AUTH0_ISSUER,
+});
+
+const authenticatedFactory = defaultEndpointsFactory.use(jwtCheck, {
+  // Provide context from the middleware
+  provider: (req) => ({ 
+    auth: req.auth,
+    userId: req.auth?.payload.sub,
+  }),
+  
+  // Transform errors to HttpError
+  transformer: (err) => createHttpError(401, err.message),
+});
+
+const protectedEndpoint = authenticatedFactory.build({
+  method: "get",
+  input: z.object({}),
+  output: z.object({ 
+    userId: z.string(),
+    data: z.string(),
+  }),
+  handler: async ({ ctx: { userId } }) => {
+    // userId is available from the OAuth middleware
+    return {
+      userId,
+      data: "Protected data",
+    };
+  },
+});
+```
+
+### CORS Configuration
+
+While Express Zod API handles CORS natively, you can use the Express middleware for advanced cases:
+
+```ts
+import cors from "cors";
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const corsFactory = defaultEndpointsFactory.addExpressMiddleware(
+  cors({
+    origin: (origin, callback) => {
+      // Custom origin validation logic
+      const allowedOrigins = ["https://example.com"];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+  {
+    transformer: (err) => createHttpError(403, "CORS error"),
+  }
+);
+```
+
+<Note>
+  Prefer the built-in CORS configuration in most cases—it's designed to work seamlessly with the framework.
+</Note>
+
+### Request Compression
+
+Apply compression to specific endpoints:
+
+```ts
+import compression from "compression";
+
+const compressedFactory = defaultEndpointsFactory
+  .addExpressMiddleware(
+    compression({ threshold: "1kb" })
+  );
+```
+
+### Body Parser Alternatives
+
+Use alternative body parsers for specific content types:
+
+```ts
+import express from "express";
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const textParserFactory = defaultEndpointsFactory
+  .addExpressMiddleware(
+    express.text({ type: "text/plain" }),
+    {
+      provider: (req) => ({ rawBody: req.body }),
+    }
+  );
+
+const textEndpoint = textParserFactory.build({
+  method: "post",
+  input: z.object({}),
+  output: z.object({ length: z.number() }),
+  handler: async ({ ctx: { rawBody } }) => ({
+    length: rawBody.length,
+  }),
+});
+```
+
+### Helmet Security
+
+Add security headers with Helmet:
+
+```ts
+import helmet from "helmet";
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  beforeRouting: ({ app }) => {
+    app.use(helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+        },
+      },
+    }));
+  },
+});
+```
+
+### Request ID Middleware
+
+Add request IDs for tracking:
+
+```ts
+import { defaultEndpointsFactory } from "express-zod-api";
+import { randomUUID } from "node:crypto";
+
+const requestIdMiddleware = (req, res, next) => {
+  req.id = randomUUID();
+  res.setHeader("X-Request-ID", req.id);
+  next();
+};
+
+const trackedFactory = defaultEndpointsFactory
+  .addExpressMiddleware(requestIdMiddleware, {
+    provider: (req) => ({ requestId: req.id }),
+  });
+```
+
+## Context Providers
+
+The `provider` option extracts data from the Express request:
+
+```ts
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const factory = defaultEndpointsFactory.use(someMiddleware, {
+  // Synchronous provider
+  provider: (req) => ({
+    userAgent: req.headers["user-agent"],
+    ip: req.ip,
+  }),
+});
+
+// Or asynchronous
+const asyncFactory = defaultEndpointsFactory.use(authMiddleware, {
+  provider: async (req) => {
+    const user = await db.findUser(req.auth.userId);
+    return { user };
+  },
+});
+```
+
+## Error Transformers
+
+Transform Express middleware errors to HTTP errors:
+
+```ts
+import createHttpError from "http-errors";
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const factory = defaultEndpointsFactory.use(someMiddleware, {
+  transformer: (err) => {
+    // Map specific error types
+    if (err.name === "UnauthorizedError") {
+      return createHttpError(401, "Authentication failed");
+    }
+    if (err.name === "ForbiddenError") {
+      return createHttpError(403, "Access denied");
+    }
+    // Default to 500
+    return createHttpError(500, err.message);
+  },
+});
+```
+
+## Multiple Middlewares
+
+Chain multiple Express middlewares:
+
+```ts
+import { defaultEndpointsFactory } from "express-zod-api";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { auth } from "express-oauth2-jwt-bearer";
+
+const secureFactory = defaultEndpointsFactory
+  .use(helmet())
+  .use(rateLimit({ windowMs: 900000, max: 100 }))
+  .use(auth({ /* config */ }), {
+    provider: (req) => ({ auth: req.auth }),
+    transformer: (err) => createHttpError(401, err.message),
+  });
+```
+
+## Avoid: CORS Middleware
+
+Don't use Express CORS middleware in `beforeRouting`—use the framework's built-in option instead:
+
+```ts
+// ❌ Don't do this
+import cors from "cors";
+
+const config = createConfig({
+  beforeRouting: ({ app }) => {
+    app.use(cors()); // Not recommended
+  },
+});
+
+// ✅ Do this instead
+const config = createConfig({
+  cors: true, // or function for custom headers
+});
+```
+
+## Static File Serving
+
+Serve static files without Express middleware:
+
+```ts
+import { Routing, ServeStatic } from "express-zod-api";
+
+const routing: Routing = {
+  public: new ServeStatic("assets", {
+    dotfiles: "deny",
+    index: false,
+    redirect: false,
+  }),
+};
+```
+
+## Passport.js Integration
+
+Integrate Passport authentication strategies:
+
+```ts
+import passport from "passport";
+import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+import { createConfig, defaultEndpointsFactory } from "express-zod-api";
+
+// Configure Passport
+passport.use(
+  new JwtStrategy(
+    {
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: process.env.JWT_SECRET,
+    },
+    async (payload, done) => {
+      const user = await db.Users.findById(payload.sub);
+      return done(null, user || false);
+    }
+  )
+);
+
+const config = createConfig({
+  beforeRouting: ({ app }) => {
+    app.use(passport.initialize());
+  },
+});
+
+const authenticatedFactory = defaultEndpointsFactory.use(
+  passport.authenticate("jwt", { session: false }),
+  {
+    provider: (req) => ({ user: req.user }),
+    transformer: (err) => createHttpError(401, "Unauthorized"),
+  }
+);
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Choose the Right Method" icon="route">
+    Use `beforeRouting` for global setup and `addExpressMiddleware()` for endpoint-specific logic.
+  </Card>
+  
+  <Card title="Provide Context" icon="share-nodes">
+    Always use the `provider` option to make middleware data available to handlers.
+  </Card>
+  
+  <Card title="Transform Errors" icon="triangle-exclamation">
+    Use the `transformer` option to convert Express errors to HttpError instances.
+  </Card>
+  
+  <Card title="Prefer Native Features" icon="bolt">
+    Use the framework's built-in features for CORS, compression, and file uploads when possible.
+  </Card>
+</CardGroup>
+
+## Testing
+
+Test endpoints with Express middlewares:
+
+```ts
+import { testEndpoint } from "express-zod-api";
+
+describe("rateLimitedEndpoint", () => {
+  test("should work with rate limiting", async () => {
+    const { responseMock, loggerMock } = await testEndpoint({
+      endpoint: rateLimitedEndpoint,
+      requestProps: {
+        method: "POST",
+        body: { data: "test" },
+      },
+    });
+    
+    expect(responseMock._getStatusCode()).toBe(200);
+    expect(loggerMock._getLogs().error).toHaveLength(0);
+  });
+});
+```
+
+## Next Steps
+
+- Learn about [Authentication](/guides/authentication) using native middlewares
+- Explore [Subscriptions](/guides/subscriptions) for real-time features
+- See [Testing](/essentials/testing) for endpoint testing strategies

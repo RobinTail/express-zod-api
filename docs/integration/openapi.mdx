@@ -1,0 +1,519 @@
+---
+title: OpenAPI Integration
+description: Deep dive into OpenAPI 3.1 specification generation and integration options
+---
+
+Express Zod API generates OpenAPI 3.1 (formerly Swagger) compliant documentation, the industry standard for describing RESTful APIs.
+
+## What is OpenAPI 3.1?
+
+OpenAPI 3.1 is a specification for describing HTTP APIs in a machine-readable format. It provides:
+
+- Standardized API documentation
+- Interactive API explorers (like Swagger UI)
+- Code generation for clients and servers
+- API testing and validation tools
+- JSON Schema compatibility
+
+<Info>
+OpenAPI 3.1 fully embraces JSON Schema, making it more powerful than previous versions.
+</Info>
+
+## Key Features
+
+Express Zod API's OpenAPI generator provides:
+
+<CardGroup cols={2}>
+  <Card title="Automatic Generation" icon="wand-magic-sparkles">
+    Documentation is generated directly from your Zod schemas and endpoint definitions
+  </Card>
+  <Card title="Type Safety" icon="shield-check">
+    Your TypeScript types and OpenAPI schemas are always in sync
+  </Card>
+  <Card title="JSON Schema" icon="file-code">
+    Full JSON Schema compatibility for maximum interoperability
+  </Card>
+  <Card title="Rich Metadata" icon="tags">
+    Support for examples, descriptions, deprecation, and more
+  </Card>
+</CardGroup>
+
+## Basic Usage
+
+Generate OpenAPI documentation:
+
+```typescript
+import { Documentation } from "express-zod-api";
+import { routing } from "./routing";
+import { config } from "./config";
+
+const openapi = new Documentation({
+  routing,
+  config,
+  version: "1.0.0",
+  title: "My API",
+  serverUrl: "https://api.example.com",
+});
+
+// Get as YAML string
+const yaml = openapi.getSpecAsYaml();
+
+// Or access the spec object directly
+const spec = openapi.rootDoc;
+```
+
+## Schema Mapping
+
+Here's how Zod schemas map to OpenAPI types:
+
+| Zod Schema | OpenAPI Type | Notes |
+|------------|--------------|-------|
+| `z.string()` | `type: string` | |
+| `z.number()` | `type: number` | |
+| `z.boolean()` | `type: boolean` | |
+| `z.object()` | `type: object` | With properties |
+| `z.array()` | `type: array` | With items |
+| `z.enum()` | `enum: [...]` | Enumeration values |
+| `z.literal()` | `const: value` | Single value |
+| `z.union()` | `anyOf: [...]` | Multiple schemas |
+| `z.intersection()` | `allOf: [...]` | Combined schemas |
+| `z.optional()` | No `required` | Property is optional |
+| `z.nullable()` | `type: ["...", "null"]` | OpenAPI 3.1 style |
+| `ez.dateIn()` | `type: string, format: date-time` | ISO 8601 string |
+| `ez.dateOut()` | `type: string, format: date-time` | ISO 8601 string |
+| `ez.upload()` | `type: string, format: binary` | File upload |
+
+## Security Schemes
+
+Express Zod API automatically generates security schemes from your middleware definitions:
+
+```typescript
+import { Middleware } from "express-zod-api";
+import { z } from "zod";
+
+const authMiddleware = new Middleware({
+  security: {
+    // Generates API key security scheme
+    and: [
+      { type: "input", name: "apiKey" },
+      { type: "header", name: "X-API-Token" },
+    ],
+  },
+  input: z.object({
+    apiKey: z.string().min(1),
+  }),
+  handler: async ({ input, request }) => {
+    // Validate authentication
+    const token = request.headers["x-api-token"];
+    // ...
+    return { userId: "123" };
+  },
+});
+```
+
+This generates:
+
+```yaml
+securitySchemes:
+  INPUT_1:
+    type: apiKey
+    in: query
+    name: apiKey
+  HEADER_1:
+    type: apiKey
+    in: header
+    name: X-API-Token
+```
+
+### Security Types
+
+Supported security scheme types:
+
+<ParamField path="type: 'input'" type="object">
+  API key in query parameter or request body
+  - `name`: Parameter name
+</ParamField>
+
+<ParamField path="type: 'header'" type="object">
+  API key in request header
+  - `name`: Header name (case-insensitive)
+</ParamField>
+
+<ParamField path="type: 'cookie'" type="object">
+  API key in cookie
+  - `name`: Cookie name
+</ParamField>
+
+<ParamField path="type: 'http'" type="object">
+  HTTP authentication (Basic, Bearer, etc.)
+  - `scheme`: Authentication scheme (e.g., "bearer", "basic")
+</ParamField>
+
+<ParamField path="type: 'oauth2'" type="object">
+  OAuth 2.0 authentication
+  - `flows`: OAuth flows configuration
+</ParamField>
+
+<ParamField path="type: 'openIdConnect'" type="object">
+  OpenID Connect Discovery
+  - `url`: OpenID Connect URL
+</ParamField>
+
+## Request and Response Examples
+
+Add examples to your schemas for better documentation:
+
+```typescript
+import { z } from "zod";
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const createUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    name: z.string()
+      .min(1)
+      .example("John Doe")
+      .describe("User's full name"),
+    email: z.string()
+      .email()
+      .example("john@example.com")
+      .describe("User's email address"),
+    age: z.number()
+      .int()
+      .positive()
+      .optional()
+      .example(30)
+      .describe("User's age in years"),
+  }),
+  output: z.object({
+    id: z.string().example("user_123"),
+    name: z.string().example("John Doe"),
+    email: z.string().email().example("john@example.com"),
+    createdAt: z.string().example("2024-01-01T00:00:00Z"),
+  }),
+  handler: async ({ input }) => {
+    // Implementation
+    return {
+      id: "user_123",
+      name: input.name,
+      email: input.email,
+      createdAt: new Date().toISOString(),
+    };
+  },
+});
+```
+
+Generates:
+
+```yaml
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          name:
+            type: string
+            description: User's full name
+            example: John Doe
+          email:
+            type: string
+            format: email
+            description: User's email address
+            example: john@example.com
+```
+
+## Path Parameters
+
+Path parameters are automatically detected and documented:
+
+```typescript
+import { Routing } from "express-zod-api";
+import { z } from "zod";
+
+const getUserEndpoint = defaultEndpointsFactory.build({
+  input: z.object({
+    userId: z.string()
+      .describe("The unique user identifier"),
+  }),
+  // ...
+});
+
+const routing: Routing = {
+  user: {
+    ":userId": getUserEndpoint,
+  },
+};
+```
+
+Generates:
+
+```yaml
+paths:
+  /user/{userId}:
+    get:
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The unique user identifier
+          schema:
+            type: string
+```
+
+## Response Status Codes
+
+Document different status codes using custom result handlers:
+
+```typescript
+import { ResultHandler } from "express-zod-api";
+import { z } from "zod";
+
+const customResultHandler = new ResultHandler({
+  positive: (data) => ({
+    statusCode: [200, 201], // OK or Created
+    schema: z.object({ 
+      status: z.literal("success"), 
+      data 
+    }),
+  }),
+  negative: [
+    {
+      statusCode: 400, // Bad Request
+      schema: z.object({ 
+        status: z.literal("error"), 
+        message: z.string() 
+      }),
+    },
+    {
+      statusCode: 401, // Unauthorized
+      schema: z.object({ 
+        status: z.literal("unauthorized") 
+      }),
+    },
+    {
+      statusCode: 500, // Internal Server Error
+      schema: z.object({ 
+        status: z.literal("error"), 
+        message: z.string() 
+      }),
+    },
+  ],
+  handler: ({ error, response, output }) => {
+    // Implementation
+  },
+});
+```
+
+## Content Types
+
+Express Zod API supports various content types:
+
+### JSON (Default)
+
+```typescript
+// application/json - default for most endpoints
+const endpoint = defaultEndpointsFactory.build({
+  input: z.object({ name: z.string() }),
+  // ...
+});
+```
+
+### Form Data
+
+```typescript
+import { ez } from "express-zod-api";
+
+// application/x-www-form-urlencoded
+const formEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.form({
+    name: z.string(),
+    email: z.string().email(),
+  }),
+  // ...
+});
+```
+
+### File Uploads
+
+```typescript
+import { ez } from "express-zod-api";
+
+// multipart/form-data
+const uploadEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    avatar: ez.upload(),
+  }),
+  // ...
+});
+```
+
+### Raw Data
+
+```typescript
+import { ez } from "express-zod-api";
+
+// application/octet-stream
+const rawEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw({}),
+  // ...
+});
+```
+
+## Using Generated Documentation
+
+### With Swagger UI
+
+```typescript
+import express from "express";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yaml";
+import { readFileSync } from "fs";
+import { createConfig } from "express-zod-api";
+
+const spec = YAML.parse(
+  readFileSync("openapi.yaml", "utf-8")
+);
+
+const config = createConfig({
+  beforeRouting: ({ app }) => {
+    app.use(
+      "/docs",
+      swaggerUi.serve,
+      swaggerUi.setup(spec, {
+        explorer: true,
+        customCss: '.swagger-ui .topbar { display: none }',
+      })
+    );
+  },
+  // ... other config
+});
+```
+
+### With Redoc
+
+```typescript
+import { createConfig } from "express-zod-api";
+import { readFileSync } from "fs";
+
+const config = createConfig({
+  beforeRouting: ({ app }) => {
+    const spec = readFileSync("openapi.yaml", "utf-8");
+    
+    app.get("/docs", (req, res) => {
+      res.send(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>API Documentation</title>
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+          </head>
+          <body>
+            <redoc spec-url="/openapi.yaml"></redoc>
+            <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+          </body>
+        </html>
+      `);
+    });
+    
+    app.get("/openapi.yaml", (req, res) => {
+      res.type("text/yaml").send(spec);
+    });
+  },
+});
+```
+
+### With API Clients
+
+Generate clients using OpenAPI Generator:
+
+```bash
+# Generate TypeScript Axios client
+npx @openapitools/openapi-generator-cli generate \
+  -i openapi.yaml \
+  -g typescript-axios \
+  -o ./generated-client
+
+# Generate Python client
+npx @openapitools/openapi-generator-cli generate \
+  -i openapi.yaml \
+  -g python \
+  -o ./python-client
+```
+
+<Note>
+While OpenAPI Generator can create clients, Express Zod API's [type-safe client generator](/integration/end-to-end-type-safety) provides superior TypeScript integration.
+</Note>
+
+## Best Practices
+
+### 1. Use Descriptive Names
+
+```typescript
+// Good
+const getUserByIdEndpoint = factory.build({ /* ... */ });
+
+// Less good
+const endpoint1 = factory.build({ /* ... */ });
+```
+
+### 2. Provide Examples
+
+```typescript
+z.string().example("example-value")
+  .describe("Clear description of what this is")
+```
+
+### 3. Tag Your Endpoints
+
+```typescript
+factory.build({
+  tag: "users",
+  // ...
+});
+```
+
+### 4. Add Deprecation Warnings
+
+```typescript
+factory.build({
+  deprecated: true, // Marks endpoint as deprecated
+  input: z.object({
+    oldField: z.string().deprecated(), // Marks field as deprecated
+  }),
+});
+```
+
+### 5. Use Component Mode for Large APIs
+
+```typescript
+new Documentation({
+  composition: "components", // Reduces duplication
+  // ...
+});
+```
+
+## Validation
+
+Validate your generated OpenAPI spec:
+
+```bash
+# Using swagger-cli
+npm install -g @apidevtools/swagger-cli
+swagger-cli validate openapi.yaml
+
+# Using openapi-cli
+npm install -g @redocly/cli
+openapi lint openapi.yaml
+```
+
+## Next Steps
+
+- Learn about [generating TypeScript clients](/integration/end-to-end-type-safety)
+- Explore [documentation generation](/integration/documentation) features
+- See [integration with Express apps](/integration/express-app)

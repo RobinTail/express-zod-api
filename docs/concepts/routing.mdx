@@ -1,0 +1,448 @@
+---
+title: Routing
+description: Learn how to define routes and connect endpoints to URL paths
+---
+
+## Overview
+
+Routing in Express Zod API maps URL paths to endpoints. The framework supports multiple routing styles: nested objects, flat paths, method-based routing, and static file serving. All styles can be mixed within the same application.
+
+## Routing Interface
+
+The `Routing` interface defines your API's URL structure:
+
+```typescript
+interface Routing {
+  [K: string]: Routing | AbstractEndpoint | ServeStatic;
+}
+```
+
+Routes can be:
+- Nested objects for hierarchical paths
+- Endpoints to handle requests
+- Static file servers
+- Other routing objects for composition
+
+## Basic Routing
+
+### Nested Syntax
+
+Create hierarchical routes using nested objects:
+
+```typescript
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  v1: {
+    users: listUsersEndpoint,      // GET /v1/users
+    user: {
+      ":id": getUserEndpoint,       // GET /v1/user/:id
+    },
+  },
+};
+```
+
+### Flat Syntax
+
+Define complete paths as string keys:
+
+```typescript
+const routing: Routing = {
+  "/v1/users": listUsersEndpoint,
+  "/v1/user/:id": getUserEndpoint,
+};
+```
+
+### Mixed Syntax
+
+Combine nested and flat styles:
+
+```typescript
+const routing: Routing = {
+  v1: {
+    "/users/active": activeUsersEndpoint,  // /v1/users/active
+    user: {
+      ":id": getUserEndpoint,              // /v1/user/:id
+    },
+  },
+};
+```
+
+## Path Parameters
+
+Define dynamic path segments with colon prefix:
+
+```typescript
+const routing: Routing = {
+  user: {
+    ":userId": {
+      posts: {
+        ":postId": getPostEndpoint,  // /user/:userId/posts/:postId
+      },
+    },
+  },
+};
+```
+
+Path parameters must be declared in the endpoint's input schema:
+
+```typescript
+const getPostEndpoint = factory.build({
+  input: z.object({
+    userId: z.string(),   // from :userId path param
+    postId: z.string(),   // from :postId path param
+  }),
+  handler: async ({ input }) => {
+    const post = await db.posts.find({
+      userId: input.userId,
+      id: input.postId,
+    });
+    return post;
+  },
+});
+```
+
+<Warning>
+  Path parameters are always strings. Use `.transform()` to convert them to other types:
+  ```typescript
+  userId: z.string().transform((id) => parseInt(id, 10))
+  ```
+</Warning>
+
+## Method-Based Routing
+
+Handle multiple HTTP methods on the same path:
+
+```typescript
+const routing: Routing = {
+  user: {
+    get: getUserEndpoint,      // GET /user
+    post: createUserEndpoint,  // POST /user
+    put: updateUserEndpoint,   // PUT /user
+    delete: deleteUserEndpoint, // DELETE /user
+  },
+};
+```
+
+### Explicit Method in Path
+
+Specify the method directly in the route key:
+
+```typescript
+const routing: Routing = {
+  "get /v1/users": listUsersEndpoint,
+  "post /v1/users": createUserEndpoint,
+  "delete /v1/user/:id": deleteUserEndpoint,
+  
+  v1: {
+    "patch /user/:id": updateUserEndpoint,  // Mixed with nested
+  },
+};
+```
+
+<Info>
+  When a method is explicitly defined in the route, it overrides the endpoint's configured method.
+</Info>
+
+## Nested Routes
+
+Use the `.nest()` method to create both a parent route and child routes:
+
+```typescript
+const pathEndpoint = factory.build({ /* ... */ });
+const subpathEndpoint = factory.build({ /* ... */ });
+
+const routing: Routing = {
+  v1: {
+    // Creates both /v1/path and /v1/path/subpath
+    path: pathEndpoint.nest({
+      subpath: subpathEndpoint,
+    }),
+  },
+};
+```
+
+## Static File Serving
+
+Serve static files using `ServeStatic`:
+
+```typescript
+import { Routing, ServeStatic } from "express-zod-api";
+
+const routing: Routing = {
+  // Serves files from ./public directory at /assets/*
+  assets: new ServeStatic("public", {
+    dotfiles: "deny",
+    index: false,
+    redirect: false,
+  }),
+  
+  // API endpoints
+  api: {
+    v1: {
+      users: listUsersEndpoint,
+    },
+  },
+};
+```
+
+Options are passed directly to [express.static()](https://expressjs.com/en/5x/api.html#express.static).
+
+## Comprehensive Example
+
+Combining all routing styles:
+
+```typescript
+import { Routing, ServeStatic } from "express-zod-api";
+
+const routing: Routing = {
+  // Flat syntax
+  "/v1/health": healthCheckEndpoint,
+  
+  // Nested syntax
+  v1: {
+    // Method-based routing
+    users: {
+      get: listUsersEndpoint,
+      post: createUserEndpoint,
+    },
+    
+    // Path parameters
+    user: {
+      ":id": {
+        get: getUserEndpoint,
+        put: updateUserEndpoint,
+        delete: deleteUserEndpoint,
+      },
+    },
+    
+    // Explicit method in path
+    "post /auth/login": loginEndpoint,
+    "post /auth/logout": logoutEndpoint,
+    
+    // Nested endpoints
+    profile: profileEndpoint.nest({
+      avatar: avatarEndpoint,
+      settings: settingsEndpoint,
+    }),
+  },
+  
+  // Static files
+  public: new ServeStatic("assets", {
+    dotfiles: "deny",
+    index: false,
+  }),
+};
+```
+
+## Route Processing
+
+The framework processes routes by walking the routing tree:
+
+1. **Flattens paths**: Converts nested objects to flat path strings
+2. **Extracts methods**: Detects explicit methods in keys or uses endpoint's configured methods
+3. **Validates uniqueness**: Ensures no duplicate method+path combinations
+4. **Checks compatibility**: Verifies explicit methods are supported by the endpoint
+5. **Registers handlers**: Attaches endpoints to Express router
+
+### Route Validation
+
+The framework validates routes at startup:
+
+```typescript
+// ✅ Valid - different methods
+const routing = {
+  user: {
+    get: getUserEndpoint,
+    post: createUserEndpoint,
+  },
+};
+
+// ❌ Throws RoutingError - duplicate route
+const invalid = {
+  user: getUserEndpoint,
+  "get /user": getUserEndpoint,  // Same as above!
+};
+
+// ❌ Throws RoutingError - method not supported
+const getOnlyEndpoint = factory.build({ method: "get", /* ... */ });
+const invalid2 = {
+  "post /users": getOnlyEndpoint,  // Endpoint only supports GET
+};
+```
+
+## CORS and OPTIONS
+
+When CORS is enabled, the framework automatically adds OPTIONS handlers:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  cors: true,  // Adds OPTIONS handler to all routes
+});
+```
+
+The OPTIONS handler returns:
+- `Access-Control-Allow-Origin: *`
+- `Access-Control-Allow-Methods`: List of methods for that path
+- `Access-Control-Allow-Headers: content-type`
+
+## HEAD Method Support
+
+GET endpoints automatically support HEAD requests:
+
+```typescript
+const endpoint = factory.build({
+  method: "get",
+  // ...
+});
+
+// Automatically handles:
+// GET /path
+// HEAD /path
+```
+
+## Wrong Method Handling
+
+Configure how to respond when a request uses an unsupported method:
+
+```typescript
+const config = createConfig({
+  wrongMethodBehavior: 405,  // Returns 405 Method Not Allowed (default)
+  // or
+  wrongMethodBehavior: 404,  // Returns 404 Not Found
+});
+```
+
+With `405`, the response includes an `Allow` header listing valid methods:
+
+```
+HTTP/1.1 405 Method Not Allowed
+Allow: GET, POST, OPTIONS
+```
+
+## Method-Like Route Behavior
+
+Configure how keys named after HTTP methods are interpreted:
+
+```typescript
+const config = createConfig({
+  methodLikeRouteBehavior: "method",  // Treat as method (default)
+  // or
+  methodLikeRouteBehavior: "path",    // Treat as path segment
+});
+```
+
+Effect on routing:
+
+```typescript
+const routing = {
+  user: {
+    get: someEndpoint,
+  },
+};
+
+// With "method": /user (GET)
+// With "path": /user/get (any method)
+```
+
+## Initialization
+
+Routes are initialized when you create the server:
+
+```typescript
+import { createServer } from "express-zod-api";
+
+const { app, logger } = await createServer(config, routing);
+```
+
+Or attach to your own Express app:
+
+```typescript
+import { attachRouting } from "express-zod-api";
+import express from "express";
+
+const app = express();
+const { notFoundHandler, logger } = attachRouting(config, routing);
+
+app.use(notFoundHandler);  // Optional 404 handler
+app.listen(8080);
+```
+
+## Best Practices
+
+<Tip>
+  1. **Be consistent**: Choose one routing style and stick with it
+  2. **Use semantic paths**: `/users/:id` is clearer than `/u/:i`
+  3. **Group by resource**: Keep related endpoints together
+  4. **Version your API**: Use `/v1/`, `/v2/` prefixes
+  5. **Avoid deep nesting**: More than 3-4 levels becomes hard to maintain
+  6. **Use path params wisely**: `/user/:id/posts/:postId` is clearer than `/posts/:userId/:postId`
+</Tip>
+
+## Common Patterns
+
+### RESTful Resource
+
+```typescript
+const routing: Routing = {
+  api: {
+    v1: {
+      users: {
+        get: listUsers,
+        post: createUser,
+      },
+      "user/:id": {
+        get: getUser,
+        put: updateUser,
+        patch: patchUser,
+        delete: deleteUser,
+      },
+    },
+  },
+};
+```
+
+### Nested Resources
+
+```typescript
+const routing: Routing = {
+  api: {
+    v1: {
+      "user/:userId": {
+        posts: {
+          get: listUserPosts,
+          post: createUserPost,
+        },
+        "post/:postId": {
+          get: getUserPost,
+          delete: deleteUserPost,
+        },
+      },
+    },
+  },
+};
+```
+
+### Action-Based Routes
+
+```typescript
+const routing: Routing = {
+  api: {
+    v1: {
+      auth: {
+        "post /login": loginEndpoint,
+        "post /logout": logoutEndpoint,
+        "post /refresh": refreshTokenEndpoint,
+      },
+    },
+  },
+};
+```
+
+## See Also
+
+- [Endpoints](/concepts/endpoints) - Create endpoint handlers
+- [Middleware](/concepts/middleware) - Add route-level logic
+- [Error Handling](/concepts/error-handling) - Handle 404 and routing errors

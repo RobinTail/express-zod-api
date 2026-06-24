@@ -1,0 +1,270 @@
+---
+title: Response Customization
+description: Create custom result handlers to control how your API responds to successful operations and errors.
+---
+
+## Overview
+
+`ResultHandler` is responsible for transmitting consistent responses containing the endpoint output or errors. While Express Zod API provides a default handler, you can create custom ones to match your API's requirements.
+
+## Default Result Handler
+
+The `defaultResultHandler` sets the HTTP status code and ensures the following response type:
+
+```typescript
+type DefaultResponse<OUT> =
+  | { status: "success"; data: OUT } // Positive response
+  | { status: "error"; error: { message: string } }; // Negative response
+```
+
+## Creating a Custom Result Handler
+
+Here's a template for creating your own result handler:
+
+```typescript
+import { z } from "zod";
+import {
+  ResultHandler,
+  ensureHttpError,
+  getMessageFromError,
+} from "express-zod-api";
+
+const customResultHandler = new ResultHandler({
+  positive: (data) => ({
+    schema: z.object({ data }),
+    mimeType: "application/json", // optional, can be array
+  }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ error, input, output, request, response, logger }) => {
+    if (error) {
+      const { statusCode } = ensureHttpError(error);
+      const message = getMessageFromError(error);
+      return void response.status(statusCode).json({ error: message });
+    }
+    response.status(200).json({ data: output });
+  },
+});
+```
+
+## Using Custom Result Handlers
+
+After creating your custom `ResultHandler`, use it when creating an `EndpointsFactory`:
+
+```typescript
+import { EndpointsFactory } from "express-zod-api";
+
+const endpointsFactory = new EndpointsFactory(customResultHandler);
+
+const myEndpoint = endpointsFactory.build({
+  input: z.object({ name: z.string() }),
+  output: z.object({ greeting: z.string() }),
+  handler: async ({ input }) => ({
+    greeting: `Hello, ${input.name}!`,
+  }),
+});
+```
+
+## Status Code Variations
+
+For REST APIs that require different response schemas for different status codes:
+
+```typescript
+import { ResultHandler } from "express-zod-api";
+import { z } from "zod";
+
+const statusDependingHandler = new ResultHandler({
+  positive: (data) => ({
+    statusCode: [201, 202], // Created or will be created
+    schema: z.object({ status: z.literal("created"), data }),
+  }),
+  negative: [
+    {
+      statusCode: 409, // Conflict: entity already exists
+      schema: z.object({ status: z.literal("exists"), id: z.number() }),
+    },
+    {
+      statusCode: [400, 500], // Validation or internal error
+      schema: z.object({ status: z.literal("error"), reason: z.string() }),
+    },
+  ],
+  handler: ({ error, response, output }) => {
+    if (error) {
+      const httpError = ensureHttpError(error);
+      const doesExist =
+        httpError.statusCode === 409 &&
+        "id" in httpError &&
+        typeof httpError.id === "number";
+
+      return void response
+        .status(httpError.statusCode)
+        .json(
+          doesExist
+            ? { status: "exists", id: httpError.id }
+            : { status: "error", reason: httpError.message },
+        );
+    }
+    response.status(201).json({ status: "created", data: output });
+  },
+});
+```
+
+## Empty Response (204 No Content)
+
+For endpoints that don't return content:
+
+```typescript
+const noContentHandler = new ResultHandler({
+  positive: { statusCode: 204, mimeType: null, schema: z.never() },
+  negative: { statusCode: 404, mimeType: null, schema: z.never() },
+  handler: ({ error, response }) => {
+    response.status(error ? ensureHttpError(error).statusCode : 204).end();
+  },
+});
+
+const deleteFactory = new EndpointsFactory(noContentHandler);
+
+const deleteUserEndpoint = deleteFactory.build({
+  method: "delete",
+  input: z.object({ id: z.string() }),
+  output: z.object({}), // Empty output
+  handler: async ({ input }) => {
+    // Delete user logic
+    return {};
+  },
+});
+```
+
+## Custom Headers
+
+Add custom headers to responses:
+
+```typescript
+const customHeaderHandler = new ResultHandler({
+  positive: (data) => ({
+    schema: z.object({ data }),
+    mimeType: "application/json",
+  }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ error, output, response }) => {
+    // Add custom headers
+    response.set("X-API-Version", "2.0");
+    response.set("X-Request-Id", crypto.randomUUID());
+
+    if (error) {
+      const { statusCode } = ensureHttpError(error);
+      return void response.status(statusCode).json({ error: error.message });
+    }
+    response.status(200).json({ data: output });
+  },
+});
+```
+
+## Resource Cleanup
+
+Clean up resources at the end of request processing:
+
+```typescript
+import { ResultHandler } from "express-zod-api";
+
+const cleanupHandler = new ResultHandler({
+  positive: (data) => ({
+    schema: z.object({ data }),
+    mimeType: "application/json",
+  }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ ctx, error, output, response }) => {
+    // Cleanup logic
+    if ("db" in ctx && ctx.db) {
+      ctx.db.connection.close(); // Example cleanup
+    }
+
+    if (error) {
+      const { statusCode } = ensureHttpError(error);
+      return void response.status(statusCode).json({ error: error.message });
+    }
+    response.status(200).json({ data: output });
+  },
+});
+```
+
+## Multiple MIME Types
+
+Support multiple MIME types in responses:
+
+```typescript
+const multiMimeHandler = new ResultHandler({
+  positive: (data) => ({
+    schema: z.object({ data }),
+    mimeType: ["application/json", "application/xml"], // Array of MIME types
+  }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ error, output, response, request }) => {
+    const acceptsXml = request.accepts("xml");
+
+    if (error) {
+      return void response.status(ensureHttpError(error).statusCode).json({
+        error: error.message,
+      });
+    }
+
+    if (acceptsXml) {
+      // Return XML
+      response.type("xml").send(convertToXml(output));
+    } else {
+      // Return JSON
+      response.json({ data: output });
+    }
+  },
+});
+```
+
+## Real-World Example
+
+Here's a complete example from the Express Zod API examples:
+
+```typescript
+import { EndpointsFactory, ResultHandler } from "express-zod-api";
+import { z } from "zod";
+
+const statusDependingFactory = new EndpointsFactory(
+  new ResultHandler({
+    positive: (data) => ({
+      statusCode: [201, 202],
+      schema: z.object({ status: z.literal("created"), data }),
+    }),
+    negative: [
+      {
+        statusCode: 409,
+        schema: z.object({ status: z.literal("exists"), id: z.number() }),
+      },
+      {
+        statusCode: [400, 500],
+        schema: z.object({ status: z.literal("error"), reason: z.string() }),
+      },
+    ],
+    handler: ({ error, response, output }) => {
+      if (error) {
+        const httpError = ensureHttpError(error);
+        const doesExist =
+          httpError.statusCode === 409 &&
+          "id" in httpError &&
+          typeof httpError.id === "number";
+        return void response
+          .status(httpError.statusCode)
+          .json(
+            doesExist
+              ? { status: "exists", id: httpError.id }
+              : { status: "error", reason: httpError.message },
+          );
+      }
+      response.status(201).json({ status: "created", data: output });
+    },
+  }),
+);
+```
+
+## Related Topics
+
+- [Non-JSON Responses](/advanced/non-json-responses) - Serving files and other content types
+- [Error Handling](/core-concepts/error-handling) - Understanding error handling
+- [Production Mode](/advanced/production-mode) - Error message behavior in production

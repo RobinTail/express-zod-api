@@ -1,0 +1,298 @@
+---
+title: "Server Functions"
+description: "Start and configure your Express Zod API server"
+---
+
+## Overview
+
+Express Zod API provides functions to start standalone servers or attach to existing Express applications.
+
+## createServer()
+
+Creates and starts an HTTP/HTTPS server with your configuration and routing.
+
+```typescript
+import { createServer, createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: true,
+});
+
+await createServer(config, routing);
+```
+
+### Signature
+
+```typescript
+function createServer(
+  config: ServerConfig,
+  routing: Routing
+): Promise<{
+  app: Express;
+  servers: Server[];
+  logger: Logger;
+}>;
+```
+
+### Returns
+
+<ResponseField name="app" type="Express">
+  Express application instance
+</ResponseField>
+
+<ResponseField name="servers" type="Server[]">
+  Array of HTTP/HTTPS server instances
+</ResponseField>
+
+<ResponseField name="logger" type="Logger">
+  Logger instance
+</ResponseField>
+
+### Examples
+
+#### Basic Server
+
+```typescript
+import { createServer, createConfig, Routing } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: true,
+  logger: { level: "info" },
+});
+
+const routing: Routing = {
+  v1: {
+    users: listUsersEndpoint,
+  },
+};
+
+const { app, servers, logger } = await createServer(config, routing);
+
+logger.info("Server started successfully");
+```
+
+#### HTTPS Server
+
+```typescript
+import { readFileSync } from "fs";
+
+const config = createConfig({
+  https: {
+    options: {
+      cert: readFileSync("cert.pem"),
+      key: readFileSync("key.pem"),
+    },
+    listen: 443,
+  },
+  cors: true,
+});
+
+await createServer(config, routing);
+```
+
+#### Both HTTP and HTTPS
+
+```typescript
+const config = createConfig({
+  http: { listen: 80 },
+  https: {
+    options: {
+      cert: readFileSync("cert.pem"),
+      key: readFileSync("key.pem"),
+    },
+    listen: 443,
+  },
+  cors: true,
+});
+
+const { servers } = await createServer(config, routing);
+
+// servers[0] is HTTP, servers[1] is HTTPS
+```
+
+#### With Graceful Shutdown
+
+```typescript
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: true,
+  gracefulShutdown: {
+    timeout: 30000,
+    beforeShutdown: async () => {
+      await db.disconnect();
+      await redis.quit();
+    },
+  },
+});
+
+await createServer(config, routing);
+```
+
+## attachRouting()
+
+Attaches routing to an existing Express application or router.
+
+```typescript
+import express from "express";
+import { attachRouting, createConfig } from "express-zod-api";
+
+const app = express();
+
+const config = createConfig({
+  app,
+  cors: true,
+  logger: { level: "info" },
+});
+
+const { notFoundHandler, logger } = attachRouting(config, routing);
+
+app.use(notFoundHandler);
+app.listen(8090);
+```
+
+### Signature
+
+```typescript
+function attachRouting(
+  config: AppConfig,
+  routing: Routing
+): {
+  notFoundHandler: RequestHandler;
+  logger: Logger;
+};
+```
+
+### Returns
+
+<ResponseField name="notFoundHandler" type="RequestHandler">
+  Middleware for handling 404 errors
+</ResponseField>
+
+<ResponseField name="logger" type="Logger">
+  Logger instance
+</ResponseField>
+
+### Examples
+
+#### Basic Attachment
+
+```typescript
+import express from "express";
+import { attachRouting, createConfig } from "express-zod-api";
+
+const app = express();
+
+// Add your own routes
+app.get("/health", (req, res) => res.send("OK"));
+
+// Attach Express Zod API routing
+const config = createConfig({
+  app,
+  cors: true,
+});
+
+const { notFoundHandler } = attachRouting(config, routing);
+
+app.use(notFoundHandler);
+
+app.listen(8090, () => {
+  console.log("Server running on http://localhost:8090");
+});
+```
+
+#### With Router
+
+```typescript
+import express from "express";
+import { attachRouting, createConfig } from "express-zod-api";
+
+const app = express();
+const apiRouter = express.Router();
+
+const config = createConfig({
+  app: apiRouter,
+  cors: true,
+});
+
+attachRouting(config, routing);
+
+app.use("/api", apiRouter);
+app.listen(8090);
+```
+
+## Configuration Examples
+
+### Development Server
+
+```typescript
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: true,
+  logger: {
+    level: "debug",
+    color: true,
+  },
+  startupLogo: true,
+});
+
+await createServer(config, routing);
+```
+
+### Production Server
+
+```typescript
+import winston from "winston";
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
+  ],
+});
+
+const config = createConfig({
+  https: {
+    options: {
+      cert: readFileSync(process.env.SSL_CERT_PATH),
+      key: readFileSync(process.env.SSL_KEY_PATH),
+    },
+    listen: 443,
+  },
+  cors: ({ defaultHeaders }) => ({
+    ...defaultHeaders,
+    "Access-Control-Allow-Origin": process.env.ALLOWED_ORIGIN,
+  }),
+  logger,
+  compression: { threshold: "1kb" },
+  gracefulShutdown: {
+    timeout: 30000,
+    beforeShutdown: async () => {
+      await db.close();
+    },
+  },
+  startupLogo: false,
+});
+
+await createServer(config, routing);
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="createConfig" href="/api/create-config">
+    Create configuration objects
+  </Card>
+  <Card title="Routing" href="/api/routing">
+    Define your API routes
+  </Card>
+  <Card title="Express App Integration" href="/integration/express-app">
+    Integrate with existing Express apps
+  </Card>
+  <Card title="Production Mode" href="/advanced/production-mode">
+    Production deployment guide
+  </Card>
+</CardGroup>
