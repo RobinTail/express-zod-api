@@ -157,13 +157,17 @@ export const makeGetLogger =
     (request as EquippedRequest | undefined)?.res?.locals[localsID]?.logger ||
     fallback;
 
-export const installDeprecationListener = (logger: ActualLogger) =>
+let hasDeprecationListener = false;
+export const installDeprecationListener = (logger: ActualLogger) => {
+  if (hasDeprecationListener) return;
+  hasDeprecationListener = true;
   process.on("deprecation", ({ message, namespace, name, stack }) =>
     logger.warn(
       `${name} (${namespace}): ${message}`,
       stack.split("\n").slice(1),
     ),
   );
+};
 
 export const installTerminationListener = ({
   servers,
