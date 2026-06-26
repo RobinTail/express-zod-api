@@ -185,7 +185,9 @@ export const installTerminationListener = ({
   if (monitors.length > 1) return;
   const onTerm = async () => {
     await Promise.allSettled(monitors.map(({ shutdown }) => shutdown()));
-    await Promise.allSettled(beforeExitHooks.map((hook) => hook()));
+    await Promise.allSettled(
+      beforeExitHooks.map((hook) => Promise.resolve().then(() => hook())),
+    );
     process.exit();
   };
   for (const trigger of events) process.on(trigger, onTerm);
