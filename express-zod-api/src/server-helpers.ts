@@ -169,6 +169,7 @@ export const installDeprecationListener = (logger: ActualLogger) => {
   );
 };
 
+let hasTerminationListener = false;
 export const installTerminationListener = ({
   servers,
   logger,
@@ -178,6 +179,8 @@ export const installTerminationListener = ({
   options: Extract<ServerConfig["gracefulShutdown"], object>;
   logger: ActualLogger;
 }) => {
+  if (hasTerminationListener) return;
+  hasTerminationListener = true;
   const graceful = monitor(servers, { logger, timeout });
   const onTerm = async () => {
     await graceful.shutdown();
