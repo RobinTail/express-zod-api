@@ -12,11 +12,12 @@ import {
 } from "./graceful-helpers";
 
 export const monitor = (
-  servers: Array<http.Server | https.Server>,
+  initialServers: Array<http.Server | https.Server>,
   { timeout = 1e3, logger }: { timeout?: number; logger?: ActualLogger } = {},
 ) => {
   let pending: Promise<PromiseSettledResult<void>[]> | undefined;
   const sockets = new Set<Socket>();
+  const servers: Array<http.Server | https.Server> = [];
   const destroy = (socket: Socket) => void sockets.delete(socket.destroy());
 
   const disconnect = (socket: Socket) =>
@@ -25,14 +26,25 @@ export const monitor = (
         socket._httpMessage.setHeader("connection", "close")
       : /* v8 ignore next -- unreachable */ destroy(socket));
 
+  const cleanup = (socket: Socket) => void sockets.delete(socket);
   const watch = (socket: Socket) =>
     void (pending
       ? /* v8 ignore next -- unstable */ socket.destroy()
-      : sockets.add(socket.once("close", () => void sockets.delete(socket))));
+      : sockets.add(
+          socket
+            .once("close", () => cleanup(socket))
+            .once("error", () => cleanup(socket)), // @todo test
+        ));
 
-  for (const server of servers) // eslint-disable-next-line curly
-    for (const event of ["connection", "secureConnection"])
-      server.on(event, watch);
+  const addServers = (additional: typeof servers) => {
+    for (const server of additional) {
+      for (const event of ["connection", "secureConnection"] as const)
+        server.on(event, watch);
+      servers.push(server);
+    }
+  };
+
+  addServers(initialServers);
 
   const workflow = async () => {
     for (const server of servers) server.on("request", weAreClosed);
@@ -45,5 +57,5 @@ export const monitor = (
     return Promise.allSettled(servers.map(closeAsync));
   };
 
-  return { sockets, shutdown: () => (pending ??= workflow()) };
+  return { sockets, shutdown: () => (pending ??= workflow()), addServers };
 };
