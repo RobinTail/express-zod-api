@@ -14,6 +14,7 @@ const appMock = {
   put: vi.fn(),
   patch: vi.fn(),
   delete: vi.fn(),
+  query: vi.fn(),
   options: vi.fn(),
   init: vi.fn(),
   all: vi.fn(),

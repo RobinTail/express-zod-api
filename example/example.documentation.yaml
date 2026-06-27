@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
   title: Example API
   version: 0.0.0
@@ -76,7 +76,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -138,7 +138,7 @@ paths:
               - "1234567890"
           examples:
             example1:
-              value: "1234567890"
+              dataValue: "1234567890"
         - name: id
           in: path
           required: true
@@ -149,7 +149,7 @@ paths:
               - "12"
           examples:
             example1:
-              value: "12"
+              dataValue: "12"
       requestBody:
         description: PATCH /v1/user/:id Request body
         content:
@@ -184,7 +184,7 @@ paths:
                 - birthday
             examples:
               example1:
-                value:
+                dataValue:
                   key: 1234-5678-90
                   name: John Doe
                   birthday: 1963-04-21
@@ -230,7 +230,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: success
                     data:
                       name: John Doe
@@ -259,7 +259,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -285,7 +285,7 @@ paths:
                 - name
             examples:
               example1:
-                value:
+                dataValue:
                   name: John Doe
         required: true
       responses:
@@ -388,26 +388,28 @@ paths:
                   - reason
                 additionalProperties: false
   /v1/user/list:
-    get:
-      operationId: GetV1UserList
+    query:
+      operationId: QueryV1UserList
       tags:
         - users
-      parameters:
-        - name: roles
-          in: query
-          required: false
-          description: GET /v1/user/list Parameter
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - manager
-                - operator
-                - admin
+      requestBody:
+        description: QUERY /v1/user/list Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roles:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - manager
+                      - operator
+                      - admin
       responses:
         "200":
-          description: GET /v1/user/list Positive response
+          description: QUERY /v1/user/list Positive response
           content:
             application/json:
               schema:
@@ -429,7 +431,7 @@ paths:
                   additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     - name: Hunter Schafer
                       role: manager
                     - name: Laverne Cox
@@ -437,36 +439,14 @@ paths:
                     - name: Patti Harrison
                       role: admin
         "400":
-          description: GET /v1/user/list Negative response
+          description: QUERY /v1/user/list Negative response
           content:
             text/plain:
               schema:
                 type: string
               examples:
                 example1:
-                  value: Sample error message
-    head:
-      operationId: HeadV1UserList
-      tags:
-        - users
-      parameters:
-        - name: roles
-          in: query
-          required: false
-          description: HEAD /v1/user/list Parameter
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - manager
-                - operator
-                - admin
-      responses:
-        "200":
-          description: HEAD /v1/user/list Positive response
-        "400":
-          description: HEAD /v1/user/list Negative response
+                  dataValue: Sample error message
   /v1/login:
     post:
       operationId: PostV1Login
@@ -536,7 +516,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -736,7 +716,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -803,7 +783,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -827,7 +807,7 @@ paths:
           description: GET /v1/events/stream Positive response
           content:
             text/event-stream:
-              schema:
+              itemSchema:
                 type: object
                 properties:
                   data:
@@ -948,7 +928,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -1075,7 +1055,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message

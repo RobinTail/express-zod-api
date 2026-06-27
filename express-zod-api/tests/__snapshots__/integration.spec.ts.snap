@@ -37,7 +37,14 @@ interface PostV1CustomNegativeResponseVariants {
 
 export type Path = "/v1/custom";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  | "get"
+  | "post"
+  | "put"
+  | "delete"
+  | "patch"
+  | "query"
+  | "head";
 
 export interface Input {
   "post /v1/custom": PostV1CustomInput;
@@ -121,7 +128,14 @@ interface HeadV1PathNegativeResponseVariants {
 
 export type Path = "/v1/path";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  | "get"
+  | "post"
+  | "put"
+  | "delete"
+  | "patch"
+  | "query"
+  | "head";
 
 export interface Input {
   "get /v1/path": GetV1PathInput;
@@ -192,7 +206,14 @@ interface GetV1PathNegativeResponseVariants {
 
 export type Path = "/v1/path";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  | "get"
+  | "post"
+  | "put"
+  | "delete"
+  | "patch"
+  | "query"
+  | "head";
 
 export interface Input {
   "get /v1/path": GetV1PathInput;
@@ -265,7 +286,14 @@ interface PostV1MtplNegativeResponseVariants {
 
 export type Path = "/v1/mtpl";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  | "get"
+  | "post"
+  | "put"
+  | "delete"
+  | "patch"
+  | "query"
+  | "head";
 
 export interface Input {
   "post /v1/mtpl": PostV1MtplInput;
@@ -302,62 +330,62 @@ exports[`Integration > Should support types variant and handle recursive schemas
 
 type SomeOf<T> = T[keyof T];
 
-/** post /v1/test */
-type PostV1TestInput = {
+/** query /v1/test */
+type QueryV1TestInput = {
     features: Type1;
 };
 
-/** post /v1/test */
-type PostV1TestPositiveVariant1 = {
+/** query /v1/test */
+type QueryV1TestPositiveVariant1 = {
     status: "success";
     data: {};
 };
 
-/** post /v1/test */
-interface PostV1TestPositiveResponseVariants {
-    200: PostV1TestPositiveVariant1;
+/** query /v1/test */
+interface QueryV1TestPositiveResponseVariants {
+    200: QueryV1TestPositiveVariant1;
 }
 
-/** post /v1/test */
-type PostV1TestNegativeVariant1 = {
+/** query /v1/test */
+type QueryV1TestNegativeVariant1 = {
     status: "error";
     error: {
         message: string;
     };
 };
 
-/** post /v1/test */
-interface PostV1TestNegativeResponseVariants {
-    400: PostV1TestNegativeVariant1;
+/** query /v1/test */
+interface QueryV1TestNegativeResponseVariants {
+    400: QueryV1TestNegativeVariant1;
 }
 
 export type Path = "/v1/test";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
     /** @deprecated */
-    "post /v1/test": PostV1TestInput;
+    "query /v1/test": QueryV1TestInput;
 }
 
 export interface PositiveResponse {
     /** @deprecated */
-    "post /v1/test": SomeOf<PostV1TestPositiveResponseVariants>;
+    "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
     /** @deprecated */
-    "post /v1/test": SomeOf<PostV1TestNegativeResponseVariants>;
+    "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
     /** @deprecated */
-    "post /v1/test": PostV1TestPositiveResponseVariants & PostV1TestNegativeResponseVariants;
+    "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
 }
 
 export interface Response {
     /** @deprecated */
-    "post /v1/test": PositiveResponse["post /v1/test"] | NegativeResponse["post /v1/test"];
+    "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
 }
 
 export type Request = keyof Input;"
@@ -371,62 +399,62 @@ exports[`Integration > Should support types variant and handle recursive schemas
 
 type SomeOf<T> = T[keyof T];
 
-/** post /v1/test */
-type PostV1TestInput = {
+/** query /v1/test */
+type QueryV1TestInput = {
     features: Type1;
 };
 
-/** post /v1/test */
-type PostV1TestPositiveVariant1 = {
+/** query /v1/test */
+type QueryV1TestPositiveVariant1 = {
     status: "success";
     data: {};
 };
 
-/** post /v1/test */
-interface PostV1TestPositiveResponseVariants {
-    200: PostV1TestPositiveVariant1;
+/** query /v1/test */
+interface QueryV1TestPositiveResponseVariants {
+    200: QueryV1TestPositiveVariant1;
 }
 
-/** post /v1/test */
-type PostV1TestNegativeVariant1 = {
+/** query /v1/test */
+type QueryV1TestNegativeVariant1 = {
     status: "error";
     error: {
         message: string;
     };
 };
 
-/** post /v1/test */
-interface PostV1TestNegativeResponseVariants {
-    400: PostV1TestNegativeVariant1;
+/** query /v1/test */
+interface QueryV1TestNegativeResponseVariants {
+    400: QueryV1TestNegativeVariant1;
 }
 
 export type Path = "/v1/test";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
     /** @deprecated */
-    "post /v1/test": PostV1TestInput;
+    "query /v1/test": QueryV1TestInput;
 }
 
 export interface PositiveResponse {
     /** @deprecated */
-    "post /v1/test": SomeOf<PostV1TestPositiveResponseVariants>;
+    "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
     /** @deprecated */
-    "post /v1/test": SomeOf<PostV1TestNegativeResponseVariants>;
+    "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
     /** @deprecated */
-    "post /v1/test": PostV1TestPositiveResponseVariants & PostV1TestNegativeResponseVariants;
+    "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
 }
 
 export interface Response {
     /** @deprecated */
-    "post /v1/test": PositiveResponse["post /v1/test"] | NegativeResponse["post /v1/test"];
+    "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
 }
 
 export type Request = keyof Input;"
@@ -468,7 +496,14 @@ interface PostV1TestWithDashesNegativeResponseVariants {
 
 export type Path = "/v1/test-with-dashes";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  | "get"
+  | "post"
+  | "put"
+  | "delete"
+  | "patch"
+  | "query"
+  | "head";
 
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;

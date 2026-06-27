@@ -117,6 +117,7 @@ describe("Example", async () => {
       signal,
     }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/list`, {
+        method: "QUERY",
         signal,
       });
       expect(response.status).toBe(200);
@@ -605,7 +606,8 @@ describe("Example", async () => {
     });
   });
 
-  describe("OpenAPI Documentation", () => {
+  /** @todo temporary replaced with oas.yml workflow, restore when the validator supports 3.2 */
+  describe.skip("OpenAPI Documentation", () => {
     test.extend("response", async ({ signal }) => {
       const data = await readFile("example.documentation.yaml", "utf-8");
       try {

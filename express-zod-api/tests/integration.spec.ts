@@ -35,7 +35,7 @@ describe("Integration", () => {
           v1: {
             test: defaultEndpointsFactory
               .build({
-                method: "post",
+                method: "query",
                 input: z.object({
                   features: recursiveSchema,
                 }),
@@ -137,7 +137,7 @@ describe("Integration", () => {
         globalRegistry.remove(schema);
         return next(schema);
       };
-      const client = await Integration.create({
+      const client = new Integration({
         config: configMock,
         variant: "types",
         brandHandling: {
