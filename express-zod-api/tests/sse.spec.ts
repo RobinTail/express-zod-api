@@ -110,6 +110,24 @@ describe("SSE", () => {
       requestMock.emit("close");
       expect(signal?.aborted).toBeTruthy();
     });
+
+    test("should clear the stream timeout when request closes before timeout fires", async () => {
+      vi.useFakeTimers();
+      try {
+        const middleware = makeMiddleware({ test: z.string() });
+        const { requestMock, responseMock, output } = await testMiddleware({
+          middleware,
+        });
+        expect(output.signal?.aborted).toBeFalsy();
+        expect(responseMock.headersSent).toBeFalsy();
+        requestMock.emit("close");
+        expect(output.signal?.aborted).toBeTruthy();
+        vi.advanceTimersByTime(10000);
+        expect(responseMock.headersSent).toBeFalsy();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
   });
 
   describe("makeResultHandler()", () => {
