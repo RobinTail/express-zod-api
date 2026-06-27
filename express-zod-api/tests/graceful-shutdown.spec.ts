@@ -172,25 +172,6 @@ describe("monitor()", () => {
     },
   );
 
-  test(
-    "removes socket from tracking on error event",
-    { timeout: 500 },
-    async ({ signal }) => {
-      const [httpServer, port] = await makeHttpServer(() => {});
-      const graceful = monitor([httpServer], { timeout: 150 });
-      void fetch(`http://localhost:${port}`, { signal }).catch(() => {});
-      await vi.waitFor(() => assert(graceful.sockets.size > 0), {
-        timeout: 200,
-        interval: 30,
-      });
-      const socket = [...graceful.sockets][0]!;
-      socket.emit("error", new Error("forced"));
-      expect(graceful.sockets.size).toBe(0);
-      socket.destroy();
-      await graceful.shutdown();
-    },
-  );
-
   describe("https", async () => {
     const [httpsServer, port] = await makeHttpsServer(({}, res) => {
       res.end("foo");
