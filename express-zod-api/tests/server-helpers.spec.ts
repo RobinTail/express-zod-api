@@ -322,18 +322,14 @@ describe("Server helpers", () => {
   });
 
   describe("installDeprecationListener()", () => {
-    const spy = vi.spyOn(process, "on").mockImplementation(vi.fn());
-    test.each([1, 2])(
-      "should assign deprecation event listener on process once",
-      () => {
-        const logger = makeLoggerMock();
-        installDeprecationListener(logger);
-        expect(spy).toHaveBeenCalledExactlyOnceWith(
-          "deprecation",
-          expect.any(Function),
-        );
-      },
-    );
+    test("should assign deprecation event listener on process once", () => {
+      const spy = vi.spyOn(process, "on").mockImplementation(vi.fn());
+      const logger = makeLoggerMock();
+      installDeprecationListener(logger);
+      expect(spy).toHaveBeenCalledWith("deprecation", expect.any(Function));
+      installDeprecationListener(logger);
+      expect(spy).toHaveBeenCalledOnce();
+    });
   });
 
   describe("installTerminationListener", () => {
