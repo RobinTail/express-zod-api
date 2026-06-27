@@ -33,7 +33,7 @@ export const monitor = (
       : sockets.add(
           socket
             .once("close", () => cleanup(socket))
-            .once("error", () => cleanup(socket)), // @todo test
+            .once("error", () => cleanup(socket)),
         ));
 
   const addServers = (additional: typeof servers) => {
