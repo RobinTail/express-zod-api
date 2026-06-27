@@ -2,6 +2,13 @@
 
 ## Version 28
 
+### v28.7.2
+
+- Several minor memory optimizations:
+  - Ensured a single deprecation event listener on the process;
+  - When `gracefulShutdown` is enabled, destroying broken sockets immediately (edge case);
+  - For SSE endpoints, removing the stream ensuring timer when the connection is closed.
+
 ### v28.7.1
 
 - Fix: supporting the latest versions of `express-rate-limit` (v8) for the rate limiting feature.
