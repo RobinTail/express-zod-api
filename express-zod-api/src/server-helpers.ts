@@ -172,7 +172,7 @@ export const installDeprecationListener = (logger: ActualLogger) => {
 
 let graceful: ReturnType<typeof monitor> | undefined;
 let onTerm: (() => Promise<void>) | undefined;
-const exitHooks: Array<() => Promise<void>> = [];
+const beforeExitHooks = new Set<() => Promise<void>>();
 export const installTerminationListener = ({
   servers,
   logger,
@@ -184,12 +184,12 @@ export const installTerminationListener = ({
 }) => {
   graceful ??= monitor({ logger, timeout });
   graceful.add(...servers);
-  if (beforeExit) exitHooks.push(() => Promise.resolve().then(beforeExit));
+  if (beforeExit) beforeExitHooks.add(() => Promise.resolve().then(beforeExit));
   onTerm ??= async () => {
     if (graceful?.isShuttingDown) return;
     await graceful?.shutdown();
-    if (exitHooks.length)
-      await Promise.allSettled(exitHooks.map((hook) => hook()));
+    if (beforeExitHooks.size)
+      await Promise.allSettled([...beforeExitHooks].map((hook) => hook()));
     process.exit();
   };
   for (const trigger of events) {

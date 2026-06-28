@@ -14,7 +14,7 @@ export const monitor = ({
   logger,
 }: { timeout?: number; logger?: ActualLogger } = {}) => {
   let pending: Promise<PromiseSettledResult<void>[]> | undefined;
-  const servers: Array<Server> = [];
+  const servers = new Set<Server>();
   const sockets = new Set<Socket>();
   const cleanup = (socket: Socket) => void sockets.delete(socket);
   const destroy = (socket: Socket) => cleanup(socket.destroy());
@@ -42,16 +42,18 @@ export const monitor = ({
     for await (const started of setInterval(10, Date.now()))
       if (sockets.size === 0 || Date.now() - started >= timeout) break;
     for (const socket of sockets) destroy(socket);
-    return Promise.allSettled(servers.map(closeAsync));
+    return Promise.allSettled([...servers].map(closeAsync));
   };
 
   const instance = {
     sockets,
     add: (...subjects: Server[]) => {
-      servers.push(...subjects);
-      for (const server of subjects) // eslint-disable-next-line curly
+      for (const server of subjects) {
+        if (servers.has(server)) continue;
+        servers.add(server);
         for (const event of ["connection", "secureConnection"])
           server.on(event, watch);
+      }
       return instance;
     },
     shutdown: () => (pending ??= workflow()),
