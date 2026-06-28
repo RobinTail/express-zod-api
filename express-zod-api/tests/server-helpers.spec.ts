@@ -335,7 +335,17 @@ describe("Server helpers", () => {
   describe("installTerminationListener", () => {
     test("should install termination signal listener on process only once per event", () => {
       const eventName = "NOT_HAPPEN";
-      expect(process.listenerCount(eventName)).toBe(0);
+      const listeners: Record<string, any[]> = {};
+      const spy = vi
+        .spyOn(process, "on")
+        .mockImplementation((evt: string, fn: any) => {
+          listeners[evt] ??= [];
+          listeners[evt].push(fn);
+          return process;
+        });
+      vi.spyOn(process, "listeners").mockImplementation(
+        (evt: string) => listeners[evt] ?? [],
+      );
       const logger = makeLoggerMock();
       const argument = {
         servers: [],
@@ -343,10 +353,15 @@ describe("Server helpers", () => {
         options: { events: [eventName] },
       };
       installTerminationListener(argument);
-      expect(process.listenerCount(eventName)).toBe(1);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(
+        eventName,
+        expect.any(Function),
+      );
       installTerminationListener(argument);
-      expect(process.listenerCount(eventName)).toBe(1);
-      process.removeAllListeners(eventName);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(
+        eventName,
+        expect.any(Function),
+      );
     });
   });
 });
