@@ -42,7 +42,7 @@ export const monitor = ({
     for await (const started of setInterval(10, Date.now()))
       if (sockets.size === 0 || Date.now() - started >= timeout) break;
     for (const socket of sockets) destroy(socket);
-    return Promise.allSettled([...servers].map(closeAsync));
+    return Promise.allSettled(servers.values().map(closeAsync));
   };
 
   const instance = {
