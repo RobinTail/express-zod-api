@@ -186,8 +186,9 @@ export const installTerminationListener = ({
   graceful.add(...servers);
   if (beforeExit) exitHooks.push(() => Promise.resolve().then(beforeExit));
   onTerm ??= async () => {
+    if (graceful?.isShuttingDown) return;
     await graceful?.shutdown();
-    await Promise.allSettled(exitHooks.splice(0).map((hook) => hook()));
+    await Promise.allSettled(exitHooks.map((hook) => hook()));
     logger.info("Done.");
     process.exit();
   };

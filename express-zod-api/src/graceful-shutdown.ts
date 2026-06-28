@@ -52,5 +52,10 @@ export const monitor = ({
     return Promise.allSettled(servers.map(closeAsync));
   };
 
-  return { sockets, add, shutdown: () => (pending ??= workflow()) };
+  return {
+    sockets,
+    add,
+    shutdown: () => (pending ??= workflow()),
+    get isShuttingDown() { return !!pending; }, // eslint-disable-line prettier/prettier
+  };
 };
