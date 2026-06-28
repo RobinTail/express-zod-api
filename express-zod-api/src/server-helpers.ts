@@ -188,11 +188,8 @@ export const installTerminationListener = ({
   onTerm ??= async () => {
     if (graceful?.isShuttingDown) return;
     await graceful?.shutdown();
-    if (exitHooks.size) {
-      await Promise.allSettled(
-        [...exitHooks].map((hook) => Promise.resolve().then(hook)),
-      );
-    }
+    if (exitHooks.size)
+      await Promise.allSettled([...exitHooks].map(async (hook) => hook()));
     process.exit();
   };
   for (const trigger of events) {
