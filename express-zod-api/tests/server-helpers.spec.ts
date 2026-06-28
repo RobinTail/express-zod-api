@@ -356,7 +356,7 @@ describe("Server helpers", () => {
       installTerminationListener({
         servers: [],
         logger,
-        options: { events: ["NOT_HAPPEN", "ANOTHER_ONE"] },
+        options: { events: ["NOT_HAPPEN", "ANOTHER_ONE", "NOT_HAPPEN"] },
       });
       expect(spy.mock.calls).toEqual([
         ["NOT_HAPPEN", expect.any(Function)],
