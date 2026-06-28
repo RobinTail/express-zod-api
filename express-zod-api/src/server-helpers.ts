@@ -171,7 +171,7 @@ export const installDeprecationListener = (logger: ActualLogger) => {
 };
 
 let graceful: ReturnType<typeof monitor> | undefined;
-let onTerm: () => Promise<void> | undefined;
+let onTerm: (() => Promise<void>) | undefined;
 const exitHooks: Array<() => Promise<void>> = [];
 export const installTerminationListener = ({
   servers,
