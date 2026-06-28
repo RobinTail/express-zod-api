@@ -329,6 +329,7 @@ describe("Server helpers", () => {
       expect(spy).toHaveBeenCalledWith("deprecation", expect.any(Function));
       installDeprecationListener(logger);
       expect(spy).toHaveBeenCalledOnce();
+      spy.mockReset();
     });
   });
 
