@@ -7,6 +7,6 @@ describe("Set iteration", () => {
     return void [...set].map(mapper);
   });
   bench("values map", () => {
-    return void set.values().map(mapper);
+    return void [...set.values().map(mapper)];
   });
 });
