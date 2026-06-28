@@ -72,7 +72,7 @@ const performanceConcerns = [
   {
     selector:
       "CallExpression > MemberExpression[property.name='map'] > ArrayExpression > SpreadElement",
-    message: "Set::values().map() would be 5% faster and more memory efficient",
+    message: "use Set::values().map() instead (mem+perf)",
   },
 ];
 
