@@ -84,7 +84,9 @@ describe("monitor()", () => {
         signal,
       });
       await setTimeout(50);
+      expect(graceful.isShuttingDown).toBeFalsy();
       void graceful.shutdown();
+      expect(graceful.isShuttingDown).toBeTruthy();
       await setTimeout(50);
       const request1 = fetch(`http://localhost:${port}`, {
         headers: { connection: "close" },
