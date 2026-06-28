@@ -34,13 +34,6 @@ export const monitor = ({
             .once("error", () => destroy(socket)),
         ));
 
-  const add = (...subjects: Server[]) => {
-    servers.push(...subjects);
-    for (const server of subjects) // eslint-disable-next-line curly
-      for (const event of ["connection", "secureConnection"])
-        server.on(event, watch);
-  };
-
   const workflow = async () => {
     for (const server of servers) server.on("request", weAreClosed);
     logger?.info("Graceful shutdown", { sockets: sockets.size, timeout });
@@ -52,10 +45,17 @@ export const monitor = ({
     return Promise.allSettled(servers.map(closeAsync));
   };
 
-  return {
+  const instance = {
     sockets,
-    add,
+    add: (...subjects: Server[]) => {
+      servers.push(...subjects);
+      for (const server of subjects) // eslint-disable-next-line curly
+        for (const event of ["connection", "secureConnection"])
+          server.on(event, watch);
+      return instance;
+    },
     shutdown: () => (pending ??= workflow()),
     get isShuttingDown() { return !!pending; }, // eslint-disable-line prettier/prettier
   };
+  return instance;
 };

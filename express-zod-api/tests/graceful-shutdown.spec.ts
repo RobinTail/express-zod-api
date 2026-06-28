@@ -37,8 +37,7 @@ describe("monitor()", () => {
     async () => {
       const [httpServer] = await makeHttpServer(vi.fn());
       expect(httpServer.listening).toBeTruthy();
-      const graceful = monitor();
-      graceful.add(httpServer);
+      const graceful = monitor().add(httpServer);
       await graceful.shutdown();
       expect(httpServer.listening).toBeFalsy();
     },
@@ -50,8 +49,7 @@ describe("monitor()", () => {
     async ({ signal }) => {
       const handler = vi.fn();
       const [httpServer, port] = await makeHttpServer(handler);
-      const graceful = monitor({ timeout: 150 });
-      graceful.add(httpServer);
+      const graceful = monitor({ timeout: 150 }).add(httpServer);
       void fetch(`http://localhost:${port}`, {
         signal,
         headers: { connection: "close" },
@@ -77,8 +75,7 @@ describe("monitor()", () => {
         await setTimeout(100);
         res.end("foo");
       });
-      const graceful = monitor({ timeout: 150 });
-      graceful.add(httpServer);
+      const graceful = monitor({ timeout: 150 }).add(httpServer);
       const request0 = fetch(`http://localhost:${port}`, {
         headers: { connection: "close" },
         signal,
@@ -107,8 +104,7 @@ describe("monitor()", () => {
         await setTimeout(100);
         res.end("foo");
       });
-      const graceful = monitor({ timeout: 150 });
-      graceful.add(httpServer);
+      const graceful = monitor({ timeout: 150 }).add(httpServer);
       const request = fetch(`http://localhost:${port}`, {
         keepalive: true,
         signal,
@@ -137,8 +133,7 @@ describe("monitor()", () => {
           res.end("baz");
         });
       const [httpServer, port] = await makeHttpServer(handler);
-      const graceful = monitor({ timeout: 150 });
-      graceful.add(httpServer);
+      const graceful = monitor({ timeout: 150 }).add(httpServer);
       const dispatcher = new Agent({ pipelining: 5, keepAliveTimeout: 5e3 });
       const request0 = fetch(`http://localhost:${port}`, {
         dispatcher,
@@ -168,8 +163,7 @@ describe("monitor()", () => {
       const [httpServer, port] = await makeHttpServer(({}, res) => {
         res.end("foo");
       });
-      const graceful = monitor({ timeout: 150 });
-      graceful.add(httpServer);
+      const graceful = monitor({ timeout: 150 }).add(httpServer);
       await fetch(`http://localhost:${port}`, {
         headers: { connection: "close" },
         signal,
@@ -185,8 +179,7 @@ describe("monitor()", () => {
     { timeout: 500 },
     async ({ signal }) => {
       const [httpServer, port] = await makeHttpServer(() => {});
-      const graceful = monitor({ timeout: 150 });
-      graceful.add(httpServer);
+      const graceful = monitor({ timeout: 150 }).add(httpServer);
       void fetch(`http://localhost:${port}`, { signal }).catch(() => {});
       await vi.waitFor(() => assert(graceful.sockets.size > 0), {
         timeout: 200,
@@ -209,8 +202,7 @@ describe("monitor()", () => {
       "empties internal socket collection for https server",
       { timeout: 500 },
       async ({ signal }) => {
-        const graceful = monitor({ timeout: 150 });
-        graceful.add(httpsServer);
+        const graceful = monitor({ timeout: 150 }).add(httpsServer);
         await fetch(`https://localhost:${port}`, {
           dispatcher: new Agent({ connect: { rejectUnauthorized: false } }),
           headers: { connection: "close" },
@@ -233,8 +225,7 @@ describe("monitor()", () => {
       });
       const [httpServer, port] = await makeHttpServer(spy);
       expect(httpServer.listening).toBeTruthy();
-      const graceful = monitor({ timeout: 500 });
-      graceful.add(httpServer);
+      const graceful = monitor({ timeout: 500 }).add(httpServer);
       void fetch(`http://localhost:${port}`, {
         headers: { connection: "close" },
         signal,
