@@ -2,6 +2,12 @@
 
 ## Version 28
 
+### v28.7.3
+
+- Several minor improvements to the `gracefulShutdown` feature:
+  - Ensured a single graceful shutdown event listener per signal on the process;
+  - Handling potential errors thrown from syncronous `beforeExit` hooks and ensured the hooks run only once.
+
 ### v28.7.2
 
 - Several minor memory optimizations:
