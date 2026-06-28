@@ -189,7 +189,6 @@ export const installTerminationListener = ({
     if (graceful?.isShuttingDown) return;
     await graceful?.shutdown();
     await Promise.allSettled(exitHooks.map((hook) => hook()));
-    logger.info("Done.");
     process.exit();
   };
   for (const trigger of events) {
