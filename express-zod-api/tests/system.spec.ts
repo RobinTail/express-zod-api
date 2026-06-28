@@ -135,7 +135,7 @@ describe("App in production mode", async () => {
     "post /v1/upload": uploadEndpoint,
   };
   vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
-  const beforeExit = vi.fn();
+  const beforeExit = vi.fn().mockThrowOnce("failure resistant");
   const config = createConfig({
     http: { listen: port },
     compression: { threshold: 1 },
