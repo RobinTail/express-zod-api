@@ -1,7 +1,5 @@
-import http from "node:http";
-import https from "node:https";
 import { setInterval } from "node:timers/promises";
-import type { Socket } from "node:net";
+import type { Socket, Server } from "node:net";
 import type { ActualLogger } from "./logger-helpers";
 import {
   closeAsync,
@@ -11,11 +9,12 @@ import {
   weAreClosed,
 } from "./graceful-helpers";
 
-export const monitor = (
-  servers: Array<http.Server | https.Server>,
-  { timeout = 1e3, logger }: { timeout?: number; logger?: ActualLogger } = {},
-) => {
+export const monitor = ({
+  timeout = 1e3,
+  logger,
+}: { timeout?: number; logger?: ActualLogger } = {}) => {
   let pending: Promise<PromiseSettledResult<void>[]> | undefined;
+  const servers: Array<Server> = [];
   const sockets = new Set<Socket>();
   const cleanup = (socket: Socket) => void sockets.delete(socket);
   const destroy = (socket: Socket) => cleanup(socket.destroy());
@@ -35,9 +34,12 @@ export const monitor = (
             .once("error", () => destroy(socket)),
         ));
 
-  for (const server of servers) // eslint-disable-next-line curly
-    for (const event of ["connection", "secureConnection"])
-      server.on(event, watch);
+  const add = (...subjects: Server[]) => {
+    servers.push(...subjects);
+    for (const server of subjects) // eslint-disable-next-line curly
+      for (const event of ["connection", "secureConnection"])
+        server.on(event, watch);
+  };
 
   const workflow = async () => {
     for (const server of servers) server.on("request", weAreClosed);
@@ -50,5 +52,5 @@ export const monitor = (
     return Promise.allSettled(servers.map(closeAsync));
   };
 
-  return { sockets, shutdown: () => (pending ??= workflow()) };
+  return { sockets, add, shutdown: () => (pending ??= workflow()) };
 };

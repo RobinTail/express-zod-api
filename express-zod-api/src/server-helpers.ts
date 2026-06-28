@@ -10,6 +10,7 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
+import type { Server } from "node:net";
 
 // eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN
 export const localsID = Symbol.for(process.env.TSDOWN_SELF!);
@@ -169,20 +170,29 @@ export const installDeprecationListener = (logger: ActualLogger) => {
   );
 };
 
+let graceful: ReturnType<typeof monitor> | undefined;
+let onTerm: () => Promise<void> | undefined;
+const exitHooks: Array<() => Promise<void>> = [];
 export const installTerminationListener = ({
   servers,
   logger,
   options: { timeout, beforeExit, events = ["SIGINT", "SIGTERM"] },
 }: {
-  servers: Parameters<typeof monitor>[0];
+  servers: Server[];
   options: Extract<ServerConfig["gracefulShutdown"], object>;
   logger: ActualLogger;
 }) => {
-  const graceful = monitor(servers, { logger, timeout });
-  const onTerm = async () => {
-    await graceful.shutdown();
-    await beforeExit?.();
+  graceful ??= monitor({ logger, timeout });
+  graceful.add(...servers);
+  if (beforeExit) exitHooks.push(() => Promise.resolve().then(beforeExit));
+  onTerm ??= async () => {
+    await graceful?.shutdown();
+    await Promise.allSettled(exitHooks.splice(0).map((hook) => hook()));
+    logger.info("Done.");
     process.exit();
   };
-  for (const trigger of events) process.on(trigger, onTerm);
+  for (const trigger of events) {
+    if (!process.listeners(trigger).includes(onTerm))
+      process.on(trigger, onTerm);
+  }
 };

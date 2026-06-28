@@ -333,15 +333,20 @@ describe("Server helpers", () => {
   });
 
   describe("installTerminationListener", () => {
-    test("should install termination signal listener on process", () => {
-      const spy = vi.spyOn(process, "on").mockImplementation(vi.fn());
+    test("should install termination signal listener on process only once per event", () => {
+      const eventName = "NOT_HAPPEN";
+      expect(process.listenerCount(eventName)).toBe(0);
       const logger = makeLoggerMock();
-      installTerminationListener({
+      const argument = {
         servers: [],
         logger,
-        options: { events: ["NOT_HAPPEN"] },
-      });
-      expect(spy).toHaveBeenCalledWith("NOT_HAPPEN", expect.any(Function));
+        options: { events: [eventName] },
+      };
+      installTerminationListener(argument);
+      expect(process.listenerCount(eventName)).toBe(1);
+      installTerminationListener(argument);
+      expect(process.listenerCount(eventName)).toBe(1);
+      process.removeAllListeners(eventName);
     });
   });
 });
