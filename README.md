@@ -83,7 +83,7 @@ Therefore, many basic tasks can be achieved faster and easier, in particular:
 - All of your endpoints can respond consistently.
 - The expected endpoint input and response types can be exported to the frontend, giving you end-to-end type safety
   so you don't get confused about the field names when you implement the client for your API.
-- You can generate your API documentation in OpenAPI 3.1 and JSON Schema compatible format.
+- You can generate your API documentation in OpenAPI 3.2 and JSON Schema compatible format.
 
 ## Contributors
 
@@ -171,7 +171,7 @@ Much can be customized to fit your needs.
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
-  - Documentation — [OpenAPI 3.1](https://github.com/metadevpro/openapi3-ts) (former Swagger);
+  - Documentation — [OpenAPI 3.2](https://github.com/metadevpro/openapi3-ts) (former Swagger);
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
