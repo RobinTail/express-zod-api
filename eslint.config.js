@@ -79,6 +79,11 @@ const performanceConcerns = [
     selector: "CallExpression[callee.property.name=/^(shift|unshift)$/]", // #3343
     message: "shifting is 2-20x slower than index-based iteration",
   },
+  {
+    selector:
+      "CallExpression > MemberExpression[property.name='map'] > ArrayExpression > SpreadElement",
+    message: "Set::values().map() would be 5% faster and more memory efficient",
+  },
 ];
 
 const tsFactoryConcerns = [

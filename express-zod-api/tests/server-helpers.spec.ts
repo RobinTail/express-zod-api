@@ -329,19 +329,39 @@ describe("Server helpers", () => {
       expect(spy).toHaveBeenCalledWith("deprecation", expect.any(Function));
       installDeprecationListener(logger);
       expect(spy).toHaveBeenCalledOnce();
+      spy.mockReset();
     });
   });
 
   describe("installTerminationListener", () => {
-    test("should install termination signal listener on process", () => {
-      const spy = vi.spyOn(process, "on").mockImplementation(vi.fn());
+    test("should install termination signal listener on process only once per event", () => {
+      const listeners: Record<string, any[]> = {};
+      const spy = vi
+        .spyOn(process, "on")
+        .mockImplementation((evt: string, fn: any) => {
+          listeners[evt] ??= [];
+          listeners[evt].push(fn);
+          return process;
+        });
+      vi.spyOn(process, "listeners").mockImplementation(
+        (evt: string) => listeners[evt] ?? [],
+      );
       const logger = makeLoggerMock();
       installTerminationListener({
         servers: [],
         logger,
         options: { events: ["NOT_HAPPEN"] },
       });
-      expect(spy).toHaveBeenCalledWith("NOT_HAPPEN", expect.any(Function));
+      expect(spy.mock.calls).toEqual([["NOT_HAPPEN", expect.any(Function)]]);
+      installTerminationListener({
+        servers: [],
+        logger,
+        options: { events: ["NOT_HAPPEN", "ANOTHER_ONE", "NOT_HAPPEN"] },
+      });
+      expect(spy.mock.calls).toEqual([
+        ["NOT_HAPPEN", expect.any(Function)],
+        ["ANOTHER_ONE", expect.any(Function)],
+      ]);
     });
   });
 });

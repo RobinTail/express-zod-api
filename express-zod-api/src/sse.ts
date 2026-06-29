@@ -60,12 +60,12 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
     handler: async ({ request, response }): Promise<Emitter<E>> => {
       const controller = new AbortController();
+      const timer = setTimeout(() => ensureStream(response), headersTimeout);
 
       request.once("close", () => {
+        clearTimeout(timer);
         controller.abort();
       });
-
-      setTimeout(() => ensureStream(response), headersTimeout);
 
       return {
         isClosed: () => response.writableEnded || response.closed,

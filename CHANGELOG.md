@@ -34,6 +34,19 @@
 
 ## Version 28
 
+### v28.7.3
+
+- Several minor improvements to the `gracefulShutdown` feature:
+  - Ensured a single graceful shutdown event listener per signal on the process;
+  - Handling potential errors thrown from syncronous `beforeExit` hooks and ensured the hooks run only once.
+
+### v28.7.2
+
+- Several minor memory optimizations:
+  - Ensured a single deprecation event listener on the process;
+  - When `gracefulShutdown` is enabled, destroying broken sockets immediately (edge case);
+  - For SSE endpoints, removing the stream ensuring timer when the connection is closed.
+
 ### v28.7.1
 
 - Fix: supporting the latest versions of `express-rate-limit` (v8) for the rate limiting feature.
