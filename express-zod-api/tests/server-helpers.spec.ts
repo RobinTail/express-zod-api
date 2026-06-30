@@ -59,6 +59,35 @@ describe("Server helpers", () => {
         );
       },
     );
+
+    test.each([() => fail("I am faulty"), () => Promise.reject("I am faulty")])(
+      "should call Last Resort Handler in case of errorHandler::handler is faulty %#",
+      async (rhImpl) => {
+        const errorHandler = new ResultHandler({
+          positive: vi.fn(),
+          negative: vi.fn(),
+          handler: vi.fn().mockImplementation(rhImpl),
+        });
+        const handler = createCatcher({
+          errorHandler,
+          getLogger: () => makeLoggerMock(),
+        });
+        const responseMock = makeResponseMock();
+        await handler(
+          new Error("boom"),
+          makeRequestMock(),
+          responseMock,
+          vi.fn(),
+        );
+        expect(responseMock._getStatusCode()).toBe(500);
+        expect(responseMock._getHeaders()).toHaveProperty(
+          "content-type",
+          "text/plain",
+        ); // handled by lastResort:
+        expect(responseMock._getData()).toMatch(/I am faulty/);
+        expect(responseMock._getData()).toMatch(/boom/);
+      },
+    );
   });
 
   describe("createNotFoundHandler()", () => {
