@@ -242,7 +242,9 @@ describe("ResultHandler", () => {
       /Property 'items' is missing in the endpoint output/,
     );
   });
+});
 
+describe("AbstractResultHandler", () => {
   describe("lastResort()", () => {
     describe.each(["development", "production"])("%s mode", (mode) => {
       beforeAll(() => {
@@ -263,7 +265,7 @@ describe("ResultHandler", () => {
             cause,
             new Error("what went wrong before"),
           );
-          ResultHandler.lastResort({
+          AbstractResultHandler.lastResort({
             error,
             logger: loggerMock,
             response: responseMock,
