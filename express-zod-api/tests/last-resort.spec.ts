@@ -1,11 +1,11 @@
 import createHttpError, { HttpError } from "http-errors";
 import { ResultHandlerError } from "../src/errors";
-import { lastResortHandler } from "../src/last-resort";
+import { AbstractResultHandler } from "../src/result-handler";
 import { makeLoggerMock, makeResponseMock } from "../src/testing";
 
-describe("Last Resort Handler", () => {
+describe("AbstractResultHandler.lastResort", () => {
   test("should be a function", () => {
-    expect(typeof lastResortHandler).toBe("function");
+    expect(typeof AbstractResultHandler.lastResort).toBe("function");
   });
 
   describe.each(["development", "production"])("%s mode", (mode) => {
@@ -27,7 +27,7 @@ describe("Last Resort Handler", () => {
           cause,
           new Error("what went wrong before"),
         );
-        lastResortHandler({
+        AbstractResultHandler.lastResort({
           error,
           logger: loggerMock,
           response: responseMock,
