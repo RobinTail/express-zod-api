@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import createHttpError from "http-errors";
+import createHttpError, { HttpError } from "http-errors";
 import { z } from "zod";
 import {
   InputValidationError,
@@ -241,5 +241,53 @@ describe("ResultHandler", () => {
       "content-type",
       "text/plain",
     );
+  });
+
+  describe("AbstractResultHandler.lastResort", () => {
+    test("should be a function", () => {
+      expect(typeof AbstractResultHandler.lastResort).toBe("function");
+    });
+
+    describe.each(["development", "production"])("%s mode", (mode) => {
+      beforeAll(() => {
+        vi.stubEnv("TSDOWN_STATIC", mode);
+        vi.stubEnv("NODE_ENV", mode);
+      });
+      afterAll(() => vi.unstubAllEnvs());
+
+      test.each([
+        new Error("something went wrong"),
+        createHttpError("something went wrong", { expose: true }),
+      ])(
+        "should log the supplied error and respond with plain text %#",
+        (cause) => {
+          const responseMock = makeResponseMock();
+          const loggerMock = makeLoggerMock();
+          const error = new ResultHandlerError(
+            cause,
+            new Error("what went wrong before"),
+          );
+          AbstractResultHandler.lastResort({
+            error,
+            logger: loggerMock,
+            response: responseMock,
+          });
+          expect(loggerMock._getLogs().error).toEqual([
+            ["Result handler failure", error],
+          ]);
+          expect(responseMock._getStatusCode()).toBe(500);
+          expect(responseMock._getHeaders()).toHaveProperty(
+            "content-type",
+            "text/plain",
+          );
+          expect(responseMock._getData()).toBe(
+            mode === "development" ||
+              (cause instanceof HttpError && cause.expose)
+              ? "An error occurred while serving the result: something went wrong.\nOriginal error: what went wrong before."
+              : "Internal Server Error",
+          );
+        },
+      );
+    });
   });
 });
