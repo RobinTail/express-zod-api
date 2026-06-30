@@ -69,6 +69,7 @@ export abstract class AbstractResultHandler {
     }
   }
 
+  /** @internal */
   public static lastResort({
     error,
     logger,
