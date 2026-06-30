@@ -244,10 +244,6 @@ describe("ResultHandler", () => {
   });
 
   describe("AbstractResultHandler.lastResort", () => {
-    test("should be a function", () => {
-      expect(typeof AbstractResultHandler.lastResort).toBe("function");
-    });
-
     describe.each(["development", "production"])("%s mode", (mode) => {
       beforeAll(() => {
         vi.stubEnv("TSDOWN_STATIC", mode);
