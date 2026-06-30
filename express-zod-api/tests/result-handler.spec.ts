@@ -14,6 +14,7 @@ import {
   makeRequestMock,
   makeResponseMock,
 } from "../src/testing";
+import { expect } from "vitest";
 
 describe("ResultHandler", () => {
   describe("constructor()", () => {
@@ -235,11 +236,10 @@ describe("ResultHandler", () => {
       request: requestMock,
       response: responseMock,
       logger: loggerMock,
-    });
+    }); // handled by lastResort:
     expect(responseMock._getStatusCode()).toBe(500);
-    expect(responseMock._getHeaders()).toHaveProperty(
-      "content-type",
-      "text/plain",
+    expect(responseMock._getData()).toMatch(
+      /Property 'items' is missing in the endpoint output/,
     );
   });
 
