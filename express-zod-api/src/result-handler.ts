@@ -86,7 +86,7 @@ export abstract class AbstractResultHandler {
         500,
         `An error occurred while serving the result: ${error.message}.` +
           (error.handled ? `\nOriginal error: ${error.handled.message}.` : ""),
-        { expose: isHttpError(error.cause) ? error.cause.expose : false },
+        { expose: isHttpError(error.cause) ? error.cause.expose : false }, // retain the cause exposition setting
       ),
     );
     response.status(500).type("text/plain").end(message);
