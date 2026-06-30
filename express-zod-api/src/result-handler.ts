@@ -59,11 +59,11 @@ export abstract class AbstractResultHandler {
   public async execute(...params: Parameters<Handler>) {
     try {
       return await this.#handler(...params);
-    } catch (e) {
-      const { response, logger, error } = params[0];
+    } catch (caught) {
+      const { response, logger, error: handledError } = params[0];
       const rhError = new ResultHandlerError(
-        ensureError(e),
-        error || undefined,
+        ensureError(caught),
+        handledError || undefined,
       );
       AbstractResultHandler.lastResort({ response, logger, error: rhError });
     }
