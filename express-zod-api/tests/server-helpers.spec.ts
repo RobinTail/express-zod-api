@@ -21,6 +21,7 @@ import {
   makeResponseMock,
 } from "../src/testing";
 import createHttpError from "http-errors";
+import { AbstractResultHandler } from "../src/result-handler.ts";
 
 describe("Server helpers", () => {
   describe("createCatcher()", () => {
@@ -68,6 +69,7 @@ describe("Server helpers", () => {
           negative: vi.fn(),
           handler: vi.fn().mockImplementation(rhImpl),
         });
+        const spy = vi.spyOn(AbstractResultHandler, "lastResort");
         const handler = createCatcher({
           errorHandler,
           getLogger: () => makeLoggerMock(),
@@ -79,13 +81,16 @@ describe("Server helpers", () => {
           responseMock,
           vi.fn(),
         );
-        expect(responseMock._getStatusCode()).toBe(500);
-        expect(responseMock._getHeaders()).toHaveProperty(
-          "content-type",
-          "text/plain",
-        ); // handled by lastResort:
-        expect(responseMock._getData()).toMatch(/I am faulty/);
-        expect(responseMock._getData()).toMatch(/boom/);
+        expect(spy).toHaveBeenCalledWith({
+          error: expect.objectContaining({
+            message: "I am faulty",
+            cause: expect.objectContaining({
+              message: "I am faulty",
+            }),
+          }),
+          logger: expect.any(Object),
+          response: responseMock,
+        });
       },
     );
   });
@@ -129,7 +134,7 @@ describe("Server helpers", () => {
           negative: vi.fn(),
           handler: vi.fn().mockImplementation(rhImpl),
         });
-        const spy = vi.spyOn(errorHandler, "execute");
+        const spy = vi.spyOn(AbstractResultHandler, "lastResort");
         const handler = createNotFoundHandler({
           errorHandler,
           getLogger: () => makeLoggerMock(),
@@ -143,12 +148,17 @@ describe("Server helpers", () => {
         const responseMock = makeResponseMock();
         await handler(requestMock, responseMock, next);
         expect(next).toHaveBeenCalledTimes(0);
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(responseMock._getStatusCode()).toBe(500);
-        expect(responseMock._getData()).toBe(
-          "An error occurred while serving the result: I am faulty.\n" +
-            "Original error: Can not POST /v1/test.",
-        );
+        expect(spy).toHaveBeenCalledWith({
+          error: expect.objectContaining({
+            message: "I am faulty",
+            cause: expect.objectContaining({ message: "I am faulty" }),
+            handled: expect.objectContaining({
+              message: "Can not POST /v1/test",
+            }),
+          }),
+          logger: expect.any(Object),
+          response: responseMock,
+        });
       },
     );
   });
