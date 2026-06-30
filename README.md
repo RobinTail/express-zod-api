@@ -989,7 +989,7 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## Error handling
 
-![Error handling](error-handling.svg)
+![Error handling](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/error-handling.svg)
 
 All runtime errors are handled by a `ResultHandler`. The default is `defaultResultHandler`. Using `ensureHttpError()`
 it normalizes errors into consistent HTTP responses with sensible status codes. Errors can originate from three layers:
