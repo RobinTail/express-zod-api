@@ -60,14 +60,12 @@ export abstract class AbstractResultHandler {
     try {
       return await this.#handler(...params);
     } catch (e) {
-      AbstractResultHandler.lastResort({
-        response: params[0].response,
-        logger: params[0].logger,
-        error: new ResultHandlerError(
-          ensureError(e),
-          params[0].error || undefined,
-        ),
-      });
+      const { response, logger, error } = params[0];
+      const rhError = new ResultHandlerError(
+        ensureError(e),
+        error || undefined,
+      );
+      AbstractResultHandler.lastResort({ response, logger, error: rhError });
     }
   }
 
