@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import createHttpError, { HttpError } from "http-errors";
+import createHttpError, { isHttpError } from "http-errors";
 import { z } from "zod";
 import {
   InputValidationError,
@@ -281,8 +281,7 @@ describe("ResultHandler", () => {
             "text/plain",
           );
           expect(responseMock._getData()).toBe(
-            mode === "development" ||
-              (cause instanceof HttpError && cause.expose)
+            mode === "development" || (isHttpError(cause) && cause.expose)
               ? "An error occurred while serving the result: something went wrong.\nOriginal error: what went wrong before."
               : "Internal Server Error",
           );
