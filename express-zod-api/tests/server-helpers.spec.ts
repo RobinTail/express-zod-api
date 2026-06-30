@@ -87,6 +87,7 @@ describe("Server helpers", () => {
             cause: expect.objectContaining({
               message: "I am faulty",
             }),
+            handled: expect.objectContaining({ message: "boom" }),
           }),
           logger: expect.any(Object),
           response: responseMock,
