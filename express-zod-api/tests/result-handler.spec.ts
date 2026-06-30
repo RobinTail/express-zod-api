@@ -243,7 +243,7 @@ describe("ResultHandler", () => {
     );
   });
 
-  describe("AbstractResultHandler.lastResort", () => {
+  describe("lastResort()", () => {
     describe.each(["development", "production"])("%s mode", (mode) => {
       beforeAll(() => {
         vi.stubEnv("TSDOWN_STATIC", mode);
@@ -263,7 +263,7 @@ describe("ResultHandler", () => {
             cause,
             new Error("what went wrong before"),
           );
-          AbstractResultHandler.lastResort({
+          ResultHandler.lastResort({
             error,
             logger: loggerMock,
             response: responseMock,
