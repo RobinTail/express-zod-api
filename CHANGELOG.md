@@ -6,7 +6,8 @@
 
 - Centralized the `ResultHandler` error handling by `AbstractResultHandler::execute()`:
   - Last Resort Handler is now an internal static method of the abstract class;
-  - When `errorHandler` fails to process a routing error (Not found) it's now also handled by the Last Resort Handler.
+  - When `errorHandler` fails to process a routing error (Not found) it's now also handled by the Last Resort Handler;
+- Added an error handling diagram to the documentation in the Readme file.
 
 ### v28.7.3
 
