@@ -60,10 +60,10 @@ export abstract class AbstractResultHandler {
     try {
       return await this.#handler(...params);
     } catch (caught) {
-      const { response, logger, error: handledError } = params[0];
+      const { response, logger, error: handled } = params[0];
       const error = new ResultHandlerError(
         ensureError(caught),
-        handledError || undefined,
+        handled || undefined,
       );
       AbstractResultHandler.lastResort({ response, logger, error });
     }
