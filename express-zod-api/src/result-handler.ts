@@ -5,8 +5,10 @@ import {
   type ApiResponse,
   type NormalizedResponse,
 } from "./api-response";
-import { isObject, type FlatObject } from "./common-helpers";
+import { ensureError, isObject, type FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
+import createHttpError, { isHttpError } from "http-errors";
+import { ResultHandlerError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import {
@@ -54,8 +56,39 @@ export abstract class AbstractResultHandler {
   protected constructor(handler: Handler) {
     this.#handler = handler;
   }
-  public execute(...params: Parameters<Handler>) {
-    return this.#handler(...params);
+  public async execute(...params: Parameters<Handler>) {
+    try {
+      return await this.#handler(...params);
+    } catch (caught) {
+      const { response, logger, error: handled } = params[0];
+      const error = new ResultHandlerError(
+        ensureError(caught),
+        handled || undefined,
+      );
+      AbstractResultHandler.lastResort({ response, logger, error });
+    }
+  }
+
+  /** @internal */
+  public static lastResort({
+    error,
+    logger,
+    response,
+  }: {
+    error: ResultHandlerError;
+    logger: ActualLogger;
+    response: Response;
+  }) {
+    logger.error("Result handler failure", error);
+    const message = getPublicErrorMessage(
+      createHttpError(
+        500,
+        `An error occurred while serving the result: ${error.message}.` +
+          (error.handled ? `\nOriginal error: ${error.handled.message}.` : ""),
+        { expose: isHttpError(error.cause) ? error.cause.expose : false }, // retain the cause exposition setting
+      ),
+    );
+    response.status(500).type("text/plain").end(message);
   }
 }
 

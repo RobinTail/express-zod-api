@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import createHttpError from "http-errors";
+import createHttpError, { isHttpError } from "http-errors";
 import { z } from "zod";
 import {
   InputValidationError,
@@ -14,6 +14,7 @@ import {
   makeRequestMock,
   makeResponseMock,
 } from "../src/testing";
+import { expect } from "vitest";
 
 describe("ResultHandler", () => {
   describe("constructor()", () => {
@@ -80,11 +81,11 @@ describe("ResultHandler", () => {
       name: "arrayResultHandler",
     },
   ])("$name", ({ subject }) => {
-    test("Should handle generic error", () => {
+    test("Should handle generic error", async () => {
       const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock();
       const error = new Error("Some error");
-      subject.execute({
+      await subject.execute({
         error,
         input: { something: 453 },
         output: null,
@@ -106,10 +107,10 @@ describe("ResultHandler", () => {
       ).toMatchSnapshot();
     });
 
-    test("Should handle schema error", () => {
+    test("Should handle schema error", async () => {
       const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock();
-      subject.execute({
+      await subject.execute({
         error: new InputValidationError(
           new z.ZodError([
             {
@@ -141,10 +142,10 @@ describe("ResultHandler", () => {
       ).toMatchSnapshot();
     });
 
-    test("Should handle HTTP error", () => {
+    test("Should handle HTTP error", async () => {
       const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock();
-      subject.execute({
+      await subject.execute({
         error: createHttpError(404, "Something not found"),
         input: { something: 453 },
         output: null,
@@ -166,10 +167,10 @@ describe("ResultHandler", () => {
       ).toMatchSnapshot();
     });
 
-    test("Should handle regular response", () => {
+    test("Should handle regular response", async () => {
       const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock();
-      subject.execute({
+      await subject.execute({
         error: null,
         input: { something: 453 },
         output: { anything: 118, items: ["One", "Two", "Three"] },
@@ -212,7 +213,7 @@ describe("ResultHandler", () => {
     expect(apiResponse[0]!.schema.meta()).toMatchSnapshot();
   });
 
-  test("arrayResultHandler should fail when there is no items prop in the output", () => {
+  test("arrayResultHandler should fail when there is no items prop in the output", async () => {
     const responseMock = makeResponseMock();
     const loggerMock = makeLoggerMock();
     const positiveSchema = arrayResultHandler
@@ -227,19 +228,63 @@ describe("ResultHandler", () => {
       ["_zod", "def", "element", "_zod", "def", "type"],
       "any",
     );
-    expect(() =>
-      arrayResultHandler.execute({
-        error: null,
-        input: { something: 453 },
-        output: { anything: 118 },
-        ctx: {},
-        request: requestMock,
-        response: responseMock,
-        logger: loggerMock,
-      }),
-    ).toThrowError(
-      // delegated to LastResortHandler, having same format
-      new Error("Property 'items' is missing in the endpoint output"),
+    await arrayResultHandler.execute({
+      error: null,
+      input: { something: 453 },
+      output: { anything: 118 },
+      ctx: {},
+      request: requestMock,
+      response: responseMock,
+      logger: loggerMock,
+    }); // handled by lastResort:
+    expect(responseMock._getStatusCode()).toBe(500);
+    expect(responseMock._getData()).toMatch(
+      /Property 'items' is missing in the endpoint output/,
     );
+  });
+});
+
+describe("AbstractResultHandler", () => {
+  describe("lastResort()", () => {
+    describe.each(["development", "production"])("%s mode", (mode) => {
+      beforeAll(() => {
+        vi.stubEnv("TSDOWN_STATIC", mode);
+        vi.stubEnv("NODE_ENV", mode);
+      });
+      afterAll(() => vi.unstubAllEnvs());
+
+      test.each([
+        new Error("something went wrong"),
+        createHttpError("something went wrong", { expose: true }),
+      ])(
+        "should log the supplied error and respond with plain text %#",
+        (cause) => {
+          const responseMock = makeResponseMock();
+          const loggerMock = makeLoggerMock();
+          const error = new ResultHandlerError(
+            cause,
+            new Error("what went wrong before"),
+          );
+          AbstractResultHandler.lastResort({
+            error,
+            logger: loggerMock,
+            response: responseMock,
+          });
+          expect(loggerMock._getLogs().error).toEqual([
+            ["Result handler failure", error],
+          ]);
+          expect(responseMock._getStatusCode()).toBe(500);
+          expect(responseMock._getHeaders()).toHaveProperty(
+            "content-type",
+            "text/plain",
+          );
+          expect(responseMock._getData()).toBe(
+            mode === "development" || (isHttpError(cause) && cause.expose)
+              ? "An error occurred while serving the result: something went wrong.\nOriginal error: what went wrong before."
+              : "Internal Server Error",
+          );
+        },
+      );
+    });
   });
 });

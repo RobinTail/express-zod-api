@@ -1005,7 +1005,7 @@ it normalizes errors into consistent HTTP responses with sensible status codes. 
   - Upload issues: thrown only if `upload.limitError` is configured (`HttpError::statusCode` can be used for response);
   - For other errors the default status code is `500`;
 - `ResultHandler` failures:
-  - Handled by `LastResortHandler` with status code `500` and a plain text response.
+  - Handled by `AbstractResultHandler::lastResort()` with status code `500` and a plain text response.
 
 You can customize it by passing a custom `ResultHandler` to `EndpointsFactory` and by configuring `errorHandler`.
 
@@ -1015,8 +1015,8 @@ Consider enabling production mode by setting `NODE_ENV` environment variable to 
 
 - Express activates some [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html);
 - Self-diagnosis for potential problems is disabled to ensure faster startup;
-- The `defaultResultHandler`, `defaultEndpointsFactory` and `LastResortHandler` generalize server-side error messages
-  in negative responses to improve the security of your API by not disclosing the exact causes of errors:
+- The `defaultResultHandler`, `defaultEndpointsFactory` and `AbstractResultHandler::lastResort()` generalize server-side
+  error messages in negative responses to improve the security of your API by not disclosing the exact causes of errors:
   - Throwing errors that have or imply `5XX` status codes become just `Internal Server Error` message in response;
   - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option:
 

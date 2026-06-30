@@ -2,6 +2,12 @@
 
 ## Version 28
 
+### v28.7.4
+
+- Centralized the `ResultHandler` error handling by `AbstractResultHandler::execute()`:
+  - Last Resort Handler is now an internal static method of the abstract class;
+  - When `errorHandler` fails to process a routing error (Not found) it's now also handled by the Last Resort Handler.
+
 ### v28.7.3
 
 - Several minor improvements to the `gracefulShutdown` feature:

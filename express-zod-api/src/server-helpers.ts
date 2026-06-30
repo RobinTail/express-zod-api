@@ -6,8 +6,6 @@ import type { ActualLogger } from "./logger-helpers";
 import type { CommonConfig, ServerConfig } from "./config-type";
 import type { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError from "http-errors";
-import { lastResortHandler } from "./last-resort";
-import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
 import type { Server } from "node:net";
@@ -54,23 +52,15 @@ export const createNotFoundHandler =
       `Can not ${request.method} ${request.path}`,
     );
     const logger = getLogger(request);
-    try {
-      await errorHandler.execute({
-        request,
-        response,
-        logger,
-        error,
-        input: null,
-        output: null,
-        ctx: {},
-      });
-    } catch (e) {
-      lastResortHandler({
-        response,
-        logger,
-        error: new ResultHandlerError(ensureError(e), error),
-      });
-    }
+    await errorHandler.execute({
+      request,
+      response,
+      logger,
+      error,
+      input: null,
+      output: null,
+      ctx: {},
+    });
   };
 
 export const createUploadFailureHandler =
