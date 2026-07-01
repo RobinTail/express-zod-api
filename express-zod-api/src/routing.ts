@@ -2,14 +2,12 @@ import type { IRouter, RequestHandler, IRouterMatcher } from "express";
 import createHttpError from "http-errors";
 import { isProduction } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
-import type { ContentType } from "./content-type";
 import { Diagnostics } from "./diagnostics";
 import type { AbstractEndpoint } from "./endpoint";
 import { isMethod, type CORSMethod } from "./method";
 import { walkRouting, type OnEndpoint } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import type { GetLogger } from "./server-helpers";
-import * as R from "ramda";
 
 /**
  * @example { v1: { books: { ":bookId": getBookEndpoint } } }
@@ -23,14 +21,11 @@ export interface Routing {
   [K: string]: Routing | AbstractEndpoint | ServeStatic;
 }
 
-export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
-
 interface InitProps {
   app: IRouter;
   getLogger: GetLogger;
   config: CommonConfig;
   routing: Routing;
-  parsers?: Parsers;
 }
 
 const lineUp = (methods: CORSMethod[]) =>
@@ -57,25 +52,17 @@ const makeCorsHeaders = (accessMethods: CORSMethod[]) => ({
   "Access-Control-Allow-Headers": "content-type",
 });
 
-type Siblings = Map<CORSMethod, [RequestHandler[], AbstractEndpoint]>;
+type Siblings = Map<CORSMethod, AbstractEndpoint>;
 
 /** This fn exists to reduce the complexity of initRouting and to ensure the disposal of Diagnostics ASAP */
-const collectSiblings = ({
-  app,
-  getLogger,
-  config,
-  routing,
-  parsers,
-}: InitProps) => {
+const collectSiblings = ({ app, getLogger, config, routing }: InitProps) => {
   const doc = isProduction() ? undefined : new Diagnostics(getLogger());
   const familiar = new Map<string, Siblings>();
   const onEndpoint: OnEndpoint = (method, path, endpoint) => {
     doc?.check(method, path, endpoint);
-    const matchingParsers = parsers?.[endpoint.requestType] || [];
-    const value = R.pair(matchingParsers, endpoint);
     if (!familiar.has(path))
-      familiar.set(path, new Map(config.cors ? [["options", value]] : []));
-    familiar.get(path)?.set(method, value);
+      familiar.set(path, new Map(config.cors ? [["options", endpoint]] : []));
+    familiar.get(path)?.set(method, endpoint);
   };
   walkRouting({ routing, config, onEndpoint, onStatic: app.use.bind(app) });
   return familiar;
@@ -88,7 +75,7 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
     const accessMethods = Array.from(methods.keys());
     /** @link https://github.com/RobinTail/express-zod-api/discussions/2791#discussioncomment-13745912 */
     if (accessMethods.includes("get")) accessMethods.push("head");
-    for (const [method, [matchingParsers, endpoint]] of methods) {
+    for (const [method, endpoint] of methods) {
       const handlers: RequestHandler[] = []; // issue #2706: CORS must go before parsers:
       if (config.cors) {
         handlers.push(async (request, response, next) => {
@@ -102,7 +89,7 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
           next();
         });
       }
-      handlers.push(...matchingParsers, async (request, response) => {
+      handlers.push(async (request, response) => {
         const logger = getLogger(request);
         return endpoint.execute({ request, response, logger, config });
       });
