@@ -113,19 +113,32 @@ describe("Example", async () => {
       expect(true).toBeTruthy();
     });
 
-    test("Should respond with array (legacy API ResultHandler)", async ({
-      signal,
-    }) => {
-      const response = await fetch(`http://localhost:${port}/v1/user/list`, {
-        method: "QUERY",
-        signal,
-        headers: { "Content-Type": "application/json" },
+    test.for([
+      {
+        contentType: "application/json",
         body: JSON.stringify({ roles: ["manager", "operator"] }),
-      });
-      expect(response.status).toBe(200);
-      const json = await response.json();
-      expect(json).toMatchSnapshot();
-    });
+      },
+      {
+        contentType: "application/x-www-form-urlencoded",
+        body: new URLSearchParams([
+          ["roles", "manager"],
+          ["roles", "operator"],
+        ]).toString(),
+      },
+    ] as const)(
+      "Should respond with array for $contentType",
+      async ({ contentType, body }, { signal }) => {
+        const response = await fetch(`http://localhost:${port}/v1/user/list`, {
+          method: "QUERY",
+          signal,
+          headers: { "Content-Type": contentType },
+          body,
+        });
+        expect(response.status).toBe(200);
+        const json = await response.json();
+        expect(json).toMatchSnapshot();
+      },
+    );
 
     test("Should respond with paginated list (ez.paginated)", async ({
       signal,
