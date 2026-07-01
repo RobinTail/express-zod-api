@@ -785,6 +785,7 @@ createConfig({
     put: ["body", "params"],
     patch: ["body", "params"],
     delete: ["query", "params"],
+    query: ["query", "body", "params"],
   }, // ...
 });
 ```
