@@ -85,8 +85,10 @@ const setup = (config: ServerConfig, routing: Routing) => {
   // issue #2706: CORS must go before parsers:
   if (config.cors === true) {
     app.use((_req, res, next) => {
-      res.set("Access-Control-Allow-Origin", "*");
-      res.set("Access-Control-Allow-Headers", "content-type");
+      res.set({
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "content-type",
+      });
       next();
     });
   } else if (typeof config.cors === "function") {
