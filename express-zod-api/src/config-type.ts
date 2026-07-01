@@ -170,7 +170,7 @@ export interface ServerConfig extends CommonConfig {
   /** @desc HTTPS server configuration. */
   https?: HttpsConfig;
   /**
-   * @desc Custom JSON parser.
+   * @desc Custom JSON parser applied to all incoming requests.
    * @default express.json()
    * @link https://expressjs.com/en/5x/api.html#express.json
    * */
@@ -202,13 +202,13 @@ export interface ServerConfig extends CommonConfig {
    */
   queryParser?: "simple" | "extended" | ((query: string) => object);
   /**
-   * @desc Custom raw parser (assigns Buffer to request body)
+   * @desc Custom parser for Buffer payloads applied to all incoming requests.
    * @default express.raw()
    * @link https://expressjs.com/en/5x/api.html#express.raw
    * */
   rawParser?: RequestHandler;
   /**
-   * @desc Custom parser for URL Encoded requests used for submitting HTML forms
+   * @desc Custom parser for URL Encoded requests applied to all incoming requests.
    * @default express.urlencoded()
    * @link https://expressjs.com/en/5x/api.html#express.urlencoded
    * */
