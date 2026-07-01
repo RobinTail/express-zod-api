@@ -15,6 +15,7 @@ import { defaultResultHandler } from "./result-handler";
 import { initRouting, type Routing } from "./routing";
 import {
   createCookieParser,
+  defaultCorsMiddleware,
   createLoggingMiddleware,
   createNotFoundHandler,
   createCatcher,
@@ -83,17 +84,8 @@ const setup = (config: ServerConfig, routing: Routing) => {
   if (config.cookies) app.use(createCookieParser({ config }));
 
   // issue #2706: CORS must go before parsers:
-  if (config.cors === true) {
-    app.use((_req, res, next) => {
-      res.set({
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "content-type",
-      });
-      next();
-    });
-  } else if (typeof config.cors === "function") {
-    app.use(config.cors);
-  }
+  if (config.cors === true) app.use(defaultCorsMiddleware);
+  else if (typeof config.cors === "function") app.use(config.cors);
 
   app
     .use(config.jsonParser || express.json())
