@@ -82,6 +82,17 @@ export const createServer = (config: ServerConfig, routing: Routing) => {
   if (config.cookies) app.use(createCookieParser({ config }));
   config.beforeRouting?.({ app, getLogger });
 
+  // issue #2706: CORS must go before parsers:
+  if (config.cors === true) {
+    app.use((_req, res, next) => {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Headers", "content-type");
+      next();
+    });
+  } else if (typeof config.cors === "function") {
+    app.use(config.cors);
+  }
+
   const parsers: Parsers = {
     json: [config.jsonParser || express.json()],
     raw: [config.rawParser || express.raw(), moveRaw],

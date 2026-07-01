@@ -4,7 +4,6 @@ import type fileUpload from "express-fileupload";
 import type cookieParser from "cookie-parser";
 import type { ServerOptions } from "node:https";
 import type { BuiltinLoggerConfig } from "./builtin-logger";
-import type { AbstractEndpoint } from "./endpoint";
 import type { AbstractLogger, ActualLogger } from "./logger-helpers";
 import type { Method } from "./method";
 import type { AbstractResultHandler } from "./result-handler";
@@ -23,15 +22,6 @@ export type InputSource = keyof Pick<
 >;
 export type InputSources = Record<Method, InputSource[]>;
 
-type Headers = Record<string, string>;
-type HeadersProvider = (params: {
-  /** @desc The default headers to be overridden. */
-  defaultHeaders: Headers;
-  request: Request;
-  endpoint: AbstractEndpoint;
-  logger: ActualLogger;
-}) => Headers | Promise<Headers>;
-
 type ChildLoggerProvider = (params: {
   request: Request;
   parent: ActualLogger;
@@ -42,10 +32,12 @@ type LogAccess = (request: Request, logger: ActualLogger) => void;
 export interface CommonConfig {
   /**
    * @desc Enables cross-origin resource sharing.
+   * @desc You can provide a custom middleware, e.g. from the "cors" package.
+   * @example import cors from "cors";
+   * @example config.cors = cors({ origin: "https://example.com" });
    * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-   * @desc You can override the default CORS headers by setting up a provider function here.
    */
-  cors: boolean | HeadersProvider;
+  cors: boolean | RequestHandler;
   /**
    * @desc Controls how to respond to a request to an existing endpoint with an invalid HTTP method.
    * @example true — respond with status code 405 and "Allow" header containing a list of valid methods
