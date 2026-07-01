@@ -119,6 +119,8 @@ describe("Example", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/list`, {
         method: "QUERY",
         signal,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roles: ["manager", "operator"] }),
       });
       expect(response.status).toBe(200);
       const json = await response.json();
