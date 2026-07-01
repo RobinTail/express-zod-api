@@ -12,7 +12,7 @@ import type {
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
-import { initRouting, type Parsers, type Routing } from "./routing";
+import { initRouting, type Routing } from "./routing";
 import {
   createCookieParser,
   createLoggingMiddleware,
@@ -93,13 +93,12 @@ export const createServer = (config: ServerConfig, routing: Routing) => {
     app.use(config.cors);
   }
 
-  const parsers: Parsers = {
-    json: [config.jsonParser || express.json()],
-    raw: [config.rawParser || express.raw(), moveRaw],
-    form: [config.formParser || express.urlencoded()],
-    upload: config.upload ? createUploadParsers({ config, getLogger }) : [],
-  };
-  initRouting({ app, routing, getLogger, config, parsers });
+  app
+    .use(config.jsonParser || express.json())
+    .use(config.formParser || express.urlencoded())
+    .use(config.rawParser || express.raw(), moveRaw);
+  if (config.upload) app.use(...createUploadParsers({ config, getLogger }));
+  initRouting({ app, routing, getLogger, config });
 
   config.afterRouting?.({ app, getLogger });
   app.use(catcher, notFoundHandler);
