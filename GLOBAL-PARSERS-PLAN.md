@@ -12,7 +12,7 @@ QUERY method (which needs both JSON and URL-encoded body parsing).
 - **Parsers self-select by Content-Type** — `express.json()`, `express.urlencoded()`,
   `express.raw()`, and `express-fileupload` all check `Content-Type` and call `next()`
   when it doesn't match. Running them unconditionally adds negligible overhead.
-- **Simpler mental model** — endpoints declare their input *schema*, not their wire format.
+- **Simpler mental model** — endpoints declare their input _schema_, not their wire format.
 
 ## Key invariant
 
@@ -46,51 +46,51 @@ deep-checks.ts:53-59    — findRequestTypeDefiningSchema() — helper for reque
 
 #### Supporting runtime pieces:
 
-| File | Lines | Role |
-|---|---|---|
-| `routing.ts` | 26, 33, 68, 74, 75, 91, 105 | `Parsers` type, `InitProps.parsers`, `matchingParsers` selection/destructure/spread, `R.pair` pairing |
-| `server.ts` | 15, 85-91 | Imports `Parsers` type, assembles parsers object, passes to `initRouting()` |
-| `server-helpers.ts` | 92-117 | `createUploadParsers()` builder (local `parsers` var is `RequestHandler[]`, not `Parsers` type) |
-| `endpoint.ts` | 78, 161-170 | `requestType` abstract getter + concrete logic (brand detection) |
-| `deep-checks.ts` | 53-59 | `findRequestTypeDefiningSchema()` — helper for `requestType` |
-| `content-type.ts` | 1-9 | `ContentType` type and `contentTypes` mapping |
+| File                | Lines                       | Role                                                                                                  |
+| ------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `routing.ts`        | 26, 33, 68, 74, 75, 91, 105 | `Parsers` type, `InitProps.parsers`, `matchingParsers` selection/destructure/spread, `R.pair` pairing |
+| `server.ts`         | 15, 85-91                   | Imports `Parsers` type, assembles parsers object, passes to `initRouting()`                           |
+| `server-helpers.ts` | 92-117                      | `createUploadParsers()` builder (local `parsers` var is `RequestHandler[]`, not `Parsers` type)       |
+| `endpoint.ts`       | 78, 161-170                 | `requestType` abstract getter + concrete logic (brand detection)                                      |
+| `deep-checks.ts`    | 53-59                       | `findRequestTypeDefiningSchema()` — helper for `requestType`                                          |
+| `content-type.ts`   | 1-9                         | `ContentType` type and `contentTypes` mapping                                                         |
 
 #### `initRouting()` call sites:
 
-| File | Line | Passes parsers? |
-|---|---|---|
-| `src/server.ts:57` (`attachRouting`) | **No** — users bring their own app/parsers |
-| `src/server.ts:91` (`createServer`) | **Yes** — the runtime path we're modifying |
-| `tests/routing.spec.ts` (18 calls) | **No** — tests are independent of parser dispatch |
+| File                                 | Line                                              | Passes parsers? |
+| ------------------------------------ | ------------------------------------------------- | --------------- |
+| `src/server.ts:57` (`attachRouting`) | **No** — users bring their own app/parsers        |
+| `src/server.ts:91` (`createServer`)  | **Yes** — the runtime path we're modifying        |
+| `tests/routing.spec.ts` (18 calls)   | **No** — tests are independent of parser dispatch |
 
 #### Test files that assert parser ordering:
 
-| File | Lines | What it asserts |
-|---|---|---|
-| `tests/server.spec.ts` | 69-74 | Default `expressJsonMock` in GET handler chain at index 2 |
-| `tests/server.spec.ts` | 82-88 | Default `expressJsonMock` in OPTIONS handler chain |
-| `tests/server.spec.ts` | 159-165 | Custom `jsonParser` in GET route at index 2 |
-| `tests/server.spec.ts` | 166-172 | Custom `jsonParser` in POST route at index 2 |
-| `tests/server.spec.ts` | 173-178 | Custom `formParser` in POST /form route at index 2 |
-| `tests/server.spec.ts` | 179-186 | Custom `rawParser` + `moveRaw` in PATCH /raw at indices 2-3 |
-| `tests/server.spec.ts` | 187-206 | Custom parsers in OPTIONS routes |
-| `tests/server.spec.ts` | 308-341 | Upload parsers (uploader + failure handler) before endpoint |
-| `tests/server.spec.ts` | 343-369 | Raw parser (`expressRawMock` + `moveRaw`) before endpoint |
-| `tests/server.spec.ts` | 371-394 | Form parser (`expressUrlencodedMock`) before endpoint |
-| `tests/server.spec.ts` | 397-438 | `attachRouting()` test — NO parsers (confirms it doesn't inject) |
-| `tests/server-helpers.spec.ts` | 205-259 | `createUploadParsers()` returns 2-element `RequestHandler[]` |
-| `tests/endpoint.spec.ts` | 370-389 | `.requestType` returns correct value per brand — **keep** |
-| `tests/express-mock.ts` | 1-3, 24-26 | `expressJsonMock`, `expressRawMock`, `expressUrlencodedMock` definitions and wiring |
+| File                           | Lines      | What it asserts                                                                     |
+| ------------------------------ | ---------- | ----------------------------------------------------------------------------------- |
+| `tests/server.spec.ts`         | 69-74      | Default `expressJsonMock` in GET handler chain at index 2                           |
+| `tests/server.spec.ts`         | 82-88      | Default `expressJsonMock` in OPTIONS handler chain                                  |
+| `tests/server.spec.ts`         | 159-165    | Custom `jsonParser` in GET route at index 2                                         |
+| `tests/server.spec.ts`         | 166-172    | Custom `jsonParser` in POST route at index 2                                        |
+| `tests/server.spec.ts`         | 173-178    | Custom `formParser` in POST /form route at index 2                                  |
+| `tests/server.spec.ts`         | 179-186    | Custom `rawParser` + `moveRaw` in PATCH /raw at indices 2-3                         |
+| `tests/server.spec.ts`         | 187-206    | Custom parsers in OPTIONS routes                                                    |
+| `tests/server.spec.ts`         | 308-341    | Upload parsers (uploader + failure handler) before endpoint                         |
+| `tests/server.spec.ts`         | 343-369    | Raw parser (`expressRawMock` + `moveRaw`) before endpoint                           |
+| `tests/server.spec.ts`         | 371-394    | Form parser (`expressUrlencodedMock`) before endpoint                               |
+| `tests/server.spec.ts`         | 397-438    | `attachRouting()` test — NO parsers (confirms it doesn't inject)                    |
+| `tests/server-helpers.spec.ts` | 205-259    | `createUploadParsers()` returns 2-element `RequestHandler[]`                        |
+| `tests/endpoint.spec.ts`       | 370-389    | `.requestType` returns correct value per brand — **keep**                           |
+| `tests/express-mock.ts`        | 1-3, 24-26 | `expressJsonMock`, `expressRawMock`, `expressUrlencodedMock` definitions and wiring |
 
 #### Non-runtime references (keep as-is):
 
-| File | Lines | Usage |
-|---|---|---|
-| `diagnostics.ts` | 39 | `requestType` read **only** for JSON-incompatibility warnings |
-| `documentation.ts` | 253 | `requestType` read **only** for OpenAPI `mimeType` |
-| `integration-base.ts` | 67, 104, 395, 702 | `requestType` is just a code-gen string `"Request"` — unrelated |
-| `documentation-helpers.ts` | — | Uses `contentTypes` but not `requestType` directly |
-| `endpoint.spec.ts` | 370-389 | Tests `.requestType` getter correctness — must be **preserved** |
+| File                       | Lines             | Usage                                                           |
+| -------------------------- | ----------------- | --------------------------------------------------------------- |
+| `diagnostics.ts`           | 39                | `requestType` read **only** for JSON-incompatibility warnings   |
+| `documentation.ts`         | 253               | `requestType` read **only** for OpenAPI `mimeType`              |
+| `integration-base.ts`      | 67, 104, 395, 702 | `requestType` is just a code-gen string `"Request"` — unrelated |
+| `documentation-helpers.ts` | —                 | Uses `contentTypes` but not `requestType` directly              |
+| `endpoint.spec.ts`         | 370-389           | Tests `.requestType` getter correctness — must be **preserved** |
 
 #### Key observations:
 
@@ -142,12 +142,14 @@ The CORS implementation splits into two layers:
      path is removed from the route handler.
 
 **Changes to `config-type.ts`**:
+
 - Remove `Headers` and `HeadersProvider` types.
 - Change `cors` from `boolean | HeadersProvider` to `boolean | RequestHandler`.
 - Update JSDoc: remove `@desc You can override the default CORS headers by setting up a provider function here.`
   and add `@example import cors from "cors";` / `config.cors = cors({ origin: "https://example.com" })`.
 
 **Changes to `routing.ts`**:
+
 - Remove `makeCorsHeaders` — no longer needed (global sets Origin/Headers, route sets Methods only).
 - Simplify the route-level CORS handler to just `res.set("Access-Control-Allow-Methods", lineUp(accessMethods))`.
 - Remove the `typeof config.cors === "function"` branch (the `cors: RequestHandler` case
@@ -156,6 +158,7 @@ The CORS implementation splits into two layers:
 - Update `Siblings` type if needed (already done in Phase 1).
 
 **Changes to `server.ts`**:
+
 - In `createServer()`, add the global CORS middleware before parsers:
   ```typescript
   if (config.cors === true) {
@@ -171,12 +174,14 @@ The CORS implementation splits into two layers:
   This goes after `config.beforeRouting?.({ app, getLogger })` and before parsers.
 
 **Risks**:
+
 - The `HeadersProvider` approach allowed the function to access `endpoint` and `logger`
   for dynamic header customization. Users relying on this must migrate to a `RequestHandler`
   that accesses `req` and `res` directly (same info is available from Express req/res).
 - The `Access-Control-Allow-Origin: *` default for `cors: true` is unchanged.
 
 **Test impact**:
+
 - `tests/server.spec.ts`: assertions that check custom CORS headers via `config.cors`
   function behavior need updating. Tests using `cors: true` should verify `app.use` is
   called with the global CORS inline middleware once, and route handlers set
@@ -186,7 +191,7 @@ The CORS implementation splits into two layers:
 ### Phase 2 — Move parser attachment to server.ts
 
 In `createServer()`, move parsers from `initRouting()` parameter to global `app.use()`
-calls *before* `initRouting()`:
+calls _before_ `initRouting()`:
 
 ```typescript
 // Before (lines 85-91):
@@ -216,7 +221,7 @@ it a no-op. We can't guard it by Content-Type because a custom `rawParser` might
 match a different type (e.g., `express.raw({ type: 'custom/custom' })`). The
 `Buffer.isBuffer` check is a native C++ function — the overhead is immeasurable.
 
-**Important**: ordering must place parsers *after* `beforeRouting` hooks so that
+**Important**: ordering must place parsers _after_ `beforeRouting` hooks so that
 `beforeRouting`-registered routes (e.g., Swagger UI) don't run through body parsers
 unnecessarily. The current code does `beforeRouting` then `initRouting` — this ordering
 is preserved.
@@ -287,7 +292,7 @@ In `createUploadParsers()` (`server-helpers.ts:92-117`):
 #### `tests/server.spec.ts`
 
 The "Should create server with custom parsers" test (line 93) currently asserts that
-custom parsers appear *inside* route handler chains:
+custom parsers appear _inside_ route handler chains:
 
 ```typescript
 expect(appMock.get).toHaveBeenCalledWith(
@@ -374,13 +379,13 @@ Add a changelog entry describing the behavioral change:
 
 ## Risks and mitigations
 
-| Risk | Mitigation |
-|---|---|
-| **express-fileupload `debug: true` logs on every request** | Remove `debug: true` default in Phase 4. Users opt in via `config.upload`. |
-| **`beforeUpload` runs for every request** | Acceptable — it's a user-defined hook. If it's expensive, users should guard it themselves. |
-| **`moveRaw` runs on every request** | `Buffer.isBuffer()` is a native C++ call — false for most requests, effectively free. Can't guard by Content-Type because custom `rawParser` may use a different `type` option. |
-| **Behavior change for existing users** | Non-breaking in practice. Endpoints previously limited to one Content-Type now accept others. Schema validation rejects mismatched shapes regardless. |
-| **Custom parsers in `attachRouting()` users** | `attachRouting()` doesn't set up parsers; users of that API are responsible for their own body parsing — unchanged. |
+| Risk                                                       | Mitigation                                                                                                                                                                      |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **express-fileupload `debug: true` logs on every request** | Remove `debug: true` default in Phase 4. Users opt in via `config.upload`.                                                                                                      |
+| **`beforeUpload` runs for every request**                  | Acceptable — it's a user-defined hook. If it's expensive, users should guard it themselves.                                                                                     |
+| **`moveRaw` runs on every request**                        | `Buffer.isBuffer()` is a native C++ call — false for most requests, effectively free. Can't guard by Content-Type because custom `rawParser` may use a different `type` option. |
+| **Behavior change for existing users**                     | Non-breaking in practice. Endpoints previously limited to one Content-Type now accept others. Schema validation rejects mismatched shapes regardless.                           |
+| **Custom parsers in `attachRouting()` users**              | `attachRouting()` doesn't set up parsers; users of that API are responsible for their own body parsing — unchanged.                                                             |
 
 ## Future considerations
 

@@ -63,7 +63,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger };
 };
 
-export const createServer = (config: ServerConfig, routing: Routing) => {
+const setup = (config: ServerConfig, routing: Routing) => {
   const { logger, getLogger, notFoundHandler, catcher, loggingMiddleware } =
     makeCommonEntities(config);
   const app = express()
@@ -102,6 +102,11 @@ export const createServer = (config: ServerConfig, routing: Routing) => {
 
   config.afterRouting?.({ app, getLogger });
   app.use(catcher, notFoundHandler);
+  return { app, logger };
+};
+
+export const createServer = (config: ServerConfig, routing: Routing) => {
+  const { app, logger } = setup(config, routing);
 
   const created: Array<http.Server | https.Server> = [];
   const makeStarter =
