@@ -11,14 +11,9 @@ import {
   isSchema,
 } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
-import {
-  InputValidationError,
-  OutputValidationError,
-  ResultHandlerError,
-} from "./errors";
+import { InputValidationError, OutputValidationError } from "./errors";
 import { ezFormBrand } from "./form-schema";
 import type { IOSchema } from "./io-schema";
-import { lastResortHandler } from "./last-resort";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
 import { getBrand, getExamples } from "./metadata";
@@ -270,17 +265,7 @@ export class Endpoint<
       ctx: Partial<CTX>;
     },
   ) {
-    try {
-      await this.#def.resultHandler.execute(params);
-    } catch (e) {
-      lastResortHandler({
-        ...params,
-        error: new ResultHandlerError(
-          ensureError(e),
-          params.error || undefined,
-        ),
-      });
-    }
+    await this.#def.resultHandler.execute(params);
   }
 
   public override async execute({

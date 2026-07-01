@@ -136,7 +136,7 @@ describe("SSE", () => {
       { single: z.string() },
     ])(
       "should create ResultHandler describing possible events and handling generic errors %#",
-      (events) => {
+      async (events) => {
         const resultHandler = makeResultHandler(events);
         expect(resultHandler).toBeInstanceOf(ResultHandler);
         expect(
@@ -150,7 +150,7 @@ describe("SSE", () => {
           request: makeRequestMock(),
           logger: makeLoggerMock(),
         };
-        resultHandler.execute({
+        await resultHandler.execute({
           ...commons,
           output: {},
           response: positiveResponse,
@@ -160,7 +160,7 @@ describe("SSE", () => {
         expect(positiveResponse._getData()).toBe("");
         expect(positiveResponse.writableEnded).toBeTruthy();
         const negativeResponse = makeResponseMock();
-        resultHandler.execute({
+        await resultHandler.execute({
           ...commons,
           output: null,
           response: negativeResponse,
