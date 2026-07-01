@@ -125,7 +125,7 @@ describe("Example", async () => {
           ["roles", "operator"],
         ]).toString(),
       },
-    ] as const)(
+    ])(
       "Should respond with array for $contentType",
       async ({ contentType, body }, { signal }) => {
         const response = await fetch(`http://localhost:${port}/v1/user/list`, {
