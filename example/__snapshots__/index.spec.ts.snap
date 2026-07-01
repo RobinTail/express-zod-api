@@ -147,20 +147,12 @@ exports[`Example > Positive > Should respond with array (legacy API ResultHandle
     "role": "operator",
   },
   {
-    "name": "Marie Skłodowska Curie",
-    "role": "admin",
-  },
-  {
     "name": "Henrietta Leavitt",
     "role": "manager",
   },
   {
     "name": "Lise Meitner",
     "role": "operator",
-  },
-  {
-    "name": "Alice Ball",
-    "role": "admin",
   },
   {
     "name": "Gerty Cori",

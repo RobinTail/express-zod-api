@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import * as R from "ramda";
 import { z } from "zod";
 import { createRequire } from "node:module";
+import { METHODS } from "node:http";
 
 describe("Environment checks", () => {
   describe("Zod global registry", () => {
@@ -211,6 +212,12 @@ describe("Environment checks", () => {
       expect(
         z.toJSONSchema(z.string().meta({ id: "uniq" })),
       ).not.toHaveProperty("id");
+    });
+  });
+
+  describe("Node.js HTTP method support", () => {
+    test("should include QUERY in http.METHODS", () => {
+      expect(METHODS).toContain("QUERY");
     });
   });
 

@@ -182,17 +182,6 @@ export class Integration extends IntegrationBase {
     );
   }
 
-  /**
-   * @deprecated use `new Integration()` without `typescript` option on its argument
-   * @todo remove in the next major — no longer needed
-   * */
-  public static async create(params: Omit<IntegrationParams, "typescript">) {
-    return new Integration({
-      ...params,
-      typescript: loadPeer<typeof ts>("typescript"),
-    });
-  }
-
   #printUsage(printerOptions?: ts.PrinterOptions) {
     return this.#usage.length
       ? this.#usage

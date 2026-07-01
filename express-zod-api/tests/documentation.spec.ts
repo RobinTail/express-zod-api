@@ -25,7 +25,58 @@ describe("Documentation", () => {
     http: { listen: givePort() },
   });
 
+  describe("Constructor metadata", () => {
+    test("should use expanded info and server objects with all fields", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {},
+        info: {
+          title: "Expanded API",
+          version: "3.0.0",
+          summary: "Full info object",
+          contact: { name: "Dev", email: "dev@example.com" },
+          license: { name: "MIT", url: "https://opensource.org/licenses/MIT" },
+        },
+        server: {
+          url: "https://{env}.example.com/{ver}",
+          description: "Environment server",
+          variables: {
+            env: { default: "api", enum: ["api", "staging"] },
+            ver: { default: "v1" },
+          },
+        },
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test.each<Pick<ConstructorParameters<typeof Documentation>[0], "server">>([
+      {
+        server: { url: "https://s.example.com", description: "Single" },
+      },
+      {
+        server: [
+          { url: "https://a.example.com", description: "A" },
+          { url: "https://b.example.com", description: "B" },
+        ],
+      },
+      { server: ["https://ex.one", "https://ex.two"] },
+      { server: "https://single.example" },
+    ])("should aggregate servers %#", ({ server }) => {
+      expect(
+        new Documentation({
+          config: sampleConfig,
+          routing: {},
+          server,
+          info: { title: "test", version: "1.0" },
+        }).rootDoc.servers,
+      ).toMatchSnapshot();
+    });
+  });
+
   describe("Basic cases", () => {
+    const info = { version: "3.4.5", title: "Testing basic cases" };
+    const server = "https://example.com";
+
     test("should generate the correct schema for DELETE request without body", () => {
       const spec = new Documentation({
         routing: {
@@ -42,9 +93,8 @@ describe("Documentation", () => {
           },
         },
         config: sampleConfig,
-        version: "3.4.5",
-        title: "Testing DELETE request without body",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -73,9 +123,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Complex Types",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -111,9 +160,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Nullable and Optional Types",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -124,7 +172,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              method: "post",
+              method: "query",
               input: z.object({
                 intersection: z.intersection(
                   z.object({ one: z.string() }),
@@ -145,9 +193,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Intersection and And types",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -172,9 +219,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Union and Or Types",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -204,9 +250,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Discriminated Union Type",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -228,9 +273,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Transformation in response schema",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -262,9 +306,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing additional types",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -291,9 +334,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing record",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -314,9 +356,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing type any",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -347,9 +388,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing numbers",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -386,9 +426,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing strings",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -412,9 +451,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing tuples",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -438,9 +476,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing enums",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -463,9 +500,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing z.preprocess()",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
       expect(string.parse(123)).toBe("123");
@@ -508,9 +544,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Lazy",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -574,9 +609,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Security",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -602,9 +636,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing CookieSecurity",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -629,9 +662,8 @@ describe("Documentation", () => {
             },
           },
         },
-        version: "3.4.5",
-        title: "Testing Operation IDs",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -652,9 +684,8 @@ describe("Documentation", () => {
             },
           },
         },
-        version: "3.4.5",
-        title: "Testing Operation IDs",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
@@ -677,9 +708,8 @@ describe("Documentation", () => {
             },
           },
         },
-        version: "3.4.5",
-        title: "Testing Operation IDs",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
@@ -719,9 +749,8 @@ describe("Documentation", () => {
                 },
               },
             },
-            version: "3.4.5",
-            title: "Testing Operation IDs",
-            serverUrl: "https://example.com",
+            info,
+            server,
           }),
       ).toThrow(expectedError);
     });
@@ -751,15 +780,17 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing MIME types and status codes",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
   });
 
   describe("Issue #98", () => {
+    const info = { version: "3.4.5", title: "Testing issue #98" };
+    const server = "https://example.com";
+
     test("Should describe non-empty array", () => {
       // There is no such class as ZodNonEmptyArray in Zod v3.7.0+
       // It existed though in Zod v3.6.x:
@@ -776,9 +807,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing issue #98",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -816,15 +846,17 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing issue #98",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
   });
 
   describe("Route Path Params", () => {
+    const info = { version: "3.4.5", title: "Testing route path params" };
+    const server = "https://example.com";
+
     test("should handle route path params for POST request", () => {
       const spec = new Documentation({
         config: sampleConfig,
@@ -844,9 +876,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing route path params",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -879,9 +910,8 @@ describe("Documentation", () => {
               }),
             },
           },
-          version: "3.4.5",
-          title: "Testing route path params",
-          serverUrl: "https://example.com",
+          info,
+          server,
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -902,9 +932,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing route path params",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -938,9 +967,8 @@ describe("Documentation", () => {
               }),
             },
           },
-          version: "3.4.5",
-          title: "Testing headers params",
-          serverUrl: "https://example.com",
+          info: { version: "3.4.5", title: "Testing headers params" },
+          server: "https://example.com",
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -970,9 +998,11 @@ describe("Documentation", () => {
       );
       expect(
         new Documentation({
-          version: "3.4.5",
-          title: "Testing multiple schemas for different status codes",
-          serverUrl: "https://example.com",
+          info: {
+            version: "3.4.5",
+            title: "Testing multiple schemas for different status codes",
+          },
+          server: "https://example.com",
           config: sampleConfig,
           routing: {
             v1: {
@@ -990,6 +1020,9 @@ describe("Documentation", () => {
   });
 
   describe("Metadata", () => {
+    const info = { version: "3.4.5", title: "Testing Metadata" };
+    const server = "https://example.com";
+
     test("should pass over the schema description", () => {
       const spec = new Documentation({
         config: sampleConfig,
@@ -1010,9 +1043,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Metadata:description",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1028,9 +1060,8 @@ describe("Documentation", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: { v1: { getSomething: endpoint.deprecated() } },
-        version: "3.4.5",
-        title: "Testing Metadata:deprecations",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1056,9 +1087,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Metadata:description",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1088,9 +1118,8 @@ describe("Documentation", () => {
               }),
             },
           },
-          version: "3.4.5",
-          title: "Testing Metadata:example on IO parameter",
-          serverUrl: "https://example.com",
+          info,
+          server,
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -1118,9 +1147,8 @@ describe("Documentation", () => {
               }),
             },
           },
-          version: "3.4.5",
-          title: "Testing Metadata:example on IO schema",
-          serverUrl: "https://example.com",
+          info,
+          server,
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -1150,9 +1178,8 @@ describe("Documentation", () => {
               }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO schema + middleware",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1179,9 +1206,8 @@ describe("Documentation", () => {
               }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO schema + middleware",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1205,9 +1231,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO parameter",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1240,15 +1265,20 @@ describe("Documentation", () => {
           }),
           [deep]: rule,
         },
-        version: "3.4.5",
-        title: "Testing custom brands handling",
-        serverUrl: "https://example.com",
+        info: { version: "3.4.5", title: "Testing custom brands handling" },
+        server: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
   });
 
   describe("Feature #1869: Top level transformations", () => {
+    const info = {
+      version: "3.4.5",
+      title: "Testing top level transformations",
+    };
+    const server = "https://example.com";
+
     test("should handle object-to-object functional transformations and mapping", () => {
       const spec = new Documentation({
         config: sampleConfig,
@@ -1268,9 +1298,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing top level transformations",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1298,9 +1327,8 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing top level transformations",
-        serverUrl: "https://example.com",
+        info,
+        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
