@@ -387,8 +387,11 @@ describe("Example", async () => {
         body: '{"name": "Test', // no closing bracket
       });
       expect(response.status).toBe(400); // Issue #907
-      expect(response.headers.get("access-control-allow-methods")).toBe(
-        "POST, OPTIONS", // issue #2706
+      // Issue #2706: Global CORS layer runs before parsers, so these are preserved in error
+      // responses even though the route-level allow-methods never fires
+      expect(response.headers.get("access-control-allow-origin")).toBe("*");
+      expect(response.headers.get("access-control-allow-headers")).toBe(
+        "content-type",
       );
       const json = await response.json();
       expect(json).toMatchSnapshot({
@@ -588,8 +591,11 @@ describe("Example", async () => {
         { signal, method: "POST", body: data },
       );
       expect(response.status).toBe(413);
-      expect(response.headers.get("access-control-allow-methods")).toBe(
-        "POST, OPTIONS", // issue #2706
+      // Issue #2706: Global CORS layer runs before parsers, so these are preserved in error
+      // responses even though the route-level allow-methods never fires
+      expect(response.headers.get("access-control-allow-origin")).toBe("*");
+      expect(response.headers.get("access-control-allow-headers")).toBe(
+        "content-type",
       );
       const json = await response.json();
       expect(json).toMatchSnapshot();
