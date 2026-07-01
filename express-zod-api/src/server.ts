@@ -80,7 +80,6 @@ const setup = (config: ServerConfig, routing: Routing) => {
     );
   }
   if (config.cookies) app.use(createCookieParser({ config }));
-  config.beforeRouting?.({ app, getLogger });
 
   // issue #2706: CORS must go before parsers:
   if (config.cors === true) {
@@ -98,9 +97,11 @@ const setup = (config: ServerConfig, routing: Routing) => {
     .use(config.formParser || express.urlencoded())
     .use(config.rawParser || express.raw(), moveRaw);
   if (config.upload) app.use(...createUploadParsers({ config, getLogger }));
-  initRouting({ app, routing, getLogger, config });
 
+  config.beforeRouting?.({ app, getLogger });
+  initRouting({ app, routing, getLogger, config });
   config.afterRouting?.({ app, getLogger });
+
   app.use(catcher, notFoundHandler);
   return { app, logger };
 };

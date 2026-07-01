@@ -214,7 +214,8 @@ export interface ServerConfig extends CommonConfig {
    * */
   formParser?: RequestHandler;
   /**
-   * @desc A code to execute before processing the Routing of your API (and before parsing).
+   * @desc A code to execute before processing the Routing of your API.
+   * @desc Runs after compression, cookies, CORS and body parsers are installed.
    * @desc This can be a good place for express middlewares establishing their own routes.
    * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
    * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
