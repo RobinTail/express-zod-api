@@ -4,7 +4,7 @@ export type SomeMethod = Lowercase<string>;
 
 type FamiliarMethod =
   | Exclude<keyof IRouter, "param" | "use" | "route" | "stack" | "all">
-  /** @todo remove when Express team added the "query" method into their types officially */
+  /** @todo remove when merged: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/75187 */
   | "query";
 
 export const methods = [

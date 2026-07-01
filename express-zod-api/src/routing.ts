@@ -106,7 +106,7 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
         const logger = getLogger(request);
         return endpoint.execute({ request, response, logger, config });
       });
-      /** @todo remove type assertion when Express teams adds the QUERY method into types officially */
+      /** @todo remove type assertion when merged: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/75187 */
       const register: (path: string, ...handlers: RequestHandler[]) => IRouter =
         (app as IRouter & { query: IRouterMatcher<IRouter> })[method];
       register.call(app, path, ...handlers);
