@@ -113,19 +113,32 @@ describe("Example", async () => {
       expect(true).toBeTruthy();
     });
 
-    test("Should respond with array (legacy API ResultHandler)", async ({
-      signal,
-    }) => {
-      const response = await fetch(`http://localhost:${port}/v1/user/list`, {
-        method: "QUERY",
-        signal,
-        headers: { "Content-Type": "application/json" },
+    test.for([
+      {
+        contentType: "application/json",
         body: JSON.stringify({ roles: ["manager", "operator"] }),
-      });
-      expect(response.status).toBe(200);
-      const json = await response.json();
-      expect(json).toMatchSnapshot();
-    });
+      },
+      {
+        contentType: "application/x-www-form-urlencoded",
+        body: new URLSearchParams([
+          ["roles", "manager"],
+          ["roles", "operator"],
+        ]).toString(),
+      },
+    ])(
+      "Should respond with array for $contentType",
+      async ({ contentType, body }, { signal }) => {
+        const response = await fetch(`http://localhost:${port}/v1/user/list`, {
+          method: "QUERY",
+          signal,
+          headers: { "Content-Type": contentType },
+          body,
+        });
+        expect(response.status).toBe(200);
+        const json = await response.json();
+        expect(json).toMatchSnapshot();
+      },
+    );
 
     test("Should respond with paginated list (ez.paginated)", async ({
       signal,
@@ -387,8 +400,11 @@ describe("Example", async () => {
         body: '{"name": "Test', // no closing bracket
       });
       expect(response.status).toBe(400); // Issue #907
-      expect(response.headers.get("access-control-allow-methods")).toBe(
-        "POST, OPTIONS", // issue #2706
+      // Issue #2706: Global CORS layer runs before parsers, so these are preserved in error
+      // responses even though the route-level allow-methods never fires
+      expect(response.headers.get("access-control-allow-origin")).toBe("*");
+      expect(response.headers.get("access-control-allow-headers")).toBe(
+        "content-type",
       );
       const json = await response.json();
       expect(json).toMatchSnapshot({
@@ -588,8 +604,11 @@ describe("Example", async () => {
         { signal, method: "POST", body: data },
       );
       expect(response.status).toBe(413);
-      expect(response.headers.get("access-control-allow-methods")).toBe(
-        "POST, OPTIONS", // issue #2706
+      // Issue #2706: Global CORS layer runs before parsers, so these are preserved in error
+      // responses even though the route-level allow-methods never fires
+      expect(response.headers.get("access-control-allow-origin")).toBe("*");
+      expect(response.headers.get("access-control-allow-headers")).toBe(
+        "content-type",
       );
       const json = await response.json();
       expect(json).toMatchSnapshot();

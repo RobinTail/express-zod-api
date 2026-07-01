@@ -4,7 +4,6 @@ import type fileUpload from "express-fileupload";
 import type cookieParser from "cookie-parser";
 import type { ServerOptions } from "node:https";
 import type { BuiltinLoggerConfig } from "./builtin-logger";
-import type { AbstractEndpoint } from "./endpoint";
 import type { AbstractLogger, ActualLogger } from "./logger-helpers";
 import type { Method } from "./method";
 import type { AbstractResultHandler } from "./result-handler";
@@ -23,15 +22,6 @@ export type InputSource = keyof Pick<
 >;
 export type InputSources = Record<Method, InputSource[]>;
 
-type Headers = Record<string, string>;
-type HeadersProvider = (params: {
-  /** @desc The default headers to be overridden. */
-  defaultHeaders: Headers;
-  request: Request;
-  endpoint: AbstractEndpoint;
-  logger: ActualLogger;
-}) => Headers | Promise<Headers>;
-
 type ChildLoggerProvider = (params: {
   request: Request;
   parent: ActualLogger;
@@ -42,10 +32,12 @@ type LogAccess = (request: Request, logger: ActualLogger) => void;
 export interface CommonConfig {
   /**
    * @desc Enables cross-origin resource sharing.
+   * @desc You can provide a custom middleware, e.g. from the "cors" package.
+   * @example import cors from "cors";
+   * @example config.cors = cors({ origin: "https://example.com" });
    * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-   * @desc You can override the default CORS headers by setting up a provider function here.
    */
-  cors: boolean | HeadersProvider;
+  cors: boolean | RequestHandler;
   /**
    * @desc Controls how to respond to a request to an existing endpoint with an invalid HTTP method.
    * @example true — respond with status code 405 and "Allow" header containing a list of valid methods
@@ -178,7 +170,7 @@ export interface ServerConfig extends CommonConfig {
   /** @desc HTTPS server configuration. */
   https?: HttpsConfig;
   /**
-   * @desc Custom JSON parser.
+   * @desc Custom JSON parser applied to all incoming requests.
    * @default express.json()
    * @link https://expressjs.com/en/5x/api.html#express.json
    * */
@@ -210,19 +202,25 @@ export interface ServerConfig extends CommonConfig {
    */
   queryParser?: "simple" | "extended" | ((query: string) => object);
   /**
-   * @desc Custom raw parser (assigns Buffer to request body)
+   * @desc Custom parser for Buffer payloads applied to all incoming requests.
    * @default express.raw()
    * @link https://expressjs.com/en/5x/api.html#express.raw
    * */
   rawParser?: RequestHandler;
   /**
-   * @desc Custom parser for URL Encoded requests used for submitting HTML forms
+   * @desc Custom parser for URL Encoded requests applied to all incoming requests.
    * @default express.urlencoded()
    * @link https://expressjs.com/en/5x/api.html#express.urlencoded
    * */
   formParser?: RequestHandler;
   /**
-   * @desc A code to execute before processing the Routing of your API (and before parsing).
+   * @desc A code to execute before any parsers (cookies, CORS, body) are installed.
+   * @example ({ app }) => { app.use(); }
+   * */
+  beforeParsing?: ServerHook;
+  /**
+   * @desc A code to execute before processing the Routing of your API.
+   * @desc Runs after compression, cookies, CORS and body parsers are installed.
    * @desc This can be a good place for express middlewares establishing their own routes.
    * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
    * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }

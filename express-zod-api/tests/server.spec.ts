@@ -64,26 +64,28 @@ describe("Server", () => {
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.set).toHaveBeenCalledWith("query parser", "simple");
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.use).toHaveBeenCalledTimes(6);
+      expect(appMock.use).toHaveBeenNthCalledWith(1, expect.any(Function)); // logging
+      expect(appMock.use).toHaveBeenNthCalledWith(2, expect.any(Function)); // cors
+      expect(appMock.use).toHaveBeenNthCalledWith(3, expressJsonMock);
+      expect(appMock.use).toHaveBeenNthCalledWith(4, expressUrlencodedMock);
+      expect(appMock.use).toHaveBeenNthCalledWith(5, expressRawMock, moveRaw);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        expressJsonMock,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledTimes(1);
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        expressJsonMock,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        expressJsonMock,
         expect.any(Function), // endpoint
       );
       expect(httpListenSpy).toHaveBeenCalledTimes(1);
@@ -146,7 +148,16 @@ describe("Server", () => {
         "query parser",
         configMock.queryParser,
       );
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.use).toHaveBeenCalledTimes(6);
+      expect(appMock.use).toHaveBeenNthCalledWith(1, expect.any(Function)); // logging
+      expect(appMock.use).toHaveBeenNthCalledWith(2, expect.any(Function)); // cors
+      expect(appMock.use).toHaveBeenNthCalledWith(3, configMock.jsonParser);
+      expect(appMock.use).toHaveBeenNthCalledWith(4, configMock.formParser);
+      expect(appMock.use).toHaveBeenNthCalledWith(
+        5,
+        configMock.rawParser,
+        moveRaw,
+      );
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
       for (const hook of ["beforeRouting", "afterRouting"] as const) {
         expect(configMock[hook]).toHaveBeenCalledWith({
@@ -160,48 +171,39 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledTimes(2);
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/form",
         expect.any(Function), // cors
-        configMock.formParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.patch).toHaveBeenCalledTimes(1);
       expect(appMock.patch).toHaveBeenCalledWith(
         "/v1/raw",
         expect.any(Function), // cors
-        configMock.rawParser,
-        moveRaw,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledTimes(3);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/raw",
         expect.any(Function), // cors
-        configMock.rawParser,
-        moveRaw,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/form",
         expect.any(Function), // cors
-        configMock.formParser,
         expect.any(Function), // endpoint
       );
       expect(httpListenSpy).toHaveBeenCalledTimes(1);
@@ -280,7 +282,7 @@ describe("Server", () => {
         logger: { level: "warn" },
       } satisfies ServerConfig;
       createServer(configMock, {});
-      expect(appMock.use).toHaveBeenCalledTimes(3);
+      expect(appMock.use).toHaveBeenCalledTimes(7);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
@@ -296,7 +298,7 @@ describe("Server", () => {
           logger: { level: "warn" },
         } satisfies ServerConfig;
         createServer(configMock, {});
-        expect(appMock.use).toHaveBeenCalledTimes(3);
+        expect(appMock.use).toHaveBeenCalledTimes(7);
         expect(cookieParserMock).toHaveBeenCalledTimes(1);
         expect(cookieParserMock).toHaveBeenCalledWith(
           typeof cookies === "object" ? cookies.secret : undefined,
@@ -329,13 +331,11 @@ describe("Server", () => {
         },
       };
       createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.use).toHaveBeenCalledTimes(7);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        expect.any(Function), // uploader with logger
-        expect.any(Function), // createUploadFailureHandler()
         expect.any(Function), // endpoint
       );
     });
@@ -357,13 +357,11 @@ describe("Server", () => {
         },
       };
       createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.use).toHaveBeenCalledTimes(6);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        expressRawMock,
-        moveRaw,
         expect.any(Function), // endpoint
       );
     });
@@ -384,11 +382,10 @@ describe("Server", () => {
         },
       };
       createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.use).toHaveBeenCalledTimes(5);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
-        expressUrlencodedMock,
         expect.any(Function), // endpoint
       );
     });

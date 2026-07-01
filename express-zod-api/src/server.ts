@@ -12,9 +12,10 @@ import type {
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
-import { initRouting, type Parsers, type Routing } from "./routing";
+import { initRouting, type Routing } from "./routing";
 import {
   createCookieParser,
+  defaultCorsMiddleware,
   createLoggingMiddleware,
   createNotFoundHandler,
   createCatcher,
@@ -63,7 +64,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger };
 };
 
-export const createServer = (config: ServerConfig, routing: Routing) => {
+const setup = (config: ServerConfig, routing: Routing) => {
   const { logger, getLogger, notFoundHandler, catcher, loggingMiddleware } =
     makeCommonEntities(config);
   const app = express()
@@ -71,6 +72,7 @@ export const createServer = (config: ServerConfig, routing: Routing) => {
     .set("query parser", config.queryParser ?? "simple")
     .use(loggingMiddleware);
 
+  config.beforeParsing?.({ app, getLogger });
   if (config.compression) {
     const compressor = loadPeer<typeof compression>("compression");
     app.use(
@@ -80,18 +82,27 @@ export const createServer = (config: ServerConfig, routing: Routing) => {
     );
   }
   if (config.cookies) app.use(createCookieParser({ config }));
+
+  // issue #2706: CORS must go before parsers:
+  if (config.cors === true) app.use(defaultCorsMiddleware);
+  else if (typeof config.cors === "function") app.use(config.cors);
+
+  app
+    .use(config.jsonParser || express.json())
+    .use(config.formParser || express.urlencoded())
+    .use(config.rawParser || express.raw(), moveRaw);
+  if (config.upload) app.use(...createUploadParsers({ config, getLogger }));
+
   config.beforeRouting?.({ app, getLogger });
-
-  const parsers: Parsers = {
-    json: [config.jsonParser || express.json()],
-    raw: [config.rawParser || express.raw(), moveRaw],
-    form: [config.formParser || express.urlencoded()],
-    upload: config.upload ? createUploadParsers({ config, getLogger }) : [],
-  };
-  initRouting({ app, routing, getLogger, config, parsers });
-
+  initRouting({ app, routing, getLogger, config });
   config.afterRouting?.({ app, getLogger });
+
   app.use(catcher, notFoundHandler);
+  return { app, logger };
+};
+
+export const createServer = (config: ServerConfig, routing: Routing) => {
+  const { app, logger } = setup(config, routing);
 
   const created: Array<http.Server | https.Server> = [];
   const makeStarter =

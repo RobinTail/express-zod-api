@@ -85,9 +85,22 @@ export const createCookieParser = ({
   return parser(secret, Object.keys(rest).length ? rest : undefined);
 };
 
+export const defaultCorsMiddleware: RequestHandler = ({}, res, next) => {
+  res.set({
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "content-type",
+  });
+  next();
+};
+
 export const createUploadLogger = (
   logger: ActualLogger,
-): Pick<Console, "log"> => ({ log: logger.debug.bind(logger) });
+): Pick<Console, "log"> => ({
+  log: (message: string) => {
+    if (/not eligible/i.test(message)) return;
+    logger.debug(message);
+  },
+});
 
 export const createUploadParsers = ({
   getLogger,
