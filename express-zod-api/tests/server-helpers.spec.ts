@@ -192,14 +192,22 @@ describe("Server helpers", () => {
   });
 
   describe("createUploadLogger()", () => {
-    const logger = makeLoggerMock();
-    const uploadLogger = createUploadLogger(logger);
-
     test("should debug the messages", () => {
-      uploadLogger.log("Express-file-upload: Busboy finished parsing request.");
+      const logger = makeLoggerMock();
+      createUploadLogger(logger).log(
+        "Express-file-upload: Busboy finished parsing request.",
+      );
       expect(logger._getLogs().debug).toEqual([
         ["Express-file-upload: Busboy finished parsing request."],
       ]);
+    });
+
+    test("should ignore messages about not eligible requests", () => {
+      const logger = makeLoggerMock();
+      createUploadLogger(logger).log(
+        "Express-file-upload: request is not eligible",
+      );
+      expect(logger._getLogs().debug).toEqual([]);
     });
   });
 
