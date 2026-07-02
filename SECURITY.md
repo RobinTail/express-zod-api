@@ -4,10 +4,11 @@
 
 | Version | Code name     | Release |     Supported      |
 | ------: | :------------ | :------ | :----------------: |
+|  29.x.x | ...           | 08.2026 | :white_check_mark: |
 |  28.x.x | Koko          | 05.2026 | :white_check_mark: |
 |  27.x.x | Nikki         | 02.2026 | :white_check_mark: |
 |  26.x.x | Lia           | 12.2025 | :white_check_mark: |
-|  25.x.x | Sara          | 08.2025 | :white_check_mark: |
+|  25.x.x | Sara          | 08.2025 |        :x:         |
 |  24.x.x | Ashley        | 06.2025 |        :x:         |
 |  23.x.x | Sonia         | 04.2025 |        :x:         |
 |  22.x.x | Tai           | 01.2025 |        :x:         |
