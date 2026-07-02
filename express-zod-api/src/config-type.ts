@@ -32,10 +32,10 @@ type LogAccess = (request: Request, logger: ActualLogger) => void;
 export interface CommonConfig {
   /**
    * @desc Enables cross-origin resource sharing.
-   * @desc You can provide a custom middleware, e.g. from the "cors" package.
-   * @example import cors from "cors";
-   * @example config.cors = cors({ origin: "https://example.com" });
+   * @desc You can provide custom middleware or the `cors` package.
+   * @example cors({ origin: "https://example.com" }) // import cors from "cors"
    * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+   * @link https://www.npmjs.com/package/cors
    */
   cors: boolean | RequestHandler;
   /**
