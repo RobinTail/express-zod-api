@@ -215,7 +215,7 @@ export interface ServerConfig extends CommonConfig {
   formParser?: RequestHandler;
   /**
    * @desc A code to execute before the installation of parsers (compression, cookies, CORS, body).
-   * @example ({ app }) => { app.use(); }
+   * @example ({ app }) => { app.use(helmet()); }
    * */
   beforeParsers?: ServerHook;
   /**
