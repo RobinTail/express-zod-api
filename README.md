@@ -646,28 +646,20 @@ const listUsers = defaultEndpointsFactory.build({
 
 ## Cross-Origin Resource Sharing
 
-You can enable your API for other domains using the corresponding configuration option `cors`.
-The value is required to ensure you explicitly choose the correct setting.
-
-- `cors: false` — CORS is disabled (default).
-- `cors: true` — enables CORS for any origin, setting `Access-Control-Allow-Origin: *` and
-  `Access-Control-Allow-Headers: content-type`.
-- `cors` with a `RequestHandler` — pass a standard Express middleware for full control.
-  Use the well-known [`cors`](https://www.npmjs.com/package/cors) package or write your own:
+You can enable your API for other domains using the corresponding configuration option `cors`. The value is required to
+ensure you explicitly choose the correct setting: `false | true` — disables/enables CORS for any origin, setting
+`Access-Control-Allow-Origin: *` and `Access-Control-Allow-Headers: content-type`. You can also pass standard Express
+middleware for full control, consider using the well-known [cors](https://www.npmjs.com/package/cors) package.
 
 ```ts
 import cors from "cors";
 import { createConfig } from "express-zod-api";
 
-const config = createConfig({
-  cors: cors({ origin: "https://example.com" }), // use the cors package
+const configWithCorsPackage = createConfig({
+  cors: cors({ origin: "https://example.com" }),
 });
-```
 
-```ts
-import { createConfig } from "express-zod-api";
-
-const config = createConfig({
+const configWithCustomRequestHandler = createConfig({
   cors: (req, res, next) => {
     res.set({
       "Access-Control-Allow-Origin": "https://example.com",
@@ -675,7 +667,7 @@ const config = createConfig({
       "Access-Control-Max-Age": "5000",
     });
     next();
-  }, // or a custom RequestHandler
+  },
 });
 ```
 
