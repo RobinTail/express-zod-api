@@ -55,12 +55,9 @@ const makeCommonEntities = (config: CommonConfig) => {
 export const attachRouting = (config: AppConfig, routing: Routing) => {
   const { logger, getLogger, notFoundHandler, loggingMiddleware } =
     makeCommonEntities(config);
-  initRouting({
-    app: config.app.use(loggingMiddleware),
-    routing,
-    getLogger,
-    config,
-  });
+  const app = config.app.use(loggingMiddleware);
+  if (config.cors) app.use(ensureCorsMiddleware(config.cors)); // issue #2706: CORS must go before parsers
+  initRouting({ app, routing, getLogger, config });
   return { notFoundHandler, logger };
 };
 
