@@ -8,10 +8,11 @@
 - Breaking change to the `cors` config option:
   - Changed from `boolean | HeadersProvider` to `boolean | RequestHandler`;
   - You can now use the well-known `cors` package or pass a conventional `RequestHandler` directly.
-- Body parsers are now applied globally rather than per-endpoint:
+- Body parsers are now applied globally rather than per-endpoint (`createServer` experience only):
   - Endpoints can accept requests in different content types (e.g., either JSON or URL-encoded body);
   - The `Documentation` generator continues to guess the desired request type from the input schema;
-  - Parsers retain the ability for configuration via `jsonParser`, `formParser`, and `rawParser` config options.
+  - Parsers retain the ability for configuration via `jsonParser`, `formParser`, and `rawParser` config options;
+  - If using `attachRouting()` in a DIY server, parsers have to be installed manually.
 - Potentially breaking changes to the server lifecycle hooks:
   - The hooks (`beforeRouting` and `afterRouting` config options) are no longer async;
   - `beforeRouting` now runs after the installation of globally enabled parsers;
