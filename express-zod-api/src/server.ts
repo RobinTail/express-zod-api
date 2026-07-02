@@ -56,7 +56,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   const { logger, getLogger, notFoundHandler, loggingMiddleware } =
     makeCommonEntities(config);
   const app = config.app.use(loggingMiddleware);
-  if (config.cors) app.use(ensureCorsMiddleware(config.cors)); // issue #2706: CORS must go before parsers
+  if (config.cors) app.use(ensureCorsMiddleware(config.cors));
   initRouting({ app, routing, getLogger, config });
   return { notFoundHandler, logger };
 };
