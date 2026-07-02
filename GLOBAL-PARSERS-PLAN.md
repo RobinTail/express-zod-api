@@ -364,17 +364,21 @@ test("Should respond with URL-encoded body (legacy API ResultHandler)", async ({
 
 ### Phase 7 — CHANGELOG
 
-Add a changelog entry describing the behavioral change:
+Add entries to `CHANGELOG.md` under the proposed `v29.0.0` section, before the ````diff` block:
 
 ```
-### vNext
-
-- Parsers (`express.json()`, `express.urlencoded()`, `express.raw()`) are now
-  applied globally rather than per-endpoint. This enables any endpoint to accept
-  requests in multiple content types (e.g., both JSON and URL-encoded form data).
-  The `requestType` property continues to determine the documented MIME type in
-  the generated OpenAPI specification. Configured via `jsonParser`, `formParser`,
-  and `rawParser` config options as before.
+- Body parsers (`express.json()`, `express.urlencoded()`, `express.raw()`) are now applied globally rather than per-endpoint:
+  - Any endpoint can accept requests in multiple content types (e.g., both JSON and URL-encoded form data);
+  - The `requestType` property continues to determine the documented MIME type in the generated OpenAPI spec;
+  - Configured via `jsonParser`, `formParser`, and `rawParser` config options as before.
+- Breaking change to the `cors` config option:
+  - Changed from `boolean | HeadersProvider` to `boolean | RequestHandler`;
+  - The custom `HeadersProvider` type is removed — use the well-known `cors` package or pass a conventional `RequestHandler` directly;
+  - Example: `config.cors = cors({ origin: "https://example.com" })` or `config.cors = (req, res, next) => { ... }`;
+  - The `cors: true` behavior is unchanged (sets `Access-Control-Allow-Origin: *` and `Access-Control-Allow-Headers: content-type`).
+- The `beforeRouting` hook now runs after the installation of globally enabled parsers (compression, cookies, CORS, body parsers):
+  - Previously it ran before parsers — users who depended on that ordering should use the new `beforeParsers` hook;
+  - The new `beforeParsers` hook runs before all parsers (compression, cookies, CORS, body) are installed, matching the original `beforeRouting` behavior.
 ```
 
 ## Risks and mitigations
