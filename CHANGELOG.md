@@ -351,7 +351,7 @@ const listUsers = defaultEndpointsFactory.build({
   - It has been discovered that static import of `typescript` within the framework consumes memory unnecessarily;
   - Importing `typescript` is only necessary to generate an Integration;
   - This version avoids static importing, but the solution is temporary in order to avoid breaking changes;
-  - The issue was found, investigated, and reported by [@NicolasMahe](https://github.com/NicolasMahe).
+  - The issue was found, investigated and reported by [@NicolasMahe](https://github.com/NicolasMahe).
 
 ### v26.0.0
 
@@ -821,7 +821,7 @@ const routing: Routing = {
 
 - Fixed response depiction in the generated Documentation:
   - coerced types were marked as nullable;
-  - coerced, preprocessed, and `z.any()` schemas were marked as optional.
+  - coerced, preprocessed and `z.any()` schemas were marked as optional.
 
 ### v23.1.0
 
@@ -1861,7 +1861,7 @@ const config = createConfig({
 
 - Improved documentation on error handling:
   - More clarity on the origins of possible runtime errors and how they are handled by default;
-  - Revealing details on how routing, parsing, and upload errors are handled by default;
+  - Revealing details on how routing, parsing and upload errors are handled by default;
   - Correction to the JSDoc of the corresponding `errorHandler` property in config.
 - Removing redundant type coercion in the migration tool.
 
@@ -2264,7 +2264,7 @@ new Integration({
 
 - **Breaking changes**:
   - Increased the minimum supported versions:
-    - For Node.js: 18.18.0, 20.9.0, or 22.0.0;
+    - For Node.js: 18.18.0, 20.9.0 or 22.0.0;
     - For `zod`: 3.23.0;
     - For `express`: [4.19.2](https://github.com/expressjs/express/security/advisories/GHSA-rv95-896h-c2vc);
     - For `express-fileupload` and `@types/express-fileupload`: 1.5.0.
@@ -2404,7 +2404,7 @@ const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
 
 ### v18.5.0
 
-- Major update on metadata: ~~`withMeta()`~~ is no longer required, deprecated, and will be removed in v19:
+- Major update on metadata: ~~`withMeta()`~~ is no longer required, deprecated and will be removed in v19:
   - ~~`withMeta()`~~ was introduced in version 2.10.0, because I didn't want to alter Zod's prototypes;
   - However, the [new information](https://github.com/colinhacks/zod/pull/3445#issuecomment-2091463120) arrived
     recently from the author of Zod on that matter;
@@ -2787,7 +2787,7 @@ after:
   - When the `level` is set to `debug` the inspected objects will be pretty printed.
   - When the `level` is set to `warn` the inspected objects will be serialized in one line.
 - Additionally, new option `depth` added to `SimplifiedWinstonConfig` that can be `number | null` being `2` by default.
-  - The option controls how deeply the objects should be inspected, serialized, and printed.
+  - The option controls how deeply the objects should be inspected, serialized and printed.
   - It can be set to `null` or `Infinity` for unlimited depth.
 
 ```ts
@@ -3201,7 +3201,7 @@ operationId:
   - Transitioned from an exclusive approach to the inclusive one:
     - Introducing the list of `files` included into the distribution (instead of ignoring redundant ones).
   - Stable testing environment:
-    - Inclusive, stable, and extensible `tsconfig.json` files;
+    - Inclusive, stable and extensible `tsconfig.json` files;
     - Stable `package.json` for integration, ESM and compatibility tests;
     - Dedicated environment for Issue #952 test.
   - Simplified development commands.
@@ -4083,7 +4083,7 @@ createResultHandler({
 
 - Feature #845, proposed by [@lazylace37](https://github.com/lazylace37).
   - Equipping the generated documentation with automatically generated and unique `operationId`.
-  - The `operationId` consists of method, path, and optional numeric suffix.
+  - The `operationId` consists of method, path and optional numeric suffix.
 
 ```yaml
 before:
@@ -5093,7 +5093,7 @@ const routing: Routing = {
 
 - Feature #252: a helper method for testing your endpoints: `testEndpoint()`.
   - Requires `jest` (and optionally `@types/jest`) to be installed.
-  - The method helps to mock the request, response, config, and logger required to execute the endpoint.
+  - The method helps to mock the request, response, config and logger required to execute the endpoint.
   - The method executes the endpoint and returns the created mocks.
   - After that you only need to assert your expectations in the test.
 
