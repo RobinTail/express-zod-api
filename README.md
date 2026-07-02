@@ -1132,7 +1132,7 @@ errors yourself. In this regard `attachRouting()` provides you with `notFoundHan
 to your custom express app.
 
 Besides that, if you're looking to include additional request parsers, or a middleware that establishes its own routes,
-then consider using the `beforeRouting` [option in config instead](#using-native-express-middlewares).
+then consider using the `beforeRouting` or `beforeParsers` [config options instead](#using-native-express-middlewares).
 
 ## Testing endpoints
 
