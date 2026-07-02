@@ -40,6 +40,10 @@ describe("Migration", async () => {
       `new Documentation({ info: { title: "x", version: "y" }, server: "https://", routing, config })`,
       `new Documentation({ info: { }, server: "https://", routing, config })`,
       `new Documentation({ routing, config })`,
+      // corsConfig
+      `createConfig({ cors: true })`,
+      `createConfig({ cors: someHandler })`,
+      `createConfig({ cors: (req, res, next) => { someCors(req, res); next(); } })`,
     ],
     invalid: [
       {
@@ -157,6 +161,96 @@ describe("Migration", async () => {
               subject: "Documentation",
               from: "serverUrl",
               to: "server",
+            },
+          },
+        ],
+      },
+      {
+        name: "cors concise arrow returning object",
+        code: `createConfig({ cors: () => ({ "access-control-allow-origin": "*" }) })`,
+        output: `createConfig({ cors: (req, res, next) => { res.set({ "access-control-allow-origin": "*" }); next(); } })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "cors headers provider",
+              from: "function returning object",
+              to: "request handler",
+            },
+          },
+        ],
+      },
+      {
+        name: "cors arrow with params returning object",
+        code: `createConfig({ cors: (request, response) => ({ "access-control-allow-origin": "*" }) })`,
+        output: `createConfig({ cors: (req, res, next) => { res.set({ "access-control-allow-origin": "*" }); next(); } })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "cors headers provider",
+              from: "function returning object",
+              to: "request handler",
+            },
+          },
+        ],
+      },
+      {
+        name: "cors async concise arrow returning object",
+        code: `createConfig({ cors: async () => ({ "access-control-allow-origin": "*" }) })`,
+        output: `createConfig({ cors: (req, res, next) => { res.set({ "access-control-allow-origin": "*" }); next(); } })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "cors headers provider",
+              from: "function returning object",
+              to: "request handler",
+            },
+          },
+        ],
+      },
+      {
+        name: "cors arrow with block body returning object",
+        code: `createConfig({ cors: () => { return { "access-control-allow-origin": "*" }; } })`,
+        output: `createConfig({ cors: (req, res, next) => {\nres.set({ "access-control-allow-origin": "*" });\nnext();\n} })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "cors headers provider",
+              from: "function returning object",
+              to: "request handler",
+            },
+          },
+        ],
+      },
+      {
+        name: "cors async arrow with block body returning object",
+        code: `createConfig({ cors: async () => { return { "access-control-allow-origin": "*" }; } })`,
+        output: `createConfig({ cors: async (req, res, next) => {\nres.set({ "access-control-allow-origin": "*" });\nnext();\n} })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "cors headers provider",
+              from: "function returning object",
+              to: "request handler",
+            },
+          },
+        ],
+      },
+      {
+        name: "cors arrow with block body and preceding statements",
+        code: `createConfig({ cors: () => { doSomething(); return { "access-control-allow-origin": "*" }; } })`,
+        output: `createConfig({ cors: (req, res, next) => {\ndoSomething();\nres.set({ "access-control-allow-origin": "*" });\nnext();\n} })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "cors headers provider",
+              from: "function returning object",
+              to: "request handler",
             },
           },
         ],

@@ -424,9 +424,9 @@ const resultHandlerWithCleanup = new ResultHandler({
 
 There are two ways of connecting the native express middlewares depending on their nature and your objective.
 
-In case it's a middleware establishing and serving its own routes, or somehow globally modifying the behaviour, or
-being an additional request parser (like `cookie-parser`), use the `beforeRouting` option. However, it might be better
-to avoid `cors` here — [the framework handles it on its own](#cross-origin-resource-sharing).
+In case it's middleware establishing and serving its own routes, or somehow globally modifying the behavior, use the
+`beforeRouting` or `beforeParsers` hooks. Note that [CORS](#cross-origin-resource-sharing), cookies, compression, and
+body parsing are already available as separate [config options](#set-up-config).
 
 ```ts
 import { createConfig } from "express-zod-api";
@@ -647,18 +647,27 @@ const listUsers = defaultEndpointsFactory.build({
 ## Cross-Origin Resource Sharing
 
 You can enable your API for other domains using the corresponding configuration option `cors`. The value is required to
-ensure you explicitly choose the correct setting. In addition to being a boolean, `cors` can also be assigned a
-function that overrides default CORS headers. That function has several parameters and can be asynchronous.
+ensure you explicitly choose the correct setting: `false | true` — disables/enables CORS for any origin, setting
+`Access-Control-Allow-Origin: *` and `Access-Control-Allow-Headers: content-type`. You can also pass standard Express
+middleware for full control, consider using the well-known [cors](https://www.npmjs.com/package/cors) package.
 
 ```ts
+import cors from "cors";
 import { createConfig } from "express-zod-api";
 
-const config = createConfig({
-  /** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS */
-  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
-    ...defaultHeaders,
-    "Access-Control-Max-Age": "5000",
-  }),
+const configWithCorsPackage = createConfig({
+  cors: cors({ origin: "https://example.com" }),
+});
+
+const configWithCustomRequestHandler = createConfig({
+  cors: (req, res, next) => {
+    res.set({
+      "Access-Control-Allow-Origin": "https://example.com",
+      "Access-Control-Allow-Headers": "content-type",
+      "Access-Control-Max-Age": "5000",
+    });
+    next();
+  },
 });
 ```
 
@@ -1123,7 +1132,7 @@ errors yourself. In this regard `attachRouting()` provides you with `notFoundHan
 to your custom express app.
 
 Besides that, if you're looking to include additional request parsers, or a middleware that establishes its own routes,
-then consider using the `beforeRouting` [option in config instead](#using-native-express-middlewares).
+install them on your custom `app` before calling `attachRouting()`.
 
 ## Testing endpoints
 

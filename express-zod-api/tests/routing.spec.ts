@@ -187,14 +187,8 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
-    test("Issue 705: should set all assigned methods to CORS response header", async () => {
+    test("Issue 705: should set allowed methods to CORS response header", async () => {
       const handler = vi.fn(async () => ({}));
-      const configMock = {
-        cors: (params: { defaultHeaders: Record<string, string> }) => ({
-          ...params.defaultHeaders,
-          "X-Custom-Header": "Testing",
-        }),
-      };
       const factory = new EndpointsFactory(defaultResultHandler);
       const input = z.object({});
       const output = z.object({});
@@ -225,22 +219,19 @@ describe("Routing", () => {
       initRouting({
         app: appMock as unknown as IRouter,
         getLogger: () => logger,
-        config: configMock,
+        config: { cors: true },
         routing,
       });
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0]![0]).toBe("/hello");
       const fn = appMock.options.mock.calls[0]![1];
-      expect(typeof fn).toBe("function"); // async RequestHandler, proprietary CORS middleware
+      expect(typeof fn).toBe("function"); // async RequestHandler, route-level CORS middleware
       const requestMock = makeRequestMock({ method: "PUT" });
       const responseMock = makeResponseMock();
       await fn(requestMock, responseMock, vi.fn());
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
-        "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, PATCH, POST, PUT, HEAD, OPTIONS",
-        "access-control-allow-headers": "content-type",
-        "x-custom-header": "Testing",
       });
     });
 
@@ -367,9 +358,7 @@ describe("Routing", () => {
       await fn(requestMock, responseMock, vi.fn());
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
-        "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, POST, HEAD, OPTIONS",
-        "access-control-allow-headers": "content-type",
       });
     });
 

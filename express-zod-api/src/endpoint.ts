@@ -74,7 +74,10 @@ export abstract class AbstractEndpoint {
   public abstract get scopes(): ReadonlyArray<string>;
   /** @internal */
   public abstract get tags(): ReadonlyArray<string>;
-  /** @internal */
+  /**
+   * @internal
+   * @todo reconsider the purpose of this method, since parsers are global now
+   * */
   public abstract get requestType(): ContentType;
   /** @internal */
   public abstract get isDeprecated(): boolean;

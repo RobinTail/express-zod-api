@@ -37,7 +37,6 @@ export type ClientMethod = (typeof clientMethods)[number];
 
 /**
  * @desc Methods supported in CORS headers
- * @see makeCorsHeaders
  * @see createWrongMethodHandler
  * @example ClientMethod | "options"
  * */

@@ -5,19 +5,34 @@
 ### v29.0.0
 
 - Supported Node.js versions: `^22.19.0 || ^24.11.0 || ^26.0.0`;
+- Breaking change to the `cors` config option:
+  - Changed from `boolean | HeadersProvider` to `boolean | RequestHandler`;
+  - You can now use the well-known `cors` package or pass a conventional `RequestHandler` directly.
+- Body parsers are now applied globally rather than per-endpoint (`createServer` experience only):
+  - Endpoints can accept requests in different content types (e.g., either JSON or URL-encoded body);
+  - The `Documentation` generator continues to guess the desired request type from the input schema;
+  - Parsers retain the ability for configuration via `jsonParser`, `formParser`, and `rawParser` config options;
+  - If using `attachRouting()` in a DIY server, parsers have to be installed manually.
+- Potentially breaking changes to the server lifecycle hooks:
+  - The hooks (`beforeRouting` and `afterRouting` config options) are no longer async;
+  - `beforeRouting` now runs after the installation of globally enabled parsers;
+  - Added new `beforeParsers` hook that runs before all parsers are installed.
 - The static async method `Integration::create()` removed — use `new Integration()` instead;
-- Server lifecycle hooks (`beforeRouting` and `afterRouting` config options) are no longer async;
 - The `createServer()` function is now synchronous — that should simplify the daily routines for beginners;
-- Changes to `Documentation` constructor:
-  - `serverUrl` renamed to `server` and now also accepts OpenAPI's ServerObject;
-  - `title` and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
-- The Documentation generator is featuring the OpenAPI 3.2.0 with better SSE support and other features;
 - Added HTTP QUERY method support (RFC 10008):
   - The QUERY method is like GET but with a body — safe, idempotent, and cacheable;
   - Default input sources for QUERY: `["query", "body", "params"]` (from the lowest priority to highest);
   - Supported by `Integration` and `Documentation` generators.
+- Changes to `Documentation` constructor:
+  - `serverUrl` renamed to `server` and now also accepts OpenAPI's ServerObject;
+  - `title` and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
+- The Documentation generator is featuring the OpenAPI 3.2.0 with better SSE support and other features;
 
 ```diff
+  const config = createConfig({
+-   cors: () => ({ origin: "https://example.com" }),
++   cors: cors({ origin: "https://example.com" }), // import cors from "cors"
+  });
 - await Integration.create({});
 + new Integration({});
 - const {} = await createServer({});
@@ -29,7 +44,7 @@
 +   },
 -   serverUrl: "https://example.com",
 +   server: "https://example.com",
-  })
+  });
 ```
 
 ## Version 28
