@@ -214,10 +214,10 @@ export interface ServerConfig extends CommonConfig {
    * */
   formParser?: RequestHandler;
   /**
-   * @desc A code to execute before any parsers (cookies, CORS, body) are installed.
+   * @desc A code to execute before the installation of parsers (compression, cookies, CORS, body).
    * @example ({ app }) => { app.use(); }
    * */
-  beforeParsing?: ServerHook;
+  beforeParsers?: ServerHook;
   /**
    * @desc A code to execute before processing the Routing of your API.
    * @desc Runs after compression, cookies, CORS and body parsers are installed.

@@ -72,7 +72,7 @@ const setup = (config: ServerConfig, routing: Routing) => {
     .set("query parser", config.queryParser ?? "simple")
     .use(loggingMiddleware);
 
-  config.beforeParsing?.({ app, getLogger });
+  config.beforeParsers?.({ app, getLogger });
   if (config.compression) {
     const compressor = loadPeer<typeof compression>("compression");
     app.use(
