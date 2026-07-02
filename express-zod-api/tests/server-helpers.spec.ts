@@ -7,6 +7,7 @@ import {
   createUploadFailureHandler,
   createUploadLogger,
   createUploadParsers,
+  ensureCorsMiddleware,
   makeGetLogger,
   moveRaw,
   installDeprecationListener,
@@ -402,6 +403,27 @@ describe("Server helpers", () => {
         ["NOT_HAPPEN", expect.any(Function)],
         ["ANOTHER_ONE", expect.any(Function)],
       ]);
+    });
+  });
+
+  describe("ensureCorsMiddleware()", () => {
+    test("should return default middleware when cors is true", () => {
+      const middleware = ensureCorsMiddleware(true);
+      const req = makeRequestMock();
+      const res = makeResponseMock();
+      const next = vi.fn();
+      middleware(req, res, next);
+      expect(res._getHeaders()).toEqual({
+        "access-control-allow-headers": "content-type",
+        "access-control-allow-origin": "*",
+      });
+      expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    test("should return the given function when cors is a RequestHandler", () => {
+      const custom = vi.fn();
+      const middleware = ensureCorsMiddleware(custom);
+      expect(middleware).toBe(custom);
     });
   });
 });
