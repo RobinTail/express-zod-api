@@ -11,6 +11,7 @@ interface Queries {
   createServerAwait: TSESTree.CallExpression;
   asyncLifecycleHook: NamedProp;
   documentationConfig: TSESTree.ObjectExpression;
+  corsConfig: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -33,6 +34,10 @@ const queries: Record<Listener, string> = {
   documentationConfig:
     `${NT.NewExpression}[callee.name="Documentation"] > ` +
     `${NT.ObjectExpression}`,
+  corsConfig:
+    `${NT.CallExpression}[callee.name="createConfig"] > ` +
+    `${NT.ObjectExpression} > ` +
+    queryNamedProp("cors"),
 };
 
 const listen = <
@@ -119,6 +124,49 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               : firstToken.range[0] + 5;
             return fixer.removeRange([firstToken.range[0], end]);
           },
+        });
+      },
+      corsConfig: (node) => {
+        const value = node.value;
+        const isFunc =
+          value.type === NT.ArrowFunctionExpression ||
+          value.type === NT.FunctionExpression;
+        if (!isFunc) return;
+        const body = value.body;
+        const isAsync = value.async;
+        const asyncPrefix = isAsync ? "async " : "";
+        let newFunc: string | null = null;
+        if (body.type === NT.ObjectExpression) {
+          newFunc = `(req, res, next) => { res.set(${ctx.sourceCode.getText(body)}); next(); }`;
+        } else if (body.type === NT.BlockStatement) {
+          const returnIndex = body.body.findIndex(
+            (s) => s.type === NT.ReturnStatement,
+          );
+          if (returnIndex < 0) return;
+          const ret = body.body[returnIndex] as TSESTree.ReturnStatement;
+          if (!ret.argument || ret.argument.type !== NT.ObjectExpression)
+            return;
+          const parts: string[] = [];
+          for (let i = 0; i < body.body.length; i++) {
+            if (i === returnIndex) {
+              parts.push(`res.set(${ctx.sourceCode.getText(ret.argument)});`);
+              parts.push(`next();`);
+            } else if (body.body[i]!.type !== NT.ReturnStatement) {
+              parts.push(ctx.sourceCode.getText(body.body[i]!));
+            }
+          }
+          newFunc = `${asyncPrefix}(req, res, next) => {\n${parts.join("\n")}\n}`;
+        }
+        if (!newFunc) return;
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: "cors headers provider",
+            from: "function returning object",
+            to: "request handler",
+          },
+          fix: (fixer) => fixer.replaceText(value, newFunc),
         });
       },
       documentationConfig: (node) => {
