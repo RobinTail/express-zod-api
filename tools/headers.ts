@@ -82,8 +82,7 @@ const newHeaders = allHeaders.filter(
 );
 
 if (newHeaders.length === 0) {
-  console.info("No new headers found, updating timestamp");
-  await writeDest(state);
+  console.info("No new headers found.");
   process.exit(0);
 }
 
