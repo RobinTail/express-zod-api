@@ -74,11 +74,8 @@ export abstract class AbstractEndpoint {
   public abstract get scopes(): ReadonlyArray<string>;
   /** @internal */
   public abstract get tags(): ReadonlyArray<string>;
-  /**
-   * @internal
-   * @todo reconsider the purpose of this method, since parsers are global now
-   * */
-  public abstract get requestType(): ContentType;
+  /** @internal */
+  public abstract getProbableRequestType(method?: ClientMethod): ContentType;
   /** @internal */
   public abstract get isDeprecated(): boolean;
 }
@@ -89,6 +86,7 @@ export class Endpoint<
   CTX extends FlatObject,
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
+  #requestType?: ContentType;
 
   /** considered an expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
@@ -161,15 +159,18 @@ export class Endpoint<
   }
 
   /** @internal */
-  public override get requestType() {
-    const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
-    if (found) {
-      const brand = getBrand(found);
-      if (brand === ezUploadBrand) return "upload";
-      if (brand === ezRawBrand) return "raw";
-      if (brand === ezFormBrand) return "form";
-    }
-    return "json";
+  public override getProbableRequestType(method?: ClientMethod) {
+    if (method === "query") return "form";
+    return (this.#requestType ??= (() => {
+      const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
+      if (found) {
+        const brand = getBrand(found);
+        if (brand === ezUploadBrand) return "upload";
+        if (brand === ezRawBrand) return "raw";
+        if (brand === ezFormBrand) return "form";
+      }
+      return "json";
+    })());
   }
 
   /** @internal */

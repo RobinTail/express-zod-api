@@ -367,7 +367,17 @@ describe("Endpoint", () => {
     });
   });
 
-  describe(".requestType", () => {
+  describe(".getProbableRequestType()", () => {
+    test("should return 'form' for QUERY method %#", () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        input: ez.raw(),
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      expect(endpoint.getProbableRequestType()).toBe("raw");
+      expect(endpoint.getProbableRequestType("query")).toBe("form");
+    });
     test.each([
       { input: z.object({}), expected: "json" },
       { input: ez.raw(), expected: "raw" },
@@ -383,7 +393,7 @@ describe("Endpoint", () => {
           output: z.object({}),
           handler: vi.fn(),
         });
-        expect(endpoint.requestType).toEqual(expected);
+        expect(endpoint.getProbableRequestType()).toEqual(expected);
       },
     );
   });

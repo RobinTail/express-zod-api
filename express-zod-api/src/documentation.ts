@@ -250,10 +250,7 @@ export class Documentation extends OpenApiBuilder {
             request,
             paramNames: R.pluck("name", depictedParams),
             schema: inputSchema,
-            mimeType:
-              method === "query" // @todo consider moving into the inheritor of Endpoint::requestType() when made
-                ? contentTypes.form // conventionally recommended for QUERY
-                : contentTypes[endpoint.requestType],
+            mimeType: contentTypes[endpoint.getProbableRequestType(method)],
             description: descriptions?.requestBody?.({
               method,
               path,
