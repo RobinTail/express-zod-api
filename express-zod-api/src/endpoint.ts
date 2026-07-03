@@ -160,8 +160,8 @@ export class Endpoint<
 
   /** @internal */
   public override getProbableRequestType(method?: ClientMethod) {
+    if (method === "query") return "form";
     return (this.#requestType ??= (() => {
-      if (method === "query") return "form";
       const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
       if (found) {
         const brand = getBrand(found);
