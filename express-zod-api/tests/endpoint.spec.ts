@@ -368,18 +368,16 @@ describe("Endpoint", () => {
   });
 
   describe(".getProbableRequestType()", () => {
-    test.each([z.object(), ez.raw()])(
-      "should return 'form' for QUERY method %#",
-      (input) => {
-        const factory = new EndpointsFactory(defaultResultHandler);
-        const endpoint = factory.build({
-          input,
-          output: z.object({}),
-          handler: vi.fn(),
-        });
-        expect(endpoint.getProbableRequestType("query")).toBe("form");
-      },
-    );
+    test("should return 'form' for QUERY method %#", () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        input: ez.raw(),
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      expect(endpoint.getProbableRequestType()).toBe("raw");
+      expect(endpoint.getProbableRequestType("query")).toBe("form");
+    });
     test.each([
       { input: z.object({}), expected: "json" },
       { input: ez.raw(), expected: "raw" },
