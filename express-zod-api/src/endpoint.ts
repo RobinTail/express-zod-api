@@ -74,11 +74,8 @@ export abstract class AbstractEndpoint {
   public abstract get scopes(): ReadonlyArray<string>;
   /** @internal */
   public abstract get tags(): ReadonlyArray<string>;
-  /**
-   * @internal
-   * @todo reconsider the purpose of this method, since parsers are global now
-   * */
-  public abstract get requestType(): ContentType;
+  /** @internal */
+  public abstract getProbableRequestType(method?: ClientMethod): ContentType;
   /** @internal */
   public abstract get isDeprecated(): boolean;
 }
@@ -161,7 +158,8 @@ export class Endpoint<
   }
 
   /** @internal */
-  public override get requestType() {
+  public override getProbableRequestType(method?: ClientMethod) {
+    if (method === "query") return "form";
     const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
     if (found) {
       const brand = getBrand(found);
