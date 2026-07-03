@@ -86,6 +86,7 @@ export class Endpoint<
   CTX extends FlatObject,
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
+  #requestType?: ContentType;
 
   /** considered an expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
@@ -159,14 +160,16 @@ export class Endpoint<
 
   /** @internal */
   public override get requestType() {
-    const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
-    if (found) {
-      const brand = getBrand(found);
-      if (brand === ezUploadBrand) return "upload";
-      if (brand === ezRawBrand) return "raw";
-      if (brand === ezFormBrand) return "form";
-    }
-    return "json";
+    return (this.#requestType ??= (() => {
+      const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
+      if (found) {
+        const brand = getBrand(found);
+        if (brand === ezUploadBrand) return "upload";
+        if (brand === ezRawBrand) return "raw";
+        if (brand === ezFormBrand) return "form";
+      }
+      return "json";
+    })());
   }
 
   /** @internal */
