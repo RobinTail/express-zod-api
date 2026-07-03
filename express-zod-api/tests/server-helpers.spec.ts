@@ -1,5 +1,5 @@
+import { fileUploadMock } from "./peers-mock";
 import { fail } from "node:assert/strict";
-import { fileUploadMock } from "./express-mock";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
@@ -21,6 +21,7 @@ import {
   makeResponseMock,
 } from "../src/testing";
 import createHttpError from "http-errors";
+import { AbstractResultHandler } from "../src/result-handler.ts";
 
 describe("Server helpers", () => {
   describe("createCatcher()", () => {
@@ -54,9 +55,43 @@ describe("Server helpers", () => {
         });
         await handler(error, makeRequestMock(), makeResponseMock(), vi.fn());
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy.mock.calls[0][0].error).toEqual(
+        expect(spy.mock.calls[0]![0].error).toEqual(
           error instanceof Error ? error : new Error(error),
         );
+      },
+    );
+
+    test.each([() => fail("I am faulty"), () => Promise.reject("I am faulty")])(
+      "should call Last Resort Handler in case of errorHandler::handler is faulty %#",
+      async (rhImpl) => {
+        const errorHandler = new ResultHandler({
+          positive: vi.fn(),
+          negative: vi.fn(),
+          handler: vi.fn().mockImplementation(rhImpl),
+        });
+        const spy = vi.spyOn(AbstractResultHandler, "lastResort");
+        const handler = createCatcher({
+          errorHandler,
+          getLogger: () => makeLoggerMock(),
+        });
+        const responseMock = makeResponseMock();
+        await handler(
+          new Error("boom"),
+          makeRequestMock(),
+          responseMock,
+          vi.fn(),
+        );
+        expect(spy).toHaveBeenCalledWith({
+          error: expect.objectContaining({
+            message: "I am faulty",
+            cause: expect.objectContaining({
+              message: "I am faulty",
+            }),
+            handled: expect.objectContaining({ message: "boom" }),
+          }),
+          logger: expect.any(Object),
+          response: responseMock,
+        });
       },
     );
   });
@@ -83,14 +118,13 @@ describe("Server helpers", () => {
       await handler(requestMock, responseMock, next);
       expect(next).toHaveBeenCalledTimes(0);
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy.mock.calls[0]).toHaveLength(1);
-      expect(spy.mock.calls[0][0].error).toEqual(
+      expect(spy.mock.calls[0]![0].error).toEqual(
         createHttpError(404, "Can not POST /v1/test"),
       );
-      expect(spy.mock.calls[0][0].input).toBeNull();
-      expect(spy.mock.calls[0][0].output).toBeNull();
-      expect(spy.mock.calls[0][0].request).toEqual(requestMock);
-      expect(spy.mock.calls[0][0].response).toEqual(responseMock);
+      expect(spy.mock.calls[0]![0].input).toBeNull();
+      expect(spy.mock.calls[0]![0].output).toBeNull();
+      expect(spy.mock.calls[0]![0].request).toEqual(requestMock);
+      expect(spy.mock.calls[0]![0].response).toEqual(responseMock);
     });
 
     test.each([() => fail("I am faulty"), () => Promise.reject("I am faulty")])(
@@ -101,7 +135,7 @@ describe("Server helpers", () => {
           negative: vi.fn(),
           handler: vi.fn().mockImplementation(rhImpl),
         });
-        const spy = vi.spyOn(errorHandler, "execute");
+        const spy = vi.spyOn(AbstractResultHandler, "lastResort");
         const handler = createNotFoundHandler({
           errorHandler,
           getLogger: () => makeLoggerMock(),
@@ -115,12 +149,17 @@ describe("Server helpers", () => {
         const responseMock = makeResponseMock();
         await handler(requestMock, responseMock, next);
         expect(next).toHaveBeenCalledTimes(0);
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(responseMock._getStatusCode()).toBe(500);
-        expect(responseMock._getData()).toBe(
-          "An error occurred while serving the result: I am faulty.\n" +
-            "Original error: Can not POST /v1/test.",
-        );
+        expect(spy).toHaveBeenCalledWith({
+          error: expect.objectContaining({
+            message: "I am faulty",
+            cause: expect.objectContaining({ message: "I am faulty" }),
+            handled: expect.objectContaining({
+              message: "Can not POST /v1/test",
+            }),
+          }),
+          logger: expect.any(Object),
+          response: responseMock,
+        });
       },
     );
   });
@@ -163,10 +202,10 @@ describe("Server helpers", () => {
     });
   });
 
-  describe("createUploadParsers()", async () => {
+  describe("createUploadParsers()", () => {
     const loggerMock = makeLoggerMock();
     const beforeUploadMock = vi.fn();
-    const parsers = await createUploadParsers({
+    const parsers = createUploadParsers({
       config: {
         http: { listen: 1234 },
         upload: {
@@ -194,7 +233,7 @@ describe("Server helpers", () => {
       const error = createHttpError(403, "Not authorized");
       beforeUploadMock.mockRejectedValueOnce(error);
       await expect(() =>
-        parsers[0](requestMock, responseMock, nextMock),
+        parsers[0]!(requestMock, responseMock, nextMock),
       ).rejects.toThrowError(error);
       expect(nextMock).not.toHaveBeenCalled();
     });
@@ -202,7 +241,7 @@ describe("Server helpers", () => {
     test("should install the uploader with its special logger", async () => {
       const internalMw = vi.fn();
       fileUploadMock.mockImplementationOnce(() => internalMw);
-      await parsers[0](requestMock, responseMock, nextMock);
+      await parsers[0]!(requestMock, responseMock, nextMock);
       expect(beforeUploadMock).toHaveBeenCalledWith({
         request: requestMock,
         logger: loggerMock,
@@ -323,24 +362,46 @@ describe("Server helpers", () => {
   });
 
   describe("installDeprecationListener()", () => {
-    test("should assign deprecation event listener on process", () => {
+    test("should assign deprecation event listener on process once", () => {
       const spy = vi.spyOn(process, "on").mockImplementation(vi.fn());
       const logger = makeLoggerMock();
       installDeprecationListener(logger);
       expect(spy).toHaveBeenCalledWith("deprecation", expect.any(Function));
+      installDeprecationListener(logger);
+      expect(spy).toHaveBeenCalledOnce();
+      spy.mockReset();
     });
   });
 
   describe("installTerminationListener", () => {
-    test("should install termination signal listener on process", () => {
-      const spy = vi.spyOn(process, "on").mockImplementation(vi.fn());
+    test("should install termination signal listener on process only once per event", () => {
+      const listeners: Record<string, any[]> = {};
+      const spy = vi
+        .spyOn(process, "on")
+        .mockImplementation((evt: string, fn: any) => {
+          listeners[evt] ??= [];
+          listeners[evt].push(fn);
+          return process;
+        });
+      vi.spyOn(process, "listeners").mockImplementation(
+        (evt: string) => listeners[evt] ?? [],
+      );
       const logger = makeLoggerMock();
       installTerminationListener({
         servers: [],
         logger,
         options: { events: ["NOT_HAPPEN"] },
       });
-      expect(spy).toHaveBeenCalledWith("NOT_HAPPEN", expect.any(Function));
+      expect(spy.mock.calls).toEqual([["NOT_HAPPEN", expect.any(Function)]]);
+      installTerminationListener({
+        servers: [],
+        logger,
+        options: { events: ["NOT_HAPPEN", "ANOTHER_ONE", "NOT_HAPPEN"] },
+      });
+      expect(spy.mock.calls).toEqual([
+        ["NOT_HAPPEN", expect.any(Function)],
+        ["ANOTHER_ONE", expect.any(Function)],
+      ]);
     });
   });
 });

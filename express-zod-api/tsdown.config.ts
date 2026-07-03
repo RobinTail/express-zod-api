@@ -8,7 +8,9 @@ export default defineConfig({
   minify: true,
   attw: { profile: "esm-only", level: "error" },
   deps: {
-    neverBundle: ["express-serve-static-core", "qs"],
+    dts: {
+      neverBundle: ["express-serve-static-core", "qs"],
+    },
   },
   plugins: [fixDtsPlugin()],
   define: {

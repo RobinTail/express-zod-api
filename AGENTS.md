@@ -60,6 +60,7 @@ See `src/index.ts` for the complete public API exports.
 - **`express-zod-api/src/routing.ts`** — Core routing logic
 - **`express-zod-api/src/testing.ts`** — Test utilities: `testEndpoint` and `testMiddleware` are public, others internal
 - **`express-zod-api/tests/express-mock.ts`** — Express mocking for tests
+- **`express-zod-api/tests/peers-mock.ts`** — Mocks for compression, cookie-parser, express-fileupload, express-rate-limit
 - **`migration/index.ts`** — Migration ESLint rules
 - **`CHANGELOG.md`** — Version history and breaking changes
 

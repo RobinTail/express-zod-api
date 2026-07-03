@@ -6,10 +6,9 @@ import type { ActualLogger } from "./logger-helpers";
 import type { CommonConfig, ServerConfig } from "./config-type";
 import type { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError from "http-errors";
-import { lastResortHandler } from "./last-resort";
-import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
+import type { Server } from "node:net";
 
 // eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN
 export const localsID = Symbol.for(process.env.TSDOWN_SELF!);
@@ -53,23 +52,15 @@ export const createNotFoundHandler =
       `Can not ${request.method} ${request.path}`,
     );
     const logger = getLogger(request);
-    try {
-      await errorHandler.execute({
-        request,
-        response,
-        logger,
-        error,
-        input: null,
-        output: null,
-        ctx: {},
-      });
-    } catch (e) {
-      lastResortHandler({
-        response,
-        logger,
-        error: new ResultHandlerError(ensureError(e), error),
-      });
-    }
+    await errorHandler.execute({
+      request,
+      response,
+      logger,
+      error,
+      input: null,
+      output: null,
+      ctx: {},
+    });
   };
 
 export const createUploadFailureHandler =
@@ -82,12 +73,12 @@ export const createUploadFailureHandler =
     next();
   };
 
-export const createCookieParser = async ({
+export const createCookieParser = ({
   config,
 }: {
   config: ServerConfig;
-}): Promise<RequestHandler> => {
-  const parser = await loadPeer<typeof cookieParser>("cookie-parser");
+}): RequestHandler => {
+  const parser = loadPeer<typeof cookieParser>("cookie-parser");
   const { secret, ...rest } = {
     ...(typeof config.cookies === "object" && config.cookies),
   };
@@ -98,14 +89,14 @@ export const createUploadLogger = (
   logger: ActualLogger,
 ): Pick<Console, "log"> => ({ log: logger.debug.bind(logger) });
 
-export const createUploadParsers = async ({
+export const createUploadParsers = ({
   getLogger,
   config,
 }: {
   getLogger: GetLogger;
   config: ServerConfig;
-}): Promise<RequestHandler[]> => {
-  const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
+}): RequestHandler[] => {
+  const uploader = loadPeer<typeof fileUpload>("express-fileupload");
   const { limitError, beforeUpload, ...options } = {
     ...(typeof config.upload === "object" && config.upload),
   };
@@ -157,28 +148,42 @@ export const makeGetLogger =
     (request as EquippedRequest | undefined)?.res?.locals[localsID]?.logger ||
     fallback;
 
-export const installDeprecationListener = (logger: ActualLogger) =>
+let hasDeprecationListener = false;
+export const installDeprecationListener = (logger: ActualLogger) => {
+  if (hasDeprecationListener) return;
+  hasDeprecationListener = true;
   process.on("deprecation", ({ message, namespace, name, stack }) =>
     logger.warn(
       `${name} (${namespace}): ${message}`,
       stack.split("\n").slice(1),
     ),
   );
+};
 
+let graceful: ReturnType<typeof monitor> | undefined;
+let onTerm: (() => Promise<void>) | undefined;
+let exitHooks: Set<() => void | Promise<void>> | undefined;
 export const installTerminationListener = ({
   servers,
   logger,
   options: { timeout, beforeExit, events = ["SIGINT", "SIGTERM"] },
 }: {
-  servers: Parameters<typeof monitor>[0];
+  servers: Server[];
   options: Extract<ServerConfig["gracefulShutdown"], object>;
   logger: ActualLogger;
 }) => {
-  const graceful = monitor(servers, { logger, timeout });
-  const onTerm = async () => {
-    await graceful.shutdown();
-    await beforeExit?.();
+  graceful ??= monitor({ logger, timeout });
+  graceful.add(...servers);
+  if (beforeExit) (exitHooks ??= new Set()).add(beforeExit);
+  onTerm ??= async () => {
+    if (graceful?.isShuttingDown) return;
+    await graceful?.shutdown();
+    if (exitHooks)
+      await Promise.allSettled(exitHooks.values().map(async (hook) => hook()));
     process.exit();
   };
-  for (const trigger of events) process.on(trigger, onTerm);
+  for (const trigger of events) {
+    if (!process.listeners(trigger).includes(onTerm))
+      process.on(trigger, onTerm);
+  }
 };

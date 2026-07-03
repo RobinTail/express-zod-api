@@ -5,8 +5,10 @@ import {
   type ApiResponse,
   type NormalizedResponse,
 } from "./api-response";
-import { isObject, type FlatObject } from "./common-helpers";
+import { ensureError, isObject, type FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
+import createHttpError, { isHttpError } from "http-errors";
+import { ResultHandlerError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import {
@@ -23,7 +25,7 @@ type Handler<RES = unknown> = (
   params: DiscriminatedResult & {
     /** null in case of failure to parse or to find the matching endpoint (error: not found) */
     input: FlatObject | null;
-    /** can be empty: check presence of the required property using "in" operator */
+    /** can be empty: check the presence of the required property using the "in" operator */
     ctx: FlatObject;
     request: Request;
     response: Response<RES>;
@@ -31,11 +33,16 @@ type Handler<RES = unknown> = (
   },
 ) => void | Promise<void>;
 
+/**
+ * @desc Result definition for ResultHandler: a plain schema (for JSON and default status codes) or custom ApiResponse.
+ * @see ApiResponse
+ * */
 export type Result<S extends z.ZodType = z.ZodType> =
   | S // plain schema, default status codes applied
   | ApiResponse<S> // single response definition, status code(s) customizable
   | ApiResponse<S>[]; // Feature #1431: different responses for different status codes (non-empty, prog. check!)
 
+/** @desc A function that lazily produces a Result definition. */
 export type LazyResult<R extends Result, A extends unknown[] = []> = (
   ...args: A
 ) => R;
@@ -49,11 +56,47 @@ export abstract class AbstractResultHandler {
   protected constructor(handler: Handler) {
     this.#handler = handler;
   }
-  public execute(...params: Parameters<Handler>) {
-    return this.#handler(...params);
+  public async execute(...params: Parameters<Handler>) {
+    try {
+      return await this.#handler(...params);
+    } catch (caught) {
+      const { response, logger, error: handled } = params[0];
+      const error = new ResultHandlerError(
+        ensureError(caught),
+        handled || undefined,
+      );
+      AbstractResultHandler.lastResort({ response, logger, error });
+    }
+  }
+
+  /** @internal */
+  public static lastResort({
+    error,
+    logger,
+    response,
+  }: {
+    error: ResultHandlerError;
+    logger: ActualLogger;
+    response: Response;
+  }) {
+    logger.error("Result handler failure", error);
+    const message = getPublicErrorMessage(
+      createHttpError(
+        500,
+        `An error occurred while serving the result: ${error.message}.` +
+          (error.handled ? `\nOriginal error: ${error.handled.message}.` : ""),
+        { expose: isHttpError(error.cause) ? error.cause.expose : false }, // retain the cause exposition setting
+      ),
+    );
+    response.status(500).type("text/plain").end(message);
   }
 }
 
+/**
+ * @desc The entity responsible to respond consistently. Accepts positive and negative Result definitions.
+ *       The positive definition can be a lazy function receiving the output schema of an Endpoint.
+ * @see Result
+ * */
 export class ResultHandler<
   POS extends Result,
   NEG extends Result,
@@ -102,6 +145,12 @@ globalRegistry.add(defaultNegativeSchema, {
   >[],
 });
 
+/**
+ * @desc The default ResultHandler wrapping Endpoint output in `{ status: "success", data: output }`
+ *       and errors in `{ status: "error", error: { message } }`. Responds with JSON Content-Type.
+ *       Respects the status of errors from createHttpError(), others become InternalServerError (500).
+ * @see ensureHttpError
+ * */
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => output,
   negative: defaultNegativeSchema,
@@ -127,7 +176,7 @@ globalRegistry.add(arrayNegativeSchema, {
 
 /**
  * @deprecated Resist the urge of using it: this handler is designed only to simplify the migration of legacy APIs.
- * @desc Responding with array is a bad practice keeping your endpoints from evolving without breaking changes.
+ * @desc Responding with an array is a bad practice keeping your endpoints from evolving without breaking changes.
  * @desc This handler expects your endpoint to have the property 'items' in the output object schema
  * */
 export const arrayResultHandler = new ResultHandler({

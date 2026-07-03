@@ -70,6 +70,12 @@ describe("Testing", () => {
           }),
         }),
       });
+      expectTypeOf(output).toEqualTypeOf<
+        Partial<{
+          ctxKeys: string[];
+          inpLen: number;
+        }>
+      >();
       expect(output).toEqual({
         ctxKeys: ["prev"],
         inpLen: 9,
@@ -96,6 +102,7 @@ describe("Testing", () => {
             },
           }),
         });
+        expectTypeOf(output).toEqualTypeOf<never>();
         expect(output).toEqual({});
         expect(loggerMock._getLogs().info).toEqual([["logging something"]]);
         expect(responseMock._isJSON()).toBe(!errorHandler);

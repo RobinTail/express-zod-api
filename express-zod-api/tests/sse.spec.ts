@@ -90,25 +90,43 @@ describe("SSE", () => {
           signal: expect.any(AbortSignal),
           emit: expect.any(Function),
         });
-        const { isClosed, emit } = output as Emitter<{ test: z.ZodString }>;
-        expect(isClosed()).toBeFalsy();
-        emit("test", "something");
+        const { isClosed, emit } = output;
+        expect(isClosed?.()).toBeFalsy();
+        emit?.("test", "something");
         expect(responseMock._getData()).toBe(
           `event: test\ndata: "something"\n\n`,
         );
         if (flushMock) expect(flushMock).toHaveBeenCalled();
         responseMock.end();
-        expect(isClosed()).toBeTruthy();
+        expect(isClosed?.()).toBeTruthy();
       },
     );
 
     test("should abort signal on connection close", async () => {
       const middleware = makeMiddleware({ test: z.string() });
       const { requestMock, output } = await testMiddleware({ middleware });
-      const { signal } = output as Emitter<{ test: z.ZodString }>;
-      expect(signal.aborted).toBeFalsy();
+      const { signal } = output;
+      expect(signal?.aborted).toBeFalsy();
       requestMock.emit("close");
-      expect(signal.aborted).toBeTruthy();
+      expect(signal?.aborted).toBeTruthy();
+    });
+
+    test("should clear the stream timeout when request closes before timeout fires", async () => {
+      vi.useFakeTimers();
+      try {
+        const middleware = makeMiddleware({ test: z.string() });
+        const { requestMock, responseMock, output } = await testMiddleware({
+          middleware,
+        });
+        expect(output.signal?.aborted).toBeFalsy();
+        expect(responseMock.headersSent).toBeFalsy();
+        requestMock.emit("close");
+        expect(output.signal?.aborted).toBeTruthy();
+        vi.advanceTimersByTime(10000);
+        expect(responseMock.headersSent).toBeFalsy();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
@@ -118,7 +136,7 @@ describe("SSE", () => {
       { single: z.string() },
     ])(
       "should create ResultHandler describing possible events and handling generic errors %#",
-      (events) => {
+      async (events) => {
         const resultHandler = makeResultHandler(events);
         expect(resultHandler).toBeInstanceOf(ResultHandler);
         expect(
@@ -132,7 +150,7 @@ describe("SSE", () => {
           request: makeRequestMock(),
           logger: makeLoggerMock(),
         };
-        resultHandler.execute({
+        await resultHandler.execute({
           ...commons,
           output: {},
           response: positiveResponse,
@@ -142,7 +160,7 @@ describe("SSE", () => {
         expect(positiveResponse._getData()).toBe("");
         expect(positiveResponse.writableEnded).toBeTruthy();
         const negativeResponse = makeResponseMock();
-        resultHandler.execute({
+        await resultHandler.execute({
           ...commons,
           output: null,
           response: negativeResponse,
@@ -153,6 +171,13 @@ describe("SSE", () => {
         expect(negativeResponse.writableEnded).toBeTruthy();
       },
     );
+
+    test("its ::getPositiveResponse() method should throw when events map is empty", () => {
+      const rh = makeResultHandler({});
+      expect(() =>
+        rh.getPositiveResponse(z.object({})),
+      ).toThrowErrorMatchingSnapshot();
+    });
   });
 
   describe("EventStreamFactory()", () => {

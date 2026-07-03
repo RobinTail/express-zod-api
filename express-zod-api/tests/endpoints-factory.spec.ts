@@ -1,3 +1,4 @@
+import "./peers-mock.ts";
 import type { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import { expectTypeOf } from "vitest";
@@ -8,6 +9,9 @@ import {
   ResultHandler,
   testMiddleware,
 } from "../src";
+import * as cookieMw from "../src/cookie-middleware";
+import * as cacheMw from "../src/cache-middleware";
+import * as rateLimitMw from "../src/rate-limit-middleware";
 import type { EmptyObject } from "../src/common-helpers";
 import { Endpoint } from "../src/endpoint";
 import { z } from "zod";
@@ -104,25 +108,56 @@ describe("EndpointsFactory", () => {
   describe(".addContext()", () => {
     test("Should create a new factory with an empty-input middleware and the same result handler", async () => {
       const factory = new EndpointsFactory(resultHandlerMock);
-      const newFactory = factory.addContext(async () => ({
-        option1: "some value",
-        option2: "other value",
-      }));
+      const newFactory = factory
+        .addContext(async () => ({ option1: "some value" }))
+        .addContext(async (ctx) => ({
+          option2: `not ${ctx.option1}`,
+        }));
       expectTypeOf(newFactory).toEqualTypeOf<
-        EndpointsFactory<undefined, { option1: string; option2: string }>
+        EndpointsFactory<undefined, { option1: string } & { option2: string }>
       >();
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
-      expect(newFactory["middlewares"].length).toBe(1);
-      expect(newFactory["middlewares"][0].schema).toBeUndefined();
-      const { output: options } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+      expect(newFactory["middlewares"].length).toBe(2);
+      expect(newFactory["middlewares"][0]!.schema).toBeUndefined();
+      expect(newFactory["middlewares"][1]!.schema).toBeUndefined();
+      const { output: first } = await testMiddleware({
+        middleware: newFactory["middlewares"][0]!,
       });
-      expect(options).toEqual({
-        option1: "some value",
-        option2: "other value",
-      });
+      expect(first).toEqual({ option1: "some value" });
       expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
+      const { output: second } = await testMiddleware({
+        middleware: newFactory["middlewares"][1]!,
+        ctx: { option1: "some value" },
+      });
+      expect(second).toEqual({ option2: "not some value" });
+    });
+  });
+
+  describe(".useCookies", () => {
+    test("should add created cookie middleware", () => {
+      const spy = vi.spyOn(cookieMw, "createCookieMiddleware");
+      const factory = defaultEndpointsFactory.useCookies({ priority: "high" });
+      expect(spy).toHaveBeenCalledWith({ priority: "high" });
+      expect(factory["middlewares"]).toHaveLength(1);
+    });
+  });
+
+  describe(".useCache", () => {
+    test("should add created cache middleware", () => {
+      const spy = vi.spyOn(cacheMw, "createCacheMiddleware");
+      const factory = defaultEndpointsFactory.useCache({ maxAge: 100 });
+      expect(spy).toHaveBeenCalledWith({ maxAge: 100 });
+      expect(factory["middlewares"]).toHaveLength(1);
+    });
+  });
+
+  describe(".useRateLimit", () => {
+    test("should add created rate limit middleware", () => {
+      const spy = vi.spyOn(rateLimitMw, "createRateLimitMiddleware");
+      const factory = defaultEndpointsFactory.useRateLimit({ max: 20 });
+      expect(spy).toHaveBeenCalledWith({ max: 20 });
+      expect(factory["middlewares"]).toHaveLength(1);
     });
   });
 
@@ -137,13 +172,13 @@ describe("EndpointsFactory", () => {
         provider: (req) => ({ result: req.body.test }),
       });
       expect(newFactory["middlewares"].length).toBe(1);
-      expect(newFactory["middlewares"][0].schema).toBeUndefined();
+      expect(newFactory["middlewares"][0]!.schema).toBeUndefined();
       const {
         output: options,
         responseMock,
         requestMock,
       } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(middleware).toHaveBeenCalledTimes(1);
       expect(middleware).toHaveBeenCalledWith(
@@ -162,8 +197,9 @@ describe("EndpointsFactory", () => {
         assert.fail("Rejected"),
       );
       const newFactory = factory[method](middleware);
+      expect(newFactory["middlewares"].length).toBe(1);
       const { responseMock } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
@@ -185,7 +221,7 @@ describe("EndpointsFactory", () => {
         responseMock,
         requestMock,
       } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(middleware).toHaveBeenCalledTimes(1);
       expect(middleware).toHaveBeenCalledWith(
@@ -204,8 +240,9 @@ describe("EndpointsFactory", () => {
         next(new Error("This one has failed"));
       });
       const newFactory = factory[method](middleware);
+      expect(newFactory["middlewares"].length).toBe(1);
       const { responseMock } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
@@ -223,8 +260,9 @@ describe("EndpointsFactory", () => {
           return value;
         });
         const newFactory = factory[method](middleware);
+        expect(newFactory["middlewares"].length).toBe(1);
         const { responseMock } = await testMiddleware({
-          middleware: newFactory["middlewares"][0],
+          middleware: newFactory["middlewares"][0]!,
         });
         expect(responseMock._getStatusCode()).toBe(200);
         expect(middleware).toHaveBeenCalledTimes(1);
@@ -239,8 +277,9 @@ describe("EndpointsFactory", () => {
       const newFactory = factory[method](middleware, {
         transformer: (err) => createHttpError(401, err.message),
       });
+      expect(newFactory["middlewares"].length).toBe(1);
       const { responseMock } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(responseMock._getStatusCode()).toBe(401);
       expect(responseMock._getJSONData()).toEqual({

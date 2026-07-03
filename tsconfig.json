@@ -8,6 +8,7 @@
     "noImplicitAny": true,
     "noImplicitOverride": true,
     "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,

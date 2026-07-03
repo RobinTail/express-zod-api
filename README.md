@@ -36,16 +36,18 @@ Start your API server with I/O schema validation and custom middlewares in minut
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as an input source](#headers-as-an-input-source)
    3. [Cookies](#cookies)
-   4. [Response customization](#response-customization)
-   5. [Empty response](#empty-response)
-   6. [Non-JSON response](#non-json-response) including file downloads
-   7. [Error handling](#error-handling)
-   8. [Production mode](#production-mode)
-   9. [HTML Forms (URL encoded)](#html-forms-url-encoded)
-   10. [File uploads](#file-uploads)
-   11. [Connect to your own express app](#connect-to-your-own-express-app)
-   12. [Testing endpoints](#testing-endpoints)
-   13. [Testing middlewares](#testing-middlewares)
+   4. [Caching](#caching)
+   5. [Rate limiting](#rate-limiting)
+   6. [Response customization](#response-customization)
+   7. [Empty response](#empty-response)
+   8. [Non-JSON response](#non-json-response) including file downloads
+   9. [Error handling](#error-handling)
+   10. [Production mode](#production-mode)
+   11. [HTML Forms (URL encoded)](#html-forms-url-encoded)
+   12. [File uploads](#file-uploads)
+   13. [Connect to your own express app](#connect-to-your-own-express-app)
+   14. [Testing endpoints](#testing-endpoints)
+   15. [Testing middlewares](#testing-middlewares)
 6. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [End-to-End Type Safety](#end-to-end-type-safety)
@@ -394,7 +396,7 @@ connection, consider shorthand method `addContext`. For static values consider r
 import { readFile } from "node:fs/promises";
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const endpointsFactory = defaultEndpointsFactory.addContext(async () => {
+const endpointsFactory = defaultEndpointsFactory.addContext(async (ctx) => {
   // caution: new connection on every request:
   const db = mongoose.connect("mongodb://connection.string");
   const privateKey = await readFile("private-key.pem", "utf-8");
@@ -585,6 +587,7 @@ In order to solve this problem, the framework provides two custom methods for de
 provides your endpoint handler or middleware with a `Date`. It supports the following formats:
 
 ```text
+2021-12-31T23:59:59+02:00
 2021-12-31T23:59:59.000Z
 2021-12-31T23:59:59Z
 2021-12-31T23:59:59
@@ -839,12 +842,10 @@ Consider `createCookieMiddleware()` that makes a Middleware providing `setCookie
 as well as `getCookie()` — alternative to the cookies as an input source:
 
 ```ts
-import { createCookieMiddleware, Middleware } from "express-zod-api";
+import { Middleware } from "express-zod-api";
 
 const cookieDrivenFactory = factory
-  .addMiddleware(
-    createCookieMiddleware({ httpOnly: true, sameSite: "lax", path: "/" }), // recommended base options
-  )
+  .useCookies({ httpOnly: true, sameSite: "lax", path: "/" }) // shorthand, recommended base options
   .addMiddleware(
     new Middleware({
       security: { type: "cookie", name: "session" }, // improves Documentation
@@ -860,6 +861,43 @@ const sessionSettingEndpoint = cookieDrivenFactory.buildVoid({
     setCookie("session", "abc123", { httpOnly: false }); // overridden cookie options
   },
 });
+```
+
+## Caching
+
+Consider the `createCacheMiddleware()` that provides helpers for HTTP caching following the MDN HTTP Caching guide.
+It covers all standard `Cache-Control` directives, conditional request handling, and the "Not Modified" (304) flow:
+
+```ts
+const avatarEndpoint = factory
+  .useCache({ maxAge: 3600, scope: "public" }) // shorthand, the policy applies to every response
+  .build({
+    output: z.object({ avatar: z.string() }),
+    handler: async ({
+      ctx: { ifNoneMatch, setETag, notModified, addCachePolicy },
+    }) => {
+      const etag = `"avatar-v2"`;
+      if (ifNoneMatch?.includes(etag)) return notModified() as never; // skips validation, sends 304
+      setETag(etag);
+      addCachePolicy({ staleWhileRevalidate: 86400 }); // extends the default policy
+      return { avatar: "https://example.com/avatar.png" };
+    },
+  });
+```
+
+## Rate limiting
+
+Install `express-rate-limit`. Consider the `createRateLimitMiddleware()` to enable and configure rate limit on a certain
+`EndpointsFactory`. When the limit is exceeded, the Middleware throws a `429` HTTP error, handled by your ResultHandler.
+
+```ts
+const endpoint = factory
+  .useRateLimit({ windowMs: 60000, max: 100 }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
+  .buildVoid({
+    handler: async ({ ctx: { rateLimit, logger } }) => {
+      logger.debug("Features", rateLimit); // { limit, used, remaining, resetTime, getKey, resetKey }
+    },
+  });
 ```
 
 ## Response customization
@@ -951,6 +989,8 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## Error handling
 
+![Error handling](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/error-handling.svg)
+
 All runtime errors are handled by a `ResultHandler`. The default is `defaultResultHandler`. Using `ensureHttpError()`
 it normalizes errors into consistent HTTP responses with sensible status codes. Errors can originate from three layers:
 
@@ -960,14 +1000,14 @@ it normalizes errors into consistent HTTP responses with sensible status codes. 
   - `OutputValidationError`: handler violates `output` schema, the default status code is `500`;
   - `HttpError`: can be thrown in handlers with help of `createHttpError()`, its `.statusCode` is used for response;
   - For other errors the default status code is `500`;
-- Routing, parsing and upload issues:
+- Routing, parsing, and upload issues:
   - Handled by `ResultHandler` configured as `errorHandler` (the defaults is `defaultResultHandler`);
   - Parsing errors: passed through as-is (typically `HttpError` with `4XX` code used for response by default);
   - Routing errors: `404` or `405`, based on `hintAllowedMethods` configuration;
   - Upload issues: thrown only if `upload.limitError` is configured (`HttpError::statusCode` can be used for response);
   - For other errors the default status code is `500`;
 - `ResultHandler` failures:
-  - Handled by `LastResortHandler` with status code `500` and a plain text response.
+  - Handled by `AbstractResultHandler::lastResort()` with status code `500` and a plain text response.
 
 You can customize it by passing a custom `ResultHandler` to `EndpointsFactory` and by configuring `errorHandler`.
 
@@ -977,8 +1017,8 @@ Consider enabling production mode by setting `NODE_ENV` environment variable to 
 
 - Express activates some [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html);
 - Self-diagnosis for potential problems is disabled to ensure faster startup;
-- The `defaultResultHandler`, `defaultEndpointsFactory` and `LastResortHandler` generalize server-side error messages
-  in negative responses to improve the security of your API by not disclosing the exact causes of errors:
+- The `defaultResultHandler`, `defaultEndpointsFactory` and `AbstractResultHandler::lastResort()` generalize server-side
+  error messages in negative responses to improve the security of your API by not disclosing the exact causes of errors:
   - Throwing errors that have or imply `5XX` status codes become just `Internal Server Error` message in response;
   - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option:
 
@@ -1166,11 +1206,9 @@ safety between your API and frontend. Make sure you have `typescript` installed.
 and using the async `printFormatted()` method.
 
 ```ts
-import typescript from "typescript";
 import { Integration } from "express-zod-api";
 
 const client = new Integration({
-  typescript, // or await Integration.create() to delegate importing
   routing,
   config,
   variant: "client", // <— optional, see also "types" for a DIY solution

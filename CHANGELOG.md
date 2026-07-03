@@ -23,6 +23,96 @@
 
 ## Version 28
 
+### v28.7.5
+
+- Small performance improvement for startup and Documentation generator (cache for request type resolution).
+
+### v28.7.4
+
+- Centralized the `ResultHandler` error handling by `AbstractResultHandler::execute()`:
+  - Last Resort Handler is now an internal static method of the abstract class;
+  - When `errorHandler` fails to process a routing error (Not found) it's now also handled by the Last Resort Handler;
+- Added an error handling diagram to the documentation in the Readme file.
+
+### v28.7.3
+
+- Several minor improvements to the `gracefulShutdown` feature:
+  - Ensured a single graceful shutdown event listener per signal on the process;
+  - Handling potential errors thrown from syncronous `beforeExit` hooks and ensured the hooks run only once.
+
+### v28.7.2
+
+- Several minor memory optimizations:
+  - Ensured a single deprecation event listener on the process;
+  - When `gracefulShutdown` is enabled, destroying broken sockets immediately (edge case);
+  - For SSE endpoints, removing the stream ensuring timer when the connection is closed.
+
+### v28.7.1
+
+- Fix: supporting the latest versions of `express-rate-limit` (v8) for the rate limiting feature.
+
+### v28.7.0
+
+- Added rate limiting support:
+  - Requires `express-rate-limit` — new optional peer dependency;
+  - Added the `createRateLimitMiddleware()` method and `EndpointsFactory::useRateLimit()` shorthand;
+  - When the limit is exceeded, the Middleware throws a `429` HTTP error, handled by your ResultHandler;
+  - The middleware provides `rateLimit` property to the context with the current rate limit info (`limit`, `used`,
+    `remaining`, `resetTime`) and the limiter API (`getKey()` and `resetKey()` methods) for programmatic management.
+
+### v28.6.0
+
+- Changes to the `Integration` generator:
+  - The `typescript` option is no longer required for constructor;
+  - `Integration.create()` is now deprecated — use `new Integration()` instead;
+  - This is possible thanks to the `require(ESM)` feature, available on all supported Node.js versions;
+
+### v28.5.0
+
+- Changes to the proprietary `Date` handling schemas:
+  - Supporting timezones by `ez.dateIn()` schema (e.g. `2021-12-31T23:59:59+02:00`);
+  - Piping the transformation inside the `ez.dateOut()` through `z.iso.datetime()` for certainty;
+  - The Documentation generator removes custom depictions from both schemas and delegates them to Zod for clarity:
+    - The previous fallback description (`YYYY-MM-DDTHH:mm:ss.sssZ`) is removed;
+    - use `{ description: "whatever you like" }` as an argument to either schema instead;
+  - Fixed the type of the argument accepting the metadata for both schemas.
+
+### v28.4.0
+
+- Improved `testMiddleware()` to return the typed `output` property:
+  - Changed from `Record<string, unknown>` to `Partial<RET>`, where `RET` is the context type the Middleware returns;
+  - This should simplify testing the context properties, especially functional ones;
+  - If Middleware throws, the `output` would still be an empty object, which is aligned with its new type.
+
+### v28.3.0
+
+- `EndpointsFactory::addContext()` now passes the previously accumulated context to its callback:
+  - The argument function receives the current context as the first argument;
+- Improved the declaration file for most of the essential entities.
+
+### v28.2.0
+
+- Added `createCacheMiddleware()` function for solving most of the caching problems:
+  - The function accepts an optional default policy to apply `Cache-Control` header to every response;
+  - It returns a Middleware providing several properties and caching helpers to context:
+    - `cacheControl` — the parsed request's `Cache-Control` header into a typed object;
+    - `ifNoneMatch` — the parsed `If-None-Match` request header into an array of ETags or `"*"`;
+    - `ifModifiedSince` — the parsed `If-Modified-Since` request header into a `Date`;
+    - `addCachePolicy()` — extends the default policy into the `Cache-Control` response header;
+    - `setETag()` — sets the `ETag` response header;
+    - `setLastModified()` — sets the `Last-Modified` response header;
+    - `setVary()` — sets the `Vary` response header;
+    - `setExpires()` — sets the `Expires` response header;
+    - `clearSiteData()` — sets the `Clear-Site-Data` header with `cache` directive;
+    - `notModified()` — sends an HTTP 304 response and ends the stream;
+- Adjusted the Endpoint execution to skip output validation in case `response.writableEnded` (`notModified` called);
+- Added two shorthand methods to `EndpointsFactory` class: `useCache()` and `useCookies()`.
+
+### v28.1.1
+
+- Depicting Endpoints built on `new EventStreamFactory({})` (having empty argument) will throw a `ResultHandlerError`:
+  - Applies to `Documentation`, `Integration` as well as self-diagnostics (starting the server in development mode).
+
 ### v28.1.0
 
 - Added support for cookie handling:
@@ -46,7 +136,7 @@
 - Supported Node.js versions: `^22.19.0 || ^24.0.0 || ^26.0.0`;
 - Zod compatibility: `^4.3.4` (supports Zod 4.4+ without upper limit);
 - The Zod plugin is no longer installed automatically — it's an optional peer dependency now:
-  - To keep using `.example()`, `.label()`, `.remap()`, `.deprecated()` and methods on schemas, as well as runtime
+  - To keep using `.example()`, `.label()`, `.remap()` and `.deprecated()` methods on schemas, as well as runtime
     distinguishable brands, install the `@express-zod-api/zod-plugin` manually and import it (ideally at the top of a
     file declaring your `Routing`);
   - Breaking change: `ZodType::brand()` method is no longer patched by the plugin:

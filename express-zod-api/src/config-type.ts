@@ -156,6 +156,7 @@ interface GracefulOptions {
   beforeExit?: () => void | Promise<void>;
 }
 
+/** @todo consider removing Promise to make createServer sync in next major */
 type ServerHook = (params: {
   app: IRouter;
   /** @desc Returns child logger for the given request (if configured) or the configured logger otherwise */

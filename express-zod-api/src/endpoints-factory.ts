@@ -26,6 +26,9 @@ import {
   arrayResultHandler,
   defaultResultHandler,
 } from "./result-handler";
+import { createCacheMiddleware } from "./cache-middleware";
+import { createCookieMiddleware } from "./cookie-middleware";
+import { createRateLimitMiddleware } from "./rate-limit-middleware";
 
 interface BuildProps<
   IN extends IOSchema,
@@ -69,6 +72,12 @@ interface BuildProps<
   deprecated?: boolean;
 }
 
+/**
+ * @desc Creates a factory for building Endpoints. It can be extended by adding Middlewares that enrich the context
+ *       available to the Endpoint handler. It requires a ResultHandler to respond consistently.
+ * @see Middleware
+ * @see ResultHandler
+ * */
 export class EndpointsFactory<
   IN extends IOSchema | undefined = undefined,
   CTX extends FlatObject = EmptyObject,
@@ -76,6 +85,11 @@ export class EndpointsFactory<
 > {
   protected schema = undefined as IN;
   protected middlewares: AbstractMiddleware[] = [];
+
+  /**
+   * @param resultHandler An instance of ResultHandler for handling both Endpoint outputs and all possible errors.
+   * @see ResultHandler
+   * */
   constructor(protected resultHandler: AbstractResultHandler) {}
 
   #extend<
@@ -93,6 +107,11 @@ export class EndpointsFactory<
     return factory;
   }
 
+  /**
+   * @desc Attaches a Middleware to the factory, extending the context available to Endpoints built on it.
+   *       Accepts either a Middleware instance or a plain object compatible with the Middleware constructor.
+   * @see Middleware
+   * */
   public addMiddleware<
     RET extends FlatObject,
     ASCO extends string,
@@ -107,8 +126,32 @@ export class EndpointsFactory<
     );
   }
 
+  /** @desc Shorthand for .addMiddleware(createCookieMiddleware()) */
+  public useCookies(...args: Parameters<typeof createCookieMiddleware>) {
+    return this.#extend(createCookieMiddleware(...args));
+  }
+
+  /** @desc Shorthand for .addMiddleware(createCacheMiddleware()) */
+  public useCache(...args: Parameters<typeof createCacheMiddleware>) {
+    return this.#extend(createCacheMiddleware(...args));
+  }
+
+  /** @desc Shorthand for .addMiddleware(createRateLimitMiddleware()) */
+  public useRateLimit(...args: Parameters<typeof createRateLimitMiddleware>) {
+    return this.#extend(createRateLimitMiddleware(...args));
+  }
+
+  /**
+   * @desc Shorthand for addExpressMiddleware(). Use it for wrapping native Express middlewares.
+   * @see addExpressMiddleware
+   * */
   public use = this.addExpressMiddleware;
 
+  /**
+   * @desc Wraps a native Express middleware and attaches it to the factory as a Middleware. Optionally, a `provider`
+   *       can extract context properties from the request and response, and a `transformer` can convert errors.
+   * @see ExpressMiddleware
+   * */
   public addExpressMiddleware<
     R extends Request,
     S extends Response,
@@ -117,10 +160,25 @@ export class EndpointsFactory<
     return this.#extend(new ExpressMiddleware(...params));
   }
 
-  public addContext<RET extends FlatObject>(getContext: () => Promise<RET>) {
-    return this.#extend(new Middleware({ handler: getContext }));
+  /**
+   * @desc Extends the context available to Endpoints built on this factory by resolving additional properties
+   *       from an asynchronous callback. The callback receives the current accumulated context, allowing further
+   *       context values to depend on previously provided ones. This is a shorthand for addMiddleware() with no schema.
+   * @see addMiddleware
+   * */
+  public addContext<RET extends FlatObject>(
+    provider: (current: CTX) => Promise<RET>,
+  ) {
+    return this.#extend(
+      new Middleware({ handler: ({ ctx }) => provider(ctx) }),
+    );
   }
 
+  /**
+   * @desc Builds an Endpoint using the accumulated Middlewares, the ResultHandler, and the given configuration.
+   *       The output is validated against the output schema; the handler receives the validated input and context.
+   * @see Endpoint
+   * */
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
     input = emptySchema as unknown as BIN,
     output: outputSchema,
@@ -152,7 +210,10 @@ export class EndpointsFactory<
     });
   }
 
-  /** @desc shorthand for returning {} while having output schema z.object({}) */
+  /**
+   * @desc shorthand for build() having output schema assigned with an empty object
+   * @see build
+   * */
   public buildVoid<BIN extends IOSchema = EmptySchema>({
     handler,
     ...rest
@@ -168,13 +229,17 @@ export class EndpointsFactory<
   }
 }
 
+/**
+ * @desc The factory based on the default ResultHandler: suitable for JSON responses.
+ * @see defaultResultHandler
+ * */
 export const defaultEndpointsFactory = new EndpointsFactory(
   defaultResultHandler,
 );
 
 /**
  * @deprecated Resist the urge of using it: this factory is designed only to simplify the migration of legacy APIs.
- * @desc Responding with array is a bad practice keeping your endpoints from evolving without breaking changes.
+ * @desc Responding with an array is a bad practice keeping your endpoints from evolving without breaking changes.
  * @desc The result handler of this factory expects your endpoint to have the property 'items' in the output schema
  */
 export const arrayEndpointsFactory = new EndpointsFactory(arrayResultHandler);

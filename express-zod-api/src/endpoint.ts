@@ -11,14 +11,9 @@ import {
   isSchema,
 } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
-import {
-  InputValidationError,
-  OutputValidationError,
-  ResultHandlerError,
-} from "./errors";
+import { InputValidationError, OutputValidationError } from "./errors";
 import { ezFormBrand } from "./form-schema";
 import type { IOSchema } from "./io-schema";
-import { lastResortHandler } from "./last-resort";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
 import { getBrand, getExamples } from "./metadata";
@@ -91,6 +86,7 @@ export class Endpoint<
   CTX extends FlatObject,
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
+  #requestType?: ContentType;
 
   /** considered an expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
@@ -164,14 +160,16 @@ export class Endpoint<
 
   /** @internal */
   public override get requestType() {
-    const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
-    if (found) {
-      const brand = getBrand(found);
-      if (brand === ezUploadBrand) return "upload";
-      if (brand === ezRawBrand) return "raw";
-      if (brand === ezFormBrand) return "form";
-    }
-    return "json";
+    return (this.#requestType ??= (() => {
+      const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
+      if (found) {
+        const brand = getBrand(found);
+        if (brand === ezUploadBrand) return "upload";
+        if (brand === ezRawBrand) return "raw";
+        if (brand === ezFormBrand) return "form";
+      }
+      return "json";
+    })());
   }
 
   /** @internal */
@@ -254,9 +252,7 @@ export class Endpoint<
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
-      finalInput = (await this.#def.inputSchema.parseAsync(
-        input,
-      )) as z.output<IN>;
+      finalInput = await this.#def.inputSchema.parseAsync(input);
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
@@ -272,17 +268,7 @@ export class Endpoint<
       ctx: Partial<CTX>;
     },
   ) {
-    try {
-      await this.#def.resultHandler.execute(params);
-    } catch (e) {
-      lastResortHandler({
-        ...params,
-        error: new ResultHandlerError(
-          ensureError(e),
-          params.error || undefined,
-        ),
-      });
-    }
+    await this.#def.resultHandler.execute(params);
   }
 
   public override async execute({
@@ -312,16 +298,13 @@ export class Endpoint<
       if (response.writableEnded) return;
       if (method === ("options" satisfies CORSMethod))
         return void response.status(200).end();
-      result = {
-        output: await this.#parseOutput(
-          await this.#parseAndRunHandler({
-            input,
-            logger,
-            ctx: ctx as CTX, // ensured the complete CTX by writableEnded condition and try-catch
-          }),
-        ),
-        error: null,
-      };
+      const output = await this.#parseAndRunHandler({
+        input,
+        logger,
+        ctx: ctx as CTX, // ensured the complete CTX by writableEnded condition and try-catch
+      });
+      if (response.writableEnded) return; // Endpoint closed the stream (304)
+      result = { output: await this.#parseOutput(output), error: null };
     } catch (e) {
       result = { output: null, error: ensureError(e) };
     }

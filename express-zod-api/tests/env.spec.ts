@@ -87,6 +87,12 @@ describe("Environment checks", () => {
       expect(error).toHaveProperty("message");
       expect(real).toHaveProperty("message");
     });
+
+    test("z.enum() can be empty, but z.literal() can not", () => {
+      expect(z.enum([])._zod.def.entries).toEqual({});
+      /** @since 4.0.9 4e7a3ef180f6a5525d9021638e9df20b3ca50456 */
+      expect(() => z.literal([])).toThrow(/no valid values/);
+    });
   });
 
   describe("Zod new features", () => {
@@ -95,15 +101,22 @@ describe("Environment checks", () => {
         decode: (str) => new Date(str),
         encode: (date) => date.toISOString(),
       });
-      const {
-        in: to,
-        out: from,
-        transform: encode,
-        reverseTransform: decode,
-      } = schema._zod.def;
-      const reversed = z.codec(from, to, { decode, encode });
+      const reversed = z.invertCodec(schema);
       expect(reversed.parse(new Date("2022-01-01T00:00:00.000Z"))).toBe(
         "2022-01-01T00:00:00.000Z",
+      );
+    });
+
+    test("Codec strictly typed methods still validate inputs in runtime", () => {
+      const schema = z.codec(z.string(), z.number(), {
+        decode: Number,
+        encode: String,
+      });
+      expect(() => schema.decode(true as unknown as string)).toThrow(
+        /expected string, received boolean/,
+      );
+      expect(() => schema.encode(false as unknown as number)).toThrow(
+        /expected number, received boolean/,
       );
     });
 

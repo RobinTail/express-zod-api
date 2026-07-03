@@ -25,9 +25,10 @@ describe("ESM Test", async () => {
   });
 
   describe("Quick Start from Readme", () => {
-    test("Should handle valid GET request", async () => {
+    test("Should handle valid GET request", async ({ signal }) => {
       const response = await fetch(
         `http://localhost:${port}/v1/hello?name=Rick`,
+        { signal },
       );
       expect(response.status).toBe(200);
       const json = await response.json();

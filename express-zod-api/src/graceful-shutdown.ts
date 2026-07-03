@@ -1,7 +1,5 @@
-import http from "node:http";
-import https from "node:https";
 import { setInterval } from "node:timers/promises";
-import type { Socket } from "node:net";
+import type { Socket, Server } from "node:net";
 import type { ActualLogger } from "./logger-helpers";
 import {
   closeAsync,
@@ -11,13 +9,15 @@ import {
   weAreClosed,
 } from "./graceful-helpers";
 
-export const monitor = (
-  servers: Array<http.Server | https.Server>,
-  { timeout = 1e3, logger }: { timeout?: number; logger?: ActualLogger } = {},
-) => {
+export const monitor = ({
+  timeout = 1e3,
+  logger,
+}: { timeout?: number; logger?: ActualLogger } = {}) => {
   let pending: Promise<PromiseSettledResult<void>[]> | undefined;
+  const servers = new Set<Server>();
   const sockets = new Set<Socket>();
-  const destroy = (socket: Socket) => void sockets.delete(socket.destroy());
+  const cleanup = (socket: Socket) => void sockets.delete(socket);
+  const destroy = (socket: Socket) => cleanup(socket.destroy());
 
   const disconnect = (socket: Socket) =>
     void (hasResponse(socket)
@@ -28,11 +28,11 @@ export const monitor = (
   const watch = (socket: Socket) =>
     void (pending
       ? /* v8 ignore next -- unstable */ socket.destroy()
-      : sockets.add(socket.once("close", () => void sockets.delete(socket))));
-
-  for (const server of servers) // eslint-disable-next-line curly
-    for (const event of ["connection", "secureConnection"])
-      server.on(event, watch);
+      : sockets.add(
+          socket
+            .once("close", () => cleanup(socket))
+            .once("error", () => destroy(socket)),
+        ));
 
   const workflow = async () => {
     for (const server of servers) server.on("request", weAreClosed);
@@ -42,8 +42,22 @@ export const monitor = (
     for await (const started of setInterval(10, Date.now()))
       if (sockets.size === 0 || Date.now() - started >= timeout) break;
     for (const socket of sockets) destroy(socket);
-    return Promise.allSettled(servers.map(closeAsync));
+    return Promise.allSettled(servers.values().map(closeAsync));
   };
 
-  return { sockets, shutdown: () => (pending ??= workflow()) };
+  const instance = {
+    sockets,
+    add: (...subjects: Server[]) => {
+      for (const server of subjects) {
+        if (servers.has(server)) continue;
+        servers.add(server);
+        for (const event of ["connection", "secureConnection"])
+          server.on(event, watch);
+      }
+      return instance;
+    },
+    shutdown: () => (pending ??= workflow()),
+    get isShuttingDown() { return !!pending; }, // eslint-disable-line prettier/prettier
+  };
+  return instance;
 };

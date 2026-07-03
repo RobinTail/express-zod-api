@@ -117,7 +117,7 @@ export abstract class IntegrationBase {
     );
     const mappedType = this.api.f.createMappedTypeNode(
       undefined,
-      this.api.makeTypeParams({ K: this.#ids.requestType })[0],
+      this.api.makeTypeParams({ K: this.#ids.requestType })[0]!,
       undefined,
       undefined,
       this.api.makeIndexed(

@@ -1,6 +1,7 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
 import { parser } from "typescript-eslint";
 import manifest from "./package.json";
+import assert from "node:assert/strict";
 
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
@@ -15,6 +16,7 @@ describe("Migration", async () => {
   const { default: migration } = await import("./index");
   const ruleName = `v${manifest.version.split(".")[0]}`;
   const theRule = migration.rules[ruleName as keyof typeof migration.rules];
+  assert(theRule, "Rule not found");
 
   test("should consist of one rule being the major version of the package", () => {
     expect(migration.rules).toHaveProperty(ruleName);

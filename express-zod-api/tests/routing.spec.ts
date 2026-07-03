@@ -78,18 +78,18 @@ describe("Routing", () => {
         expect(appMock.delete).toHaveBeenCalledTimes(0);
         expect(appMock.patch).toHaveBeenCalledTimes(0);
         expect(appMock.options).toHaveBeenCalledTimes(3);
-        expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/get");
-        expect(appMock.get.mock.calls[1][0]).toBe("/v1/user/universal");
-        expect(appMock.post.mock.calls[0][0]).toBe("/v1/user/set");
-        expect(appMock.post.mock.calls[1][0]).toBe("/v1/user/universal");
-        expect(appMock.options.mock.calls[0][0]).toBe("/v1/user/get");
-        expect(appMock.options.mock.calls[1][0]).toBe("/v1/user/set");
-        expect(appMock.options.mock.calls[2][0]).toBe("/v1/user/universal");
+        expect(appMock.get.mock.calls[0]![0]).toBe("/v1/user/get");
+        expect(appMock.get.mock.calls[1]![0]).toBe("/v1/user/universal");
+        expect(appMock.post.mock.calls[0]![0]).toBe("/v1/user/set");
+        expect(appMock.post.mock.calls[1]![0]).toBe("/v1/user/universal");
+        expect(appMock.options.mock.calls[0]![0]).toBe("/v1/user/get");
+        expect(appMock.options.mock.calls[1]![0]).toBe("/v1/user/set");
+        expect(appMock.options.mock.calls[2]![0]).toBe("/v1/user/universal");
         if (hintAllowedMethods === false) return;
         expect(appMock.all).toHaveBeenCalledTimes(3);
-        expect(appMock.all.mock.calls[0][0]).toBe("/v1/user/get");
-        expect(appMock.all.mock.calls[1][0]).toBe("/v1/user/set");
-        expect(appMock.all.mock.calls[2][0]).toBe("/v1/user/universal");
+        expect(appMock.all.mock.calls[0]![0]).toBe("/v1/user/get");
+        expect(appMock.all.mock.calls[1]![0]).toBe("/v1/user/set");
+        expect(appMock.all.mock.calls[2]![0]).toBe("/v1/user/universal");
       },
     );
 
@@ -147,11 +147,11 @@ describe("Routing", () => {
       expect(appMock.patch).toHaveBeenCalledTimes(1);
       expect(appMock.delete).toHaveBeenCalledTimes(0);
       expect(appMock.options).toHaveBeenCalledTimes(1);
-      expect(appMock.get.mock.calls[0][0]).toBe("/v1/user");
-      expect(appMock.post.mock.calls[0][0]).toBe("/v1/user");
-      expect(appMock.put.mock.calls[0][0]).toBe("/v1/user");
-      expect(appMock.patch.mock.calls[0][0]).toBe("/v1/user");
-      expect(appMock.options.mock.calls[0][0]).toBe("/v1/user");
+      expect(appMock.get.mock.calls[0]![0]).toBe("/v1/user");
+      expect(appMock.post.mock.calls[0]![0]).toBe("/v1/user");
+      expect(appMock.put.mock.calls[0]![0]).toBe("/v1/user");
+      expect(appMock.patch.mock.calls[0]![0]).toBe("/v1/user");
+      expect(appMock.options.mock.calls[0]![0]).toBe("/v1/user");
     });
 
     test("Should check if endpoint supports the method it's assigned to", () => {
@@ -223,8 +223,8 @@ describe("Routing", () => {
         routing,
       });
       expect(appMock.options).toHaveBeenCalledTimes(1);
-      expect(appMock.options.mock.calls[0][0]).toBe("/hello");
-      const fn = appMock.options.mock.calls[0][1];
+      expect(appMock.options.mock.calls[0]![0]).toBe("/hello");
+      const fn = appMock.options.mock.calls[0]![1];
       expect(typeof fn).toBe("function"); // async RequestHandler, proprietary CORS middleware
       const requestMock = makeRequestMock({ method: "PUT" });
       const responseMock = makeResponseMock();
@@ -258,7 +258,7 @@ describe("Routing", () => {
         routing,
       });
       expect(appMock.get).toHaveBeenCalledTimes(1);
-      expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
+      expect(appMock.get.mock.calls[0]![0]).toBe("/v1/user/:id");
     });
 
     test("Should handle empty paths and trim spaces", () => {
@@ -355,7 +355,7 @@ describe("Routing", () => {
         expect.any(Function), // cors
         expect.any(Function), // endpoint
       ]);
-      const fn = appMock.options.mock.calls[0][1]; // similar to issue 705
+      const fn = appMock.options.mock.calls[0]![1]; // similar to issue 705
       const requestMock = makeRequestMock({ method: "POST" });
       const responseMock = makeResponseMock();
       await fn(requestMock, responseMock, vi.fn());
@@ -485,7 +485,7 @@ describe("Routing", () => {
         routing,
       });
       expect(appMock.post).toHaveBeenCalledTimes(1);
-      const routeHandler = appMock.post.mock.calls[0][2] as RequestHandler; // 1 is CORS
+      const routeHandler = appMock.post.mock.calls[0]![2] as RequestHandler; // 1 is CORS
       const requestMock = makeRequestMock({
         method: "POST",
         body: { test: 123 },

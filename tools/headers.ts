@@ -30,7 +30,7 @@ const writeExceptions = async () => {
   const keys = Object.keys(responseOnlyHeaders).sort();
   const entries = keys.map(
     (key) =>
-      `"${key}": { proof: ${JSON.stringify(responseOnlyHeaders[key].proof)}, reason: ${JSON.stringify(responseOnlyHeaders[key].reason)} },`,
+      `"${key}": { proof: ${JSON.stringify(responseOnlyHeaders[key]!.proof)}, reason: ${JSON.stringify(responseOnlyHeaders[key]!.reason)} },`,
   );
   const tsCode = await format(
     `${banner}\n` +
@@ -72,9 +72,9 @@ const allHeaders = lines
   })
   .filter(
     ({ name, category }) =>
-      /^[\w-]+$/.test(name) && categories.includes(category),
+      /^[\w-]+$/.test(name!) && categories.includes(category ?? ""),
   )
-  .map(({ name }) => name.toLowerCase());
+  .map(({ name }) => name!.toLowerCase());
 
 const exceptionNames = new Set(Object.keys(responseOnlyHeaders));
 const newHeaders = allHeaders.filter(
@@ -82,8 +82,7 @@ const newHeaders = allHeaders.filter(
 );
 
 if (newHeaders.length === 0) {
-  console.info("No new headers found, updating timestamp");
-  await writeDest(state);
+  console.info("No new headers found.");
   process.exit(0);
 }
 

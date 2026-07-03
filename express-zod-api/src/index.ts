@@ -9,6 +9,8 @@ export { ensureHttpError } from "./result-helpers";
 export { BuiltinLogger } from "./builtin-logger";
 export { Middleware } from "./middleware";
 export { createCookieMiddleware } from "./cookie-middleware";
+export { createCacheMiddleware } from "./cache-middleware";
+export { createRateLimitMiddleware } from "./rate-limit-middleware";
 export {
   ResultHandler,
   defaultResultHandler,
@@ -40,6 +42,7 @@ export type { TagOverrides } from "./common-helpers";
 
 // Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
 import type {} from "qs"; // fixes TS2742 for attachRouting, makeRequestMock, testEndpoint, testMiddleware
+export type { CacheControl, CachePolicy } from "./cache-middleware";
 export type { Routing } from "./routing";
 export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";

@@ -78,9 +78,6 @@ export type IsHeader = (
 
 export type BrandHandling = Record<string | symbol, Depicter>;
 
-const isoDateDocumentationUrl =
-  "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
-
 const samples = {
   integer: 0,
   number: 0,
@@ -134,8 +131,8 @@ export const depictIntersection = R.tryCatch<Depicter>(
 
 /** @since OAS 3.1 nullable replaced with type array having null */
 export const depictNullable: Depicter = ({ jsonSchema }) => {
-  if (!jsonSchema.anyOf) return jsonSchema;
-  const original = jsonSchema.anyOf[0];
+  if (!jsonSchema.anyOf || !jsonSchema.anyOf.length) return jsonSchema;
+  const original = jsonSchema.anyOf[0]!;
   return Object.assign(original, { type: makeNullableType(original.type) });
 };
 
@@ -143,36 +140,15 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
 const asOAS = (subject: z.core.JSONSchema.BaseSchema) =>
   subject as SchemaObject | ReferenceObject;
 
-export const depictDateIn: Depicter = (
-  { jsonSchema: { examples, description } },
-  ctx,
-) => {
+export const depictDateIn: Depicter = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  const jsonSchema: z.core.JSONSchema.StringSchema = {
-    description: description || "YYYY-MM-DDTHH:mm:ss.sssZ",
-    type: "string",
-    format: "date-time",
-    pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
-    externalDocs: { url: isoDateDocumentationUrl },
-  };
-  if (examples?.length) jsonSchema.examples = examples;
   return jsonSchema;
 };
 
-export const depictDateOut: Depicter = (
-  { jsonSchema: { examples, description } },
-  ctx,
-) => {
+export const depictDateOut: Depicter = ({ jsonSchema }, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
-  const jsonSchema: z.core.JSONSchema.StringSchema = {
-    description: description || "YYYY-MM-DDTHH:mm:ss.sssZ",
-    type: "string",
-    format: "date-time",
-    externalDocs: { url: isoDateDocumentationUrl },
-  };
-  if (examples?.length) jsonSchema.examples = examples;
   return jsonSchema;
 };
 
@@ -426,12 +402,12 @@ const depict = (
 };
 
 export const excludeParamsFromDepiction = (
-  subject: SchemaObject | ReferenceObject,
+  subject: z.core.JSONSchema.BaseSchema,
   names: string[],
-): [SchemaObject | ReferenceObject, boolean] => {
+): [typeof subject, boolean] => {
   if (isReferenceObject(subject)) return [subject, false];
   let hasRequired = false;
-  const subTransformer = R.map((entry: SchemaObject | ReferenceObject) => {
+  const subTransformer = R.map((entry: typeof subject) => {
     const [sub, subRequired] = excludeParamsFromDepiction(entry, names);
     hasRequired = hasRequired || subRequired;
     return sub;
@@ -445,7 +421,7 @@ export const excludeParamsFromDepiction = (
     oneOf: subTransformer,
     anyOf: subTransformer,
   };
-  const result: SchemaObject = R.evolve(transformers, subject);
+  const result: typeof subject = R.evolve(transformers, subject);
   return [result, hasRequired || Boolean(result.required?.length)];
 };
 
@@ -464,7 +440,7 @@ export const depictResponse = ({
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
 }: ReqResCommons & {
-  schema: z.core.$ZodType;
+  schema: z.ZodType;
   composition: "inline" | "components";
   description?: string;
   brandHandling?: BrandHandling;
@@ -620,20 +596,18 @@ export const depictBody = ({
   mimeType: string;
   paramNames: string[];
 }) => {
-  const [withoutParams, hasRequired] = excludeParamsFromDepiction(
-    asOAS(request),
-    paramNames,
-  );
+  const [_pure, hasRequired] = excludeParamsFromDepiction(request, paramNames);
+  const pure = asOAS(_pure);
   const examples = [];
-  if (isSchemaObject(withoutParams) && withoutParams.examples) {
-    examples.push(...withoutParams.examples);
-    delete withoutParams.examples; // pull up
+  if (isSchemaObject(pure) && pure.examples) {
+    examples.push(...pure.examples);
+    delete pure.examples; // pull up
   }
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, withoutParams, makeCleanId(description))
-        : withoutParams,
+        ? makeRef(schema, pure, makeCleanId(description))
+        : pure,
     examples: enumerateExamples(
       examples.length
         ? examples

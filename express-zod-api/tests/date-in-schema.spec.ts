@@ -26,6 +26,8 @@ describe("ez.dateIn()", () => {
       "2022-12-31T00:00:00Z",
       "2022-12-31T00:00:00",
       "2022-12-31",
+      "2022-12-31T00:00:00+02:00",
+      "2022-12-31T00:00:00.000+02:00",
     ])("should accept valid date string %#", (subject) => {
       const schema = ez.dateIn();
       const result = schema.safeParse(subject);
