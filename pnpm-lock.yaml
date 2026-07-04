@@ -58,7 +58,7 @@ overrides:
   '@scarf/scarf': '-'
   lightningcss: '-'
 
-pnpmfileChecksum: sha256-84P3wnvwB5/F6fBuX7O8GyArtsD8VV9nHpPds4hp+rQ=
+pnpmfileChecksum: sha256-tRhwpnY5aYb5ZliMYj+HXYrsfGXUEdTyDQt9r2ML/N4=
 
 importers:
 
@@ -1591,7 +1591,7 @@ packages:
 
   rolldown-plugin-dts@0.26.0:
     resolution: {integrity: sha512-e+kEPtUiDES0htk5iqkSeF4EzAV7R+vugGB44iPDuw1Kw9E+WyL1VG7PaV0IIjGHLiacztMBcMTyrr8ON9CT1Q==}
-    engines: {node: ^22.18.0 || >=24.11.0}
+    engines: {node: ^22.18.0 || >=24.0.0}
     peerDependencies:
       '@ts-macro/tsc': ^0.3.6
       '@typescript/native-preview': '>=7.0.0-dev.20260325.1'

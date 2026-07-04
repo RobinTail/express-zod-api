@@ -8,7 +8,8 @@ function readPackage(pkg, ctx) {
     (pkg.name &&
       pkg.name.startsWith("@babel/") &&
       pkg.version.startsWith("8.0.0")) ||
-    pkg.name === "tsdown"
+    pkg.name === "tsdown" ||
+    pkg.name === "rolldown-plugin-dts"
   ) {
     pkg.engines = {
       ...pkg.engines,
