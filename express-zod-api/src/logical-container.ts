@@ -5,9 +5,7 @@ type LogicalOr<T> = { or: T[] };
 type LogicalAnd<T> = { and: T[] };
 
 export type LogicalContainer<T> =
-  | LogicalOr<T | LogicalAnd<T>>
-  | LogicalAnd<T | LogicalOr<T>>
-  | T;
+  LogicalOr<T | LogicalAnd<T>> | LogicalAnd<T | LogicalOr<T>> | T;
 
 /** @internal */
 export const isLogicalOr = <T>(subject: LogicalContainer<T>) =>
