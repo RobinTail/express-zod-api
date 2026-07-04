@@ -7,8 +7,9 @@ function readPackage(pkg, ctx) {
   // Target the specific breaking version of babel types
   if (
     (pkg.name.startsWith("@babel/") && pkg.version.startsWith("8.")) ||
-    pkg.name === "tsdown" ||
-    pkg.name === "rolldown-plugin-dts"
+    (pkg.name === "ast-kit" && pkg.version.startsWith("3.")) || // uses babel 8
+    pkg.name === "rolldown-plugin-dts" || // uses ast-kit
+    pkg.name === "tsdown" // uses rolldown-plugin-dts
   ) {
     pkg.engines = {
       ...pkg.engines,
