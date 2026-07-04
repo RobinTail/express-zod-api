@@ -58,8 +58,7 @@ export interface EncodedResponse {
 
 export interface Response {
   "post /v1/custom":
-    | PositiveResponse["post /v1/custom"]
-    | NegativeResponse["post /v1/custom"];
+    PositiveResponse["post /v1/custom"] | NegativeResponse["post /v1/custom"];
 }
 
 export type Request = keyof Input;
@@ -147,11 +146,9 @@ export interface EncodedResponse {
 
 export interface Response {
   "get /v1/path":
-    | PositiveResponse["get /v1/path"]
-    | NegativeResponse["get /v1/path"];
+    PositiveResponse["get /v1/path"] | NegativeResponse["get /v1/path"];
   "head /v1/path":
-    | PositiveResponse["head /v1/path"]
-    | NegativeResponse["head /v1/path"];
+    PositiveResponse["head /v1/path"] | NegativeResponse["head /v1/path"];
 }
 
 export type Request = keyof Input;
@@ -213,8 +210,7 @@ export interface EncodedResponse {
 
 export interface Response {
   "get /v1/path":
-    | PositiveResponse["get /v1/path"]
-    | NegativeResponse["get /v1/path"];
+    PositiveResponse["get /v1/path"] | NegativeResponse["get /v1/path"];
 }
 
 export type Request = keyof Input;
@@ -286,8 +282,7 @@ export interface EncodedResponse {
 
 export interface Response {
   "post /v1/mtpl":
-    | PositiveResponse["post /v1/mtpl"]
-    | NegativeResponse["post /v1/mtpl"];
+    PositiveResponse["post /v1/mtpl"] | NegativeResponse["post /v1/mtpl"];
 }
 
 export type Request = keyof Input;
