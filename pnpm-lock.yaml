@@ -58,7 +58,7 @@ overrides:
   '@scarf/scarf': '-'
   lightningcss: '-'
 
-pnpmfileChecksum: sha256-YDrL38AkX5yQ+KXYaGBrzm2DQS06AJRgUhGwY3D8HPc=
+pnpmfileChecksum: sha256-84P3wnvwB5/F6fBuX7O8GyArtsD8VV9nHpPds4hp+rQ=
 
 importers:
 
@@ -1739,7 +1739,7 @@ packages:
 
   tsdown@0.22.3:
     resolution: {integrity: sha512-louqbfA8Qf//B9jTTL0FPtXTNpjCWv1VPkbcmQMph2pTpzs+LnB1tbe4tDDRVpo2BjF5SgUXaTZe45SxB8pWHg==}
-    engines: {node: ^22.18.0 || >=24.11.0}
+    engines: {node: ^22.18.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
       '@arethetypeswrong/core': ^0.18.1

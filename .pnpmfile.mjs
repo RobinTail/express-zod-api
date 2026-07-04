@@ -5,9 +5,10 @@
 function readPackage(pkg, ctx) {
   // Target the specific breaking version of babel types
   if (
-    pkg.name &&
-    pkg.name.startsWith("@babel/") &&
-    pkg.version.startsWith("8.0.0")
+    (pkg.name &&
+      pkg.name.startsWith("@babel/") &&
+      pkg.version.startsWith("8.0.0")) ||
+    pkg.name === "tsdown"
   ) {
     pkg.engines = {
       ...pkg.engines,
