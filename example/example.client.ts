@@ -697,8 +697,7 @@ export interface Response {
     | PositiveResponse["head /v1/user/list"]
     | NegativeResponse["head /v1/user/list"];
   "post /v1/login":
-    | PositiveResponse["post /v1/login"]
-    | NegativeResponse["post /v1/login"];
+    PositiveResponse["post /v1/login"] | NegativeResponse["post /v1/login"];
   /** @deprecated */
   "get /v1/avatar/send":
     | PositiveResponse["get /v1/avatar/send"]
