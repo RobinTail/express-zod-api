@@ -97,8 +97,7 @@ type GetV1UserRetrievePositiveVariant1 = { id: number; name: string };
 ```typescript
 export interface EncodedResponse {
   "get /v1/user/retrieve":
-    | [200, { id: number; name: string }]
-    | [400, { message: string }];
+    [200, { id: number; name: string }] | [400, { message: string }];
 }
 ```
 
@@ -136,8 +135,7 @@ type GetV1UserRetrievePositiveVariant1 = { id: number; name: string };
 // No *Variants interfaces; PositiveResponse is a direct union of bare bodies:
 export interface PositiveResponse {
   "get /v1/user/retrieve":
-    | GetV1UserRetrievePositiveVariant1
-    | GetV1UserRetrieveNegativeVariant1;
+    GetV1UserRetrievePositiveVariant1 | GetV1UserRetrieveNegativeVariant1;
 }
 
 // EncodedResponse is a direct union of [status, body] tuples:

@@ -4263,9 +4263,7 @@ import { z } from "express-zod-api";
 
 const endpoint = endpointsFactory.build({
   input: z
-    .object({
-      /* ... */
-    })
+    .object({/* ... */})
     .refine(() => true)
     .refine(() => true)
     .refine(() => true),
@@ -4524,9 +4522,7 @@ const myMiddleware = createMiddleware({
     },
   },
   input: z.object({}),
-  middleware: async () => ({
-    /* ... */
-  }),
+  middleware: async () => ({/* ... */}),
 });
 
 // example endpoint
@@ -4535,9 +4531,7 @@ const myEndpoint = defaultEndpointsFactory.addMiddleware(myMiddleware).build({
   method: "post",
   input: z.object({}),
   output: z.object({}),
-  handler: async () => ({
-    /* ... */
-  }),
+  handler: async () => ({/* ... */}),
 });
 ```
 
@@ -5469,15 +5463,11 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
   input: z.object({
     avatar: z.upload(),
   }),
-  output: z.object({
-    /* ... */
-  }),
+  output: z.object({/* ... */}),
   handler: async ({ input: { avatar } }) => {
     // avatar: {name, mv(), mimetype, encoding, data, truncated, size, etc}
     // avatar.truncated is true on failure
-    return {
-      /* ... */
-    };
+    return {/* ... */};
   },
 });
 ```
@@ -5711,15 +5701,11 @@ import { EndpointOutput } from "express-zod-api";
 
 const myEndpointV1 = endpointsFactory.build({
   method: "get",
-  input: z.object({
-    /* ... */
-  }),
+  input: z.object({/* ... */}),
   output: z.object({
     name: z.string(),
   }),
-  handler: async () => ({
-    /* ... */
-  }),
+  handler: async () => ({/* ... */}),
 });
 type MyEndpointOutput = EndpointOutput<typeof myEndpointV1>; // => { name: string }
 
@@ -5728,15 +5714,11 @@ import { defaultEndpointsFactory, EndpointResponse } from "express-zod-api";
 
 const myEndpointV2 = defaultEndpointsFactory.build({
   method: "get",
-  input: z.object({
-    /* ... */
-  }),
+  input: z.object({/* ... */}),
   output: z.object({
     name: z.string(),
   }),
-  handler: async () => ({
-    /* ... */
-  }),
+  handler: async () => ({/* ... */}),
 });
 type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the following type:
 //  {
@@ -5750,13 +5732,9 @@ type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the follo
 
 ```ts
 // before
-new OpenAPI({
-  /* ... */
-}).builder.getSpecAsYaml();
+new OpenAPI({/* ... */}).builder.getSpecAsYaml();
 // after
-new OpenAPI({
-  /* ... */
-}).getSpecAsYaml();
+new OpenAPI({/* ... */}).getSpecAsYaml();
 ```
 
 ```ts
@@ -5781,12 +5759,7 @@ const myResultHandlerV2 = createResultHandler({
       }),
       ["mime/type1", "mime/type2"], // optional, default: application/json
     ),
-  getNegativeResponse: () =>
-    createApiResponse(
-      z.object({
-        /* ... */
-      }),
-    ),
+  getNegativeResponse: () => createApiResponse(z.object({/* ... */})),
   handler: ({ error, input, output, request, response, logger }) => {
     /* ... */
   },
