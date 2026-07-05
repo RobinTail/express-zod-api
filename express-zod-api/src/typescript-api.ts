@@ -2,10 +2,7 @@ import * as R from "ramda";
 import type ts from "typescript";
 
 export type Typeable =
-  | ts.TypeNode
-  | ts.Identifier
-  | string
-  | ts.KeywordTypeSyntaxKind;
+  ts.TypeNode | ts.Identifier | string | ts.KeywordTypeSyntaxKind;
 
 type TypeParams =
   | string[]

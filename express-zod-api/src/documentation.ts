@@ -36,9 +36,7 @@ import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 
 type Component =
-  | `${ResponseVariant}Response`
-  | "requestParameter"
-  | "requestBody";
+  `${ResponseVariant}Response` | "requestParameter" | "requestBody";
 
 /** @desc user defined function that creates a component description from its properties */
 type Descriptor = (
