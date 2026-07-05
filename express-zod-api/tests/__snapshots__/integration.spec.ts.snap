@@ -38,13 +38,7 @@ interface PostV1CustomNegativeResponseVariants {
 export type Path = "/v1/custom";
 
 export type Method =
-  | "get"
-  | "post"
-  | "put"
-  | "delete"
-  | "patch"
-  | "query"
-  | "head";
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "post /v1/custom": PostV1CustomInput;
@@ -128,13 +122,7 @@ interface HeadV1PathNegativeResponseVariants {
 export type Path = "/v1/path";
 
 export type Method =
-  | "get"
-  | "post"
-  | "put"
-  | "delete"
-  | "patch"
-  | "query"
-  | "head";
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "get /v1/path": GetV1PathInput;
@@ -204,13 +192,7 @@ interface GetV1PathNegativeResponseVariants {
 export type Path = "/v1/path";
 
 export type Method =
-  | "get"
-  | "post"
-  | "put"
-  | "delete"
-  | "patch"
-  | "query"
-  | "head";
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "get /v1/path": GetV1PathInput;
@@ -283,13 +265,7 @@ interface PostV1MtplNegativeResponseVariants {
 export type Path = "/v1/mtpl";
 
 export type Method =
-  | "get"
-  | "post"
-  | "put"
-  | "delete"
-  | "patch"
-  | "query"
-  | "head";
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "post /v1/mtpl": PostV1MtplInput;
@@ -492,13 +468,7 @@ interface PostV1TestWithDashesNegativeResponseVariants {
 export type Path = "/v1/test-with-dashes";
 
 export type Method =
-  | "get"
-  | "post"
-  | "put"
-  | "delete"
-  | "patch"
-  | "query"
-  | "head";
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
