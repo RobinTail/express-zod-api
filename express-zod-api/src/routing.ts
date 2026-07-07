@@ -81,10 +81,7 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
         const logger = getLogger(request);
         return endpoint.execute({ request, response, logger, config });
       });
-      const register:
-        ((path: string, ...handlers: RequestHandler[]) => IRouter) | undefined =
-        app[method];
-      register?.call(app, path, ...handlers);
+      app[method]?.(path, ...handlers);
     }
     if (config.hintAllowedMethods === false) continue;
     deprioritized.set(path, createWrongMethodHandler(accessMethods));
