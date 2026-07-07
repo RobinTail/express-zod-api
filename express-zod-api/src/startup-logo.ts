@@ -1,5 +1,5 @@
 import { hex, italic, whiteBright as wht } from "ansis";
-import { WriteStream } from "node:tty";
+import type { WriteStream } from "node:tty";
 
 export const printStartupLogo = (stream: WriteStream) => {
   if (stream.columns < 62) return;

@@ -1,4 +1,4 @@
-import { WriteStream } from "node:tty";
+import type { WriteStream } from "node:tty";
 import { printStartupLogo } from "../src/startup-logo";
 
 describe("Startup logo", () => {
