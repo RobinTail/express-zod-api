@@ -2,10 +2,10 @@ import type { IRouter } from "express";
 
 export type SomeMethod = Lowercase<string>;
 
-type FamiliarMethod =
-  | Exclude<keyof IRouter, "param" | "use" | "route" | "stack" | "all">
-  /** @todo remove when merged: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/75187 */
-  | "query";
+type FamiliarMethod = Exclude<
+  keyof IRouter,
+  "param" | "use" | "route" | "stack" | "all"
+>;
 
 export const methods = [
   "get",
