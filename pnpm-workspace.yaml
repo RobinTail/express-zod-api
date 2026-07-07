@@ -13,7 +13,7 @@ autoInstallPeers: false
 dedupePeers: true
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
-  - "@types/express-serve-static-core@5.1.2"
+  - "@types/express-serve-static-core@5.1.2" # todo remove 15.07.2026
 publicHoistPattern:
   - "@typescript-eslint/*" # used as an assumed transitive in migration
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
