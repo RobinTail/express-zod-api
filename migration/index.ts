@@ -127,14 +127,12 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       corsConfig: (node) => {
-        const value = node.value;
+        const { value } = node;
         const isFunc =
           value.type === NT.ArrowFunctionExpression ||
           value.type === NT.FunctionExpression;
         if (!isFunc) return;
-        const body = value.body;
-        const isAsync = value.async;
-        const asyncPrefix = isAsync ? "async " : "";
+        const { body } = value;
         let newFunc: string | null = null;
         if (body.type === NT.ObjectExpression) {
           newFunc = `(req, res, next) => { res.set(${ctx.sourceCode.getText(body)}); next(); }`;
@@ -155,6 +153,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               parts.push(ctx.sourceCode.getText(body.body[i]!));
             }
           }
+          const asyncPrefix = value.async ? "async " : "";
           newFunc = `${asyncPrefix}(req, res, next) => {\n${parts.join("\n")}\n}`;
         }
         if (!newFunc) return;
