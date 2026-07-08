@@ -198,7 +198,7 @@ describe("Migration", async () => {
       {
         name: "cors async concise arrow returning object",
         code: `createConfig({ cors: async () => ({ "access-control-allow-origin": "*" }) })`,
-        output: `createConfig({ cors: (req, res, next) => { res.set({ "access-control-allow-origin": "*" }); next(); } })`,
+        output: `createConfig({ cors: async (req, res, next) => { res.set({ "access-control-allow-origin": "*" }); next(); } })`,
         errors: [
           {
             messageId: "change",

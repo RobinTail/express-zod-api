@@ -132,10 +132,11 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           value.type === NT.ArrowFunctionExpression ||
           value.type === NT.FunctionExpression;
         if (!isFunc) return;
-        const { body } = value;
+        const { body, async } = value;
+        const asyncPrefix = async ? "async " : "";
         let newFunc: string | null = null;
         if (body.type === NT.ObjectExpression) {
-          newFunc = `(req, res, next) => { res.set(${ctx.sourceCode.getText(body)}); next(); }`;
+          newFunc = `${asyncPrefix}(req, res, next) => { res.set(${ctx.sourceCode.getText(body)}); next(); }`;
         } else if (body.type === NT.BlockStatement) {
           const returnIndex = body.body.findIndex(
             (s) => s.type === NT.ReturnStatement,
@@ -153,7 +154,6 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               parts.push(ctx.sourceCode.getText(body.body[i]!));
             }
           }
-          const asyncPrefix = value.async ? "async " : "";
           newFunc = `${asyncPrefix}(req, res, next) => {\n${parts.join("\n")}\n}`;
         }
         if (!newFunc) return;
