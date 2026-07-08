@@ -167,8 +167,7 @@ describe("Common Helpers", () => {
           makeRequestMock({
             query: { q: "search" },
             body: { filters: "active" },
-            /** @todo rm when merged: https://github.com/eugef/node-mocks-http/pull/335 */
-            method: "QUERY" as "GET",
+            method: "QUERY",
           }),
           undefined,
         ),
