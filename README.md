@@ -2,12 +2,11 @@
 
 ![logo](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/logo.svg)
 
-![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
-![OpenAPI](https://github.com/RobinTail/express-zod-api/actions/workflows/oas.yml/badge.svg)
-[![coverage](https://coveralls.io/repos/github/RobinTail/express-zod-api/badge.svg)](https://coveralls.io/github/RobinTail/express-zod-api)
+![CI](https://img.shields.io/github/actions/workflow/status/RobinTail/express-zod-api/node.js.yml?label=CI)
+![OpenAPI](https://img.shields.io/github/actions/workflow/status/RobinTail/express-zod-api/oas.yml?label=OpenAPI)
+[![coverage](https://img.shields.io/coverallsCoverage/github/RobinTail/express-zod-api)](https://coveralls.io/github/RobinTail/express-zod-api)
 
 ![downloads](https://img.shields.io/npm/dw/express-zod-api.svg)
-![npm release](https://img.shields.io/npm/v/express-zod-api.svg?color=green25&label=latest)
 ![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api.svg?style=flat)
 ![License](https://img.shields.io/npm/l/express-zod-api.svg?color=green25)
 
