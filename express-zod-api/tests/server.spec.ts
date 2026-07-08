@@ -104,6 +104,7 @@ describe("Server", () => {
         formParser: vi.fn(),
         beforeRouting: vi.fn(),
         afterRouting: vi.fn(),
+        beforeParsers: vi.fn(),
         cors: true,
         startupLogo: false,
         errorHandler: {
@@ -159,7 +160,11 @@ describe("Server", () => {
         moveRaw,
       );
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
-      for (const hook of ["beforeRouting", "afterRouting"] as const) {
+      for (const hook of [
+        "beforeRouting",
+        "afterRouting",
+        "beforeParsers",
+      ] as const) {
         expect(configMock[hook]).toHaveBeenCalledWith({
           app: appMock,
           getLogger: expect.any(Function),
