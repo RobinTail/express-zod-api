@@ -263,7 +263,7 @@ describe("Server", () => {
       expect(servers[1]).toBeTruthy();
     });
 
-    test("should warn when neigher configured", () => {
+    test("should warn when neither configured", () => {
       const customLogger = new BuiltinLogger({ level: "silent" });
       const warnMethod = vi.spyOn(customLogger, "warn");
       createServer(
