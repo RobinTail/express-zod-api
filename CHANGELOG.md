@@ -27,6 +27,7 @@
   - `serverUrl` renamed to `server` and now also accepts OpenAPI's ServerObject;
   - `title` and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
 - The Documentation generator is featuring the OpenAPI 3.2.0 with better SSE support and other features;
+- Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff
   const config = createConfig({
