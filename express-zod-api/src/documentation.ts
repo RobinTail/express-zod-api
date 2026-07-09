@@ -60,13 +60,9 @@ const defaultSummarizer: Summarizer = ({
 
 interface DocumentationParams {
   /** @desc At least title and version properties are required */
-  info: InfoObject;
+  info?: InfoObject;
   /** @desc Server URL(s) or their complete definitions */
-  server:
-    | string
-    | [string, ...string[]]
-    | ServerObject
-    | [ServerObject, ...ServerObject[]];
+  server?: string | ServerObject | Array<string | ServerObject>;
   routing: Routing;
   config: CommonConfig;
   /**
@@ -172,8 +168,9 @@ export class Documentation extends OpenApiBuilder {
   }
 
   #addMetadata({ tags, info, server }: DocumentationParams) {
-    this.addInfo(info);
+    if (info) this.addInfo(info);
     if (tags) this.rootDoc.tags = depictTags(tags);
+    if (!server) return;
     for (const one of Array.isArray(server) ? server : [server])
       this.addServer(typeof one === "string" ? { url: one } : one);
   }
