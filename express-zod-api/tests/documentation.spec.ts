@@ -67,16 +67,12 @@ describe("Documentation", () => {
           config: sampleConfig,
           routing: {},
           server,
-          info: { title: "test", version: "1.0" },
         }).rootDoc.servers,
       ).toMatchSnapshot();
     });
   });
 
   describe("Basic cases", () => {
-    const info = { version: "3.4.5", title: "Testing basic cases" };
-    const server = "https://example.com";
-
     test("should generate the correct schema for DELETE request without body", () => {
       const spec = new Documentation({
         routing: {
@@ -93,8 +89,6 @@ describe("Documentation", () => {
           },
         },
         config: sampleConfig,
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -123,8 +117,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -160,8 +152,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -193,8 +183,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -219,8 +207,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -250,8 +236,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -273,8 +257,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -306,8 +288,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -334,8 +314,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -356,8 +334,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -388,8 +364,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -426,8 +400,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -451,8 +423,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -476,8 +446,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -500,8 +468,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
       expect(string.parse(123)).toBe("123");
@@ -544,8 +510,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -609,8 +573,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -636,8 +598,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -662,8 +622,6 @@ describe("Documentation", () => {
             },
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -684,8 +642,6 @@ describe("Documentation", () => {
             },
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
@@ -708,8 +664,6 @@ describe("Documentation", () => {
             },
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
@@ -749,8 +703,6 @@ describe("Documentation", () => {
                 },
               },
             },
-            info,
-            server,
           }),
       ).toThrow(expectedError);
     });
@@ -780,17 +732,12 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
   });
 
   describe("Issue #98", () => {
-    const info = { version: "3.4.5", title: "Testing issue #98" };
-    const server = "https://example.com";
-
     test("Should describe non-empty array", () => {
       // There is no such class as ZodNonEmptyArray in Zod v3.7.0+
       // It existed though in Zod v3.6.x:
@@ -807,8 +754,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -846,17 +791,12 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
   });
 
   describe("Route Path Params", () => {
-    const info = { version: "3.4.5", title: "Testing route path params" };
-    const server = "https://example.com";
-
     test("should handle route path params for POST request", () => {
       const spec = new Documentation({
         config: sampleConfig,
@@ -876,8 +816,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -910,8 +848,6 @@ describe("Documentation", () => {
               }),
             },
           },
-          info,
-          server,
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -932,8 +868,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -967,8 +901,6 @@ describe("Documentation", () => {
               }),
             },
           },
-          info: { version: "3.4.5", title: "Testing headers params" },
-          server: "https://example.com",
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -998,11 +930,6 @@ describe("Documentation", () => {
       );
       expect(
         new Documentation({
-          info: {
-            version: "3.4.5",
-            title: "Testing multiple schemas for different status codes",
-          },
-          server: "https://example.com",
           config: sampleConfig,
           routing: {
             v1: {
@@ -1020,9 +947,6 @@ describe("Documentation", () => {
   });
 
   describe("Metadata", () => {
-    const info = { version: "3.4.5", title: "Testing Metadata" };
-    const server = "https://example.com";
-
     test("should pass over the schema description", () => {
       const spec = new Documentation({
         config: sampleConfig,
@@ -1043,8 +967,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1060,8 +982,6 @@ describe("Documentation", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: { v1: { getSomething: endpoint.deprecated() } },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1087,8 +1007,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1118,8 +1036,6 @@ describe("Documentation", () => {
               }),
             },
           },
-          info,
-          server,
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -1147,8 +1063,6 @@ describe("Documentation", () => {
               }),
             },
           },
-          info,
-          server,
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -1178,8 +1092,6 @@ describe("Documentation", () => {
               }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1206,8 +1118,6 @@ describe("Documentation", () => {
               }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1231,8 +1141,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1265,20 +1173,12 @@ describe("Documentation", () => {
           }),
           [deep]: rule,
         },
-        info: { version: "3.4.5", title: "Testing custom brands handling" },
-        server: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
   });
 
   describe("Feature #1869: Top level transformations", () => {
-    const info = {
-      version: "3.4.5",
-      title: "Testing top level transformations",
-    };
-    const server = "https://example.com";
-
     test("should handle object-to-object functional transformations and mapping", () => {
       const spec = new Documentation({
         config: sampleConfig,
@@ -1298,8 +1198,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1327,8 +1225,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        info,
-        server,
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
