@@ -298,6 +298,12 @@ export const responseOnlyHeaders: Record<
     reason:
       "Specifies which origins can access timing information in the response.",
   },
+  "unencoded-digest": {
+    proof:
+      "RFC 9842, Section 4.2: 'The Unencoded-Digest header field is sent in responses to indicate the digest of the uncompressed content.'",
+    reason:
+      "The Unencoded-Digest header is defined in RFC 9842 (Compression Dictionary Transport) as a response header used by the server to indicate the digest of the uncompressed content. It is not defined for use in requests in any RFC or extension.",
+  },
   "use-as-dictionary": {
     proof:
       "RFC 9842, Section 2.1: 'When responding to an HTTP Request, a server can advertise that the response can be used as a dictionary for future requests for URLs that match the rules specified in the \"Use-As-Dictionary\" response header.' Example (line 133): '200 OK\\nUse-As-Dictionary: match=\"/app*js\"'",
