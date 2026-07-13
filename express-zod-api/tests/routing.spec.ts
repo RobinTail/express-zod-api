@@ -583,6 +583,7 @@ describe("Routing", () => {
     test.each([
       z.object({ id: z.string() }),
       z.record(z.literal("id"), z.string()),
+      z.object({ id: z.string() }).or(z.record(z.enum(["id"]), z.string())),
     ])("should warn about unused path params %#", (input) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
         input,

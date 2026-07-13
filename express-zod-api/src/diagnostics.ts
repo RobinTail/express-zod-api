@@ -4,13 +4,11 @@ import { type FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";
-import { flattenIO } from "./json-schema-helpers";
 import type { ActualLogger } from "./logger-helpers";
 import type { OnEndpoint } from "./routing-walker";
 
 interface Findings {
   isSchemaChecked: boolean;
-  flat?: ReturnType<typeof flattenIO>;
   paths: Set<string>;
 }
 
@@ -60,29 +58,44 @@ export class Diagnostics {
     ref.isSchemaChecked = true;
   }
 
-  #checkPathParams(
+  #checkRouteParams(
     ref: Findings,
     endpoint: AbstractEndpoint,
-    path: string,
+    route: string,
     ctx: FlatObject,
   ): void {
-    if (ref.paths.has(path)) return;
-    const params = getRoutePathParams(path);
+    if (ref.paths.has(route)) return;
+    const params = getRoutePathParams(route);
     if (params.length === 0) return; // next statement can be expensive
-    ref.flat ??= flattenIO(
-      z.toJSONSchema(endpoint.inputSchema, {
-        unrepresentable: "any",
-        io: "input",
-      }),
-    );
+    const props = new Set<string>();
+    z.toJSONSchema(endpoint.inputSchema, {
+      unrepresentable: "any",
+      io: "input",
+      override: ({ jsonSchema, path }) => {
+        while (
+          typeof path[0] === "string" &&
+          ["allOf", "anyOf", "oneOf"].includes(path[0])
+        )
+          path = path.slice(2);
+        if (path[0] === "properties" && typeof path[1] === "string")
+          props.add(path[1]);
+        if (path[0] === "propertyNames") {
+          if (typeof jsonSchema.const === "string") props.add(jsonSchema.const);
+          if (jsonSchema.enum) {
+            for (const item of jsonSchema.enum)
+              if (typeof item === "string") props.add(item);
+          }
+        }
+      },
+    });
     for (const param of params) {
-      if (param in ref.flat.properties) continue;
+      if (props.has(param)) continue;
       this.logger.warn(
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
-        { ...ctx, path, param },
+        { ...ctx, path: route, param },
       );
     }
-    ref.paths.add(path);
+    ref.paths.add(route);
   }
 
   public check: OnEndpoint = (method, path, endpoint) => {
@@ -92,6 +105,6 @@ export class Diagnostics {
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, endpoint, { method, path });
-    this.#checkPathParams(ref, endpoint, path, { method });
+    this.#checkRouteParams(ref, endpoint, path, { method });
   };
 }
