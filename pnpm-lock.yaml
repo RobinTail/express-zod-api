@@ -58,7 +58,7 @@ overrides:
   '@scarf/scarf': '-'
   lightningcss: '-'
 
-pnpmfileChecksum: sha256-PacLH+pG38iISjn4GIBN0m93eoisewP7ujrrRsSo/1g=
+pnpmfileChecksum: sha256-aZbX4xB5iFnKgBTnrlqdIPG+13CZjR7yG1IV+fZaJps=
 
 importers:
 

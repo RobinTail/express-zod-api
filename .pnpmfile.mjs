@@ -6,10 +6,7 @@
 function readPackage(pkg, ctx) {
   if (!pkg.name) return pkg;
   // Target the specific breaking version of babel types
-  if (
-    pkg.name === "rolldown-plugin-dts" || // uses ast-kit
-    pkg.name === "tsdown" // uses rolldown-plugin-dts
-  ) {
+  if (["rolldown-plugin-dts", "tsdown"].includes(pkg.name)) {
     pkg.engines = {
       ...pkg.engines,
       node: "^22.18.0 || >=24.0.0", // Force compatibility
