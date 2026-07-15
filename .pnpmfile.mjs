@@ -5,7 +5,6 @@
  */
 function readPackage(pkg, ctx) {
   if (!pkg.name) return pkg;
-  // Target the specific breaking version of babel types
   if (["rolldown-plugin-dts", "tsdown"].includes(pkg.name)) {
     pkg.engines = {
       ...pkg.engines,
