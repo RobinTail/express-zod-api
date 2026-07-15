@@ -27,7 +27,7 @@
     "husky": "^9.1.7",
     "openai": "^6.37.0",
     "prettier": "3.9.4",
-    "tsdown": "^0.22.0",
+    "tsdown": "^0.22.4",
     "typescript-eslint": "catalog:dev",
     "vitest": "^4.1.5"
   },
