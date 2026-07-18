@@ -27,9 +27,20 @@
   - `serverUrl` renamed to `server` and now also accepts OpenAPI's ServerObject;
   - `title` and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
 - The Documentation generator is featuring the OpenAPI 3.2.0 with better SSE support and other features;
+- `Integration` and `Documentation` are now available via dedicated subpath exports;
+- Removed `typescript` option from `Integration` constructor — typescript is now imported statically within the integration module;
+- ⚠️? `typescript` is re-exported from `express-zod-api/integration` for use in `brandHandling` callbacks;
+- `Producer` type moved to `express-zod-api/integration`;
+- `Depicter` type moved to `express-zod-api/documentation`;
+- The main entrypoint (`express-zod-api`) no longer exports `Integration`, `Documentation`, `Producer`, or `Depicter`;
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff
+- import { Integration, type Producer } from "express-zod-api";
++ import { Integration, type Producer } from "express-zod-api/integration";
+- import { Documentation, type Depicter } from "express-zod-api";
++ import { Documentation, type Depicter } from "express-zod-api/documentation";
+
   const config = createConfig({
 -   cors: () => ({ origin: "https://example.com" }),
 +   cors: cors({ origin: "https://example.com" }), // import cors from "cors"
