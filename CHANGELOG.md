@@ -17,21 +17,20 @@
   - The hooks (`beforeRouting` and `afterRouting` config options) are no longer async;
   - `beforeRouting` now runs after the installation of globally enabled parsers;
   - Added new `beforeParsers` hook that runs before all parsers are installed.
-- The static async method `Integration::create()` removed — use `new Integration()` instead;
 - The `createServer()` function is now synchronous — that should simplify the daily routines for beginners;
 - Added HTTP QUERY method support (RFC 10008):
   - The QUERY method is like GET but with a body — safe, idempotent, and cacheable;
   - Default input sources for QUERY: `["query", "body", "params"]` (from the lowest priority to highest);
   - Supported by `Integration` and `Documentation` generators.
-- Changes to `Documentation` constructor:
-  - `serverUrl` renamed to `server` and now also accepts OpenAPI's ServerObject;
-  - `title` and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
-- The Documentation generator is featuring the OpenAPI 3.2.0 with better SSE support and other features;
-- `Integration` and `Documentation` are now available via dedicated subpath exports;
-- Removed `typescript` option from `Integration` constructor — typescript is now imported statically within the integration module;
-- `Producer` type moved to `express-zod-api/integration`;
-- `Depicter` type moved to `express-zod-api/documentation`;
-- The main entrypoint (`express-zod-api`) no longer exports `Integration`, `Documentation`, `Producer`, or `Depicter`;
+- Changes to `Documentation`:
+  - Moved to the dedicated subpath `express-zod-api/documentation` along with `Depicter` type;
+  - `serverUrl` constructor option renamed to `server` and now also accepts OpenAPI's ServerObject;
+  - `title` option and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
+  - Now produces OpenAPI 3.2.0 with better SSE support and other features.
+- Changes to `Integration`:
+  - Moved to the dedicated subpath `express-zod-api/integration` along with `Producer` type;
+  - The static async method `create()` removed — use `new Integration()` instead;
+  - Removed `typescript` option from constructor — now imported statically.
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff
