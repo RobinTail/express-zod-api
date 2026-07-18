@@ -3,7 +3,11 @@ import manifest from "./package.json" with { type: "json" };
 import { fixDtsPlugin } from "../tools/fixDts.ts";
 
 export default defineConfig({
-  entry: "src/index.ts",
+  entry: {
+    index: "src/index.ts",
+    integration: "src/integration.ts",
+    documentation: "src/documentation.ts",
+  },
   fixedExtension: false,
   minify: true,
   attw: { profile: "esm-only", level: "error" },
