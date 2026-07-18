@@ -1,5 +1,4 @@
 import type { IRouter } from "express";
-import ts from "typescript";
 import { z } from "zod";
 import * as entrypoint from "../src";
 import type {
@@ -9,16 +8,14 @@ import type {
   BearerSecurity,
   CommonConfig,
   CookieSecurity,
-  HeaderSecurity,
-  Depicter,
   FlatObject,
+  HeaderSecurity,
   IOSchema,
   InputSecurity,
   LoggerOverrides,
   Method,
   OAuth2Security,
   OpenIdSecurity,
-  Producer,
   Routing,
   ServerConfig,
 } from "../src";
@@ -34,20 +31,6 @@ describe("Index Entrypoint", () => {
     test.each(entities)("%s should have certain value", (entry) => {
       const entity = entrypoint[entry as keyof typeof entrypoint];
       if (entity !== undefined) expect(entity).toMatchSnapshot();
-    });
-
-    test("Convenience types should be exposed", () => {
-      expectTypeOf(
-        ({
-          jsonSchema,
-        }: {
-          zodSchema: z.core.$ZodType;
-          jsonSchema: z.core.JSONSchema.BaseSchema;
-        }) => jsonSchema,
-      ).toExtend<Depicter>();
-      expectTypeOf(() =>
-        ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-      ).toExtend<Producer>();
     });
 
     test("Issue 952, 1182, 1269: should expose certain types and interfaces", () => {

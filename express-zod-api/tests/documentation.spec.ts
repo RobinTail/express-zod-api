@@ -1,7 +1,6 @@
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
 import {
-  Documentation,
   DocumentationError,
   EndpointsFactory,
   createConfig,
@@ -9,9 +8,9 @@ import {
   defaultEndpointsFactory,
   ez,
   ResultHandler,
-  type Depicter,
   type Method,
 } from "../src";
+import { Documentation, type Depicter } from "../src/documentation";
 import { contentTypes } from "../src/content-type";
 import { z } from "zod";
 import { givePort } from "../../tools/ports";
@@ -1228,5 +1227,16 @@ describe("Documentation", () => {
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+  });
+
+  test("Depicter type should be satisfied", () => {
+    expectTypeOf(
+      ({
+        jsonSchema,
+      }: {
+        zodSchema: z.core.$ZodType;
+        jsonSchema: z.core.JSONSchema.BaseSchema;
+      }) => jsonSchema,
+    ).toExtend<Depicter>();
   });
 });
