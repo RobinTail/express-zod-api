@@ -222,27 +222,60 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           ["express-zod-api/integration", ["Integration", "Producer"]],
           ["express-zod-api/documentation", ["Documentation", "Depicter"]],
         ];
-        for (const [target, names] of targets) {
-          const found = node.specifiers.filter(
-            (s) =>
-              s.type === NT.ImportSpecifier &&
-              s.imported.type === NT.Identifier &&
-              names.includes(s.imported.name),
-          );
-          if (found.length === 0) continue;
-          const spec = found[0] as TSESTree.ImportSpecifier;
-          const imported =
+        const groups = new Map<string, TSESTree.ImportSpecifier[]>();
+        const remaining: TSESTree.ImportSpecifier[] = [];
+        const nonNamed: TSESTree.ImportDeclaration["specifiers"] = [];
+        for (const spec of node.specifiers) {
+          if (spec.type !== NT.ImportSpecifier) {
+            nonNamed.push(spec);
+            continue;
+          }
+          const name =
             spec.imported.type === NT.Identifier
               ? spec.imported.name
               : spec.imported.value;
-          ctx.report({
-            node,
-            messageId: "move",
-            data: { subject: imported, to: target },
-            fix: (fixer) => fixer.replaceText(node.source, `"${target}"`),
-          });
-          return;
+          let found = false;
+          for (const [target, names] of targets) {
+            if (names.includes(name)) {
+              if (!groups.has(target)) groups.set(target, []);
+              groups.get(target)!.push(spec);
+              found = true;
+              break;
+            }
+          }
+          if (!found) remaining.push(spec);
         }
+        if (groups.size === 0) return;
+        const importKind = node.importKind === "type" ? "type " : "";
+        const first = groups.entries().next().value!;
+        const firstName =
+          first[1][0]!.imported.type === NT.Identifier
+            ? first[1][0]!.imported.name
+            : first[1][0]!.imported.value;
+        ctx.report({
+          node,
+          messageId: "move",
+          data: { subject: firstName, to: first[0] },
+          fix: (fixer) => {
+            const parts: string[] = [];
+            const allMain = [...nonNamed, ...remaining];
+            if (allMain.length > 0) {
+              const text = allMain
+                .map((s) => ctx.sourceCode.getText(s))
+                .join(", ");
+              parts.push(
+                `import ${importKind}{ ${text} } from "express-zod-api"`,
+              );
+            }
+            for (const [target, specs] of groups) {
+              const text = specs
+                .map((s) => ctx.sourceCode.getText(s))
+                .join(", ");
+              parts.push(`import ${importKind}{ ${text} } from "${target}"`);
+            }
+            return fixer.replaceText(node, parts.join("\n"));
+          },
+        });
       },
       integrationNewTypescript: (node) => {
         const arg = node.arguments[0];

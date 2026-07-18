@@ -317,6 +317,62 @@ describe("Migration", async () => {
         ],
       },
       {
+        name: "split mixed import with Integration and main",
+        code: `import { createConfig, Integration } from "express-zod-api"`,
+        output: `import { createConfig } from "express-zod-api"\nimport { Integration } from "express-zod-api/integration"`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "Integration",
+              to: "express-zod-api/integration",
+            },
+          },
+        ],
+      },
+      {
+        name: "split mixed import across both subpaths",
+        code: `import { Integration, Documentation } from "express-zod-api"`,
+        output: `import { Integration } from "express-zod-api/integration"\nimport { Documentation } from "express-zod-api/documentation"`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "Integration",
+              to: "express-zod-api/integration",
+            },
+          },
+        ],
+      },
+      {
+        name: "split mixed import with main and both subpaths",
+        code: `import { createConfig, Integration, Depicter } from "express-zod-api"`,
+        output: `import { createConfig } from "express-zod-api"\nimport { Integration } from "express-zod-api/integration"\nimport { Depicter } from "express-zod-api/documentation"`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "Integration",
+              to: "express-zod-api/integration",
+            },
+          },
+        ],
+      },
+      {
+        name: "split import type across subpaths",
+        code: `import type { Producer, Depicter } from "express-zod-api"`,
+        output: `import type { Producer } from "express-zod-api/integration"\nimport type { Depicter } from "express-zod-api/documentation"`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "Producer",
+              to: "express-zod-api/integration",
+            },
+          },
+        ],
+      },
+      {
         name: "remove typescript option from Integration constructor",
         code: `new Integration({ typescript: ts, routing, config })`,
         output: `new Integration({ routing, config })`,
