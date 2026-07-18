@@ -297,3 +297,5 @@ export class Documentation extends OpenApiBuilder {
     walkRouting({ ...rest, onEndpoint });
   }
 }
+
+export type { Depicter } from "./documentation-helpers";

@@ -240,3 +240,5 @@ export class Integration extends IntegrationBase {
     return format ? format(output) : output;
   }
 }
+
+export type { Producer } from "./zts-helpers";
