@@ -211,7 +211,7 @@ Markdown files should avoid `---` horizontal rule separators.
 
 ### 13. TypeScript Generators Policy
 
-For generating TypeScript code, prefer using helpers from `TypescriptAPI` class over direct factory methods. Native
+For generating TypeScript code, prefer using helpers from `typescript-api.ts` over direct factory methods. Native
 factory methods have verbose APIs with many redundant arguments.
 
 Files that generate TypeScript code:
@@ -224,11 +224,11 @@ Files that generate TypeScript code:
 **Examples**: Use these helpers instead of verbose factory calls:
 
 ```typescript
-// Use TypescriptAPI methods:
-api.makeId("User");
-api.makeParam("name", { type: "string" });
-api.makeConst("count", api.literally(0));
-api.makeInterface("User", [api.makeInterfaceProp("name", "string")]);
+// Use helpers:
+makeId("User");
+makeParam("name", { type: "string" });
+makeConst("count", api.literally(0));
+makeInterface("User", [api.makeInterfaceProp("name", "string")]);
 
 // Avoid native factory calls:
 ts.factory.createIdentifier("User");
