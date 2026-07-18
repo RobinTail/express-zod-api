@@ -40,6 +40,7 @@ import {
   propOf,
   ts,
   makeArrowFn,
+  f,
 } from "./typescript-api";
 import type {
   CursorPaginatedResult,
@@ -167,11 +168,11 @@ export abstract class IntegrationBase {
   protected makeEndpointTags = () =>
     makeConst(
       "endpointTags",
-      ts.factory.createObjectLiteralExpression(
+      f.createObjectLiteralExpression(
         Array.from(this.tags).map(([request, tags]) =>
-          ts.factory.createPropertyAssignment(
+          f.createPropertyAssignment(
             makePropertyIdentifier(request),
-            ts.factory.createArrayLiteralExpression(R.map(literally, tags)),
+            f.createArrayLiteralExpression(R.map(literally, tags)),
           ),
         ),
       ),
@@ -209,12 +210,12 @@ export abstract class IntegrationBase {
       this.#ids.parseRequestFn,
       makeArrowFn(
         { [this.#ids.requestParameter]: ts.SyntaxKind.StringKeyword },
-        ts.factory.createAsExpression(
+        f.createAsExpression(
           makeCall(this.#ids.requestParameter, propOf<string>("split"))(
-            ts.factory.createRegularExpressionLiteral("/ (.+)/"), // split once
+            f.createRegularExpressionLiteral("/ (.+)/"), // split once
             literally(2), // excludes third empty element
           ),
-          ts.factory.createTupleTypeNode([
+          f.createTupleTypeNode([
             ensureTypeNode(this.#ids.methodType),
             ensureTypeNode(this.#ids.pathType),
           ]),
@@ -234,39 +235,37 @@ export abstract class IntegrationBase {
           [this.#ids.pathParameter]: ts.SyntaxKind.StringKeyword,
           [this.#ids.paramsArgument]: makeRecordStringAny(),
         },
-        ts.factory.createBlock([
+        f.createBlock([
           makeConst(
             this.#ids.restConst,
-            ts.factory.createObjectLiteralExpression([
-              ts.factory.createSpreadAssignment(
-                makeId(this.#ids.paramsArgument),
-              ),
+            f.createObjectLiteralExpression([
+              f.createSpreadAssignment(makeId(this.#ids.paramsArgument)),
             ]),
           ),
-          ts.factory.createForInStatement(
-            ts.factory.createVariableDeclarationList(
-              [ts.factory.createVariableDeclaration(this.#ids.keyParameter)],
+          f.createForInStatement(
+            f.createVariableDeclarationList(
+              [f.createVariableDeclaration(this.#ids.keyParameter)],
               ts.NodeFlags.Const,
             ),
             makeId(this.#ids.paramsArgument),
-            ts.factory.createBlock([
+            f.createBlock([
               makeAssignment(
                 this.#ids.pathParameter,
                 makeCall(this.#ids.pathParameter, propOf<string>("replace"))(
                   makeTemplate(":", [this.#ids.keyParameter]), // `:${key}`
                   makeArrowFn(
                     [],
-                    ts.factory.createBlock([
-                      ts.factory.createExpressionStatement(
-                        ts.factory.createDeleteExpression(
-                          ts.factory.createElementAccessExpression(
+                    f.createBlock([
+                      f.createExpressionStatement(
+                        f.createDeleteExpression(
+                          f.createElementAccessExpression(
                             makeId(this.#ids.restConst),
                             makeId(this.#ids.keyParameter),
                           ),
                         ),
                       ),
-                      ts.factory.createReturnStatement(
-                        ts.factory.createElementAccessExpression(
+                      f.createReturnStatement(
+                        f.createElementAccessExpression(
                           makeId(this.#ids.paramsArgument),
                           makeId(this.#ids.keyParameter),
                         ),
@@ -277,9 +276,9 @@ export abstract class IntegrationBase {
               ),
             ]),
           ),
-          ts.factory.createReturnStatement(
-            ts.factory.createAsExpression(
-              ts.factory.createArrayLiteralExpression([
+          f.createReturnStatement(
+            f.createAsExpression(
+              f.createArrayLiteralExpression([
                 makeId(this.#ids.pathParameter),
                 makeId(this.#ids.restConst),
               ]),
@@ -301,7 +300,7 @@ export abstract class IntegrationBase {
     const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
     const offsetProp =
       propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
-    const cursorShape = ts.factory.createTypeLiteralNode([
+    const cursorShape = f.createTypeLiteralNode([
       makeInterfaceProp(
         nextCursorProp,
         makeUnion([
@@ -310,7 +309,7 @@ export abstract class IntegrationBase {
         ]),
       ),
     ]);
-    const offsetShape = ts.factory.createTypeLiteralNode(
+    const offsetShape = f.createTypeLiteralNode(
       [totalProp, limitProp, offsetProp].map((prop) =>
         makeInterfaceProp(prop, ts.SyntaxKind.NumberKeyword),
       ),
@@ -333,34 +332,34 @@ export abstract class IntegrationBase {
     const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
     const offsetProp =
       propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
-    const inExpression = ts.factory.createBinaryExpression(
+    const inExpression = f.createBinaryExpression(
       literally(nextCursorProp),
       ts.SyntaxKind.InKeyword,
       responseId,
     );
-    const returnCursor = ts.factory.createReturnStatement(
-      ts.factory.createBinaryExpression(
-        ts.factory.createPropertyAccessExpression(responseId, nextCursorProp),
+    const returnCursor = f.createReturnStatement(
+      f.createBinaryExpression(
+        f.createPropertyAccessExpression(responseId, nextCursorProp),
         ts.SyntaxKind.ExclamationEqualsEqualsToken,
         literally(null),
       ),
     );
-    const offsetPlusLimit = ts.factory.createBinaryExpression(
-      ts.factory.createPropertyAccessExpression(responseId, offsetProp),
+    const offsetPlusLimit = f.createBinaryExpression(
+      f.createPropertyAccessExpression(responseId, offsetProp),
       ts.SyntaxKind.PlusToken,
-      ts.factory.createPropertyAccessExpression(responseId, limitProp),
+      f.createPropertyAccessExpression(responseId, limitProp),
     );
-    const returnOffset = ts.factory.createReturnStatement(
-      ts.factory.createBinaryExpression(
+    const returnOffset = f.createReturnStatement(
+      f.createBinaryExpression(
         offsetPlusLimit,
         ts.SyntaxKind.LessThanToken,
-        ts.factory.createPropertyAccessExpression(responseId, totalProp),
+        f.createPropertyAccessExpression(responseId, totalProp),
       ),
     );
     return makePublicMethod(
       "hasMore",
       [makeParam(responseId, { type: this.#ids.paginationType })],
-      [ts.factory.createIfStatement(inExpression, returnCursor), returnOffset],
+      [f.createIfStatement(inExpression, returnCursor), returnOffset],
       {
         returns: ensureTypeNode(ts.SyntaxKind.BooleanKeyword),
         isStatic: true,
@@ -387,10 +386,10 @@ export abstract class IntegrationBase {
           makeCall(this.#ids.parseRequestFn)(this.#ids.requestParameter),
         ),
         // return this.implementation(___)
-        ts.factory.createReturnStatement(
-          makeCall(ts.factory.createThis(), this.#ids.implementationArgument)(
+        f.createReturnStatement(
+          makeCall(f.createThis(), this.#ids.implementationArgument)(
             this.#ids.methodParameter,
-            ts.factory.createSpreadElement(
+            f.createSpreadElement(
               makeCall(this.#ids.substituteFn)(
                 this.#ids.pathParameter,
                 this.#ids.paramsArgument,
@@ -450,18 +449,18 @@ export abstract class IntegrationBase {
    * */
   protected makeDefaultImplementation = () => {
     // method: method.toUpperCase()
-    const methodProperty = ts.factory.createPropertyAssignment(
+    const methodProperty = f.createPropertyAssignment(
       propOf<RequestInit>("method"),
       makeCall(this.#ids.methodParameter, propOf<string>("toUpperCase"))(),
     );
 
     // headers: hasBody ? { "Content-Type": "application/json" } : undefined
-    const headersProperty = ts.factory.createPropertyAssignment(
+    const headersProperty = f.createPropertyAssignment(
       propOf<RequestInit>("headers"),
       makeTernary(
         this.#ids.hasBodyConst,
-        ts.factory.createObjectLiteralExpression([
-          ts.factory.createPropertyAssignment(
+        f.createObjectLiteralExpression([
+          f.createPropertyAssignment(
             literally("Content-Type"),
             literally(contentTypes.json),
           ),
@@ -471,7 +470,7 @@ export abstract class IntegrationBase {
     );
 
     // body: hasBody ? JSON.stringify(params) : undefined
-    const bodyProperty = ts.factory.createPropertyAssignment(
+    const bodyProperty = f.createPropertyAssignment(
       propOf<RequestInit>("body"),
       makeTernary(
         this.#ids.hasBodyConst,
@@ -486,10 +485,10 @@ export abstract class IntegrationBase {
     // const response = await fetch(new URL(`${path}${searchParams}`, "https://example.com"), { ___ });
     const responseStatement = makeConst(
       this.#ids.responseConst,
-      ts.factory.createAwaitExpression(
+      f.createAwaitExpression(
         makeCall(fetch.name)(
           this.#makeFetchURL(),
-          ts.factory.createObjectLiteralExpression([
+          f.createObjectLiteralExpression([
             methodProperty,
             headersProperty,
             bodyProperty,
@@ -501,9 +500,9 @@ export abstract class IntegrationBase {
     // const hasBody = !["get", "delete"].includes(method);
     const hasBodyStatement = makeConst(
       this.#ids.hasBodyConst,
-      ts.factory.createLogicalNot(
+      f.createLogicalNot(
         makeCall(
-          ts.factory.createArrayLiteralExpression([
+          f.createArrayLiteralExpression([
             literally("get" satisfies ClientMethod),
             literally("head" satisfies ClientMethod),
             literally("delete" satisfies ClientMethod),
@@ -534,12 +533,12 @@ export abstract class IntegrationBase {
     );
 
     // if (!contentType) return;
-    const noBodyStatement = ts.factory.createIfStatement(
-      ts.factory.createPrefixUnaryExpression(
+    const noBodyStatement = f.createIfStatement(
+      f.createPrefixUnaryExpression(
         ts.SyntaxKind.ExclamationToken,
         makeId(this.#ids.contentTypeConst),
       ),
-      ts.factory.createReturnStatement(),
+      f.createReturnStatement(),
     );
 
     // const isJSON = contentType.startsWith("application/json");
@@ -552,7 +551,7 @@ export abstract class IntegrationBase {
     );
 
     // return response[isJSON ? "json" : "text"]();
-    const returnStatement = ts.factory.createReturnStatement(
+    const returnStatement = f.createReturnStatement(
       makeCall(
         this.#ids.responseConst,
         makeTernary(
@@ -571,7 +570,7 @@ export abstract class IntegrationBase {
           this.#ids.pathParameter,
           this.#ids.paramsArgument,
         ],
-        ts.factory.createBlock([
+        f.createBlock([
           hasBodyStatement,
           searchParamsStatement,
           responseStatement,
@@ -596,7 +595,7 @@ export abstract class IntegrationBase {
         makeConst(
           makeDeconstruction(this.#ids.pathParameter, this.#ids.restConst),
           makeCall(this.#ids.substituteFn)(
-            ts.factory.createElementAccessExpression(
+            f.createElementAccessExpression(
               makeCall(this.#ids.parseRequestFn)(this.#ids.requestParameter),
               literally(1),
             ),
@@ -608,8 +607,8 @@ export abstract class IntegrationBase {
           this.#makeSearchParams(this.#ids.restConst),
         ),
         makeAssignment(
-          ts.factory.createPropertyAccessExpression(
-            ts.factory.createThis(),
+          f.createPropertyAccessExpression(
+            f.createThis(),
             this.#ids.sourceProp,
           ),
           makeNew("EventSource", this.#makeFetchURL()),
@@ -618,7 +617,7 @@ export abstract class IntegrationBase {
     );
 
   #makeEventNarrow = (value: Typeable) =>
-    ts.factory.createTypeLiteralNode([
+    f.createTypeLiteralNode([
       makeInterfaceProp(propOf<SSEShape>("event"), value),
     ]);
 
@@ -638,9 +637,9 @@ export abstract class IntegrationBase {
         ),
       }),
       [
-        ts.factory.createExpressionStatement(
+        f.createExpressionStatement(
           makeCall(
-            ts.factory.createThis(),
+            f.createThis(),
             this.#ids.sourceProp,
             propOf<EventSource>("addEventListener"),
           )(
@@ -652,9 +651,9 @@ export abstract class IntegrationBase {
                   JSON[Symbol.toStringTag],
                   propOf<JSON>("parse"),
                 )(
-                  ts.factory.createPropertyAccessExpression(
-                    ts.factory.createParenthesizedExpression(
-                      ts.factory.createAsExpression(
+                  f.createPropertyAccessExpression(
+                    f.createParenthesizedExpression(
+                      f.createAsExpression(
                         makeId(this.#ids.msgParameter),
                         ensureTypeNode(MessageEvent.name),
                       ),
@@ -666,7 +665,7 @@ export abstract class IntegrationBase {
             ),
           ),
         ),
-        ts.factory.createReturnStatement(ts.factory.createThis()),
+        f.createReturnStatement(f.createThis()),
       ],
       {
         typeParams: {
@@ -691,15 +690,12 @@ export abstract class IntegrationBase {
         typeParams: {
           K: makeExtract(
             this.#ids.requestType,
-            ts.factory.createTemplateLiteralType(
-              ts.factory.createTemplateHead("get "),
-              [
-                ts.factory.createTemplateLiteralTypeSpan(
-                  ensureTypeNode(ts.SyntaxKind.StringKeyword),
-                  ts.factory.createTemplateTail(""),
-                ),
-              ],
-            ),
+            f.createTemplateLiteralType(f.createTemplateHead("get "), [
+              f.createTemplateLiteralTypeSpan(
+                ensureTypeNode(ts.SyntaxKind.StringKeyword),
+                f.createTemplateTail(""),
+              ),
+            ]),
           ),
           R: makeExtract(
             makeIndexed(this.interfaces.positive, "K"),
@@ -718,8 +714,8 @@ export abstract class IntegrationBase {
     // client.provide("get /v1/user/retrieve", { id: "10" });
     makeCall(this.#ids.clientConst, this.#ids.provideMethod)(
       literally(`${"get" satisfies ClientMethod} /v1/user/retrieve`),
-      ts.factory.createObjectLiteralExpression([
-        ts.factory.createPropertyAssignment("id", literally("10")),
+      f.createObjectLiteralExpression([
+        f.createPropertyAssignment("id", literally("10")),
       ]),
     ),
     // new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
@@ -727,9 +723,9 @@ export abstract class IntegrationBase {
       makeNew(
         subscriptionClassName,
         literally(`${"get" satisfies ClientMethod} /v1/events/stream`),
-        ts.factory.createObjectLiteralExpression(),
+        f.createObjectLiteralExpression(),
       ),
       this.#ids.onMethod,
-    )(literally("time"), makeArrowFn(["time"], ts.factory.createBlock([]))),
+    )(literally("time"), makeArrowFn(["time"], f.createBlock([]))),
   ];
 }

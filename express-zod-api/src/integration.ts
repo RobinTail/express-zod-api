@@ -15,6 +15,7 @@ import {
   makeUnion,
   printNode,
   ts,
+  f,
 } from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
@@ -147,7 +148,7 @@ export class Integration extends IntegrationBase {
           makeIndexed(this.interfaces.positive, literalIdx),
           makeIndexed(this.interfaces.negative, literalIdx),
         ]),
-        encoded: ts.factory.createIntersectionTypeNode([
+        encoded: f.createIntersectionTypeNode([
           ensureTypeNode(dictionaries.positive.name),
           ensureTypeNode(dictionaries.negative.name),
         ]),
@@ -205,7 +206,7 @@ export class Integration extends IntegrationBase {
       usageExampleText &&
       ts.addSyntheticLeadingComment(
         ts.addSyntheticLeadingComment(
-          ts.factory.createEmptyStatement(),
+          f.createEmptyStatement(),
           ts.SyntaxKind.SingleLineCommentTrivia,
           " Usage example:",
         ),

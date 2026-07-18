@@ -14,6 +14,7 @@ import {
 } from "./schema-walker";
 import {
   ensureTypeNode,
+  f,
   makeInterfaceProp,
   makeLiteralType,
   makeUnion,
@@ -59,21 +60,17 @@ const onTemplateLiteral: Producer = (
     }
     return text;
   };
-  const head = ts.factory.createTemplateHead(readText());
+  const head = f.createTemplateHead(readText());
   const spans: ts.TemplateLiteralTypeSpan[] = [];
   while (idx < parts.length) {
     const schema = next(parts[idx++] as z.core.$ZodType);
     const text = readText();
     const textWrapper =
-      idx < parts.length
-        ? ts.factory.createTemplateMiddle
-        : ts.factory.createTemplateTail;
-    spans.push(
-      ts.factory.createTemplateLiteralTypeSpan(schema, textWrapper(text)),
-    );
+      idx < parts.length ? f.createTemplateMiddle : f.createTemplateTail;
+    spans.push(f.createTemplateLiteralTypeSpan(schema, textWrapper(text)));
   }
   if (!spans.length) return makeLiteralType(head.text);
-  return ts.factory.createTemplateLiteralType(head, spans);
+  return f.createTemplateLiteralType(head, spans);
 };
 
 const onObject: Producer = (
@@ -97,7 +94,7 @@ const onObject: Producer = (
         });
       },
     );
-    return ts.factory.createTypeLiteralNode(members);
+    return f.createTypeLiteralNode(members);
   };
   return hasCycle(obj, { io: isResponse ? "output" : "input" })
     ? makeAlias(obj, produce)
@@ -105,7 +102,7 @@ const onObject: Producer = (
 };
 
 const onArray: Producer = ({ _zod: { def } }: z.core.$ZodArray, { next }) =>
-  ts.factory.createArrayTypeNode(next(def.element));
+  f.createArrayTypeNode(next(def.element));
 
 const onEnum: Producer = ({ _zod: { def } }: z.core.$ZodEnum) =>
   makeUnion(R.map(makeLiteralType, Object.values(def.entries)));
@@ -121,12 +118,10 @@ const onNullable: Producer = (
 ) => makeUnion([next(def.innerType), makeLiteralType(null)]);
 
 const onTuple: Producer = ({ _zod: { def } }: z.core.$ZodTuple, { next }) =>
-  ts.factory.createTupleTypeNode(
+  f.createTupleTypeNode(
     def.items
       .map(next)
-      .concat(
-        def.rest === null ? [] : ts.factory.createRestTypeNode(next(def.rest)),
-      ),
+      .concat(def.rest === null ? [] : f.createRestTypeNode(next(def.rest))),
   );
 
 const onRecord: Producer = ({ _zod: { def } }: z.core.$ZodRecord, { next }) => {
@@ -134,7 +129,7 @@ const onRecord: Producer = ({ _zod: { def } }: z.core.$ZodRecord, { next }) => {
   const primary = ensureTypeNode("Record", [keyNode!, valueNode!]);
   const isLoose = def.mode === "loose";
   if (!isLoose) return primary;
-  return ts.factory.createIntersectionTypeNode([
+  return f.createIntersectionTypeNode([
     primary,
     ensureTypeNode("Record", ["PropertyKey", valueNode!]),
   ]);
@@ -150,9 +145,9 @@ const intersect = R.tryCatch(
         return true;
       throw new Error("Has conflicting prop");
     }, members);
-    return ts.factory.createTypeLiteralNode(uniqs);
+    return f.createTypeLiteralNode(uniqs);
   },
-  (_err, nodes) => ts.factory.createIntersectionTypeNode(nodes),
+  (_err, nodes) => f.createIntersectionTypeNode(nodes),
 );
 
 const onIntersection: Producer = (
