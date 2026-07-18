@@ -17,7 +17,7 @@ export const accessModifiers = {
     f.createModifier(ts.SyntaxKind.ProtectedKeyword),
     f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
   ],
-} as const;
+};
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
@@ -56,7 +56,7 @@ export const literally = <T extends string | null | boolean | number | bigint>(s
 
 export const makeId = (name: string) => f.createIdentifier(name);
 
-const makePropertyIdentifier = (name: string | number) =>
+export const makePropertyIdentifier = (name: string | number) =>
   typeof name === "string" && safePropRegex.test(name)
     ? makeId(name)
     : literally(name);
