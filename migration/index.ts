@@ -12,6 +12,8 @@ interface Queries {
   asyncLifecycleHook: NamedProp;
   documentationConfig: TSESTree.ObjectExpression;
   corsConfig: NamedProp;
+  expressZodApiImport: TSESTree.ImportDeclaration;
+  integrationNewTypescript: TSESTree.NewExpression;
 }
 
 type Listener = keyof Queries;
@@ -38,6 +40,8 @@ const queries: Record<Listener, string> = {
     `${NT.CallExpression}[callee.name="createConfig"] > ` +
     `${NT.ObjectExpression} > ` +
     queryNamedProp("cors"),
+  expressZodApiImport: `${NT.ImportDeclaration}[source.value="express-zod-api"]`,
+  integrationNewTypescript: `${NT.NewExpression}[callee.name="Integration"]`,
 };
 
 const listen = <
@@ -211,6 +215,58 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             to: entries.map(([, v]) => v).join(", "),
           },
           fix: (fixer) => fixer.replaceText(node, newText),
+        });
+      },
+      expressZodApiImport: (node) => {
+        const targets: [string, string[]][] = [
+          ["express-zod-api/integration", ["Integration", "Producer"]],
+          ["express-zod-api/documentation", ["Documentation", "Depicter"]],
+        ];
+        for (const [target, names] of targets) {
+          const found = node.specifiers.filter(
+            (s) =>
+              s.type === NT.ImportSpecifier &&
+              s.imported.type === NT.Identifier &&
+              names.includes(s.imported.name),
+          );
+          if (found.length === 0) continue;
+          const spec = found[0] as TSESTree.ImportSpecifier;
+          const imported =
+            spec.imported.type === NT.Identifier
+              ? spec.imported.name
+              : spec.imported.value;
+          ctx.report({
+            node,
+            messageId: "move",
+            data: { subject: imported, to: target },
+            fix: (fixer) => fixer.replaceText(node.source, `"${target}"`),
+          });
+          return;
+        }
+      },
+      integrationNewTypescript: (node) => {
+        const arg = node.arguments[0];
+        if (!arg || arg.type !== NT.ObjectExpression) return;
+        const typescriptProp = arg.properties.find(
+          (p) =>
+            p.type === NT.Property &&
+            p.key.type === NT.Identifier &&
+            p.key.name === "typescript",
+        );
+        if (!typescriptProp) return;
+        ctx.report({
+          node,
+          messageId: "remove",
+          data: { subject: "typescript option" },
+          fix: (fixer) => {
+            const remaining = arg.properties.filter(
+              (p) => p !== typescriptProp,
+            );
+            const newText = remaining.length
+              ? `{ ${remaining.map((p) => ctx.sourceCode.getText(p)).join(", ")} }`
+              : "{}";
+            return fixer.replaceText(arg, newText);
+          },
         });
       },
     }),

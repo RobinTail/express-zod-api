@@ -40,6 +40,11 @@ describe("Migration", async () => {
       `new Documentation({ info: { title: "x", version: "y" }, server: "https://", routing, config })`,
       `new Documentation({ info: { }, server: "https://", routing, config })`,
       `new Documentation({ routing, config })`,
+      // expressZodApiImport
+      `import { createServer } from "express-zod-api"`,
+      `import { Integration } from "express-zod-api/integration"`,
+      `import { Documentation } from "express-zod-api/documentation"`,
+      // integrationNewTypescript
       // corsConfig
       `createConfig({ cors: true })`,
       `createConfig({ cors: someHandler })`,
@@ -252,6 +257,84 @@ describe("Migration", async () => {
               from: "function returning object",
               to: "request handler",
             },
+          },
+        ],
+      },
+      {
+        name: "import Integration from main entrypoint",
+        code: `import { Integration } from "express-zod-api"`,
+        output: `import { Integration } from "express-zod-api/integration"`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "Integration",
+              to: "express-zod-api/integration",
+            },
+          },
+        ],
+      },
+      {
+        name: "import Documentation from main entrypoint",
+        code: `import { Documentation } from "express-zod-api"`,
+        output: `import { Documentation } from "express-zod-api/documentation"`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "Documentation",
+              to: "express-zod-api/documentation",
+            },
+          },
+        ],
+      },
+      {
+        name: "import Producer from main entrypoint",
+        code: `import { Producer } from "express-zod-api"`,
+        output: `import { Producer } from "express-zod-api/integration"`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "Producer",
+              to: "express-zod-api/integration",
+            },
+          },
+        ],
+      },
+      {
+        name: "import Depicter from main entrypoint",
+        code: `import { Depicter } from "express-zod-api"`,
+        output: `import { Depicter } from "express-zod-api/documentation"`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "Depicter",
+              to: "express-zod-api/documentation",
+            },
+          },
+        ],
+      },
+      {
+        name: "remove typescript option from Integration constructor",
+        code: `new Integration({ typescript: ts, routing, config })`,
+        output: `new Integration({ routing, config })`,
+        errors: [
+          {
+            messageId: "remove",
+            data: { subject: "typescript option" },
+          },
+        ],
+      },
+      {
+        name: "remove typescript option as the only property",
+        code: `new Integration({ typescript: ts })`,
+        output: `new Integration({})`,
+        errors: [
+          {
+            messageId: "remove",
+            data: { subject: "typescript option" },
           },
         ],
       },
