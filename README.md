@@ -1347,8 +1347,8 @@ handling rule for multiple brands, use the exposed types `Depicter` and `Produce
 ```ts
 import ts from "typescript";
 import { z } from "zod";
-import { Documentation, Depicter } from "express-zod-api/documentation";
-import { Integration, Producer } from "express-zod-api/integration";
+import { Documentation, type Depicter } from "express-zod-api/documentation";
+import { Integration, type Producer } from "express-zod-api/integration";
 
 const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
 const myBrandedSchema = z.string().xBrand(myBrand); // requires Zod Plugin, or .meta({ "x-brand": myBrand })
