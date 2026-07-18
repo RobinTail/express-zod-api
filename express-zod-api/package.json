@@ -31,6 +31,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./integration": {
+      "types": "./dist/integration.d.ts",
+      "default": "./dist/integration.js"
+    },
+    "./documentation": {
+      "types": "./dist/documentation.d.ts",
+      "default": "./dist/documentation.js"
     }
   },
   "files": [
