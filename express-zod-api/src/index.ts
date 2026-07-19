@@ -28,27 +28,15 @@ export {
 export { testEndpoint, testMiddleware } from "./testing";
 export { EventStreamFactory } from "./sse";
 
-export type { Routing } from "./routing";
 export { ez } from "./proprietary-schemas";
+
+// Types and interfaces that can be used for user convenience
+export type { Method } from "./method";
+export type { Routing } from "./routing";
 
 // Interfaces exposed for augmentation
 export type { LoggerOverrides } from "./logger-helpers";
 export type { TagOverrides } from "./common-helpers";
 
-// Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
-import type {} from "qs"; // fixes TS2742 for attachRouting, makeRequestMock, testEndpoint, testMiddleware
-export type { CacheControl, CachePolicy } from "./cache-middleware";
-export type { FlatObject } from "./common-helpers";
-export type { Method } from "./method";
-export type { IOSchema } from "./io-schema";
-export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
-export type { ApiResponse } from "./api-response";
-export type {
-  BasicSecurity,
-  BearerSecurity,
-  CookieSecurity,
-  HeaderSecurity,
-  InputSecurity,
-  OAuth2Security,
-  OpenIdSecurity,
-} from "./security";
+// Fixes TS2742 during the build: inferred types need ParsedQs from qs
+import type {} from "qs"; // for attachRouting, makeRequestMock, testEndpoint, testMiddleware

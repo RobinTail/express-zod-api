@@ -21,9 +21,8 @@ import {
   createServer,
   defaultResultHandler,
   ez,
-  type AppConfig,
-  type ServerConfig,
 } from "../src";
+import type { AppConfig, ServerConfig } from "../src/config-type";
 import express from "express";
 
 describe("Server", () => {
