@@ -65,6 +65,11 @@ const listen = <
     {},
   );
 
+const moveTargets = new Map<string, string[]>([
+  ["express-zod-api/integration", ["Integration", "Producer"]],
+  ["express-zod-api/documentation", ["Documentation", "Depicter"]],
+]);
+
 const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0]}`;
 
 const theRule = ESLintUtils.RuleCreator.withoutDocs({
@@ -226,10 +231,6 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       expressZodApiImport: (node) => {
-        const targets: [string, string[]][] = [
-          ["express-zod-api/integration", ["Integration", "Producer"]],
-          ["express-zod-api/documentation", ["Documentation", "Depicter"]],
-        ];
         const groups = new Map<string, TSESTree.ImportSpecifier[]>();
         const remaining: TSESTree.ImportSpecifier[] = [];
         const nonNamed: TSESTree.ImportDeclaration["specifiers"] = [];
@@ -243,7 +244,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               ? spec.imported.name
               : spec.imported.value;
           let found = false;
-          for (const [target, names] of targets) {
+          for (const [target, names] of moveTargets) {
             if (names.includes(name)) {
               if (!groups.has(target)) groups.set(target, []);
               groups.get(target)!.push(spec);
