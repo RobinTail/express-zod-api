@@ -1,3 +1,5 @@
+/** @fileOverview The entrypoint for generating OpenAPI Documentation */
+export type { Depicter } from "./documentation-helpers";
 import {
   type InfoObject,
   type OperationObject,
@@ -297,5 +299,3 @@ export class Documentation extends OpenApiBuilder {
     walkRouting({ ...rest, onEndpoint });
   }
 }
-
-export type { Depicter } from "./documentation-helpers";

@@ -1,3 +1,8 @@
+/**
+ * @fileOverview The entrypoint for generating Integration code
+ * @requires typescript
+ * */
+export type { Producer } from "./zts-helpers";
 import * as R from "ramda";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
@@ -246,5 +251,3 @@ export class Integration extends IntegrationBase {
     return format ? format(output) : output;
   }
 }
-
-export type { Producer } from "./zts-helpers";
