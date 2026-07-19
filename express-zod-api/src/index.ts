@@ -40,7 +40,7 @@ export type { CacheControl, CachePolicy } from "./cache-middleware";
 export type { Routing } from "./routing";
 export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
-export type { IOSchema, FinalInputSchema } from "./io-schema";
+export type { IOSchema } from "./io-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
 export type { ApiResponse } from "./api-response";
 export type {
@@ -52,4 +52,3 @@ export type {
   OAuth2Security,
   OpenIdSecurity,
 } from "./security";
-export type { Endpoint } from "./endpoint";

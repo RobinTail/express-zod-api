@@ -39,6 +39,10 @@
     "./documentation": {
       "types": "./dist/documentation.d.ts",
       "default": "./dist/documentation.js"
+    },
+    "./dist/*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
     }
   },
   "files": [
