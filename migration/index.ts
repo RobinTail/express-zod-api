@@ -4,7 +4,12 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
-import { queryNamedProp, type NamedProp, getPropName } from "./helpers.ts";
+import {
+  queryNamedProp,
+  type NamedProp,
+  getPropName,
+  removeProp,
+} from "./helpers.ts";
 
 interface Queries {
   integrationCreate: TSESTree.CallExpression;
@@ -280,19 +285,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           },
         });
       },
-      integrationNewTypescript: (node) =>
-        ctx.report({
-          node,
-          messageId: "remove",
-          data: { subject: "typescript option" },
-          fix: (fixer) => {
-            const next = ctx.sourceCode.getTokenAfter(node);
-            return fixer.removeRange([
-              node.range[0],
-              next?.value === "," ? next.range[1] : node.range[1],
-            ]);
-          },
-        }),
+      integrationNewTypescript: (node) => removeProp({ ctx, node }),
     }),
 });
 

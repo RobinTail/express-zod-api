@@ -378,7 +378,7 @@ describe("Migration", async () => {
         errors: [
           {
             messageId: "remove",
-            data: { subject: "typescript option" },
+            data: { subject: "typescript property" },
           },
         ],
       },
@@ -389,7 +389,7 @@ describe("Migration", async () => {
         errors: [
           {
             messageId: "remove",
-            data: { subject: "typescript option" },
+            data: { subject: "typescript property" },
           },
         ],
       },
