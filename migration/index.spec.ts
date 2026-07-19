@@ -44,7 +44,6 @@ describe("Migration", async () => {
       `import { createServer } from "express-zod-api"`,
       `import { Integration } from "express-zod-api/integration"`,
       `import { Documentation } from "express-zod-api/documentation"`,
-      // integrationNewTypescript
       // corsConfig
       `createConfig({ cors: true })`,
       `createConfig({ cors: someHandler })`,
