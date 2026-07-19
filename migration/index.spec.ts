@@ -374,7 +374,7 @@ describe("Migration", async () => {
       {
         name: "remove typescript option from Integration constructor",
         code: `new Integration({ typescript: ts, routing, config })`,
-        output: `new Integration({ routing, config })`,
+        output: `new Integration({  routing, config })`,
         errors: [
           {
             messageId: "remove",
@@ -385,7 +385,7 @@ describe("Migration", async () => {
       {
         name: "remove typescript option as the only property",
         code: `new Integration({ typescript: ts })`,
-        output: `new Integration({})`,
+        output: `new Integration({  })`,
         errors: [
           {
             messageId: "remove",

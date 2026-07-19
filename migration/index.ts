@@ -13,7 +13,7 @@ interface Queries {
   documentationConfig: TSESTree.ObjectExpression;
   corsConfig: NamedProp;
   expressZodApiImport: TSESTree.ImportDeclaration;
-  integrationNewTypescript: TSESTree.ObjectExpression;
+  integrationNewTypescript: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -43,7 +43,8 @@ const queries: Record<Listener, string> = {
   expressZodApiImport: `${NT.ImportDeclaration}[source.value="express-zod-api"]`,
   integrationNewTypescript:
     `${NT.NewExpression}[callee.name="Integration"] > ` +
-    `${NT.ObjectExpression}`,
+    `${NT.ObjectExpression} > ` +
+    queryNamedProp("typescript"),
 };
 
 const listen = <
@@ -280,25 +281,16 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       integrationNewTypescript: (node) => {
-        const typescriptProp = node.properties.find(
-          (p) =>
-            p.type === NT.Property &&
-            p.key.type === NT.Identifier &&
-            p.key.name === "typescript",
-        );
-        if (!typescriptProp) return;
         ctx.report({
           node,
           messageId: "remove",
           data: { subject: "typescript option" },
           fix: (fixer) => {
-            const remaining = node.properties.filter(
-              (p) => p !== typescriptProp,
-            );
-            const newText = remaining.length
-              ? `{ ${remaining.map((p) => ctx.sourceCode.getText(p)).join(", ")} }`
-              : "{}";
-            return fixer.replaceText(node, newText);
+            const next = ctx.sourceCode.getTokenAfter(node);
+            return fixer.removeRange([
+              node.range[0],
+              next?.value === "," ? next.range[1] : node.range[1],
+            ]);
           },
         });
       },
