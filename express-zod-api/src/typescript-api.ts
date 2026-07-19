@@ -51,7 +51,7 @@ export const literally = <T extends string | null | boolean | number | bigint>(s
       : typeof subj === "boolean" ? subj ? f.createTrue() : f.createFalse()
         : subj === null ? f.createNull() : f.createStringLiteral(subj)
 ) as T extends string ? ts.StringLiteral : T extends number ? ts.NumericLiteral
-  : T extends boolean ? ts.BooleanLiteral : ts.NullLiteral;
+  : T extends boolean ? ts.BooleanLiteral : T extends bigint ? ts.BigIntLiteral : ts.NullLiteral;
 /* eslint-enable prettier/prettier */
 
 export const makeId = (name: string) => f.createIdentifier(name);
