@@ -13,7 +13,7 @@ interface Queries {
   documentationConfig: TSESTree.ObjectExpression;
   corsConfig: NamedProp;
   expressZodApiImport: TSESTree.ImportDeclaration;
-  integrationNewTypescript: TSESTree.NewExpression;
+  integrationNewTypescript: TSESTree.ObjectExpression;
 }
 
 type Listener = keyof Queries;
@@ -41,7 +41,9 @@ const queries: Record<Listener, string> = {
     `${NT.ObjectExpression} > ` +
     queryNamedProp("cors"),
   expressZodApiImport: `${NT.ImportDeclaration}[source.value="express-zod-api"]`,
-  integrationNewTypescript: `${NT.NewExpression}[callee.name="Integration"]`,
+  integrationNewTypescript:
+    `${NT.NewExpression}[callee.name="Integration"] > ` +
+    `${NT.ObjectExpression}`,
 };
 
 const listen = <
@@ -278,9 +280,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       integrationNewTypescript: (node) => {
-        const arg = node.arguments[0];
-        if (!arg || arg.type !== NT.ObjectExpression) return;
-        const typescriptProp = arg.properties.find(
+        const typescriptProp = node.properties.find(
           (p) =>
             p.type === NT.Property &&
             p.key.type === NT.Identifier &&
@@ -292,13 +292,13 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           messageId: "remove",
           data: { subject: "typescript option" },
           fix: (fixer) => {
-            const remaining = arg.properties.filter(
+            const remaining = node.properties.filter(
               (p) => p !== typescriptProp,
             );
             const newText = remaining.length
               ? `{ ${remaining.map((p) => ctx.sourceCode.getText(p)).join(", ")} }`
               : "{}";
-            return fixer.replaceText(arg, newText);
+            return fixer.replaceText(node, newText);
           },
         });
       },
