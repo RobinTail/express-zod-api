@@ -280,7 +280,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           },
         });
       },
-      integrationNewTypescript: (node) => {
+      integrationNewTypescript: (node) =>
         ctx.report({
           node,
           messageId: "remove",
@@ -292,8 +292,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               next?.value === "," ? next.range[1] : node.range[1],
             ]);
           },
-        });
-      },
+        }),
     }),
 });
 
