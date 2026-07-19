@@ -2,11 +2,10 @@ import ts from "typescript";
 import { globalRegistry, z } from "zod";
 import {
   EndpointsFactory,
-  Integration,
   defaultEndpointsFactory,
   ResultHandler,
-  type Producer,
 } from "../src";
+import { Integration, type Producer } from "../src/integration";
 import { brandProperty } from "../src/metadata";
 
 describe("Integration", () => {
@@ -28,7 +27,6 @@ describe("Integration", () => {
     "Should support types variant and handle recursive schemas %#",
     (recursiveSchema) => {
       const client = new Integration({
-        typescript: ts,
         variant: "types",
         config: configMock,
         routing: {
@@ -163,5 +161,11 @@ describe("Integration", () => {
       });
       expect(await client.printFormatted()).toMatchSnapshot();
     });
+  });
+
+  test("Producer type should be satisfied", () => {
+    expectTypeOf(() =>
+      ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+    ).toExtend<Producer>();
   });
 });

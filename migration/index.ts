@@ -4,7 +4,12 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
-import { queryNamedProp, type NamedProp, getPropName } from "./helpers.ts";
+import {
+  queryNamedProp,
+  type NamedProp,
+  getPropName,
+  removeProp,
+} from "./helpers.ts";
 
 interface Queries {
   integrationCreate: TSESTree.CallExpression;
@@ -12,6 +17,8 @@ interface Queries {
   asyncLifecycleHook: NamedProp;
   documentationConfig: TSESTree.ObjectExpression;
   corsConfig: NamedProp;
+  expressZodApiImport: TSESTree.ImportDeclaration;
+  integrationNewTypescript: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -38,6 +45,11 @@ const queries: Record<Listener, string> = {
     `${NT.CallExpression}[callee.name="createConfig"] > ` +
     `${NT.ObjectExpression} > ` +
     queryNamedProp("cors"),
+  expressZodApiImport: `${NT.ImportDeclaration}[source.value="express-zod-api"]`,
+  integrationNewTypescript:
+    `${NT.NewExpression}[callee.name="Integration"] > ` +
+    `${NT.ObjectExpression} > ` +
+    queryNamedProp("typescript"),
 };
 
 const listen = <
@@ -52,6 +64,11 @@ const listen = <
       }),
     {},
   );
+
+const moveTargets = new Map<string, string[]>([
+  ["express-zod-api/integration", ["Integration", "Producer"]],
+  ["express-zod-api/documentation", ["Documentation", "Depicter"]],
+]);
 
 const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0]}`;
 
@@ -213,6 +230,63 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           fix: (fixer) => fixer.replaceText(node, newText),
         });
       },
+      expressZodApiImport: (node) => {
+        const groups = new Map<string, TSESTree.ImportSpecifier[]>();
+        const remaining: TSESTree.ImportSpecifier[] = [];
+        const nonNamed: TSESTree.ImportDeclaration["specifiers"] = [];
+        for (const spec of node.specifiers) {
+          if (spec.type !== NT.ImportSpecifier) {
+            nonNamed.push(spec);
+            continue;
+          }
+          const name =
+            spec.imported.type === NT.Identifier
+              ? spec.imported.name
+              : spec.imported.value;
+          let found = false;
+          for (const [target, names] of moveTargets) {
+            if (names.includes(name)) {
+              if (!groups.has(target)) groups.set(target, []);
+              groups.get(target)!.push(spec);
+              found = true;
+              break;
+            }
+          }
+          if (!found) remaining.push(spec);
+        }
+        if (groups.size === 0) return;
+        const importKind = node.importKind === "type" ? "type " : "";
+        const first = groups.entries().next().value!;
+        const firstName =
+          first[1][0]!.imported.type === NT.Identifier
+            ? first[1][0]!.imported.name
+            : first[1][0]!.imported.value;
+        ctx.report({
+          node,
+          messageId: "move",
+          data: { subject: firstName, to: first[0] },
+          fix: (fixer) => {
+            const parts: string[] = [];
+            const allMain = [...nonNamed, ...remaining];
+            if (allMain.length > 0) {
+              const text = allMain
+                .map((s) => ctx.sourceCode.getText(s))
+                .join(", ");
+              parts.push(
+                `import ${importKind}{ ${text} } from "express-zod-api"`,
+              );
+            }
+            for (const [target, specs] of groups) {
+              const text = specs
+                .map((s) => ctx.sourceCode.getText(s))
+                .join(", ");
+              parts.push(`import ${importKind}{ ${text} } from "${target}"`);
+            }
+            return fixer.replaceText(node, parts.join("\n"));
+          },
+        });
+      },
+      integrationNewTypescript: (node) => removeProp({ ctx, node }),
     }),
 });
 

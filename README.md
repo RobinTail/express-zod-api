@@ -1213,7 +1213,7 @@ safety between your API and frontend. Make sure you have `typescript` installed.
 and using the async `printFormatted()` method.
 
 ```ts
-import { Integration } from "express-zod-api";
+import { Integration } from "express-zod-api/integration";
 
 const client = new Integration({
   routing,
@@ -1243,7 +1243,7 @@ new Subscription("get /v1/events/stream", {}).on("time", (time) => {}); // Serve
 You can generate the specification of your API and write it to a `.yaml` file, that can be used as the documentation:
 
 ```ts
-import { Documentation } from "express-zod-api";
+import { Documentation } from "express-zod-api/documentation";
 
 const yamlString = new Documentation({
   routing, // the same routing and config that you use to start the server
@@ -1287,7 +1287,8 @@ endpoints is available for that purpose. In order to establish the constraints o
 should be declared as keys of `TagOverrides` interface. Consider the following example:
 
 ```ts
-import { defaultEndpointsFactory, Documentation } from "express-zod-api";
+import { defaultEndpointsFactory } from "express-zod-api";
+import { Documentation } from "express-zod-api/documentation";
 
 // Add similar declaration once, somewhere in your code, preferably near config
 declare module "express-zod-api" {
@@ -1346,12 +1347,8 @@ handling rule for multiple brands, use the exposed types `Depicter` and `Produce
 ```ts
 import ts from "typescript";
 import { z } from "zod";
-import {
-  Documentation,
-  Integration,
-  Depicter,
-  Producer,
-} from "express-zod-api";
+import { Documentation, type Depicter } from "express-zod-api/documentation";
+import { Integration, type Producer } from "express-zod-api/integration";
 
 const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
 const myBrandedSchema = z.string().xBrand(myBrand); // requires Zod Plugin, or .meta({ "x-brand": myBrand })

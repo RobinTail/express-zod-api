@@ -1,18 +1,16 @@
 import ts from "typescript";
 import { z } from "zod";
 import { ez } from "../src";
-import { TypescriptAPI } from "../src/typescript-api";
+import { printNode } from "../src/typescript-api";
 import { zodToTs } from "../src/zts";
 import type { ZTSContext } from "../src/zts-helpers";
 
 describe("zod-to-ts", () => {
-  const api = new TypescriptAPI(ts);
   const printNodeTest = (node: ts.Node) =>
-    api.printNode(node, { newLine: ts.NewLineKind.LineFeed });
+    printNode(node, { newLine: ts.NewLineKind.LineFeed });
   const ctx: ZTSContext = {
     isResponse: false,
-    makeAlias: vi.fn(() => api.f.createTypeReferenceNode("SomeType")),
-    api,
+    makeAlias: vi.fn(() => ts.factory.createTypeReferenceNode("SomeType")),
   };
 
   describe("z.array()", () => {

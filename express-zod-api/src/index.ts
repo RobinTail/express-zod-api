@@ -18,7 +18,6 @@ export {
 } from "./result-handler";
 export { ServeStatic } from "./serve-static";
 export { createServer, attachRouting } from "./server";
-export { Documentation } from "./documentation";
 export {
   DocumentationError,
   RoutingError,
@@ -27,14 +26,9 @@ export {
   MissingPeerError,
 } from "./errors";
 export { testEndpoint, testMiddleware } from "./testing";
-export { Integration } from "./integration";
 export { EventStreamFactory } from "./sse";
 
 export { ez } from "./proprietary-schemas";
-
-// Convenience types
-export type { Depicter } from "./documentation-helpers";
-export type { Producer } from "./zts-helpers";
 
 // Interfaces exposed for augmentation
 export type { LoggerOverrides } from "./logger-helpers";
