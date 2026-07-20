@@ -1,5 +1,6 @@
 import {
   type ApiResponse,
+  createApiResponse,
   defaultStatusCodes,
   responseVariants,
 } from "../src/api-response";
@@ -19,6 +20,23 @@ describe("ApiResponse", () => {
   describe("responseVariants", () => {
     test("should consist of positive and negative", () => {
       expect(responseVariants).toMatchSnapshot();
+    });
+  });
+
+  describe("createApiResponse()", () => {
+    test("should accept schema", () => {
+      const schema = z.string();
+      expect(createApiResponse(schema)).toEqual({ schema });
+      expectTypeOf(createApiResponse(schema)).toEqualTypeOf<
+        ApiResponse<z.ZodString>
+      >();
+    });
+    test("should accept ApiResponse", () => {
+      const response = { schema: z.string(), statusCode: 204 };
+      expect(createApiResponse(response)).toEqual(response);
+      expectTypeOf(createApiResponse(response)).toEqualTypeOf<
+        ApiResponse<z.ZodString>
+      >();
     });
   });
 });

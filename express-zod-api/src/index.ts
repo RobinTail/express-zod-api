@@ -16,6 +16,7 @@ export {
   defaultResultHandler,
   arrayResultHandler,
 } from "./result-handler";
+export { createApiResponse } from "./api-response";
 export { ServeStatic } from "./serve-static";
 export { createServer, attachRouting } from "./server";
 export {
