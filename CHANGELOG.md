@@ -10,7 +10,7 @@
   - `Integration` and `Producer` type moved to the `express-zod-api/integration` subpath;
   - Several types and interfaces are no longer exposed:
     - `CommonConfig`, `AppConfig`, `ServerConfig` — use `createConfig()` instead;
-    - `ApiResponse` — use `createApiResponse()` instead (previously removed in v9.0.0);
+    - `ApiResponse` — use `createApiResponse()` instead (new);
     - `CacheControl` and `CachePolicy` — use `createCacheMiddleware()` or `EndpointsFactory::useCacheMiddleware()`;
     - `FlatObject`, `IOSchema` and every type ending with `Security`;
     - The public nature of these types was a workaround for user-side type declarations, but it's solved differently.
