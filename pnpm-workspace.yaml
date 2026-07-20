@@ -36,7 +36,7 @@ catalogs:
     "express": "^5.2.1"
     "express-fileupload": "^1.5.2"
     "http-errors": "^2.0.1"
-    "typescript": "^6.0.2"
+    "typescript": "^7.0.0"
     "typescript-eslint": "^8.59.0"
     "zod": "^4.4.3"
 overrides:
