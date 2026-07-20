@@ -105,7 +105,7 @@ importers:
         version: 3.9.5
       tsdown:
         specifier: ^0.22.4
-        version: 0.22.6(@arethetypeswrong/core@0.18.5)(typescript@6.0.3)
+        version: 0.22.7(@arethetypeswrong/core@0.18.5)(typescript@6.0.3)
       typescript-eslint:
         specifier: catalog:dev
         version: 8.63.0(eslint@10.7.0)(typescript@6.0.3)
@@ -1823,14 +1823,14 @@ packages:
   ts-toolbelt@9.6.0:
     resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
 
-  tsdown@0.22.6:
-    resolution: {integrity: sha512-RIsCLvtGAV+41juswItHrHaEbgcXr9sL6DI55ZrzP1nxeak5qC9/q/LaWZR0PG0drxro13qxJwvFK2GaiFrT5w==}
+  tsdown@0.22.7:
+    resolution: {integrity: sha512-4egbOzc9dxVv/QS+gDV75FIxDIjQQeOnXBlUuikyjmn0ozuc6FW11djJjEEo3vqkuJRygpnKHurnj+Iwftk4VA==}
     engines: {node: ^22.18.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
       '@arethetypeswrong/core': ^0.18.1
-      '@tsdown/css': 0.22.6
-      '@tsdown/exe': 0.22.6
+      '@tsdown/css': 0.22.7
+      '@tsdown/exe': 0.22.7
       '@vitejs/devtools': '*'
       publint: ^0.3.8
       tsx: '*'
@@ -3551,7 +3551,7 @@ snapshots:
 
   ts-toolbelt@9.6.0: {}
 
-  tsdown@0.22.6(@arethetypeswrong/core@0.18.5)(typescript@6.0.3):
+  tsdown@0.22.7(@arethetypeswrong/core@0.18.5)(typescript@6.0.3):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0
