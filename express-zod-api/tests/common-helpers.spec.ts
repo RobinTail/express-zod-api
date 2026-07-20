@@ -12,6 +12,7 @@ import {
   emptySchema,
   type EmptySchema,
   type EmptyObject,
+  type FlatObject,
 } from "../src/common-helpers";
 import { z } from "zod";
 import { makeRequestMock } from "../src/testing";
@@ -34,6 +35,12 @@ describe("Common Helpers", () => {
   describe("EmptyObject", () => {
     test("should be a Record of never", () => {
       expectTypeOf<EmptyObject>().toEqualTypeOf<Record<string, never>>();
+    });
+  });
+
+  describe("FlatObject", () => {
+    test("type should satisfy", () => {
+      expectTypeOf({}).toExtend<FlatObject>();
     });
   });
 

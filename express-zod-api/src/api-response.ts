@@ -30,6 +30,21 @@ export interface ApiResponse<S extends z.ZodType> {
   mimeType?: string | [string, ...string[]] | null;
 }
 
+/** @desc Creates an ApiResponse from a schema */
+export function createApiResponse<S extends z.ZodType>(
+  schema: S,
+): ApiResponse<S>;
+/** @desc Convenience method for asserting ApiResponse */
+export function createApiResponse<S extends z.ZodType>(
+  response: ApiResponse<S>,
+): ApiResponse<S>;
+export function createApiResponse<S extends z.ZodType>(
+  subject: S | ApiResponse<S>,
+) {
+  if (subject instanceof z.ZodType) return { schema: subject };
+  return subject;
+}
+
 /**
  * @private This is what the framework entities operate internally.
  * @see normalize

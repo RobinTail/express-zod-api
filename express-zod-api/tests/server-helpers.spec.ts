@@ -14,7 +14,8 @@ import {
   installTerminationListener,
   localsID,
 } from "../src/server-helpers";
-import { defaultResultHandler, ResultHandler, type CommonConfig } from "../src";
+import { defaultResultHandler, ResultHandler } from "../src";
+import type { CommonConfig } from "../src/config-type";
 import type { Request } from "express";
 import {
   makeLoggerMock,

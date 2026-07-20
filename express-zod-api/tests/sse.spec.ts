@@ -6,8 +6,8 @@ import {
   testMiddleware,
   EventStreamFactory,
   EndpointsFactory,
-  type FlatObject,
 } from "../src";
+import type { FlatObject } from "../src/common-helpers";
 import {
   type Emitter,
   ensureStream,
