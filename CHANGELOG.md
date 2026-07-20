@@ -34,9 +34,8 @@
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff
-- import { Integration, type Producer } from "express-zod-api";
+- import { Integration, Documentation, type Producer, type Depicter } from "express-zod-api";
 + import { Integration, type Producer } from "express-zod-api/integration";
-- import { Documentation, type Depicter } from "express-zod-api";
 + import { Documentation, type Depicter } from "express-zod-api/documentation";
 
   const config = createConfig({
