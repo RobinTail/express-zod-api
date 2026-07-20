@@ -5,6 +5,15 @@
 ### v29.0.0
 
 - Supported Node.js versions: `^22.19.0 || ^24.11.0 || ^26.0.0`;
+- Major changes to the package distribution:
+  - `Documentation` and `Depicter` type moved to the `express-zod-api/documentation` subpath;
+  - `Integration` and `Producer` type moved to the `express-zod-api/integration` subpath;
+  - Several types and interfaces are no longer exposed:
+    - `CommonConfig`, `AppConfig`, `ServerConfig` — use `createConfig()` instead;
+    - `ApiResponse` — use `createApiResponse()` instead (previously removed in v9.0.0);
+    - `CacheControl` and `CachePolicy` — use `createCacheMiddleware()` or `EndpointsFactory::useCacheMiddleware()`;
+    - `FlatObject`, `IOSchema` and every type ending with `Security`;
+    - The public nature of these types was a workaround for user-side type declarations, but it's solved differently.
 - Breaking change to the `cors` config option:
   - Changed from `boolean | HeadersProvider` to `boolean | RequestHandler`;
   - You can now use the well-known `cors` package or pass a conventional `RequestHandler` directly.
@@ -23,12 +32,10 @@
   - Default input sources for QUERY: `["query", "body", "params"]` (from the lowest priority to highest);
   - Supported by `Integration` and `Documentation` generators.
 - Changes to `Documentation`:
-  - Moved to the dedicated subpath `express-zod-api/documentation` along with `Depicter` type;
   - `serverUrl` constructor option renamed to `server` and now also accepts OpenAPI's ServerObject;
   - `title` option and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
   - Now produces OpenAPI 3.2.0 with better SSE support and other features.
 - Changes to `Integration`:
-  - Moved to the dedicated subpath `express-zod-api/integration` along with `Producer` type;
   - The static async method `create()` removed — use `new Integration()` instead;
   - Removed `typescript` option from constructor — now imported statically.
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
