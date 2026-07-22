@@ -6,7 +6,7 @@ export type { Producer } from "./zts-helpers";
 import * as R from "ramda";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
-import { IntegrationBase } from "./integration-base";
+import { IntegrationBase, interfaces } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
@@ -150,8 +150,8 @@ export class Integration extends IntegrationBase {
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
         response: makeUnion([
-          makeIndexed(this.interfaces.positive, literalIdx),
-          makeIndexed(this.interfaces.negative, literalIdx),
+          makeIndexed(interfaces.positive, literalIdx),
+          makeIndexed(interfaces.negative, literalIdx),
         ]),
         encoded: f.createIntersectionTypeNode([
           ensureTypeNode(dictionaries.positive.name),
