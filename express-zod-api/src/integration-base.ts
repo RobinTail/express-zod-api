@@ -51,7 +51,7 @@ type IOKind = "input" | "response" | ResponseVariant | "encoded";
 type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
 type Store = Record<IOKind, ts.TypeNode>;
 
-export const ids = {
+const ids = {
   pathType: "Path",
   implementationType: "Implementation",
   keyParameter: "key",
