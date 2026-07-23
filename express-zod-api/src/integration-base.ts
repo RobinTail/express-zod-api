@@ -74,8 +74,10 @@ export abstract class IntegrationBase {
    * @example export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
    * @internal
    * */
-  protected makeMethodType = () =>
-    `export type ${ids.Method} = ${quot(clientMethods).join(" | ")};`;
+  protected makeMethodType = () => {
+    const union = quot(clientMethods).join(" | ");
+    return `export type ${ids.Method} = ${union};`;
+  };
 
   /**
    * @example type SomeOf<T> = T[keyof T];
@@ -100,62 +102,75 @@ export abstract class IntegrationBase {
    * @example export type Path = "/v1/user/retrieve" | ___;
    * @internal
    * */
-  protected makePathType = () =>
-    `export type ${ids.Path} = ${quot(this.paths).join(" | ")};`;
+  protected makePathType = () => {
+    const union = quot(this.paths).join(" | ");
+    return `export type ${ids.Path} = ${union};`;
+  };
 
   /**
    * @example export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
    * @internal
    * */
   protected makePublicInterfaces = () =>
-    (Object.keys(interfaces) as IOKind[]).map(
-      (kind) =>
-        `export interface ${interfaces[kind]} {\n` +
-        Array.from(this.registry)
-          .map(
-            ([request, { store, isDeprecated }]) =>
-              `  ${isDeprecated ? "/** @deprecated */\n  " : ""}"${request}": ${store[kind]};`,
-          )
-          .join("\n") +
-        `\n}`,
-    );
+    (Object.keys(interfaces) as IOKind[]).map((kind) => {
+      const props = Array.from(this.registry)
+        .map(
+          ([request, { store, isDeprecated }]) =>
+            `  ${isDeprecated ? "/** @deprecated */\n  " : ""}"${request}": ${store[kind]};`,
+        )
+        .join("\n");
+      return `export interface ${interfaces[kind]} {\n${props}\n}`;
+    });
 
   /**
    * @example export const endpointTags = { "get /v1/user/retrieve": ["users"] }
    * @internal
    * */
-  protected makeEndpointTags = () =>
-    `export const endpointTags = {\n` +
-    Array.from(this.tags)
+  protected makeEndpointTags = () => {
+    const props = Array.from(this.tags)
       .map(([request, tags]) => `  "${request}": [${quot(tags).join(", ")}]`)
-      .join(",\n") +
-    `}`;
+      .join(",\n");
+    return `export const endpointTags = {\n${props}\n}`;
+  };
 
   /**
    * @example export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
    * @internal
    * */
-  protected makeImplementationType = () =>
-    `export type ${ids.Implementation}<T = unknown> = (${ids.method}: ${ids.Method}, ${ids.path}: string, ${ids.params}: Record<string, any>, ${ids.ctx}?: T) => Promise<any>;`;
+  protected makeImplementationType = () => {
+    const args = [
+      `${ids.method}: ${ids.Method}`,
+      `${ids.path}: string`,
+      `${ids.params}: Record<string, any>`,
+      `${ids.ctx}?: T`,
+    ].join(",");
+    return `export type ${ids.Implementation}<T = unknown> = (${args}) => Promise<any>;`;
+  };
 
   /**
    * @example const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
    * @internal
    * @desc split once, excludes the third empty element
    * */
-  protected makeParseRequestFn = () =>
-    `const ${ids.parseRequest} = (${ids.request}: string) => ${ids.request}.${propOf<string>("split")}(/ (.+)/, 2) as [${ids.Method}, ${ids.Path}];`;
+  protected makeParseRequestFn = () => {
+    const args = `${ids.request}: string`;
+    const tuple = `[${ids.Method}, ${ids.Path}]`;
+    const implementation = `${ids.request}.${propOf<string>("split")}(/ (.+)/, 2) as ${tuple}`;
+    return `const ${ids.parseRequest} = (${args}) => ${implementation};`;
+  };
 
   /**
    * @example const substitute = (path: string, params: Record<string, any>) => { ___ return [path, rest] as const; }
    * @internal
    * */
-  protected makeSubstituteFn = () =>
-    [
-      `const ${ids.substitute} = (${ids.path}: string, ${ids.params}: Record<string, any>) => {\n`,
+  protected makeSubstituteFn = () => {
+    const args = `${ids.path}: string, ${ids.params}: Record<string, any>`;
+    const placeholder = `\`:\${${ids.key}}\``;
+    return [
+      `const ${ids.substitute} = (${args}) => {\n`,
       `  const ${ids.rest} = { ...${ids.params} };`,
       `  for (const ${ids.key} in ${ids.params}) {`,
-      `    ${ids.path} = ${ids.path}.${propOf<string>("replace")}(\`:\${${ids.key}}\`, () => {`,
+      `    ${ids.path} = ${ids.path}.${propOf<string>("replace")}(${placeholder}, () => {`,
       `      delete ${ids.rest}[${ids.key}];`,
       `      return ${ids.params}[${ids.key}];`,
       `    });`,
@@ -163,6 +178,7 @@ export abstract class IntegrationBase {
       `  return [${ids.path}, ${ids.rest}] as const;`,
       `}`,
     ].join("\n");
+  };
 
   /**
    * @example { nextCursor: string | null } | { total, limit, offset: number }
@@ -175,7 +191,9 @@ export abstract class IntegrationBase {
     const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
     const offsetProp =
       propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
-    return `type ${ids.Pagination} = { ${nextCursorProp}: string | null } | { ${totalProp}: number; ${limitProp}: number; ${offsetProp}: number }`;
+    const cursorVariant = `{ ${nextCursorProp}: string | null }`;
+    const offsetVariant = `{ ${totalProp}: number; ${limitProp}: number; ${offsetProp}: number }`;
+    return `type ${ids.Pagination} = ${cursorVariant} | ${offsetVariant}`;
   };
 
   /**
@@ -189,6 +207,7 @@ export abstract class IntegrationBase {
       propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
     const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
     const totalProp = propOf<OffsetPaginatedResult["output"]["shape"]>("total");
+    const callArgs = `${ids.method}, ...${ids.substitute}(${ids.path}, ${ids.params}), ${ids.ctx}`;
     return [
       `export class ${name}<T> {`,
       `  public constructor(`,
@@ -200,7 +219,7 @@ export abstract class IntegrationBase {
       `    ${ids.ctx}?: T,`,
       `  ): Promise<${interfaces.response}[K]> {`,
       `    const [${ids.method}, ${ids.path}] = ${ids.parseRequest}(${ids.request});`,
-      `    return this.${ids.implementation}(${ids.method}, ...${ids.substitute}(${ids.path}, ${ids.params}), ${ids.ctx});`,
+      `    return this.${ids.implementation}(${callArgs});`,
       `  }`,
       `  public static hasMore(${ids.response}: ${ids.Pagination}): boolean {`,
       `    if ("${nextCursorProp}" in ${ids.response}) return ${ids.response}.${nextCursorProp} !== null;`,
@@ -215,22 +234,32 @@ export abstract class IntegrationBase {
    * @internal
    * */
   protected makeDefaultImplementation = () => {
+    const args = `${ids.method}, ${ids.path}, ${ids.params}`;
+    const noBodyMethods = quot([
+      "get",
+      "head",
+      "delete",
+    ] satisfies ClientMethod[]).join(", ");
+    const headers = `${ids.hasBody} ? { "Content-Type": "${contentTypes.json}" } : ${ids.undefined}`;
+    const body = `${ids.hasBody} ? JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
+    const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
+    const parser = `${ids.isJSON} ? "${propOf<Response>("json")}" : "${propOf<Response>("text")}"`;
     return [
-      `const ${ids.defaultImplementation}: ${ids.Implementation} = async (${ids.method}, ${ids.path}, ${ids.params}) => {`,
-      `  const ${ids.hasBody} = ![${quot(["get", "head", "delete"] satisfies ClientMethod[]).join(", ")}].includes(${ids.method});`,
+      `const ${ids.defaultImplementation}: ${ids.Implementation} = async (${args}) => {`,
+      `  const ${ids.hasBody} = ![${noBodyMethods}].includes(${ids.method});`,
       `  const ${ids.searchParams} = ${ids.hasBody} ? "" : \`?\${new ${URLSearchParams.name}(${ids.params})}\`;`,
       `  const ${ids.response} = await ${fetch.name}(`,
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
       `    {`,
       `      ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
-      `      ${propOf<RequestInit>("headers")}: ${ids.hasBody} ? { "Content-Type": "${contentTypes.json}" } : ${ids.undefined},`,
-      `      ${propOf<RequestInit>("body")}: ${ids.hasBody} ? JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined},`,
+      `      ${propOf<RequestInit>("headers")}: ${headers},`,
+      `      ${propOf<RequestInit>("body")}: ${body},`,
       `    },`,
       `  );`,
-      `  const ${ids.contentType} = ${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type");`,
+      `  const ${ids.contentType} = ${contentType};`,
       `  if (!${ids.contentType}) return;`,
       `  const ${ids.isJSON} = ${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}");`,
-      `  return ${ids.response}[${ids.isJSON} ? "${propOf<Response>("json")}" : "${propOf<Response>("text")}"]();`,
+      `  return ${ids.response}[${parser}]();`,
       `};`,
     ].join("\n");
   };
@@ -240,6 +269,9 @@ export abstract class IntegrationBase {
    * @internal
    * */
   protected makeSubscriptionClass = (name: string) => {
+    const substitution = `${ids.substitute}(${ids.parseRequest}(${ids.request})[1], ${ids.params})`;
+    const dataType = `Extract<R, { ${propOf<SSEShape>("event")}: E }>["${propOf<SSEShape>("data")}"]`;
+    const data = `(${ids.msg} as ${MessageEvent.name}).${propOf<SSEShape>("data")}`;
     return [
       `export class ${name}<`,
       `  K extends Extract<${ids.Request}, \`get \${string}\`>,`,
@@ -247,7 +279,7 @@ export abstract class IntegrationBase {
       `> {`,
       `  public ${ids.source}: EventSource;`,
       `  public constructor(${ids.request}: K, ${ids.params}: ${interfaces.input}[K]) {`,
-      `    const [${ids.path}, ${ids.rest}] = ${ids.substitute}(${ids.parseRequest}(${ids.request})[1], ${ids.params});`,
+      `    const [${ids.path}, ${ids.rest}] = ${substitution};`,
       `    const ${ids.searchParams} = \`?\${new ${URLSearchParams.name}(${ids.rest})}\`;`,
       `    this.${ids.source} = new EventSource(`,
       `      new URL(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
@@ -255,10 +287,10 @@ export abstract class IntegrationBase {
       `  }`,
       `  public ${ids.on}<E extends R["${propOf<SSEShape>("event")}"]>(`,
       `    ${propOf<SSEShape>("event")}: E,`,
-      `    ${ids.handler}: (${ids.data}: Extract<R, { ${propOf<SSEShape>("event")}: E }>["${propOf<SSEShape>("data")}"]) => void | Promise<void>,`,
+      `    ${ids.handler}: (${ids.data}: ${dataType}) => void | Promise<void>,`,
       `  ) {`,
       `    this.${ids.source}.${propOf<EventSource>("addEventListener")}(${ids.event}, (${ids.msg}) =>`,
-      `      ${ids.handler}(JSON.${propOf<JSON>("parse")}((${ids.msg} as ${MessageEvent.name}).${propOf<SSEShape>("data")})),`,
+      `      ${ids.handler}(JSON.${propOf<JSON>("parse")}(${data})),`,
       `    );`,
       `    return this;`,
       `  }`,
