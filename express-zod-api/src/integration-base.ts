@@ -144,7 +144,7 @@ export abstract class IntegrationBase {
    * @desc split once, excludes the third empty element
    * */
   protected makeParseRequestFn = () =>
-    `const ${ids.parseRequest} = (${ids.request}: string) => ${ids.request}.${String.prototype.split.name}(/ (.+)/, 2) as [${ids.Method}, ${ids.Path}];`;
+    `const ${ids.parseRequest} = (${ids.request}: string) => ${ids.request}.${propOf<string>("split")}(/ (.+)/, 2) as [${ids.Method}, ${ids.Path}];`;
 
   /**
    * @example const substitute = (path: string, params: Record<string, any>) => { ___ return [path, rest] as const; }
@@ -155,7 +155,7 @@ export abstract class IntegrationBase {
       `const ${ids.substitute} = (${ids.path}: string, ${ids.params}: Record<string, any>) => {\n`,
       `  const ${ids.rest} = { ...${ids.params} };`,
       `  for (const ${ids.key} in ${ids.params}) {`,
-      `    ${ids.path} = ${ids.path}.${String.prototype.replace.name}(\`:\${${ids.key}}\`, () => {`,
+      `    ${ids.path} = ${ids.path}.${propOf<string>("replace")}(\`:\${${ids.key}}\`, () => {`,
       `      delete ${ids.rest}[${ids.key}];`,
       `      return ${ids.params}[${ids.key}];`,
       `    });`,
@@ -222,14 +222,14 @@ export abstract class IntegrationBase {
       `  const ${ids.response} = await ${fetch.name}(`,
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
       `    {`,
-      `      ${propOf<RequestInit>("method")}: ${ids.method}.${String.prototype.toUpperCase.name}(),`,
+      `      ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
       `      ${propOf<RequestInit>("headers")}: ${ids.hasBody} ? { "Content-Type": "${contentTypes.json}" } : ${ids.undefined},`,
       `      ${propOf<RequestInit>("body")}: ${ids.hasBody} ? JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined},`,
       `    },`,
       `  );`,
       `  const ${ids.contentType} = ${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type");`,
       `  if (!${ids.contentType}) return;`,
-      `  const ${ids.isJSON} = ${ids.contentType}.${String.prototype.startsWith.name}("${contentTypes.json}");`,
+      `  const ${ids.isJSON} = ${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}");`,
       `  return ${ids.response}[${ids.isJSON} ? "${propOf<Response>("json")}" : "${propOf<Response>("text")}"]();`,
       `};`,
     ].join("\n");
