@@ -818,5 +818,4 @@ export class Subscription<
 const client = new Client();
 client.provide("get /v1/user/retrieve", { id: "10" });
 new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
-
 */

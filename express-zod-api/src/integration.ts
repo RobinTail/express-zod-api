@@ -187,20 +187,11 @@ export class Integration extends IntegrationBase {
     );
   }
 
-  #resolveProgram(printerOptions?: ts.PrinterOptions) {
-    return this.#program.map((entry) =>
-      typeof entry === "string" ? entry : entry(printerOptions),
-    );
-  }
-
-  #printUsage() {
-    return this.#usage;
-  }
-
   public print(printerOptions?: ts.PrinterOptions) {
-    const parts = this.#resolveProgram(printerOptions);
-    const usageText = this.#printUsage();
-    if (usageText) parts.push(`// Usage example:\n/*\n${usageText}\n*/`);
+    const parts = this.#program.map((entry) =>
+      typeof entry === "function" ? entry(printerOptions) : entry,
+    );
+    if (this.#usage) parts.push(`// Usage example:\n/*\n${this.#usage}*/`);
     return parts.join("\n\n");
   }
 
