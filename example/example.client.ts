@@ -1,14 +1,14 @@
-type Type1 = {
-  title: string;
-  features?: Type1[] | undefined;
-};
-
 type SomeOf<T> = T[keyof T];
 
 /** get /v1/user/retrieve */
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
+};
+
+type Type1 = {
+  title: string;
+  features?: Type1[] | undefined;
 };
 
 /** get /v1/user/retrieve */
@@ -752,14 +752,8 @@ export type Implementation<T = unknown> = (
 ) => Promise<any>;
 
 type Pagination =
-  | {
-      nextCursor: string | null;
-    }
-  | {
-      total: number;
-      limit: number;
-      offset: number;
-    };
+  | { nextCursor: string | null }
+  | { total: number; limit: number; offset: number };
 
 const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "head", "delete"].includes(method);
