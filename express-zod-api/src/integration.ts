@@ -3,22 +3,13 @@
  * @requires typescript
  * */
 export type { Producer } from "./zts-helpers";
-import * as R from "ramda";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
 import { IntegrationBase, interfaces } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
-import {
-  ensureTypeNode,
-  makeInterface,
-  makeInterfaceProp,
-  makeLiteralType,
-  makeType,
-  printNode,
-  ts,
-} from "./typescript-api";
+import { ensureTypeNode, printNode, ts } from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
@@ -77,21 +68,20 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> = [
-    this.makeSomeOfType(),
-  ];
-  readonly #aliases = new Map<object, ts.TypeAliasDeclaration>();
+  readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
+    [];
+  readonly #aliasNames = new Map<object, string>();
   #usage?: string;
 
   #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
-    let name = this.#aliases.get(key)?.name?.text;
+    let name = this.#aliasNames.get(key);
     if (!name) {
-      name = `Type${this.#aliases.size + 1}`;
-      const temp = makeLiteralType(null);
-      this.#aliases.set(key, makeType(name, temp));
-      const value = makeType(name, produce());
-      this.#aliases.set(key, value);
-      this.#program.push((opts) => printNode(value, opts));
+      name = `Type${this.#aliasNames.size + 1}`;
+      this.#aliasNames.set(key, name);
+      const typeNode = produce();
+      this.#program.push(
+        (opts) => `type ${name} = ${printNode(typeNode, opts)};`,
+      );
     }
     return ensureTypeNode(name);
   }
@@ -112,41 +102,51 @@ export class Integration extends IntegrationBase {
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
-      const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+      const entitle = makeCleanId.bind(null, method, path);
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const input = makeType(entitle("input"), zodToTs(inputSchema, ctxIn), {
-        comment: request,
-      });
-      this.#program.push((opts) => printNode(input, opts));
+      const inputTypeName = entitle("input");
+      const inputTypeNode = zodToTs(inputSchema, ctxIn);
+      this.#program.push(
+        (opts) =>
+          `/** ${request} */\ntype ${inputTypeName} = ${printNode(inputTypeNode, opts)};`,
+      );
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
-          const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
+          const props: string[] = [];
+          for (const [
+            idx,
+            { schema, mimeTypes, statusCodes },
+          ] of responses.entries()) {
             const hasBody = shouldHaveContent(method, mimeTypes);
-            const variantType = makeType(
-              entitle(responseVariant, "variant", `${idx + 1}`),
-              zodToTs(hasBody ? schema : noBodySchema, ctxOut),
-              { comment: request },
+            const variantName = entitle(
+              responseVariant,
+              "variant",
+              `${idx + 1}`,
             );
-            this.#program.push((opts) => printNode(variantType, opts));
-            return statusCodes.map((code) =>
-              makeInterfaceProp(code, variantType.name),
+            const variantTypeNode = zodToTs(
+              hasBody ? schema : noBodySchema,
+              ctxOut,
             );
-          }, Array.from(responses.entries()));
-          const dict = makeInterface(
-            entitle(responseVariant, "response", "variants"),
-            props,
-            { comment: request },
+            this.#program.push(
+              (opts) =>
+                `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
+            );
+            for (const code of statusCodes)
+              props.push(`  ${code}: ${variantName};`);
+          }
+          const dictName = entitle(responseVariant, "response", "variants");
+          this.#program.push(
+            `/** ${request} */\ninterface ${dictName} {\n${props.join("\n")}\n}`,
           );
-          this.#program.push((opts) => printNode(dict, opts));
-          return Object.assign(agg, { [responseVariant]: dict.name.text });
+          return Object.assign(agg, { [responseVariant]: dictName });
         },
         {} as Record<ResponseVariant, string>,
       );
       this.paths.add(path);
       const store = {
-        input: input.name.text,
+        input: inputTypeName,
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
         response: `${interfaces.positive}["${request}"] | ${interfaces.negative}["${request}"]`,
@@ -161,6 +161,7 @@ export class Integration extends IntegrationBase {
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
     this.#program.push(
+      this.makeSomeOfType(),
       this.makePathType(),
       this.makeMethodType(),
       ...this.makePublicInterfaces(),
@@ -186,15 +187,21 @@ export class Integration extends IntegrationBase {
     );
   }
 
+  #resolveProgram(printerOptions?: ts.PrinterOptions) {
+    return this.#program.map((entry) =>
+      typeof entry === "string" ? entry : entry(printerOptions),
+    );
+  }
+
+  #printUsage() {
+    return this.#usage;
+  }
+
   public print(printerOptions?: ts.PrinterOptions) {
-    const comment =
-      this.#usage && `// Usage example:\n/*\n` + this.#usage + "*/";
-    return this.#program
-      .concat(comment || [])
-      .map((entry) =>
-        typeof entry === "function" ? entry(printerOptions) : entry,
-      )
-      .join("\n\n");
+    const parts = this.#resolveProgram(printerOptions);
+    const usageText = this.#printUsage();
+    if (usageText) parts.push(`// Usage example:\n/*\n${usageText}\n*/`);
+    return parts.join("\n\n");
   }
 
   public async printFormatted({

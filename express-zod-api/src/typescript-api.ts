@@ -123,34 +123,5 @@ export const makeInterfaceProp = (
   return jsdoc.length ? addJsDoc(node, jsdoc.join(" ")) : node;
 };
 
-export const makeType = (
-  name: ts.Identifier | string,
-  value: ts.TypeNode,
-  { expose, comment }: { expose?: boolean; comment?: string } = {},
-) => {
-  const node = f.createTypeAliasDeclaration(
-    expose ? exportModifier : undefined,
-    name,
-    undefined,
-    value,
-  );
-  return comment ? addJsDoc(node, comment) : node;
-};
-
-export const makeInterface = (
-  name: ts.Identifier | string,
-  props: ts.PropertySignature[],
-  { expose, comment }: { expose?: boolean; comment?: string } = {},
-) => {
-  const node = f.createInterfaceDeclaration(
-    expose ? exportModifier : undefined,
-    name,
-    undefined,
-    undefined,
-    props,
-  );
-  return comment ? addJsDoc(node, comment) : node;
-};
-
 export const makeLiteralType = (subj: Parameters<typeof literally>[0]) =>
   f.createLiteralTypeNode(literally(subj));

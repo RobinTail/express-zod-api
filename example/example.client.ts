@@ -1,5 +1,3 @@
-type SomeOf<T> = T[keyof T];
-
 /** get /v1/user/retrieve */
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
@@ -521,6 +519,8 @@ interface HeadV2UsersListNegativeResponseVariants {
   400: HeadV2UsersListNegativeVariant1;
 }
 
+type SomeOf<T> = T[keyof T];
+
 export type Path =
   | "/v1/user/retrieve"
   | "/v1/user/:id/remove"
@@ -818,4 +818,5 @@ export class Subscription<
 const client = new Client();
 client.provide("get /v1/user/retrieve", { id: "10" });
 new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
+
 */
