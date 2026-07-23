@@ -174,7 +174,7 @@ export abstract class IntegrationBase {
     const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
     const offsetProp =
       propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
-    return `type Pagination = { ${nextCursorProp}: string | null } | { ${totalProp}: number; ${limitProp}: number; ${offsetProp}: number }`;
+    return `type ${ids.Pagination} = { ${nextCursorProp}: string | null } | { ${totalProp}: number; ${limitProp}: number; ${offsetProp}: number }`;
   };
 
   /**
