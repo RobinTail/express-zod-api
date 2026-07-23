@@ -205,9 +205,7 @@ export class Integration extends IntegrationBase {
       } catch {}
     }
 
-    this.#usage =
-      this.#usage && format ? await format(this.#usage) : this.#usage;
-
+    if (this.#usage && format) this.#usage = await format(this.#usage);
     const output = this.print(printerOptions);
     return format ? format(output) : output;
   }
