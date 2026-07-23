@@ -26,10 +26,6 @@ const primitives: ts.KeywordTypeSyntaxKind[] = [
 export type Typeable =
   ts.TypeNode | ts.Identifier | string | ts.KeywordTypeSyntaxKind;
 
-type TypeParams =
-  | string[]
-  | Partial<Record<string, Typeable | { type?: ts.TypeNode; init: Typeable }>>;
-
 export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
 /* eslint-disable prettier/prettier -- shorter and works better this way than overrides */
@@ -96,54 +92,6 @@ export const printNode = (
   return printer.printNode(ts.EmitHint.Unspecified, node, sourceFile);
 };
 
-export const makeParam = (
-  name: string | ts.Identifier,
-  {
-    type,
-    mod,
-    initId,
-    optional,
-  }: {
-    type?: Typeable;
-    mod?: ts.Modifier[];
-    initId?: string;
-    optional?: boolean;
-  } = {},
-) =>
-  f.createParameterDeclaration(
-    mod,
-    undefined,
-    name,
-    optional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-    type ? ensureTypeNode(type) : undefined,
-    initId ? makeId(initId) : undefined,
-  );
-
-export const makeParams = (
-  params: Partial<
-    Record<
-      string,
-      | Typeable
-      | {
-          type?: Typeable;
-          mod?: ts.Modifier[];
-          initId?: string;
-          optional?: boolean;
-        }
-    >
-  >,
-) =>
-  Object.entries(params).map(([name, value]) =>
-    makeParam(
-      name,
-      typeof value === "string" ||
-        typeof value === "number" ||
-        (typeof value === "object" && "kind" in value)
-        ? { type: value }
-        : value,
-    ),
-  );
-
 export const makeInterfaceProp = (
   name: string | number,
   value: Typeable,
@@ -178,44 +126,16 @@ export const makeInterfaceProp = (
 export const makeType = (
   name: ts.Identifier | string,
   value: ts.TypeNode,
-  {
-    expose,
-    comment,
-    params,
-  }: { expose?: boolean; comment?: string; params?: TypeParams } = {},
+  { expose, comment }: { expose?: boolean; comment?: string } = {},
 ) => {
   const node = f.createTypeAliasDeclaration(
     expose ? exportModifier : undefined,
     name,
-    params && makeTypeParams(params),
+    undefined,
     value,
   );
   return comment ? addJsDoc(node, comment) : node;
 };
-
-export const makeTypeParams = (
-  params:
-    | string[]
-    | Partial<
-        Record<string, Typeable | { type?: ts.TypeNode; init: Typeable }>
-      >,
-) =>
-  (Array.isArray(params)
-    ? params.map((name) => R.pair(name, undefined))
-    : Object.entries(params)
-  ).map(([name, val]) => {
-    const { type, init } =
-      typeof val === "object" && "init" in val ? val : { type: val };
-    return f.createTypeParameterDeclaration(
-      [],
-      name,
-      type ? ensureTypeNode(type) : undefined,
-      init ? ensureTypeNode(init) : undefined,
-    );
-  });
-
-export const makePromise = (subject: Typeable) =>
-  ensureTypeNode(Promise.name, [subject]);
 
 export const makeInterface = (
   name: ts.Identifier | string,
