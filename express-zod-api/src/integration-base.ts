@@ -1,9 +1,8 @@
-import * as R from "ramda";
 import type { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
 import { clientMethods, type ClientMethod } from "./method";
 import type { makeEventSchema } from "./sse";
-import { ensureTypeNode, printNode, propOf, ts } from "./typescript-api";
+import { propOf } from "./typescript-api";
 import type {
   CursorPaginatedResult,
   OffsetPaginatedResult,
@@ -11,7 +10,7 @@ import type {
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
 type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
-type Store = Record<IOKind, ts.TypeNode>;
+type Store = Record<IOKind, string>;
 
 const ids = {
   Path: "Path",
@@ -55,7 +54,7 @@ export const interfaces: Record<IOKind, string> = {
   response: "Response",
 };
 
-const quot = R.map((str: string) => `"${str}"`);
+const quot = (items: Iterable<string>) => Array.from(items, (s) => `"${s}"`);
 
 export abstract class IntegrationBase {
   /** @internal */
@@ -94,15 +93,14 @@ export abstract class IntegrationBase {
    * @example SomeOf<_>
    * @internal
    **/
-  protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
-    ensureTypeNode(ids.SomeOf, [name]);
+  protected someOf = (name: string) => `${ids.SomeOf}<${name}>`;
 
   /**
    * @example export type Path = "/v1/user/retrieve" | ___;
    * @internal
    * */
   protected makePathType = () =>
-    `export type ${ids.Path} = ${quot(Array.from(this.paths)).join(" | ")};`;
+    `export type ${ids.Path} = ${quot(this.paths).join(" | ")};`;
 
   /**
    * @example export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
@@ -110,12 +108,12 @@ export abstract class IntegrationBase {
    * */
   protected makePublicInterfaces = () =>
     (Object.keys(interfaces) as IOKind[]).map(
-      (kind) => (opts?: ts.PrinterOptions) =>
+      (kind) =>
         `export interface ${interfaces[kind]} {\n` +
         Array.from(this.registry)
           .map(
             ([request, { store, isDeprecated }]) =>
-              `  ${isDeprecated ? "/** @deprecated */\n  " : ""}"${request}": ${printNode(store[kind], opts)};`,
+              `  ${isDeprecated ? "/** @deprecated */\n  " : ""}"${request}": ${store[kind]};`,
           )
           .join("\n") +
         `\n}`,

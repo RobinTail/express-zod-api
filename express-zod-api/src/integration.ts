@@ -14,13 +14,10 @@ import {
   ensureTypeNode,
   makeInterface,
   makeInterfaceProp,
-  makeIndexed,
   makeLiteralType,
   makeType,
-  makeUnion,
   printNode,
   ts,
-  f,
 } from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
@@ -143,24 +140,17 @@ export class Integration extends IntegrationBase {
             { comment: request },
           );
           this.#program.push((opts) => printNode(dict, opts));
-          return Object.assign(agg, { [responseVariant]: dict });
+          return Object.assign(agg, { [responseVariant]: dict.name.text });
         },
-        {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
+        {} as Record<ResponseVariant, string>,
       );
       this.paths.add(path);
-      const literalIdx = makeLiteralType(request);
       const store = {
-        input: ensureTypeNode(input.name),
+        input: input.name.text,
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
-        response: makeUnion([
-          makeIndexed(interfaces.positive, literalIdx),
-          makeIndexed(interfaces.negative, literalIdx),
-        ]),
-        encoded: f.createIntersectionTypeNode([
-          ensureTypeNode(dictionaries.positive.name),
-          ensureTypeNode(dictionaries.negative.name),
-        ]),
+        response: `${interfaces.positive}["${request}"] | ${interfaces.negative}["${request}"]`,
+        encoded: `${dictionaries.positive} & ${dictionaries.negative}`,
       };
       this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, tags);

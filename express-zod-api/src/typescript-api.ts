@@ -152,8 +152,5 @@ export const makeInterface = (
   return comment ? addJsDoc(node, comment) : node;
 };
 
-export const makeIndexed = (subject: Typeable, index: Typeable) =>
-  f.createIndexedAccessTypeNode(ensureTypeNode(subject), ensureTypeNode(index));
-
 export const makeLiteralType = (subj: Parameters<typeof literally>[0]) =>
   f.createLiteralTypeNode(literally(subj));
