@@ -195,7 +195,7 @@ export abstract class IntegrationBase {
       `  ) {}` +
       `  public ${ids.provideMethod}<K extends ${ids.requestType}>(` +
       `    ${ids.requestParameter}: K,` +
-      `    ${ids.paramsArgument}: Input[K],` +
+      `    ${ids.paramsArgument}: ${interfaces.input}[K],` +
       `    ${ids.ctxArgument}?: T,` +
       `  ): Promise<${interfaces.response}[K]> {` +
       `    const [${ids.methodParameter}, ${ids.pathParameter}] = ${ids.parseRequestFn}(${ids.requestParameter});` +
