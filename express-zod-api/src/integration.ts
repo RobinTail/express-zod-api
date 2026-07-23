@@ -70,18 +70,16 @@ interface FormattedPrintingOptions {
 export class Integration extends IntegrationBase {
   readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
     [];
-  readonly #aliasNames = new Map<object, string>();
+  readonly #aliases = new Map<object, string>();
   #usage?: string;
 
   #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
-    let name = this.#aliasNames.get(key);
+    let name = this.#aliases.get(key);
     if (!name) {
-      name = `Type${this.#aliasNames.size + 1}`;
-      this.#aliasNames.set(key, name);
-      const typeNode = produce();
-      this.#program.push(
-        (opts) => `type ${name} = ${printNode(typeNode, opts)};`,
-      );
+      name = `Type${this.#aliases.size + 1}`;
+      this.#aliases.set(key, name);
+      const node = produce();
+      this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
     }
     return ensureTypeNode(name);
   }
