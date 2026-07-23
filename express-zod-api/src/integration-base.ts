@@ -127,9 +127,9 @@ export abstract class IntegrationBase {
    * */
   protected makeEndpointTags = () =>
     `export const endpointTags = {\n` +
-    Array.from(this.tags).map(
-      ([request, tags]) => `"${request}": [${quot(tags).join(", ")}]`,
-    ) +
+    Array.from(this.tags)
+      .map(([request, tags]) => `  "${request}": [${quot(tags).join(", ")}]`)
+      .join(",\n") +
     `}`;
 
   /**
