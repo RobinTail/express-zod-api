@@ -15,16 +15,16 @@ names and the server URL. Template strings are the natural representation for th
 
 ### Readability gains by method
 
-| Method                | Current LOC | Expected LOC |
-| --------------------- | ----------- | ------------ |
-| `makeSubstituteFn()`  | 60          | ~15          |
-| `makeDefaultImplementation()` | 120+ | ~30      |
-| `#makeHasMoreMethod()` | 40         | ~10          |
-| `#makeProvider()`     | 30          | ~8           |
-| `makeClientClass()`   | 16          | ~15          |
-| `makeSubscriptionClass()` | 25      | ~20          |
-| `#makeOnMethod()`     | 50          | ~12          |
-| `makeUsageStatements()` | 18        | ~8           |
+| Method                        | Current LOC | Expected LOC |
+| ----------------------------- | ----------- | ------------ |
+| `makeSubstituteFn()`          | 60          | ~15          |
+| `makeDefaultImplementation()` | 120+        | ~30          |
+| `#makeHasMoreMethod()`        | 40          | ~10          |
+| `#makeProvider()`             | 30          | ~8           |
+| `makeClientClass()`           | 16          | ~15          |
+| `makeSubscriptionClass()`     | 25          | ~20          |
+| `#makeOnMethod()`             | 50          | ~12          |
+| `makeUsageStatements()`       | 18          | ~8           |
 
 ## Constraint: The `zts.ts` Bridge
 
@@ -47,8 +47,8 @@ guarantees that property names belong to the expected types:
 
 ```typescript
 // propOf ensures "method" is a valid key of RequestInit
-propOf<RequestInit>("method") // compiles
-propOf<RequestInit>("nope")   // error
+propOf<RequestInit>("method"); // compiles
+propOf<RequestInit>("nope"); // error
 ```
 
 In text templates, `propOf` is used as `${propOf<Type>("prop")}` — it resolves to the
@@ -89,6 +89,7 @@ import { propOf } from "./typescript-api";
 ```
 
 Keep the existing non-typescript-api imports:
+
 - `ResponseVariant` from `./api-response`
 - `contentTypes` from `./content-type`
 - `clientMethods`, `ClientMethod` from `./method`
@@ -100,28 +101,33 @@ Keep the existing non-typescript-api imports:
 Each becomes a function returning a string literal, using `ids.*` for all names:
 
 **`makeSomeOfType()`**
+
 ```typescript
 protected makeSomeOfType = () => `type ${ids.someOfType}<T> = T[keyof T];`;
 ```
 
 **`makeMethodType()`** — iterate `clientMethods` to build the union:
+
 ```typescript
 protected makeMethodType = () =>
   `export type ${ids.methodType} = ${clientMethods.map((m) => `"${m}"`).join(" | ")};`;
 ```
 
 **`makeRequestType()`**
+
 ```typescript
 protected makeRequestType = () => `export type ${ids.requestType} = keyof ${interfaces.input};`;
 ```
 
 **`makePathType()`** — dynamic, uses `this.paths`:
+
 ```typescript
 protected makePathType = () =>
   `export type ${ids.pathType} = ${Array.from(this.paths).map((p) => `"${p}"`).join(" | ")};`;
 ```
 
 **`makeImplementationType()`** — 15 lines of AST → 5-line template:
+
 ```typescript
 protected makeImplementationType = () =>
   `export type ${ids.implementationType}<${ids.ctxArgument} = unknown> = (\n` +
@@ -131,6 +137,7 @@ protected makeImplementationType = () =>
 ```
 
 **`makePaginationType()`** — 20 lines of AST → 8-line template:
+
 ```typescript
 protected makePaginationType = () =>
   `type ${ids.paginationType} =\n` +
@@ -143,6 +150,7 @@ protected makePaginationType = () =>
 ### 1.4 Convert dynamic builders
 
 **`makePublicInterfaces()`** — iterate the registry, produce text:
+
 ```typescript
 protected makePublicInterfaces = () =>
   (Object.keys(interfaces) as IOKind[]).map((kind) => {
@@ -157,6 +165,7 @@ protected makePublicInterfaces = () =>
 ```
 
 **`someOf()`** — changes signature from accepting `ts.TypeAliasDeclaration` to string:
+
 ```typescript
 // Before
 protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
@@ -167,6 +176,7 @@ protected someOf = (name: string) => `${ids.someOfType}<${name}>`;
 ```
 
 **`makeEndpointTags()`** — 12 lines of AST → ~8 lines template:
+
 ```typescript
 protected makeEndpointTags = () => {
   const entries = Array.from(this.tags)
@@ -186,6 +196,7 @@ AST to produce 8-30 lines of static TypeScript code. All use `ids.*` for names a
 `propOf` for type-safe property references.
 
 **`makeParseRequestFn()`** — 15 lines AST → 2 lines text:
+
 ```typescript
 protected makeParseRequestFn = () =>
   `const ${ids.parseRequestFn} = (${ids.requestParameter}: string) =>\n` +
@@ -193,6 +204,7 @@ protected makeParseRequestFn = () =>
 ```
 
 **`makeSubstituteFn()`** — 60 lines AST → ~15 lines text:
+
 ```typescript
 protected makeSubstituteFn = () =>
   `const ${ids.substituteFn} = (${ids.pathParameter}: string, ${ids.paramsArgument}: Record<string, any>) => {\n` +
@@ -208,6 +220,7 @@ protected makeSubstituteFn = () =>
 ```
 
 **`#makeHasMoreMethod()`** — 40 lines AST → ~10 lines text:
+
 ```typescript
 #makeHasMoreMethod = () => {
   const nextCursorProp = propOf<CursorPaginatedResult["output"]["shape"]>("nextCursor");
@@ -225,6 +238,7 @@ protected makeSubstituteFn = () =>
 ```
 
 **`#makeProvider()`** — 30 lines AST → ~8 lines text:
+
 ```typescript
 #makeProvider = () =>
   `  public ${ids.provideMethod}<K extends ${ids.requestType}>(\n` +
@@ -238,6 +252,7 @@ protected makeSubstituteFn = () =>
 ```
 
 **`makeDefaultImplementation()`** — 120+ lines AST → ~30 lines text:
+
 ```typescript
 protected makeDefaultImplementation = () =>
   `const ${ids.defaultImplementationConst}: ${ids.implementationType} = async (${ids.methodParameter}, ${ids.pathParameter}, ${ids.paramsArgument}) => {\n` +
@@ -259,6 +274,7 @@ protected makeDefaultImplementation = () =>
 ```
 
 **`#makeSubscriptionConstructor()`** — text:
+
 ```typescript
 #makeSubscriptionConstructor = () =>
   `  constructor(\n` +
@@ -274,6 +290,7 @@ protected makeDefaultImplementation = () =>
 ```
 
 **`#makeOnMethod()`** — text:
+
 ```typescript
 #makeOnMethod = () =>
   `  public ${ids.onMethod}<E extends keyof Extract<R, { ${propOf<SSEShape>("event")}: string }>>(\n` +
@@ -290,6 +307,7 @@ protected makeDefaultImplementation = () =>
 ```
 
 **`makeClientClass()`** — compose from text pieces:
+
 ```typescript
 protected makeClientClass = (name: string) =>
   `export class ${name}<${ids.ctxArgument}> {\n` +
@@ -302,6 +320,7 @@ protected makeClientClass = (name: string) =>
 ```
 
 **`makeSubscriptionClass()`** — compose from text pieces:
+
 ```typescript
 protected makeSubscriptionClass = (name: string) =>
   `export class ${name}<\n` +
@@ -315,6 +334,7 @@ protected makeSubscriptionClass = (name: string) =>
 ```
 
 **`makeUsageStatements()`** — return strings directly:
+
 ```typescript
 protected makeUsageStatements = (
   clientClassName: string,
@@ -462,7 +482,11 @@ const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
 ### 2.4 Assemble the program
 
 ```typescript
-walkRouting({ routing, config, onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint });
+walkRouting({
+  routing,
+  config,
+  onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
+});
 
 // Aliases were pushed to #program during walkRouting — they're first.
 // Now append makeSomeOfType, then public types, then runtime code:
