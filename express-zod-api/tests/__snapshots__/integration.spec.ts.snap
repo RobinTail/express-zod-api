@@ -294,12 +294,12 @@ export type Request = keyof Input;
 `;
 
 exports[`Integration > Should support types variant and handle recursive schemas 0 1`] = `
-"type Type1 = {
+"type SomeOf<T> = T[keyof T];
+
+type Type1 = {
     name: string;
     features: Type1;
 };
-
-type SomeOf<T> = T[keyof T];
 
 /** query /v1/test */
 type QueryV1TestInput = {
@@ -335,40 +335,40 @@ export type Path = "/v1/test";
 export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
-    /** @deprecated */
-    "query /v1/test": QueryV1TestInput;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestInput;
 }
 
 export interface PositiveResponse {
-    /** @deprecated */
-    "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
-    /** @deprecated */
-    "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
-    /** @deprecated */
-    "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
 }
 
 export interface Response {
-    /** @deprecated */
-    "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
+  /** @deprecated */
+  "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
 }
 
 export type Request = keyof Input;"
 `;
 
 exports[`Integration > Should support types variant and handle recursive schemas 1 1`] = `
-"type Type1 = {
+"type SomeOf<T> = T[keyof T];
+
+type Type1 = {
     name: string;
     features: Type1;
 };
-
-type SomeOf<T> = T[keyof T];
 
 /** query /v1/test */
 type QueryV1TestInput = {
@@ -404,28 +404,28 @@ export type Path = "/v1/test";
 export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
-    /** @deprecated */
-    "query /v1/test": QueryV1TestInput;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestInput;
 }
 
 export interface PositiveResponse {
-    /** @deprecated */
-    "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
-    /** @deprecated */
-    "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
-    /** @deprecated */
-    "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
 }
 
 export interface Response {
-    /** @deprecated */
-    "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
+  /** @deprecated */
+  "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
 }
 
 export type Request = keyof Input;"
@@ -495,7 +495,9 @@ export interface Response {
 
 export type Request = keyof Input;
 
-export const endpointTags = { "post /v1/test-with-dashes": [] };
+export const endpointTags = {
+  "post /v1/test-with-dashes": [],
+};
 
 const parseRequest = (request: string) =>
   request.split(/ (.+)/, 2) as [Method, Path];
@@ -519,14 +521,8 @@ export type Implementation<T = unknown> = (
 ) => Promise<any>;
 
 type Pagination =
-  | {
-      nextCursor: string | null;
-    }
-  | {
-      total: number;
-      limit: number;
-      offset: number;
-    };
+  | { nextCursor: string | null }
+  | { total: number; limit: number; offset: number };
 
 const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "head", "delete"].includes(method);

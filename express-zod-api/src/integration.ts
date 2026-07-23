@@ -80,9 +80,11 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  readonly #program: ts.Node[] = [this.makeSomeOfType()];
+  readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> = [
+    this.makeSomeOfType(),
+  ];
   readonly #aliases = new Map<object, ts.TypeAliasDeclaration>();
-  #usage: Array<ts.Node | string> = [];
+  #usage?: string;
 
   #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
     let name = this.#aliases.get(key)?.name?.text;
@@ -90,7 +92,9 @@ export class Integration extends IntegrationBase {
       name = `Type${this.#aliases.size + 1}`;
       const temp = makeLiteralType(null);
       this.#aliases.set(key, makeType(name, temp));
-      this.#aliases.set(key, makeType(name, produce()));
+      const value = makeType(name, produce());
+      this.#aliases.set(key, value);
+      this.#program.push((opts) => printNode(value, opts));
     }
     return ensureTypeNode(name);
   }
@@ -117,7 +121,7 @@ export class Integration extends IntegrationBase {
       const input = makeType(entitle("input"), zodToTs(inputSchema, ctxIn), {
         comment: request,
       });
-      this.#program.push(input);
+      this.#program.push((opts) => printNode(input, opts));
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
@@ -128,7 +132,7 @@ export class Integration extends IntegrationBase {
               zodToTs(hasBody ? schema : noBodySchema, ctxOut),
               { comment: request },
             );
-            this.#program.push(variantType);
+            this.#program.push((opts) => printNode(variantType, opts));
             return statusCodes.map((code) =>
               makeInterfaceProp(code, variantType.name),
             );
@@ -138,7 +142,7 @@ export class Integration extends IntegrationBase {
             props,
             { comment: request },
           );
-          this.#program.push(dict);
+          this.#program.push((opts) => printNode(dict, opts));
           return Object.assign(agg, { [responseVariant]: dict });
         },
         {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
@@ -166,8 +170,6 @@ export class Integration extends IntegrationBase {
       config,
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
-    // eslint-disable-next-line no-restricted-syntax -- accumulated late, acceptable for generator
-    this.#program.unshift(...this.#aliases.values());
     this.#program.push(
       this.makePathType(),
       this.makeMethodType(),
@@ -188,45 +190,19 @@ export class Integration extends IntegrationBase {
       this.makeSubscriptionClass(subscriptionClassName),
     );
 
-    this.#usage.push(
-      ...this.makeUsageStatements(clientClassName, subscriptionClassName),
+    this.#usage = this.makeUsageStatements(
+      clientClassName,
+      subscriptionClassName,
     );
   }
 
-  #printUsage(printerOptions?: ts.PrinterOptions) {
-    return this.#usage.length
-      ? this.#usage
-          .map((entry) =>
-            typeof entry === "string"
-              ? entry
-              : printNode(entry, printerOptions),
-          )
-          .join("\n")
-      : undefined;
-  }
-
   public print(printerOptions?: ts.PrinterOptions) {
-    const usageExampleText = this.#printUsage(printerOptions);
-    const commentNode =
-      usageExampleText &&
-      ts.addSyntheticLeadingComment(
-        ts.addSyntheticLeadingComment(
-          f.createEmptyStatement(),
-          ts.SyntaxKind.SingleLineCommentTrivia,
-          " Usage example:",
-        ),
-        ts.SyntaxKind.MultiLineCommentTrivia,
-        `\n${usageExampleText}`,
-      );
+    const comment =
+      this.#usage && `// Usage example:\n/*\n` + this.#usage + "*/";
     return this.#program
-      .concat(commentNode || [])
-      .map((node, index) =>
-        printNode(
-          node,
-          index < this.#program.length
-            ? printerOptions
-            : { ...printerOptions, omitTrailingSemicolon: true },
-        ),
+      .concat(comment || [])
+      .map((entry) =>
+        typeof entry === "function" ? entry(printerOptions) : entry,
       )
       .join("\n\n");
   }
@@ -243,9 +219,8 @@ export class Integration extends IntegrationBase {
       } catch {}
     }
 
-    const usageExample = this.#printUsage(printerOptions);
     this.#usage =
-      usageExample && format ? [await format(usageExample)] : this.#usage;
+      this.#usage && format ? await format(this.#usage) : this.#usage;
 
     const output = this.print(printerOptions);
     return format ? format(output) : output;

@@ -6,18 +6,6 @@ export { ts };
 export const f = ts.factory;
 
 export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
-export const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
-export const accessModifiers = {
-  public: [f.createModifier(ts.SyntaxKind.PublicKeyword)],
-  publicStatic: [
-    f.createModifier(ts.SyntaxKind.PublicKeyword),
-    f.createModifier(ts.SyntaxKind.StaticKeyword),
-  ],
-  protectedReadonly: [
-    f.createModifier(ts.SyntaxKind.ProtectedKeyword),
-    f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
-  ],
-};
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
@@ -73,16 +61,6 @@ export const ensureTypeNode = (
 
 /**
  * @internal
- * @example Record<string, any>
- * */
-export const makeRecordStringAny = () =>
-  ensureTypeNode("Record", [
-    ts.SyntaxKind.StringKeyword,
-    ts.SyntaxKind.AnyKeyword,
-  ]);
-
-/**
- * @internal
  * ensures distinct union (unique primitives)
  * */
 export const makeUnion = (entries: ts.TypeNode[]) => {
@@ -117,22 +95,6 @@ export const printNode = (
   const printer = ts.createPrinter(printerOptions);
   return printer.printNode(ts.EmitHint.Unspecified, node, sourceFile);
 };
-
-export const makeTemplate = (
-  head: string,
-  ...rest: [ts.Expression | string, string?][]
-) =>
-  f.createTemplateExpression(
-    f.createTemplateHead(head),
-    rest.map(([id, str = ""], idx) =>
-      f.createTemplateSpan(
-        typeof id === "string" ? makeId(id) : id,
-        idx === rest.length - 1
-          ? f.createTemplateTail(str)
-          : f.createTemplateMiddle(str),
-      ),
-    ),
-  );
 
 export const makeParam = (
   name: string | ts.Identifier,
@@ -182,16 +144,6 @@ export const makeParams = (
     ),
   );
 
-export const makePublicConstructor = (
-  params: ts.ParameterDeclaration[],
-  statements: ts.Statement[] = [],
-) =>
-  f.createConstructorDeclaration(
-    accessModifiers.public,
-    params,
-    f.createBlock(statements),
-  );
-
 export const makeInterfaceProp = (
   name: string | number,
   value: Typeable,
@@ -223,38 +175,6 @@ export const makeInterfaceProp = (
   return jsdoc.length ? addJsDoc(node, jsdoc.join(" ")) : node;
 };
 
-export const makeOneLine = (subject: ts.TypeNode) =>
-  ts.setEmitFlags(subject, ts.EmitFlags.SingleLine);
-
-export const makeDeconstruction = (
-  ...names: string[]
-): ts.ArrayBindingPattern =>
-  f.createArrayBindingPattern(
-    names.map(
-      (name) => f.createBindingElement(undefined, undefined, name), // can also add default value at last
-    ),
-  );
-
-export const makeConst = (
-  name: string | ts.Identifier | ts.ArrayBindingPattern,
-  value: ts.Expression,
-  { type, expose }: { type?: Typeable; expose?: true } = {},
-) =>
-  f.createVariableStatement(
-    expose && exportModifier,
-    f.createVariableDeclarationList(
-      [
-        f.createVariableDeclaration(
-          name,
-          undefined,
-          type ? ensureTypeNode(type) : undefined,
-          value,
-        ),
-      ],
-      ts.NodeFlags.Const,
-    ),
-  );
-
 export const makeType = (
   name: ts.Identifier | string,
   value: ts.TypeNode,
@@ -272,14 +192,6 @@ export const makeType = (
   );
   return comment ? addJsDoc(node, comment) : node;
 };
-
-export const makePublicLiteralType = (
-  name: ts.Identifier | string,
-  literals: string[],
-) =>
-  makeType(name, makeUnion(R.map(makeLiteralType, literals)), {
-    expose: true,
-  });
 
 export const makeTypeParams = (
   params:
@@ -302,59 +214,6 @@ export const makeTypeParams = (
     );
   });
 
-export const makePublicProperty = (
-  name: string | ts.PropertyName,
-  type: Typeable,
-) =>
-  f.createPropertyDeclaration(
-    accessModifiers.public,
-    name,
-    undefined,
-    ensureTypeNode(type),
-    undefined,
-  );
-
-export const makePublicMethod = (
-  name: string,
-  params: ts.ParameterDeclaration[],
-  statements: ts.Statement[],
-  {
-    typeParams,
-    returns,
-    isStatic,
-  }: {
-    typeParams?: TypeParams;
-    returns?: ts.TypeNode;
-    isStatic?: boolean;
-  } = {},
-) =>
-  f.createMethodDeclaration(
-    isStatic ? accessModifiers.publicStatic : accessModifiers.public,
-    undefined,
-    name,
-    undefined,
-    typeParams && makeTypeParams(typeParams),
-    params,
-    returns,
-    f.createBlock(statements),
-  );
-
-export const makePublicClass = (
-  name: string,
-  statements: ts.ClassElement[],
-  { typeParams }: { typeParams?: TypeParams } = {},
-) =>
-  f.createClassDeclaration(
-    exportModifier,
-    name,
-    typeParams && makeTypeParams(typeParams),
-    undefined,
-    statements,
-  );
-
-export const makeKeyOf = (subj: Typeable) =>
-  f.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, ensureTypeNode(subj));
-
 export const makePromise = (subject: Typeable) =>
   ensureTypeNode(Promise.name, [subject]);
 
@@ -373,91 +232,8 @@ export const makeInterface = (
   return comment ? addJsDoc(node, comment) : node;
 };
 
-export const makeArrowFn = (
-  params:
-    Array<Parameters<typeof makeParam>[0]> | Parameters<typeof makeParams>[0],
-  body: ts.ConciseBody,
-  { isAsync }: { isAsync?: boolean } = {},
-) =>
-  f.createArrowFunction(
-    isAsync ? asyncModifier : undefined,
-    undefined,
-    Array.isArray(params) ? R.map(makeParam, params) : makeParams(params),
-    undefined,
-    undefined,
-    body,
-  );
-
-export const makeTernary = (
-  ...args: [
-    ts.Expression | string,
-    ts.Expression | string,
-    ts.Expression | string,
-  ]
-) => {
-  const [condition, positive, negative] = args.map((arg) =>
-    typeof arg === "string" ? makeId(arg) : arg,
-  );
-  return f.createConditionalExpression(
-    condition!, // ensured by tuple type
-    f.createToken(ts.SyntaxKind.QuestionToken),
-    positive!, // ensured by tuple type
-    f.createToken(ts.SyntaxKind.ColonToken),
-    negative!, // ensured by tuple type
-  );
-};
-
-export const makeCall =
-  (
-    first: ts.Expression | string,
-    ...rest: Array<ts.Identifier | ts.ConditionalExpression | string>
-  ) =>
-  (...args: Array<ts.Expression | string>) =>
-    f.createCallExpression(
-      rest.reduce(
-        (acc, entry) =>
-          typeof entry === "string" || ts.isIdentifier(entry)
-            ? f.createPropertyAccessExpression(acc, entry)
-            : f.createElementAccessExpression(acc, entry),
-        typeof first === "string" ? makeId(first) : first,
-      ),
-      undefined,
-      args.map((arg) => (typeof arg === "string" ? makeId(arg) : arg)),
-    );
-
-export const makeNew = (cls: string, ...args: ts.Expression[]) =>
-  f.createNewExpression(makeId(cls), undefined, args);
-
-export const makeExtract = (base: Typeable, narrow: ts.TypeNode) =>
-  ensureTypeNode("Extract", [base, narrow]);
-
-export const makeAssignment = (
-  left: ts.Expression | string,
-  right: ts.Expression,
-) =>
-  f.createExpressionStatement(
-    f.createBinaryExpression(
-      typeof left === "string" ? makeId(left) : left,
-      f.createToken(ts.SyntaxKind.EqualsToken),
-      right,
-    ),
-  );
-
 export const makeIndexed = (subject: Typeable, index: Typeable) =>
   f.createIndexedAccessTypeNode(ensureTypeNode(subject), ensureTypeNode(index));
-
-export const makeMaybeAsync = (subj: Typeable) =>
-  makeUnion([ensureTypeNode(subj), makePromise(subj)]);
-
-export const makeFnType = (
-  params: Parameters<typeof makeParams>[0],
-  returns: Typeable,
-) =>
-  f.createFunctionTypeNode(
-    undefined,
-    makeParams(params),
-    ensureTypeNode(returns),
-  );
 
 export const makeLiteralType = (subj: Parameters<typeof literally>[0]) =>
   f.createLiteralTypeNode(literally(subj));
