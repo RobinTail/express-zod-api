@@ -5,8 +5,6 @@ export { ts };
 
 export const f = ts.factory;
 
-export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
-
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
 const primitives: ts.KeywordTypeSyntaxKind[] = [
