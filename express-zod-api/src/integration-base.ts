@@ -2,7 +2,6 @@ import type { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
 import { clientMethods, type ClientMethod } from "./method";
 import type { makeEventSchema } from "./sse";
-import { propOf } from "./typescript-api";
 import type {
   CursorPaginatedResult,
   OffsetPaginatedResult,
@@ -55,6 +54,8 @@ export const interfaces: Record<IOKind, string> = {
 };
 
 const quot = (items: Iterable<string>) => Array.from(items, (s) => `"${s}"`);
+
+const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
 export abstract class IntegrationBase {
   /** @internal */

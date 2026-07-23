@@ -24,8 +24,6 @@ const primitives: ts.KeywordTypeSyntaxKind[] = [
 export type Typeable =
   ts.TypeNode | ts.Identifier | string | ts.KeywordTypeSyntaxKind;
 
-export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
-
 /* eslint-disable prettier/prettier -- shorter and works better this way than overrides */
 export const literally = <T extends string | null | boolean | number | bigint>(subj: T) => (
   typeof subj === "number" ? f.createNumericLiteral(subj)
