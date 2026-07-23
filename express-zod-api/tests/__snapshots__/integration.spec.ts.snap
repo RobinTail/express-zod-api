@@ -1,9 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Integration > Feature #1470: Custom brands > should by handled accordingly 1`] = `
-"type SomeOf<T> = T[keyof T];
-
-/** post /v1/custom */
+"/** post /v1/custom */
 type PostV1CustomInput = {
   string: boolean;
   regular: string;
@@ -34,6 +32,8 @@ type PostV1CustomNegativeVariant1 = {
 interface PostV1CustomNegativeResponseVariants {
   400: PostV1CustomNegativeVariant1;
 }
+
+type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/custom";
 
@@ -67,9 +67,7 @@ export type Request = keyof Input;
 `;
 
 exports[`Integration > Should support HEAD method by default 0 1`] = `
-"type SomeOf<T> = T[keyof T];
-
-/** get /v1/path */
+"/** get /v1/path */
 type GetV1PathInput = {
   some: string;
 };
@@ -119,6 +117,8 @@ interface HeadV1PathNegativeResponseVariants {
   400: HeadV1PathNegativeVariant1;
 }
 
+type SomeOf<T> = T[keyof T];
+
 export type Path = "/v1/path";
 
 export type Method =
@@ -158,9 +158,7 @@ export type Request = keyof Input;
 `;
 
 exports[`Integration > Should support HEAD method by default 1 1`] = `
-"type SomeOf<T> = T[keyof T];
-
-/** get /v1/path */
+"/** get /v1/path */
 type GetV1PathInput = {
   some: string;
 };
@@ -188,6 +186,8 @@ type GetV1PathNegativeVariant1 = {
 interface GetV1PathNegativeResponseVariants {
   400: GetV1PathNegativeVariant1;
 }
+
+type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/path";
 
@@ -221,9 +221,7 @@ export type Request = keyof Input;
 `;
 
 exports[`Integration > Should support multiple response schemas depending on status code 1`] = `
-"type SomeOf<T> = T[keyof T];
-
-/** post /v1/mtpl */
+"/** post /v1/mtpl */
 type PostV1MtplInput = {
   test: number;
 };
@@ -262,6 +260,8 @@ interface PostV1MtplNegativeResponseVariants {
   500: PostV1MtplNegativeVariant2;
 }
 
+type SomeOf<T> = T[keyof T];
+
 export type Path = "/v1/mtpl";
 
 export type Method =
@@ -299,8 +299,6 @@ exports[`Integration > Should support types variant and handle recursive schemas
     features: Type1;
 };
 
-type SomeOf<T> = T[keyof T];
-
 /** query /v1/test */
 type QueryV1TestInput = {
     features: Type1;
@@ -314,7 +312,7 @@ type QueryV1TestPositiveVariant1 = {
 
 /** query /v1/test */
 interface QueryV1TestPositiveResponseVariants {
-    200: QueryV1TestPositiveVariant1;
+  200: QueryV1TestPositiveVariant1;
 }
 
 /** query /v1/test */
@@ -327,36 +325,38 @@ type QueryV1TestNegativeVariant1 = {
 
 /** query /v1/test */
 interface QueryV1TestNegativeResponseVariants {
-    400: QueryV1TestNegativeVariant1;
+  400: QueryV1TestNegativeVariant1;
 }
+
+type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/test";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
-    /** @deprecated */
-    "query /v1/test": QueryV1TestInput;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestInput;
 }
 
 export interface PositiveResponse {
-    /** @deprecated */
-    "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
-    /** @deprecated */
-    "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
-    /** @deprecated */
-    "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
 }
 
 export interface Response {
-    /** @deprecated */
-    "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
+  /** @deprecated */
+  "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
 }
 
 export type Request = keyof Input;"
@@ -368,8 +368,6 @@ exports[`Integration > Should support types variant and handle recursive schemas
     features: Type1;
 };
 
-type SomeOf<T> = T[keyof T];
-
 /** query /v1/test */
 type QueryV1TestInput = {
     features: Type1;
@@ -383,7 +381,7 @@ type QueryV1TestPositiveVariant1 = {
 
 /** query /v1/test */
 interface QueryV1TestPositiveResponseVariants {
-    200: QueryV1TestPositiveVariant1;
+  200: QueryV1TestPositiveVariant1;
 }
 
 /** query /v1/test */
@@ -396,45 +394,45 @@ type QueryV1TestNegativeVariant1 = {
 
 /** query /v1/test */
 interface QueryV1TestNegativeResponseVariants {
-    400: QueryV1TestNegativeVariant1;
+  400: QueryV1TestNegativeVariant1;
 }
+
+type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/test";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
-    /** @deprecated */
-    "query /v1/test": QueryV1TestInput;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestInput;
 }
 
 export interface PositiveResponse {
-    /** @deprecated */
-    "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
-    /** @deprecated */
-    "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
-    /** @deprecated */
-    "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
 }
 
 export interface Response {
-    /** @deprecated */
-    "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
+  /** @deprecated */
+  "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
 }
 
 export type Request = keyof Input;"
 `;
 
 exports[`Integration > Should treat optionals the same way as z.infer() by default 1`] = `
-"type SomeOf<T> = T[keyof T];
-
-/** post /v1/test-with-dashes */
+"/** post /v1/test-with-dashes */
 type PostV1TestWithDashesInput = {
   opt?: string | undefined;
 };
@@ -464,6 +462,8 @@ type PostV1TestWithDashesNegativeVariant1 = {
 interface PostV1TestWithDashesNegativeResponseVariants {
   400: PostV1TestWithDashesNegativeVariant1;
 }
+
+type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/test-with-dashes";
 
@@ -495,7 +495,9 @@ export interface Response {
 
 export type Request = keyof Input;
 
-export const endpointTags = { "post /v1/test-with-dashes": [] };
+export const endpointTags = {
+  "post /v1/test-with-dashes": [],
+};
 
 const parseRequest = (request: string) =>
   request.split(/ (.+)/, 2) as [Method, Path];
@@ -519,14 +521,8 @@ export type Implementation<T = unknown> = (
 ) => Promise<any>;
 
 type Pagination =
-  | {
-      nextCursor: string | null;
-    }
-  | {
-      total: number;
-      limit: number;
-      offset: number;
-    };
+  | { nextCursor: string | null }
+  | { total: number; limit: number; offset: number };
 
 const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "head", "delete"].includes(method);

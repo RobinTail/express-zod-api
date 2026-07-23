@@ -1,47 +1,7 @@
-import * as R from "ramda";
 import type { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
 import { clientMethods, type ClientMethod } from "./method";
 import type { makeEventSchema } from "./sse";
-import {
-  type Typeable,
-  accessModifiers,
-  ensureTypeNode,
-  literally,
-  makeAssignment,
-  makeCall,
-  makeConst,
-  makeDeconstruction,
-  makeExtract,
-  makeFnType,
-  makeId,
-  makeIndexed,
-  makeInterface,
-  makeInterfaceProp,
-  makeKeyOf,
-  makeLiteralType,
-  makeMaybeAsync,
-  makeNew,
-  makeOneLine,
-  makeParam,
-  makeParams,
-  makePromise,
-  makePropertyIdentifier,
-  makePublicClass,
-  makePublicConstructor,
-  makePublicLiteralType,
-  makePublicMethod,
-  makePublicProperty,
-  makeRecordStringAny,
-  makeTemplate,
-  makeTernary,
-  makeType,
-  makeUnion,
-  propOf,
-  ts,
-  makeArrowFn,
-  f,
-} from "./typescript-api";
 import type {
   CursorPaginatedResult,
   OffsetPaginatedResult,
@@ -49,40 +9,40 @@ import type {
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
 type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
-type Store = Record<IOKind, ts.TypeNode>;
+type Store = Record<IOKind, string>;
 
 const ids = {
-  pathType: "Path",
-  implementationType: "Implementation",
-  keyParameter: "key",
-  pathParameter: "path",
-  paramsArgument: "params",
-  ctxArgument: "ctx",
-  methodParameter: "method",
-  requestParameter: "request",
-  eventParameter: "event",
-  dataParameter: "data",
-  handlerParameter: "handler",
-  msgParameter: "msg",
-  parseRequestFn: "parseRequest",
-  substituteFn: "substitute",
-  provideMethod: "provide",
-  onMethod: "on",
-  implementationArgument: "implementation",
-  hasBodyConst: "hasBody",
-  undefinedValue: "undefined",
-  responseConst: "response",
-  restConst: "rest",
-  searchParamsConst: "searchParams",
-  defaultImplementationConst: "defaultImplementation",
-  clientConst: "client",
-  contentTypeConst: "contentType",
-  isJsonConst: "isJSON",
-  sourceProp: "source",
-  methodType: "Method",
-  someOfType: "SomeOf",
-  requestType: "Request",
-  paginationType: "Pagination",
+  Path: "Path",
+  Implementation: "Implementation",
+  key: "key",
+  path: "path",
+  params: "params",
+  ctx: "ctx",
+  method: "method",
+  request: "request",
+  event: "event",
+  data: "data",
+  handler: "handler",
+  msg: "msg",
+  parseRequest: "parseRequest",
+  substitute: "substitute",
+  provide: "provide",
+  on: "on",
+  implementation: "implementation",
+  hasBody: "hasBody",
+  undefined: "undefined",
+  response: "response",
+  rest: "rest",
+  searchParams: "searchParams",
+  defaultImplementation: "defaultImplementation",
+  client: "client",
+  contentType: "contentType",
+  isJSON: "isJSON",
+  source: "source",
+  Method: "Method",
+  SomeOf: "SomeOf",
+  Request: "Request",
+  Pagination: "Pagination",
 } satisfies Record<string, string>;
 
 export const interfaces: Record<IOKind, string> = {
@@ -92,6 +52,10 @@ export const interfaces: Record<IOKind, string> = {
   encoded: "EncodedResponse",
   response: "Response",
 };
+
+const quot = (items: Iterable<string>) => Array.from(items, (s) => `"${s}"`);
+
+const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
 export abstract class IntegrationBase {
   /** @internal */
@@ -110,183 +74,111 @@ export abstract class IntegrationBase {
    * @example export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
    * @internal
    * */
-  protected makeMethodType = () =>
-    makePublicLiteralType(ids.methodType, clientMethods);
+  protected makeMethodType = () => {
+    const union = quot(clientMethods).join(" | ");
+    return `export type ${ids.Method} = ${union};`;
+  };
 
   /**
    * @example type SomeOf<T> = T[keyof T];
    * @internal
    * */
-  protected makeSomeOfType = () =>
-    makeType(ids.someOfType, makeIndexed("T", makeKeyOf("T")), {
-      params: ["T"],
-    });
+  protected makeSomeOfType = () => `type ${ids.SomeOf}<T> = T[keyof T];`;
 
   /**
    * @example export type Request = keyof Input;
    * @internal
    * */
   protected makeRequestType = () =>
-    makeType(ids.requestType, makeKeyOf(interfaces.input), {
-      expose: true,
-    });
+    `export type ${ids.Request} = keyof ${interfaces.input};`;
 
   /**
    * @example SomeOf<_>
    * @internal
    **/
-  protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
-    ensureTypeNode(ids.someOfType, [name]);
+  protected someOf = (name: string) => `${ids.SomeOf}<${name}>`;
 
   /**
    * @example export type Path = "/v1/user/retrieve" | ___;
    * @internal
    * */
-  protected makePathType = () =>
-    makePublicLiteralType(ids.pathType, Array.from(this.paths));
+  protected makePathType = () => {
+    const union = quot(this.paths).join(" | ");
+    return `export type ${ids.Path} = ${union};`;
+  };
 
   /**
    * @example export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
    * @internal
    * */
   protected makePublicInterfaces = () =>
-    (Object.keys(interfaces) as IOKind[]).map((kind) =>
-      makeInterface(
-        interfaces[kind],
-        Array.from(this.registry).map(([request, { store, isDeprecated }]) =>
-          makeInterfaceProp(request, store[kind], { isDeprecated }),
-        ),
-        { expose: true },
-      ),
-    );
+    (Object.keys(interfaces) as IOKind[]).map((kind) => {
+      const props = Array.from(this.registry)
+        .map(
+          ([request, { store, isDeprecated }]) =>
+            `  ${isDeprecated ? "/** @deprecated */\n  " : ""}"${request}": ${store[kind]};`,
+        )
+        .join("\n");
+      return `export interface ${interfaces[kind]} {\n${props}\n}`;
+    });
 
   /**
    * @example export const endpointTags = { "get /v1/user/retrieve": ["users"] }
    * @internal
    * */
-  protected makeEndpointTags = () =>
-    makeConst(
-      "endpointTags",
-      f.createObjectLiteralExpression(
-        Array.from(this.tags).map(([request, tags]) =>
-          f.createPropertyAssignment(
-            makePropertyIdentifier(request),
-            f.createArrayLiteralExpression(R.map(literally, tags)),
-          ),
-        ),
-      ),
-      { expose: true },
-    );
+  protected makeEndpointTags = () => {
+    const props = Array.from(this.tags)
+      .map(([request, tags]) => `  "${request}": [${quot(tags).join(", ")}]`)
+      .join(",\n");
+    return `export const endpointTags = {\n${props}\n}`;
+  };
 
   /**
    * @example export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
    * @internal
    * */
-  protected makeImplementationType = () =>
-    makeType(
-      ids.implementationType,
-      makeFnType(
-        {
-          [ids.methodParameter]: ids.methodType,
-          [ids.pathParameter]: ts.SyntaxKind.StringKeyword,
-          [ids.paramsArgument]: makeRecordStringAny(),
-          [ids.ctxArgument]: { optional: true, type: "T" },
-        },
-        makePromise(ts.SyntaxKind.AnyKeyword),
-      ),
-      {
-        expose: true,
-        params: { T: { init: ts.SyntaxKind.UnknownKeyword } },
-      },
-    );
+  protected makeImplementationType = () => {
+    const args = [
+      `${ids.method}: ${ids.Method}`,
+      `${ids.path}: string`,
+      `${ids.params}: Record<string, any>`,
+      `${ids.ctx}?: T`,
+    ].join(",");
+    return `export type ${ids.Implementation}<T = unknown> = (${args}) => Promise<any>;`;
+  };
 
   /**
    * @example const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
    * @internal
+   * @desc split once, excludes the third empty element
    * */
-  protected makeParseRequestFn = () =>
-    makeConst(
-      ids.parseRequestFn,
-      makeArrowFn(
-        { [ids.requestParameter]: ts.SyntaxKind.StringKeyword },
-        f.createAsExpression(
-          makeCall(ids.requestParameter, propOf<string>("split"))(
-            f.createRegularExpressionLiteral("/ (.+)/"), // split once
-            literally(2), // excludes third empty element
-          ),
-          f.createTupleTypeNode([
-            ensureTypeNode(ids.methodType),
-            ensureTypeNode(ids.pathType),
-          ]),
-        ),
-      ),
-    );
+  protected makeParseRequestFn = () => {
+    const args = `${ids.request}: string`;
+    const tuple = `[${ids.Method}, ${ids.Path}]`;
+    const implementation = `${ids.request}.${propOf<string>("split")}(/ (.+)/, 2) as ${tuple}`;
+    return `const ${ids.parseRequest} = (${args}) => ${implementation};`;
+  };
 
   /**
    * @example const substitute = (path: string, params: Record<string, any>) => { ___ return [path, rest] as const; }
    * @internal
    * */
-  protected makeSubstituteFn = () =>
-    makeConst(
-      ids.substituteFn,
-      makeArrowFn(
-        {
-          [ids.pathParameter]: ts.SyntaxKind.StringKeyword,
-          [ids.paramsArgument]: makeRecordStringAny(),
-        },
-        f.createBlock([
-          makeConst(
-            ids.restConst,
-            f.createObjectLiteralExpression([
-              f.createSpreadAssignment(makeId(ids.paramsArgument)),
-            ]),
-          ),
-          f.createForInStatement(
-            f.createVariableDeclarationList(
-              [f.createVariableDeclaration(ids.keyParameter)],
-              ts.NodeFlags.Const,
-            ),
-            makeId(ids.paramsArgument),
-            f.createBlock([
-              makeAssignment(
-                ids.pathParameter,
-                makeCall(ids.pathParameter, propOf<string>("replace"))(
-                  makeTemplate(":", [ids.keyParameter]), // `:${key}`
-                  makeArrowFn(
-                    [],
-                    f.createBlock([
-                      f.createExpressionStatement(
-                        f.createDeleteExpression(
-                          f.createElementAccessExpression(
-                            makeId(ids.restConst),
-                            makeId(ids.keyParameter),
-                          ),
-                        ),
-                      ),
-                      f.createReturnStatement(
-                        f.createElementAccessExpression(
-                          makeId(ids.paramsArgument),
-                          makeId(ids.keyParameter),
-                        ),
-                      ),
-                    ]),
-                  ),
-                ),
-              ),
-            ]),
-          ),
-          f.createReturnStatement(
-            f.createAsExpression(
-              f.createArrayLiteralExpression([
-                makeId(ids.pathParameter),
-                makeId(ids.restConst),
-              ]),
-              ensureTypeNode("const"),
-            ),
-          ),
-        ]),
-      ),
-    );
+  protected makeSubstituteFn = () => {
+    const args = `${ids.path}: string, ${ids.params}: Record<string, any>`;
+    const placeholder = `\`:\${${ids.key}}\``;
+    return [
+      `const ${ids.substitute} = (${args}) => {\n`,
+      `  const ${ids.rest} = { ...${ids.params} };`,
+      `  for (const ${ids.key} in ${ids.params}) {`,
+      `    ${ids.path} = ${ids.path}.${propOf<string>("replace")}(${placeholder}, () => {`,
+      `      delete ${ids.rest}[${ids.key}];`,
+      `      return ${ids.params}[${ids.key}];`,
+      `    });`,
+      `  }`,
+      `  return [${ids.path}, ${ids.rest}] as const;`,
+      `}`,
+    ].join("\n");
+  };
 
   /**
    * @example { nextCursor: string | null } | { total, limit, offset: number }
@@ -299,409 +191,121 @@ export abstract class IntegrationBase {
     const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
     const offsetProp =
       propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
-    const cursorShape = f.createTypeLiteralNode([
-      makeInterfaceProp(
-        nextCursorProp,
-        makeUnion([
-          ensureTypeNode(ts.SyntaxKind.StringKeyword),
-          makeLiteralType(null),
-        ]),
-      ),
-    ]);
-    const offsetShape = f.createTypeLiteralNode(
-      [totalProp, limitProp, offsetProp].map((prop) =>
-        makeInterfaceProp(prop, ts.SyntaxKind.NumberKeyword),
-      ),
-    );
-    return makeType(ids.paginationType, makeUnion([cursorShape, offsetShape]));
+    const cursorVariant = `{ ${nextCursorProp}: string | null }`;
+    const offsetVariant = `{ ${totalProp}: number; ${limitProp}: number; ${offsetProp}: number }`;
+    return `type ${ids.Pagination} = ${cursorVariant} | ${offsetVariant}`;
   };
-
-  /**
-   * static hasMore(response: Pagination): boolean
-   * @internal
-   */
-  #makeHasMoreMethod = () => {
-    const responseId = makeId(ids.responseConst);
-    const nextCursorProp =
-      propOf<CursorPaginatedResult["output"]["shape"]>("nextCursor");
-    const totalProp = propOf<OffsetPaginatedResult["output"]["shape"]>("total");
-    const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
-    const offsetProp =
-      propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
-    const inExpression = f.createBinaryExpression(
-      literally(nextCursorProp),
-      ts.SyntaxKind.InKeyword,
-      responseId,
-    );
-    const returnCursor = f.createReturnStatement(
-      f.createBinaryExpression(
-        f.createPropertyAccessExpression(responseId, nextCursorProp),
-        ts.SyntaxKind.ExclamationEqualsEqualsToken,
-        literally(null),
-      ),
-    );
-    const offsetPlusLimit = f.createBinaryExpression(
-      f.createPropertyAccessExpression(responseId, offsetProp),
-      ts.SyntaxKind.PlusToken,
-      f.createPropertyAccessExpression(responseId, limitProp),
-    );
-    const returnOffset = f.createReturnStatement(
-      f.createBinaryExpression(
-        offsetPlusLimit,
-        ts.SyntaxKind.LessThanToken,
-        f.createPropertyAccessExpression(responseId, totalProp),
-      ),
-    );
-    return makePublicMethod(
-      "hasMore",
-      [makeParam(responseId, { type: ids.paginationType })],
-      [f.createIfStatement(inExpression, returnCursor), returnOffset],
-      {
-        returns: ensureTypeNode(ts.SyntaxKind.BooleanKeyword),
-        isStatic: true,
-      },
-    );
-  };
-
-  // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {}
-  #makeProvider = () =>
-    makePublicMethod(
-      ids.provideMethod,
-      makeParams({
-        [ids.requestParameter]: "K",
-        [ids.paramsArgument]: makeIndexed(interfaces.input, "K"),
-        [ids.ctxArgument]: { optional: true, type: "T" },
-      }),
-      [
-        makeConst(
-          // const [method, path] = this.parseRequest(request);
-          makeDeconstruction(ids.methodParameter, ids.pathParameter),
-          makeCall(ids.parseRequestFn)(ids.requestParameter),
-        ),
-        // return this.implementation(___)
-        f.createReturnStatement(
-          makeCall(f.createThis(), ids.implementationArgument)(
-            ids.methodParameter,
-            f.createSpreadElement(
-              makeCall(ids.substituteFn)(ids.pathParameter, ids.paramsArgument),
-            ),
-            ids.ctxArgument,
-          ),
-        ),
-      ],
-      {
-        typeParams: { K: ids.requestType },
-        returns: makePromise(makeIndexed(interfaces.response, "K")),
-      },
-    );
 
   /**
    * @example export class Client { ___ }
    * @internal
    * */
-  protected makeClientClass = (name: string) =>
-    makePublicClass(
-      name,
-      [
-        // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
-        makePublicConstructor([
-          makeParam(ids.implementationArgument, {
-            type: ensureTypeNode(ids.implementationType, ["T"]),
-            mod: accessModifiers.protectedReadonly,
-            initId: ids.defaultImplementationConst,
-          }),
-        ]),
-        this.#makeProvider(),
-        this.#makeHasMoreMethod(),
-      ],
-      { typeParams: ["T"] },
-    );
-
-  // `?${new URLSearchParams(____)}`
-  #makeSearchParams = (fromId: string) =>
-    makeTemplate("?", [makeNew(URLSearchParams.name, makeId(fromId))]);
-
-  // new URL(`${path}${searchParams}`, "http:____")
-  #makeFetchURL = () =>
-    makeNew(
-      URL.name,
-      makeTemplate("", [ids.pathParameter], [ids.searchParamsConst]),
-      literally(this.serverUrl),
-    );
+  protected makeClientClass = (name: string) => {
+    const nextCursorProp =
+      propOf<CursorPaginatedResult["output"]["shape"]>("nextCursor");
+    const offsetProp =
+      propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
+    const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
+    const totalProp = propOf<OffsetPaginatedResult["output"]["shape"]>("total");
+    const callArgs = `${ids.method}, ...${ids.substitute}(${ids.path}, ${ids.params}), ${ids.ctx}`;
+    return [
+      `export class ${name}<T> {`,
+      `  public constructor(`,
+      `    protected readonly ${ids.implementation}: ${ids.Implementation}<T> = ${ids.defaultImplementation},`,
+      `  ) {}`,
+      `  public ${ids.provide}<K extends ${ids.Request}>(`,
+      `    ${ids.request}: K,`,
+      `    ${ids.params}: ${interfaces.input}[K],`,
+      `    ${ids.ctx}?: T,`,
+      `  ): Promise<${interfaces.response}[K]> {`,
+      `    const [${ids.method}, ${ids.path}] = ${ids.parseRequest}(${ids.request});`,
+      `    return this.${ids.implementation}(${callArgs});`,
+      `  }`,
+      `  public static hasMore(${ids.response}: ${ids.Pagination}): boolean {`,
+      `    if ("${nextCursorProp}" in ${ids.response}) return ${ids.response}.${nextCursorProp} !== null;`,
+      `    return ${ids.response}.${offsetProp} + ${ids.response}.${limitProp} < ${ids.response}.${totalProp};`,
+      `  }`,
+      `}`,
+    ].join("\n");
+  };
 
   /**
    * @example export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
    * @internal
    * */
   protected makeDefaultImplementation = () => {
-    // method: method.toUpperCase()
-    const methodProperty = f.createPropertyAssignment(
-      propOf<RequestInit>("method"),
-      makeCall(ids.methodParameter, propOf<string>("toUpperCase"))(),
-    );
-
-    // headers: hasBody ? { "Content-Type": "application/json" } : undefined
-    const headersProperty = f.createPropertyAssignment(
-      propOf<RequestInit>("headers"),
-      makeTernary(
-        ids.hasBodyConst,
-        f.createObjectLiteralExpression([
-          f.createPropertyAssignment(
-            literally("Content-Type"),
-            literally(contentTypes.json),
-          ),
-        ]),
-        ids.undefinedValue,
-      ),
-    );
-
-    // body: hasBody ? JSON.stringify(params) : undefined
-    const bodyProperty = f.createPropertyAssignment(
-      propOf<RequestInit>("body"),
-      makeTernary(
-        ids.hasBodyConst,
-        makeCall(
-          JSON[Symbol.toStringTag],
-          propOf<JSON>("stringify"),
-        )(ids.paramsArgument),
-        ids.undefinedValue,
-      ),
-    );
-
-    // const response = await fetch(new URL(`${path}${searchParams}`, "https://example.com"), { ___ });
-    const responseStatement = makeConst(
-      ids.responseConst,
-      f.createAwaitExpression(
-        makeCall(fetch.name)(
-          this.#makeFetchURL(),
-          f.createObjectLiteralExpression([
-            methodProperty,
-            headersProperty,
-            bodyProperty,
-          ]),
-        ),
-      ),
-    );
-
-    // const hasBody = !["get", "delete"].includes(method);
-    const hasBodyStatement = makeConst(
-      ids.hasBodyConst,
-      f.createLogicalNot(
-        makeCall(
-          f.createArrayLiteralExpression([
-            literally("get" satisfies ClientMethod),
-            literally("head" satisfies ClientMethod),
-            literally("delete" satisfies ClientMethod),
-          ]),
-          propOf<string[]>("includes"),
-        )(ids.methodParameter),
-      ),
-    );
-
-    // const searchParams = hasBody ? "" : ___;
-    const searchParamsStatement = makeConst(
-      ids.searchParamsConst,
-      makeTernary(
-        ids.hasBodyConst,
-        literally(""),
-        this.#makeSearchParams(ids.paramsArgument),
-      ),
-    );
-
-    // const contentType = response.headers.get("content-type");
-    const contentTypeStatement = makeConst(
-      ids.contentTypeConst,
-      makeCall(
-        ids.responseConst,
-        propOf<Response>("headers"),
-        propOf<Headers>("get"),
-      )(literally("content-type")),
-    );
-
-    // if (!contentType) return;
-    const noBodyStatement = f.createIfStatement(
-      f.createPrefixUnaryExpression(
-        ts.SyntaxKind.ExclamationToken,
-        makeId(ids.contentTypeConst),
-      ),
-      f.createReturnStatement(),
-    );
-
-    // const isJSON = contentType.startsWith("application/json");
-    const isJsonConst = makeConst(
-      ids.isJsonConst,
-      makeCall(
-        ids.contentTypeConst,
-        propOf<string>("startsWith"),
-      )(literally(contentTypes.json)),
-    );
-
-    // return response[isJSON ? "json" : "text"]();
-    const returnStatement = f.createReturnStatement(
-      makeCall(
-        ids.responseConst,
-        makeTernary(
-          ids.isJsonConst,
-          literally(propOf<Response>("json")),
-          literally(propOf<Response>("text")),
-        ),
-      )(),
-    );
-
-    return makeConst(
-      ids.defaultImplementationConst,
-      makeArrowFn(
-        [ids.methodParameter, ids.pathParameter, ids.paramsArgument],
-        f.createBlock([
-          hasBodyStatement,
-          searchParamsStatement,
-          responseStatement,
-          contentTypeStatement,
-          noBodyStatement,
-          isJsonConst,
-          returnStatement,
-        ]),
-        { isAsync: true },
-      ),
-      { type: ids.implementationType },
-    );
+    const args = `${ids.method}, ${ids.path}, ${ids.params}`;
+    const noBodyMethods = quot([
+      "get",
+      "head",
+      "delete",
+    ] satisfies ClientMethod[]).join(", ");
+    const headers = `${ids.hasBody} ? { "Content-Type": "${contentTypes.json}" } : ${ids.undefined}`;
+    const body = `${ids.hasBody} ? JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
+    const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
+    const parser = `${ids.isJSON} ? "${propOf<Response>("json")}" : "${propOf<Response>("text")}"`;
+    return [
+      `const ${ids.defaultImplementation}: ${ids.Implementation} = async (${args}) => {`,
+      `  const ${ids.hasBody} = ![${noBodyMethods}].includes(${ids.method});`,
+      `  const ${ids.searchParams} = ${ids.hasBody} ? "" : \`?\${new ${URLSearchParams.name}(${ids.params})}\`;`,
+      `  const ${ids.response} = await ${fetch.name}(`,
+      `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
+      `    {`,
+      `      ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
+      `      ${propOf<RequestInit>("headers")}: ${headers},`,
+      `      ${propOf<RequestInit>("body")}: ${body},`,
+      `    },`,
+      `  );`,
+      `  const ${ids.contentType} = ${contentType};`,
+      `  if (!${ids.contentType}) return;`,
+      `  const ${ids.isJSON} = ${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}");`,
+      `  return ${ids.response}[${parser}]();`,
+      `};`,
+    ].join("\n");
   };
-
-  #makeSubscriptionConstructor = () =>
-    makePublicConstructor(
-      makeParams({
-        request: "K",
-        params: makeIndexed(interfaces.input, "K"),
-      }),
-      [
-        makeConst(
-          makeDeconstruction(ids.pathParameter, ids.restConst),
-          makeCall(ids.substituteFn)(
-            f.createElementAccessExpression(
-              makeCall(ids.parseRequestFn)(ids.requestParameter),
-              literally(1),
-            ),
-            ids.paramsArgument,
-          ),
-        ),
-        makeConst(ids.searchParamsConst, this.#makeSearchParams(ids.restConst)),
-        makeAssignment(
-          f.createPropertyAccessExpression(f.createThis(), ids.sourceProp),
-          makeNew("EventSource", this.#makeFetchURL()),
-        ),
-      ],
-    );
-
-  #makeEventNarrow = (value: Typeable) =>
-    f.createTypeLiteralNode([
-      makeInterfaceProp(propOf<SSEShape>("event"), value),
-    ]);
-
-  #makeOnMethod = () =>
-    makePublicMethod(
-      ids.onMethod,
-      makeParams({
-        [ids.eventParameter]: "E",
-        [ids.handlerParameter]: makeFnType(
-          {
-            [ids.dataParameter]: makeIndexed(
-              makeExtract("R", makeOneLine(this.#makeEventNarrow("E"))),
-              makeLiteralType(propOf<SSEShape>("data")),
-            ),
-          },
-          makeMaybeAsync(ts.SyntaxKind.VoidKeyword),
-        ),
-      }),
-      [
-        f.createExpressionStatement(
-          makeCall(
-            f.createThis(),
-            ids.sourceProp,
-            propOf<EventSource>("addEventListener"),
-          )(
-            ids.eventParameter,
-            makeArrowFn(
-              [ids.msgParameter],
-              makeCall(ids.handlerParameter)(
-                makeCall(
-                  JSON[Symbol.toStringTag],
-                  propOf<JSON>("parse"),
-                )(
-                  f.createPropertyAccessExpression(
-                    f.createParenthesizedExpression(
-                      f.createAsExpression(
-                        makeId(ids.msgParameter),
-                        ensureTypeNode(MessageEvent.name),
-                      ),
-                    ),
-                    propOf<SSEShape>("data"),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        f.createReturnStatement(f.createThis()),
-      ],
-      {
-        typeParams: {
-          E: makeIndexed("R", makeLiteralType(propOf<SSEShape>("event"))),
-        },
-      },
-    );
 
   /**
    * @example export class Subscription<K extends Extract<___>, R extends Extract<___>> { ___ }
    * @internal
    * */
-  protected makeSubscriptionClass = (name: string) =>
-    makePublicClass(
-      name,
-      [
-        makePublicProperty(ids.sourceProp, "EventSource"),
-        this.#makeSubscriptionConstructor(),
-        this.#makeOnMethod(),
-      ],
-      {
-        typeParams: {
-          K: makeExtract(
-            ids.requestType,
-            f.createTemplateLiteralType(f.createTemplateHead("get "), [
-              f.createTemplateLiteralTypeSpan(
-                ensureTypeNode(ts.SyntaxKind.StringKeyword),
-                f.createTemplateTail(""),
-              ),
-            ]),
-          ),
-          R: makeExtract(
-            makeIndexed(interfaces.positive, "K"),
-            makeOneLine(this.#makeEventNarrow(ts.SyntaxKind.StringKeyword)),
-          ),
-        },
-      },
-    );
+  protected makeSubscriptionClass = (name: string) => {
+    const substitution = `${ids.substitute}(${ids.parseRequest}(${ids.request})[1], ${ids.params})`;
+    const dataType = `Extract<R, { ${propOf<SSEShape>("event")}: E }>["${propOf<SSEShape>("data")}"]`;
+    const data = `(${ids.msg} as ${MessageEvent.name}).${propOf<SSEShape>("data")}`;
+    return [
+      `export class ${name}<`,
+      `  K extends Extract<${ids.Request}, \`get \${string}\`>,`,
+      `  R extends Extract<${interfaces.positive}[K], { ${propOf<SSEShape>("event")}: string }>,`,
+      `> {`,
+      `  public ${ids.source}: EventSource;`,
+      `  public constructor(${ids.request}: K, ${ids.params}: ${interfaces.input}[K]) {`,
+      `    const [${ids.path}, ${ids.rest}] = ${substitution};`,
+      `    const ${ids.searchParams} = \`?\${new ${URLSearchParams.name}(${ids.rest})}\`;`,
+      `    this.${ids.source} = new EventSource(`,
+      `      new URL(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
+      `    );`,
+      `  }`,
+      `  public ${ids.on}<E extends R["${propOf<SSEShape>("event")}"]>(`,
+      `    ${propOf<SSEShape>("event")}: E,`,
+      `    ${ids.handler}: (${ids.data}: ${dataType}) => void | Promise<void>,`,
+      `  ) {`,
+      `    this.${ids.source}.${propOf<EventSource>("addEventListener")}(${ids.event}, (${ids.msg}) =>`,
+      `      ${ids.handler}(JSON.${propOf<JSON>("parse")}(${data})),`,
+      `    );`,
+      `    return this;`,
+      `  }`,
+      `}`,
+    ].join("\n");
+  };
 
   /** @internal */
   protected makeUsageStatements = (
     clientClassName: string,
     subscriptionClassName: string,
-  ): ts.Node[] => [
-    makeConst(ids.clientConst, makeNew(clientClassName)), // const client = new Client();
-    // client.provide("get /v1/user/retrieve", { id: "10" });
-    makeCall(ids.clientConst, ids.provideMethod)(
-      literally(`${"get" satisfies ClientMethod} /v1/user/retrieve`),
-      f.createObjectLiteralExpression([
-        f.createPropertyAssignment("id", literally("10")),
-      ]),
-    ),
-    // new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
-    makeCall(
-      makeNew(
-        subscriptionClassName,
-        literally(`${"get" satisfies ClientMethod} /v1/events/stream`),
-        f.createObjectLiteralExpression(),
-      ),
-      ids.onMethod,
-    )(literally("time"), makeArrowFn(["time"], f.createBlock([]))),
-  ];
+  ) =>
+    [
+      `const ${ids.client} = new ${clientClassName}();`,
+      `${ids.client}.${ids.provide}("get /v1/user/retrieve", { id: "10" });`,
+      `new ${subscriptionClassName}("get /v1/events/stream", {}).${ids.on}("time", (time) => {});`,
+    ].join("\n");
 }
