@@ -74,7 +74,7 @@ const addJsDoc = <T extends ts.Node>(node: T, text: string) =>
   );
 
 export const printNode = (
-  node: ts.Node,
+  node: ts.TypeNode,
   printerOptions?: ts.PrinterOptions,
 ) => {
   const sourceFile = ts.createSourceFile(
