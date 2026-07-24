@@ -99,7 +99,7 @@ importers:
         version: 9.1.7
       openai:
         specifier: ^6.37.0
-        version: 6.47.0(zod@4.4.3)
+        version: 6.48.0(zod@4.4.3)
       prettier:
         specifier: 3.9.5
         version: 3.9.5
@@ -1569,8 +1569,8 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  openai@6.47.0:
-    resolution: {integrity: sha512-xYr+R9woSzWxVxeiqkkNbHhv89tZDEI6eBMbrdPnv3poh+mijHvbhS35a+3o6xHa411/ns8j5ENY3So9DCXWYw==}
+  openai@6.48.0:
+    resolution: {integrity: sha512-KhVp+FyV50QrXNextvL9hIU5l6ox5HYuKQjGVk7lIqprgJol90+dQXWONV6S1lRWsKA1bXjrow8RsUT14M1hNA==}
     peerDependencies:
       '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
       '@smithy/hash-node': '>=4.3.0 <5'
@@ -3303,7 +3303,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@6.47.0(zod@4.4.3):
+  openai@6.48.0(zod@4.4.3):
     optionalDependencies:
       zod: 4.4.3
 
