@@ -2,6 +2,10 @@
 
 ## Version 28
 
+### v28.7.6
+
+- Added well-known header, recognized by Documentation generator: `want-unencoded-digest`.
+
 ### v28.7.5
 
 - Small performance improvement for startup and Documentation generator (cache for request type resolution).
