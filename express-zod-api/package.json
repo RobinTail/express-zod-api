@@ -62,7 +62,7 @@
     "@express-zod-api/zod-plugin": "workspace:^",
     "@types/compression": "^1.7.5",
     "@types/cookie-parser": "^1.4.10",
-    "@types/express": "^5.0.0",
+    "@types/express": "^5.0.6",
     "@types/express-fileupload": "^1.5.0",
     "@types/http-errors": "^2.0.2",
     "compression": "^1.8.0",
