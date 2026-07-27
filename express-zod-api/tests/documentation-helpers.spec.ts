@@ -1,4 +1,4 @@
-import type { SchemaObject } from "openapi3-ts/oas31";
+import type { SchemaObjectValue } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
@@ -291,7 +291,7 @@ describe("Documentation helpers", () => {
       },
     );
 
-    test.each<SchemaObject>([
+    test.each<SchemaObjectValue>([
       { type: "null" },
       {
         anyOf: [{ type: "null" }, { type: "null" }],
@@ -617,6 +617,35 @@ describe("Documentation helpers", () => {
         ]),
       ).toMatchSnapshot();
     });
+    test("should depict OAuth2 Security with device authorization flow", () => {
+      expect(
+        depictSecurity([
+          [
+            {
+              type: "oauth2",
+              oauth2MetadataUrl:
+                "https://example.com/.well-known/openid-configuration",
+              flows: {
+                deviceAuthorization: {
+                  deviceAuthorizationUrl: "https://example.com/device/auth",
+                  tokenUrl: "https://example.com/device/token",
+                  scopes: { read: "Read access", write: "Write access" },
+                },
+              },
+            },
+          ],
+        ]),
+      ).toMatchSnapshot();
+    });
+    test("should support deprecated flag on security schemes", () => {
+      expect(
+        depictSecurity([
+          [{ type: "basic", deprecated: true }],
+          [{ type: "bearer", deprecated: true }],
+          [{ type: "header", name: "X-API-Key", deprecated: true }],
+        ]),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictSecurityRefs()", () => {
@@ -683,6 +712,34 @@ describe("Documentation helpers", () => {
           files: {
             description: "Everything about files processing",
             url: "https://example.com",
+          },
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test("should accept objects with summary and parent and kind", () => {
+      expect(
+        depictTags({
+          books: {
+            description: "Book catalog and recommendations",
+            summary: "Books & Literature",
+            parent: "products",
+            kind: "nav",
+            externalDocs: {
+              url: "https://docs.example.com",
+              description: "Full API documentation",
+            },
+          },
+          cds: {
+            description: "Music CD catalog and reviews",
+            summary: "Music CDs",
+            parent: "products",
+            kind: "nav",
+            url: "https://example.com/docs", // overrides
+            externalDocs: {
+              url: "https://example.com/old-docs",
+              description: "External docs site",
+            },
           },
         }),
       ).toMatchSnapshot();

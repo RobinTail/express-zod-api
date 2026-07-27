@@ -4,7 +4,7 @@ export type SomeMethod = Lowercase<string>;
 
 type FamiliarMethod = Exclude<
   keyof IRouter,
-  "param" | "use" | "route" | "stack"
+  "param" | "use" | "route" | "stack" | "all"
 >;
 
 export const methods = [
@@ -13,6 +13,7 @@ export const methods = [
   "put",
   "delete",
   "patch",
+  "query",
 ] satisfies Array<FamiliarMethod>;
 
 export const clientMethods = [
@@ -23,7 +24,7 @@ export const clientMethods = [
 /**
  * @desc Methods supported by the framework API to produce Endpoints on EndpointsFactory.
  * @see BuildProps
- * @example "get" | "post" | "put" | "delete" | "patch"
+ * @example "get" | "post" | "put" | "delete" | "patch" | "query"
  * */
 export type Method = (typeof methods)[number];
 
@@ -36,7 +37,6 @@ export type ClientMethod = (typeof clientMethods)[number];
 
 /**
  * @desc Methods supported in CORS headers
- * @see makeCorsHeaders
  * @see createWrongMethodHandler
  * @example ClientMethod | "options"
  * */

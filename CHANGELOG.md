@@ -1,5 +1,68 @@
 # Changelog
 
+## Version 29
+
+### v29.0.0
+
+- Supported Node.js versions: `^22.19.0 || ^24.11.0 || ^26.0.0`;
+- Major changes to the package distribution:
+  - `Documentation` and `Depicter` type moved to the `express-zod-api/documentation` subpath;
+  - `Integration` and `Producer` type moved to the `express-zod-api/integration` subpath;
+  - Several types and interfaces are no longer exposed:
+    - `CommonConfig`, `AppConfig`, `ServerConfig` — use `createConfig()` instead;
+    - `ApiResponse` — use `createApiResponse()` instead (new);
+    - `CacheControl` and `CachePolicy` — use `createCacheMiddleware()` or `EndpointsFactory::useCacheMiddleware()`;
+    - `FlatObject`, `IOSchema` and every type ending with `Security`;
+    - The public nature of these types was a workaround for user-side type declarations, but it's solved differently.
+- Breaking change to the `cors` config option:
+  - Changed from `boolean | HeadersProvider` to `boolean | RequestHandler`;
+  - You can now use the well-known `cors` package or pass a conventional `RequestHandler` directly.
+- Body parsers are now applied globally rather than per-endpoint (`createServer` experience only):
+  - Endpoints can accept requests in different content types (e.g., either JSON or URL-encoded body);
+  - The `Documentation` generator continues to guess the desired request type from the input schema;
+  - Parsers retain the ability for configuration via `jsonParser`, `formParser`, and `rawParser` config options;
+  - If using `attachRouting()` in a DIY server, parsers have to be installed manually.
+- Potentially breaking changes to the server lifecycle hooks:
+  - The hooks (`beforeRouting` and `afterRouting` config options) are no longer async;
+  - `beforeRouting` now runs after the installation of globally enabled parsers;
+  - Added new `beforeParsers` hook that runs before all parsers are installed.
+- The `createServer()` function is now synchronous — that should simplify the daily routines for beginners;
+- Added HTTP QUERY method support (RFC 10008):
+  - The QUERY method is like GET but with a body — safe, idempotent, and cacheable;
+  - Default input sources for QUERY: `["query", "body", "params"]` (from the lowest priority to highest);
+  - Supported by `Integration` and `Documentation` generators.
+- Changes to `Documentation`:
+  - `serverUrl` constructor option renamed to `server` and now also accepts OpenAPI's ServerObject;
+  - `title` option and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
+  - Now produces OpenAPI 3.2.0 with better SSE support and other features.
+- Changes to `Integration`:
+  - The static async method `create()` removed — use `new Integration()` instead;
+  - Removed `typescript` option from constructor — now imported statically.
+- Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
+
+```diff
+- import { Integration, Documentation, type Producer, type Depicter } from "express-zod-api";
++ import { Integration, type Producer } from "express-zod-api/integration";
++ import { Documentation, type Depicter } from "express-zod-api/documentation";
+
+  const config = createConfig({
+-   cors: () => ({ origin: "https://example.com" }),
++   cors: cors({ origin: "https://example.com" }), // import cors from "cors"
+  });
+- await Integration.create({});
++ new Integration({});
+- const {} = await createServer({});
++ const {} = createServer({});
+  new Documentation({
++   info: {
+      title: "Sample API",
+      version: "1.2.3",
++   },
+-   serverUrl: "https://example.com",
++   server: "https://example.com",
+  });
+```
+
 ## Version 28
 
 ### v28.7.6

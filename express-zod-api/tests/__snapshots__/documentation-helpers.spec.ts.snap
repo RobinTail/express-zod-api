@@ -316,12 +316,36 @@ exports[`Documentation helpers > depictSecurity() > should add scopes when missi
 [
   [
     {
+      "deprecated": undefined,
       "flows": {
         "password": {
           "scopes": {},
           "tokenUrl": "https://test.url",
         },
       },
+      "oauth2MetadataUrl": undefined,
+      "type": "oauth2",
+    },
+  ],
+]
+`;
+
+exports[`Documentation helpers > depictSecurity() > should depict OAuth2 Security with device authorization flow 1`] = `
+[
+  [
+    {
+      "deprecated": undefined,
+      "flows": {
+        "deviceAuthorization": {
+          "deviceAuthorizationUrl": "https://example.com/device/auth",
+          "scopes": {
+            "read": "Read access",
+            "write": "Write access",
+          },
+          "tokenUrl": "https://example.com/device/token",
+        },
+      },
+      "oauth2MetadataUrl": "https://example.com/.well-known/openid-configuration",
       "type": "oauth2",
     },
   ],
@@ -332,6 +356,7 @@ exports[`Documentation helpers > depictSecurity() > should depict OAuth2 Securit
 [
   [
     {
+      "deprecated": undefined,
       "flows": {
         "authorizationCode": {
           "authorizationUrl": "https://test.url",
@@ -367,6 +392,7 @@ exports[`Documentation helpers > depictSecurity() > should depict OAuth2 Securit
           "tokenUrl": "https://test3.url",
         },
       },
+      "oauth2MetadataUrl": undefined,
       "type": "oauth2",
     },
   ],
@@ -377,16 +403,19 @@ exports[`Documentation helpers > depictSecurity() > should handle Basic, Bearer 
 [
   [
     {
+      "deprecated": undefined,
       "scheme": "basic",
       "type": "http",
     },
     {
+      "deprecated": undefined,
       "scheme": "bearer",
       "type": "http",
     },
   ],
   [
     {
+      "deprecated": undefined,
       "in": "header",
       "name": "X-Key",
       "type": "apiKey",
@@ -399,6 +428,7 @@ exports[`Documentation helpers > depictSecurity() > should handle Input and Cook
 [
   [
     {
+      "deprecated": undefined,
       "in": "query",
       "name": "apiKey",
       "type": "apiKey",
@@ -406,6 +436,7 @@ exports[`Documentation helpers > depictSecurity() > should handle Input and Cook
   ],
   [
     {
+      "deprecated": undefined,
       "in": "cookie",
       "name": "hash",
       "type": "apiKey",
@@ -418,13 +449,16 @@ exports[`Documentation helpers > depictSecurity() > should handle OpenID and OAu
 [
   [
     {
+      "deprecated": undefined,
       "openIdConnectUrl": "https://test.url",
       "type": "openIdConnect",
     },
   ],
   [
     {
+      "deprecated": undefined,
       "flows": {},
+      "oauth2MetadataUrl": undefined,
       "type": "oauth2",
     },
   ],
@@ -435,7 +469,9 @@ exports[`Documentation helpers > depictSecurity() > should handle undefined flow
 [
   [
     {
+      "deprecated": undefined,
       "flows": {},
+      "oauth2MetadataUrl": undefined,
       "type": "oauth2",
     },
   ],
@@ -446,6 +482,7 @@ exports[`Documentation helpers > depictSecurity() > should inform on 'actual' pl
 [
   [
     {
+      "deprecated": undefined,
       "description": "key MUST be supplied within the request body instead of query",
       "in": "query",
       "name": "key",
@@ -460,11 +497,39 @@ exports[`Documentation helpers > depictSecurity() > should inform on 'alternativ
 [
   [
     {
+      "deprecated": undefined,
       "description": "key CAN also be supplied within the request body",
       "in": "query",
       "name": "key",
       "type": "apiKey",
       "x-in-alternative": "body",
+    },
+  ],
+]
+`;
+
+exports[`Documentation helpers > depictSecurity() > should support deprecated flag on security schemes 1`] = `
+[
+  [
+    {
+      "deprecated": true,
+      "scheme": "basic",
+      "type": "http",
+    },
+  ],
+  [
+    {
+      "deprecated": true,
+      "scheme": "bearer",
+      "type": "http",
+    },
+  ],
+  [
+    {
+      "deprecated": true,
+      "in": "header",
+      "name": "X-API-Key",
+      "type": "apiKey",
     },
   ],
 ]
@@ -539,6 +604,33 @@ exports[`Documentation helpers > depictTags() > should accept objects with URLs 
       "url": "https://example.com",
     },
     "name": "files",
+  },
+]
+`;
+
+exports[`Documentation helpers > depictTags() > should accept objects with summary and parent and kind 1`] = `
+[
+  {
+    "description": "Book catalog and recommendations",
+    "externalDocs": {
+      "description": "Full API documentation",
+      "url": "https://docs.example.com",
+    },
+    "kind": "nav",
+    "name": "books",
+    "parent": "products",
+    "summary": "Books & Literature",
+  },
+  {
+    "description": "Music CD catalog and reviews",
+    "externalDocs": {
+      "description": "External docs site",
+      "url": "https://example.com/docs",
+    },
+    "kind": "nav",
+    "name": "cds",
+    "parent": "products",
+    "summary": "Music CDs",
   },
 ]
 `;

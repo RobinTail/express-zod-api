@@ -1,0 +1,21 @@
+name: OpenAPI validation
+on:
+  push:
+    branches: [ master, v25, v26, v27 ]
+  pull_request:
+    branches: [ master, v25, v26, v27 ]
+
+permissions:
+  id-token: none
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+    - name: Validate OpenAPI definition
+      uses: swaggerexpert/apidom-validate@v1
+      with:
+        definition-file: example/example.documentation.yaml
