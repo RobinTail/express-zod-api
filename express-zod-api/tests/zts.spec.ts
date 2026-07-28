@@ -1,18 +1,14 @@
 import ts from "typescript";
 import { z } from "zod";
 import { ez } from "../src";
-import { TypescriptAPI } from "../src/typescript-api";
+import { printNode } from "../src/typescript-api";
 import { zodToTs } from "../src/zts";
 import type { ZTSContext } from "../src/zts-helpers";
 
 describe("zod-to-ts", () => {
-  const api = new TypescriptAPI(ts);
-  const printNodeTest = (node: ts.Node) =>
-    api.printNode(node, { newLine: ts.NewLineKind.LineFeed });
   const ctx: ZTSContext = {
     isResponse: false,
-    makeAlias: vi.fn(() => api.f.createTypeReferenceNode("SomeType")),
-    api,
+    makeAlias: vi.fn(() => ts.factory.createTypeReferenceNode("SomeType")),
   };
 
   describe("z.array()", () => {
@@ -21,21 +17,21 @@ describe("zod-to-ts", () => {
         z.object({ id: z.number(), value: z.string() }).array(),
         { ctx },
       );
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
   });
 
   describe("ez.buffer()", () => {
     test("should be Buffer", () => {
       const node = zodToTs(ez.buffer(), { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
   });
 
   describe("ez.raw()", () => {
     test("should depict the raw property", () => {
       const node = zodToTs(ez.raw({ extra: z.string() }), { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
   });
 
@@ -66,7 +62,7 @@ describe("zod-to-ts", () => {
       { schema: z.enum(Fruit), feature: "string" },
       { schema: z.enum(StringLiteral), feature: "quoted string" },
     ])("handles $feature literals", ({ schema }) => {
-      expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
+      expect(printNode(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
   });
 
@@ -183,7 +179,7 @@ describe("zod-to-ts", () => {
 
     test("should produce the expected results", () => {
       const node = zodToTs(example, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
   });
 
@@ -212,12 +208,12 @@ describe("zod-to-ts", () => {
 
     test("Zod 4: does not add undefined to it, unwrap as is", () => {
       const node = zodToTs(optionalStringSchema, { ctx });
-      expect(printNodeTest(node)).toEqual("string");
+      expect(printNode(node)).toEqual("string");
     });
 
     test("Zod 4: should add question mark only to optional props", () => {
       const node = zodToTs(objectWithOptionals, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
   });
 
@@ -228,7 +224,7 @@ describe("zod-to-ts", () => {
     const node = zodToTs(nullableUsernameSchema, { ctx });
 
     test("outputs correct typescript", () => {
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
   });
 
@@ -239,7 +235,7 @@ describe("zod-to-ts", () => {
         5: z.number(),
       });
       const node = zodToTs(schema, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
 
     test("does not unnecessary quote identifiers", () => {
@@ -249,7 +245,7 @@ describe("zod-to-ts", () => {
         countryOfOrigin: z.string(),
       });
       const node = zodToTs(schema, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
 
     test("escapes correctly", () => {
@@ -265,7 +261,7 @@ describe("zod-to-ts", () => {
         "-r": z.undefined(),
       });
       const node = zodToTs(schema, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
 
     test("supports zod.describe()", () => {
@@ -274,7 +270,7 @@ describe("zod-to-ts", () => {
         price: z.number().describe("The price of the item"),
       });
       const node = zodToTs(schema, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
 
     test("supports deprecated metadata", () => {
@@ -283,7 +279,7 @@ describe("zod-to-ts", () => {
         two: z.string().meta({ deprecated: true }).describe("with description"),
       });
       const node = zodToTs(schema, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
 
     test("specially handles coercive schema in response", () => {
@@ -291,7 +287,7 @@ describe("zod-to-ts", () => {
         prop: z.coerce.string(),
       });
       const node = zodToTs(schema, { ctx: { ...ctx, isResponse: true } });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
   });
 
@@ -310,7 +306,7 @@ describe("zod-to-ts", () => {
     ])("should deduplicate the prop with a same name", (a, b) => {
       const schema = z.object({ query: a }).and(z.object({ query: b }));
       const node = zodToTs(schema, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
 
     test.each([
@@ -334,7 +330,7 @@ describe("zod-to-ts", () => {
       "should not flatten the result for objects with a conflicting prop %#",
       (a, b) => {
         const node = zodToTs(a.and(b), { ctx });
-        expect(printNodeTest(node)).toMatchSnapshot();
+        expect(printNode(node)).toMatchSnapshot();
       },
     );
   });
@@ -357,7 +353,7 @@ describe("zod-to-ts", () => {
       const node = zodToTs(primitiveSchema, { ctx: { ...ctx, isResponse } });
 
       test("outputs correct typescript", () => {
-        expect(printNodeTest(node)).toMatchSnapshot();
+        expect(printNode(node)).toMatchSnapshot();
       });
     },
   );
@@ -371,7 +367,7 @@ describe("zod-to-ts", () => {
     const node = zodToTs(shapeSchema, { ctx });
 
     test("outputs correct typescript", () => {
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNode(node)).toMatchSnapshot();
     });
   });
 
@@ -383,7 +379,7 @@ describe("zod-to-ts", () => {
       z.literal(123),
       z.literal(undefined),
     ])("Should produce the correct typescript %#", (schema) => {
-      expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
+      expect(printNode(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
   });
 
@@ -401,7 +397,7 @@ describe("zod-to-ts", () => {
       z.templateLiteral(["head", undefined]),
       z.templateLiteral(["head", 0]),
     ])("should produce the correct typescript %#", (schema) => {
-      expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
+      expect(printNode(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
   });
 
@@ -413,14 +409,14 @@ describe("zod-to-ts", () => {
       ])("should produce the schema type $expected", ({ isResponse }) => {
         const schema = z.number().transform((num) => `${num}`);
         expect(
-          printNodeTest(zodToTs(schema, { ctx: { ...ctx, isResponse } })),
+          printNode(zodToTs(schema, { ctx: { ...ctx, isResponse } })),
         ).toMatchSnapshot();
       });
 
       test("should handle unsupported transformation in response", () => {
         const schema = z.number().transform((num) => () => num);
         expect(
-          printNodeTest(zodToTs(schema, { ctx: { ...ctx, isResponse: true } })),
+          printNode(zodToTs(schema, { ctx: { ...ctx, isResponse: true } })),
         ).toMatchSnapshot();
       });
 
@@ -428,7 +424,7 @@ describe("zod-to-ts", () => {
         const schema = z.preprocess(() => {
           throw new Error("intentional");
         }, z.number());
-        expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
+        expect(printNode(zodToTs(schema, { ctx }))).toMatchSnapshot();
       });
 
       test("should handle an error within the transformation", () => {
@@ -436,7 +432,7 @@ describe("zod-to-ts", () => {
           .number()
           .transform(() => assert.fail("this should be handled"));
         expect(
-          printNodeTest(zodToTs(schema, { ctx: { ...ctx, isResponse: true } })),
+          printNode(zodToTs(schema, { ctx: { ...ctx, isResponse: true } })),
         ).toMatchSnapshot();
       });
     });

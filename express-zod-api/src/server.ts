@@ -12,9 +12,10 @@ import type {
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
-import { initRouting, type Parsers, type Routing } from "./routing";
+import { initRouting, type Routing } from "./routing";
 import {
   createCookieParser,
+  ensureCorsMiddleware,
   createLoggingMiddleware,
   createNotFoundHandler,
   createCatcher,
@@ -54,16 +55,13 @@ const makeCommonEntities = (config: CommonConfig) => {
 export const attachRouting = (config: AppConfig, routing: Routing) => {
   const { logger, getLogger, notFoundHandler, loggingMiddleware } =
     makeCommonEntities(config);
-  initRouting({
-    app: config.app.use(loggingMiddleware),
-    routing,
-    getLogger,
-    config,
-  });
+  const app = config.app.use(loggingMiddleware);
+  if (config.cors) app.use(ensureCorsMiddleware(config.cors));
+  initRouting({ app, routing, getLogger, config });
   return { notFoundHandler, logger };
 };
 
-export const createServer = async (config: ServerConfig, routing: Routing) => {
+const setup = (config: ServerConfig, routing: Routing) => {
   const { logger, getLogger, notFoundHandler, catcher, loggingMiddleware } =
     makeCommonEntities(config);
   const app = express()
@@ -71,6 +69,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     .set("query parser", config.queryParser ?? "simple")
     .use(loggingMiddleware);
 
+  config.beforeParsers?.({ app, getLogger });
   if (config.compression) {
     const compressor = loadPeer<typeof compression>("compression");
     app.use(
@@ -80,18 +79,24 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     );
   }
   if (config.cookies) app.use(createCookieParser({ config }));
-  await config.beforeRouting?.({ app, getLogger });
+  if (config.cors) app.use(ensureCorsMiddleware(config.cors)); // issue #2706: CORS must go before parsers
 
-  const parsers: Parsers = {
-    json: [config.jsonParser || express.json()],
-    raw: [config.rawParser || express.raw(), moveRaw],
-    form: [config.formParser || express.urlencoded()],
-    upload: config.upload ? createUploadParsers({ config, getLogger }) : [],
-  };
-  initRouting({ app, routing, getLogger, config, parsers });
+  app
+    .use(config.jsonParser || express.json())
+    .use(config.formParser || express.urlencoded())
+    .use(config.rawParser || express.raw(), moveRaw);
+  if (config.upload) app.use(...createUploadParsers({ config, getLogger }));
 
-  await config.afterRouting?.({ app, getLogger });
+  config.beforeRouting?.({ app, getLogger });
+  initRouting({ app, routing, getLogger, config });
+  config.afterRouting?.({ app, getLogger });
+
   app.use(catcher, notFoundHandler);
+  return { app, logger };
+};
+
+export const createServer = (config: ServerConfig, routing: Routing) => {
+  const { app, logger } = setup(config, routing);
 
   const created: Array<http.Server | https.Server> = [];
   const makeStarter =

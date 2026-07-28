@@ -6,8 +6,8 @@ import {
   testMiddleware,
   EventStreamFactory,
   EndpointsFactory,
-  type FlatObject,
 } from "../src";
+import type { FlatObject } from "../src/common-helpers";
 import {
   type Emitter,
   ensureStream,
@@ -22,6 +22,14 @@ import {
   makeResponseMock,
 } from "../src/testing";
 import { AbstractEndpoint } from "../src/endpoint";
+
+const useFakeTimers = () => {
+  vi.useFakeTimers();
+  return {
+    [Symbol.dispose]: () => void vi.useRealTimers(),
+    shift: vi.advanceTimersByTime.bind(vi),
+  };
+};
 
 describe("SSE", () => {
   describe("makeEventSchema()", () => {
@@ -112,21 +120,17 @@ describe("SSE", () => {
     });
 
     test("should clear the stream timeout when request closes before timeout fires", async () => {
-      vi.useFakeTimers();
-      try {
-        const middleware = makeMiddleware({ test: z.string() });
-        const { requestMock, responseMock, output } = await testMiddleware({
-          middleware,
-        });
-        expect(output.signal?.aborted).toBeFalsy();
-        expect(responseMock.headersSent).toBeFalsy();
-        requestMock.emit("close");
-        expect(output.signal?.aborted).toBeTruthy();
-        vi.advanceTimersByTime(10000);
-        expect(responseMock.headersSent).toBeFalsy();
-      } finally {
-        vi.useRealTimers();
-      }
+      using timers = useFakeTimers();
+      const middleware = makeMiddleware({ test: z.string() });
+      const { requestMock, responseMock, output } = await testMiddleware({
+        middleware,
+      });
+      expect(output.signal?.aborted).toBeFalsy();
+      expect(responseMock.headersSent).toBeFalsy();
+      requestMock.emit("close");
+      expect(output.signal?.aborted).toBeTruthy();
+      timers.shift(1e4);
+      expect(responseMock.headersSent).toBeFalsy();
     });
   });
 

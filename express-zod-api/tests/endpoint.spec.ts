@@ -14,7 +14,7 @@ describe("Endpoint", () => {
   describe(".methods", () => {
     test("Should return the correct set of methods (readonly)", () => {
       const endpointMock = new Endpoint({
-        methods: ["get", "post", "put", "delete", "patch"],
+        methods: ["get", "post", "put", "delete", "patch", "query"],
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         handler: vi.fn(),
@@ -25,7 +25,14 @@ describe("Endpoint", () => {
         }),
       });
       const { methods } = endpointMock;
-      expect(methods).toEqual(["get", "post", "put", "delete", "patch"]);
+      expect(methods).toEqual([
+        "get",
+        "post",
+        "put",
+        "delete",
+        "patch",
+        "query",
+      ]);
       expect(() => (methods as any[]).push()).toThrowError(/read only/);
     });
   });
@@ -360,7 +367,17 @@ describe("Endpoint", () => {
     });
   });
 
-  describe(".requestType", () => {
+  describe(".getProbableRequestType()", () => {
+    test("should return 'form' for QUERY method %#", () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        input: ez.raw(),
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      expect(endpoint.getProbableRequestType()).toBe("raw");
+      expect(endpoint.getProbableRequestType("query")).toBe("form");
+    });
     test.each([
       { input: z.object({}), expected: "json" },
       { input: ez.raw(), expected: "raw" },
@@ -376,7 +393,7 @@ describe("Endpoint", () => {
           output: z.object({}),
           handler: vi.fn(),
         });
-        expect(endpoint.requestType).toEqual(expected);
+        expect(endpoint.getProbableRequestType()).toEqual(expected);
       },
     );
   });

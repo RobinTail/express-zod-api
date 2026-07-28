@@ -19,7 +19,8 @@ type PostV1CustomNegativeVariant1 = {
 
 export type Path = "/v1/custom";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "post /v1/custom": PostV1CustomInput;
@@ -39,9 +40,7 @@ export interface EncodedResponse {
 }
 
 /** @deprecated Use EncodedResponse instead. */
-export type Response = {
-  [K in Request]: EncodedResponse[K][1];
-};
+export type Response = { [K in Request]: EncodedResponse[K][1] };
 
 export type Request = keyof Input;
 "
@@ -74,7 +73,8 @@ type HeadV1PathNegativeVariant1 = undefined;
 
 export type Path = "/v1/path";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "get /v1/path": GetV1PathInput;
@@ -99,9 +99,7 @@ export interface EncodedResponse {
 }
 
 /** @deprecated Use EncodedResponse instead. */
-export type Response = {
-  [K in Request]: EncodedResponse[K][1];
-};
+export type Response = { [K in Request]: EncodedResponse[K][1] };
 
 export type Request = keyof Input;
 "
@@ -123,7 +121,8 @@ type GetV1PathNegativeVariant1 = {
 
 export type Path = "/v1/path";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "get /v1/path": GetV1PathInput;
@@ -143,9 +142,7 @@ export interface EncodedResponse {
 }
 
 /** @deprecated Use EncodedResponse instead. */
-export type Response = {
-  [K in Request]: EncodedResponse[K][1];
-};
+export type Response = { [K in Request]: EncodedResponse[K][1] };
 
 export type Request = keyof Input;
 "
@@ -181,7 +178,8 @@ type PostV1MtplNegativeVariant2 = "failure";
 
 export type Path = "/v1/mtpl";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "post /v1/mtpl": PostV1MtplInput;
@@ -204,9 +202,7 @@ export interface EncodedResponse {
 }
 
 /** @deprecated Use EncodedResponse instead. */
-export type Response = {
-  [K in Request]: EncodedResponse[K][1];
-};
+export type Response = { [K in Request]: EncodedResponse[K][1] };
 
 export type Request = keyof Input;
 "
@@ -218,53 +214,45 @@ exports[`Integration > Should support types variant and handle recursive schemas
     features: Type1;
 };
 
-/** post /v1/test */
-type PostV1TestInput = {
+/** query /v1/test */
+type QueryV1TestInput = {
     features: Type1;
 };
 
-/** post /v1/test */
-type PostV1TestPositiveVariant1 = {};
+/** query /v1/test */
+type QueryV1TestPositiveVariant1 = {};
 
-/** post /v1/test */
-type PostV1TestNegativeVariant1 = {
+/** query /v1/test */
+type QueryV1TestNegativeVariant1 = {
     message: string;
 };
 
 export type Path = "/v1/test";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
-    /** @deprecated */
-    "post /v1/test": PostV1TestInput;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestInput;
 }
 
 export interface PositiveResponse {
-    /** @deprecated */
-    "post /v1/test": PostV1TestPositiveVariant1;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestPositiveVariant1;
 }
 
 export interface NegativeResponse {
-    /** @deprecated */
-    "post /v1/test": PostV1TestNegativeVariant1;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestNegativeVariant1;
 }
 
 export interface EncodedResponse {
-    /** @deprecated */
-    "post /v1/test": [
-        200,
-        PostV1TestPositiveVariant1
-    ] | [
-        400,
-        PostV1TestNegativeVariant1
-    ];
+  /** @deprecated */
+  "query /v1/test": [200, QueryV1TestPositiveVariant1] | [400, QueryV1TestNegativeVariant1];
 }
 
 /** @deprecated Use EncodedResponse instead. */
-export type Response = {
-    [K in Request]: EncodedResponse[K][1];
-};
+export type Response = { [K in Request]: EncodedResponse[K][1] };
 
 export type Request = keyof Input;"
 `;
@@ -275,53 +263,45 @@ exports[`Integration > Should support types variant and handle recursive schemas
     features: Type1;
 };
 
-/** post /v1/test */
-type PostV1TestInput = {
+/** query /v1/test */
+type QueryV1TestInput = {
     features: Type1;
 };
 
-/** post /v1/test */
-type PostV1TestPositiveVariant1 = {};
+/** query /v1/test */
+type QueryV1TestPositiveVariant1 = {};
 
-/** post /v1/test */
-type PostV1TestNegativeVariant1 = {
+/** query /v1/test */
+type QueryV1TestNegativeVariant1 = {
     message: string;
 };
 
 export type Path = "/v1/test";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
-    /** @deprecated */
-    "post /v1/test": PostV1TestInput;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestInput;
 }
 
 export interface PositiveResponse {
-    /** @deprecated */
-    "post /v1/test": PostV1TestPositiveVariant1;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestPositiveVariant1;
 }
 
 export interface NegativeResponse {
-    /** @deprecated */
-    "post /v1/test": PostV1TestNegativeVariant1;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestNegativeVariant1;
 }
 
 export interface EncodedResponse {
-    /** @deprecated */
-    "post /v1/test": [
-        200,
-        PostV1TestPositiveVariant1
-    ] | [
-        400,
-        PostV1TestNegativeVariant1
-    ];
+  /** @deprecated */
+  "query /v1/test": [200, QueryV1TestPositiveVariant1] | [400, QueryV1TestNegativeVariant1];
 }
 
 /** @deprecated Use EncodedResponse instead. */
-export type Response = {
-    [K in Request]: EncodedResponse[K][1];
-};
+export type Response = { [K in Request]: EncodedResponse[K][1] };
 
 export type Request = keyof Input;"
 `;
@@ -344,7 +324,8 @@ type PostV1TestWithDashesNegativeVariant1 = {
 
 export type Path = "/v1/test-with-dashes";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
@@ -365,13 +346,13 @@ export interface EncodedResponse {
 }
 
 /** @deprecated Use EncodedResponse instead. */
-export type Response = {
-  [K in Request]: EncodedResponse[K][1];
-};
+export type Response = { [K in Request]: EncodedResponse[K][1] };
 
 export type Request = keyof Input;
 
-export const endpointTags = { "post /v1/test-with-dashes": [] };
+export const endpointTags = {
+  "post /v1/test-with-dashes": [],
+};
 
 const parseRequest = (request: string) =>
   request.split(/ (.+)/, 2) as [Method, Path];
@@ -395,14 +376,8 @@ export type Implementation<T = unknown> = (
 ) => Promise<[number, any]>;
 
 type Pagination =
-  | {
-      nextCursor: string | null;
-    }
-  | {
-      total: number;
-      limit: number;
-      offset: number;
-    };
+  | { nextCursor: string | null }
+  | { total: number; limit: number; offset: number };
 
 const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "head", "delete"].includes(method);
@@ -418,15 +393,18 @@ const defaultImplementation: Implementation = async (method, path, params) => {
   const contentType = response.headers.get("content-type");
   if (!contentType) return [response.status, undefined];
   const isJSON = contentType.startsWith("application/json");
-  const body = await response[isJSON ? "json" : "text"]();
-  return [response.status, body];
+  return [response.status, await response[isJSON ? "json" : "text"]()];
 };
 
 export class Client<T> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
-  public provide<K extends Request>(request: K, params: Input[K], ctx?: T) {
+  public provide<K extends Request>(
+    request: K,
+    params: Input[K],
+    ctx?: T,
+  ): Promise<EncodedResponse[K]> {
     const [method, path] = parseRequest(request);
     return this.implementation(
       method,

@@ -1,4 +1,4 @@
-import { Integration } from "express-zod-api";
+import { Integration } from "express-zod-api/integration";
 import { describe, test, expect } from "vitest";
 
 describe("Integration", () => {

@@ -1,8 +1,30 @@
 import type { Express, IRouter } from "express";
 import { createConfig } from "../src";
-import type { InputSource } from "../src/config-type";
+import type {
+  AppConfig,
+  CommonConfig,
+  InputSource,
+  ServerConfig,
+} from "../src/config-type";
 
 describe("ConfigType", () => {
+  test("types should satisfy", () => {
+    expectTypeOf<{
+      cors: true;
+      logger: { level: "silent" };
+    }>().toExtend<CommonConfig>();
+    expectTypeOf<{
+      app: IRouter;
+      cors: true;
+      logger: { level: "silent" };
+    }>().toExtend<AppConfig>();
+    expectTypeOf<{
+      http: { listen: 1234 };
+      logger: { level: "silent" };
+      cors: false;
+    }>().toExtend<ServerConfig>();
+  });
+
   describe("createConfig()", () => {
     const httpConfig = { http: { listen: 3333 } };
     const httpsConfig = { https: { options: {}, listen: 4444 } };

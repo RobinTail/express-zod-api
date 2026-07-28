@@ -1,8 +1,5 @@
-import {
-  defaultEndpointsFactory,
-  Documentation,
-  type TagOverrides,
-} from "express-zod-api";
+import { defaultEndpointsFactory, type TagOverrides } from "express-zod-api";
+import { Documentation } from "express-zod-api/documentation";
 
 declare module "express-zod-api" {
   export interface TagOverrides {
@@ -29,9 +26,8 @@ expectTypeOf<TagOverrides>().toEqualTypeOf<{
 }>();
 
 new Documentation({
-  title: "",
-  version: "",
-  serverUrl: "",
+  info: { title: "", version: "" },
+  server: "",
   routing: {},
   config: { cors: false },
   tags: {

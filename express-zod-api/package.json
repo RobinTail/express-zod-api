@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "28.7.5",
+  "version": "29.0.0-beta.5",
   "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -31,6 +31,18 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./integration": {
+      "types": "./dist/integration.d.ts",
+      "default": "./dist/integration.js"
+    },
+    "./documentation": {
+      "types": "./dist/documentation.d.ts",
+      "default": "./dist/documentation.js"
+    },
+    "./dist/*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
     }
   },
   "files": [
@@ -38,19 +50,19 @@
     "*.md"
   ],
   "engines": {
-    "node": "^22.19.0 || ^24.0.0 || ^26.0.0"
+    "node": "^22.19.0 || ^24.11.0 || ^26.0.0"
   },
   "dependencies": {
-    "ansis": "^4.2.0",
-    "node-mocks-http": "^1.17.2",
-    "openapi3-ts": "^4.5.0",
+    "ansis": "^4.3.1",
+    "node-mocks-http": "^1.18.0",
+    "openapi3-ts": "^4.6.0",
     "ramda": "catalog:prod"
   },
   "peerDependencies": {
     "@express-zod-api/zod-plugin": "workspace:^",
     "@types/compression": "^1.7.5",
     "@types/cookie-parser": "^1.4.10",
-    "@types/express": "^5.0.0",
+    "@types/express": "^5.0.6",
     "@types/express-fileupload": "^1.5.0",
     "@types/http-errors": "^2.0.2",
     "compression": "^1.8.0",

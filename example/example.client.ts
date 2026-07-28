@@ -1,12 +1,12 @@
-type Type1 = {
-  title: string;
-  features?: Type1[] | undefined;
-};
-
 /** get /v1/user/retrieve */
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
+};
+
+type Type1 = {
+  title: string;
+  features?: Type1[] | undefined;
 };
 
 /** get /v1/user/retrieve */
@@ -93,30 +93,19 @@ type PostV1UserCreateNegativeVariant2 = {
   reason: string;
 };
 
-/** get /v1/user/list */
-type GetV1UserListInput = {
+/** query /v1/user/list */
+type QueryV1UserListInput = {
   roles?: ("manager" | "operator" | "admin")[] | undefined;
 };
 
-/** get /v1/user/list */
-type GetV1UserListPositiveVariant1 = {
+/** query /v1/user/list */
+type QueryV1UserListPositiveVariant1 = {
   name: string;
   role: "manager" | "operator" | "admin";
 }[];
 
-/** get /v1/user/list */
-type GetV1UserListNegativeVariant1 = string;
-
-/** head /v1/user/list */
-type HeadV1UserListInput = {
-  roles?: ("manager" | "operator" | "admin")[] | undefined;
-};
-
-/** head /v1/user/list */
-type HeadV1UserListPositiveVariant1 = undefined;
-
-/** head /v1/user/list */
-type HeadV1UserListNegativeVariant1 = undefined;
+/** query /v1/user/list */
+type QueryV1UserListNegativeVariant1 = string;
 
 /** post /v1/login */
 type PostV1LoginInput = {
@@ -320,7 +309,8 @@ export type Path =
   | "/v1/forms/feedback"
   | "/v2/users/list";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
@@ -328,8 +318,7 @@ export interface Input {
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
   "patch /v1/user/:id": PatchV1UserIdInput;
   "post /v1/user/create": PostV1UserCreateInput;
-  "get /v1/user/list": GetV1UserListInput;
-  "head /v1/user/list": HeadV1UserListInput;
+  "query /v1/user/list": QueryV1UserListInput;
   "post /v1/login": PostV1LoginInput;
   /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendInput;
@@ -351,9 +340,9 @@ export interface PositiveResponse {
   "head /v1/user/retrieve": HeadV1UserRetrievePositiveVariant1;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveVariant1;
   "patch /v1/user/:id": PatchV1UserIdPositiveVariant1;
-  "post /v1/user/create": PostV1UserCreatePositiveVariant1;
-  "get /v1/user/list": GetV1UserListPositiveVariant1;
-  "head /v1/user/list": HeadV1UserListPositiveVariant1;
+  "post /v1/user/create":
+    PostV1UserCreatePositiveVariant1 | PostV1UserCreatePositiveVariant1;
+  "query /v1/user/list": QueryV1UserListPositiveVariant1;
   "post /v1/login": PostV1LoginPositiveVariant1;
   /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendPositiveVariant1;
@@ -376,9 +365,10 @@ export interface NegativeResponse {
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveNegativeVariant1;
   "patch /v1/user/:id": PatchV1UserIdNegativeVariant1;
   "post /v1/user/create":
-    PostV1UserCreateNegativeVariant1 | PostV1UserCreateNegativeVariant2;
-  "get /v1/user/list": GetV1UserListNegativeVariant1;
-  "head /v1/user/list": HeadV1UserListNegativeVariant1;
+    | PostV1UserCreateNegativeVariant1
+    | PostV1UserCreateNegativeVariant2
+    | PostV1UserCreateNegativeVariant2;
+  "query /v1/user/list": QueryV1UserListNegativeVariant1;
   "post /v1/login": PostV1LoginNegativeVariant1;
   /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendNegativeVariant1;
@@ -413,11 +403,9 @@ export interface EncodedResponse {
     | [409, PostV1UserCreateNegativeVariant1]
     | [400, PostV1UserCreateNegativeVariant2]
     | [500, PostV1UserCreateNegativeVariant2];
-  "get /v1/user/list":
-    [200, GetV1UserListPositiveVariant1] | [400, GetV1UserListNegativeVariant1];
-  "head /v1/user/list":
-    | [200, HeadV1UserListPositiveVariant1]
-    | [400, HeadV1UserListNegativeVariant1];
+  "query /v1/user/list":
+    | [200, QueryV1UserListPositiveVariant1]
+    | [400, QueryV1UserListNegativeVariant1];
   "post /v1/login":
     [200, PostV1LoginPositiveVariant1] | [400, PostV1LoginNegativeVariant1];
   /** @deprecated */
@@ -458,9 +446,7 @@ export interface EncodedResponse {
 }
 
 /** @deprecated Use EncodedResponse instead. */
-export type Response = {
-  [K in Request]: EncodedResponse[K][1];
-};
+export type Response = { [K in Request]: EncodedResponse[K][1] };
 
 export type Request = keyof Input;
 
@@ -470,8 +456,7 @@ export const endpointTags = {
   "delete /v1/user/:id/remove": ["users"],
   "patch /v1/user/:id": ["users"],
   "post /v1/user/create": ["users"],
-  "get /v1/user/list": ["users"],
-  "head /v1/user/list": ["users"],
+  "query /v1/user/list": ["users"],
   "post /v1/login": ["cookies"],
   "get /v1/avatar/send": ["files", "users"],
   "head /v1/avatar/send": ["files", "users"],
@@ -508,14 +493,8 @@ export type Implementation<T = unknown> = (
 ) => Promise<[number, any]>;
 
 type Pagination =
-  | {
-      nextCursor: string | null;
-    }
-  | {
-      total: number;
-      limit: number;
-      offset: number;
-    };
+  | { nextCursor: string | null }
+  | { total: number; limit: number; offset: number };
 
 const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "head", "delete"].includes(method);
@@ -531,15 +510,18 @@ const defaultImplementation: Implementation = async (method, path, params) => {
   const contentType = response.headers.get("content-type");
   if (!contentType) return [response.status, undefined];
   const isJSON = contentType.startsWith("application/json");
-  const body = await response[isJSON ? "json" : "text"]();
-  return [response.status, body];
+  return [response.status, await response[isJSON ? "json" : "text"]()];
 };
 
 export class Client<T> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
-  public provide<K extends Request>(request: K, params: Input[K], ctx?: T) {
+  public provide<K extends Request>(
+    request: K,
+    params: Input[K],
+    ctx?: T,
+  ): Promise<EncodedResponse[K]> {
     const [method, path] = parseRequest(request);
     return this.implementation(
       method,

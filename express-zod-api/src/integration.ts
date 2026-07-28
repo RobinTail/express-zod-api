@@ -1,10 +1,15 @@
-import type ts from "typescript";
+/**
+ * @fileOverview The entrypoint for generating Integration code
+ * @requires typescript
+ * */
+export type { Producer } from "./zts-helpers";
 import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { IntegrationBase } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
+import { ensureTypeNode, printNode, ts } from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
@@ -14,8 +19,6 @@ import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 
 interface IntegrationParams {
-  /** @default loadPeer("typescript") */
-  typescript?: typeof ts;
   routing: Routing;
   config: CommonConfig;
   /**
@@ -65,23 +68,23 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  readonly #program: ts.Node[] = [];
-  readonly #aliases = new Map<object, ts.TypeAliasDeclaration>();
-  #usage: Array<ts.Node | string> = [];
+  readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
+    [];
+  readonly #aliases = new Map<object, string>();
+  #usage?: string;
 
   #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
-    let name = this.#aliases.get(key)?.name?.text;
+    let name = this.#aliases.get(key);
     if (!name) {
       name = `Type${this.#aliases.size + 1}`;
-      const temp = this.api.makeLiteralType(null);
-      this.#aliases.set(key, this.api.makeType(name, temp));
-      this.#aliases.set(key, this.api.makeType(name, produce()));
+      this.#aliases.set(key, name);
+      const node = produce();
+      this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
     }
-    return this.api.ensureTypeNode(name);
+    return ensureTypeNode(name);
   }
 
   public constructor({
-    typescript = loadPeer<typeof ts>("typescript"),
     routing,
     config,
     brandHandling,
@@ -92,23 +95,23 @@ export class Integration extends IntegrationBase {
     noBodySchema = z.undefined(),
     hasHeadMethod = true,
   }: IntegrationParams) {
-    super(typescript, serverUrl);
-    const commons = { makeAlias: this.#makeAlias.bind(this), api: this.api };
+    super(serverUrl);
+    const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
-      const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+      const entitle = makeCleanId.bind(null, method, path);
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const input = this.api.makeType(
-        entitle("input"),
-        zodToTs(inputSchema, ctxIn),
-        { comment: request },
+      const inputTypeName = entitle("input");
+      const inputTypeNode = zodToTs(inputSchema, ctxIn);
+      this.#program.push(
+        (opts) =>
+          `/** ${request} */\ntype ${inputTypeName} = ${printNode(inputTypeNode, opts)};`,
       );
-      this.#program.push(input);
-      const positiveBare: ts.TypeNode[] = [];
-      const negativeBare: ts.TypeNode[] = [];
-      const encodedTuples: ts.TypeNode[] = [];
+      const positiveBare: string[] = [];
+      const negativeBare: string[] = [];
+      const encodedTuples: string[] = [];
       for (const responseVariant of responseVariants) {
         const responses = endpoint.getResponses(responseVariant);
         const target =
@@ -117,30 +120,29 @@ export class Integration extends IntegrationBase {
           responses.entries(),
         )) {
           const hasBody = shouldHaveContent(method, mimeTypes);
-          const variantType = this.api.makeType(
-            entitle(responseVariant, "variant", `${idx + 1}`),
-            zodToTs(hasBody ? schema : noBodySchema, ctxOut),
-            { comment: request },
+          const variantName = entitle(responseVariant, "variant", `${idx + 1}`);
+          const variantTypeNode = zodToTs(
+            hasBody ? schema : noBodySchema,
+            ctxOut,
           );
-          this.#program.push(variantType);
-          const ref = this.api.ensureTypeNode(variantType.name);
+          this.#program.push(
+            (opts) =>
+              `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
+          );
           for (const code of statusCodes) {
-            target.push(ref);
-            encodedTuples.push(
-              this.api.f.createTupleTypeNode([
-                this.api.makeLiteralType(code),
-                ref,
-              ]),
-            );
+            target.push(variantName);
+            encodedTuples.push(`[${code}, ${variantName}]`);
           }
         }
       }
       this.paths.add(path);
+      const buildUnionOrSingle = (items: string[]) =>
+        items.length === 1 ? items[0]! : items.join(" | ");
       const store = {
-        input: this.api.ensureTypeNode(input.name),
-        positive: this.api.makeUnion(positiveBare),
-        negative: this.api.makeUnion(negativeBare),
-        encoded: this.api.makeUnion(encodedTuples),
+        input: inputTypeName,
+        positive: buildUnionOrSingle(positiveBare),
+        negative: buildUnionOrSingle(negativeBare),
+        encoded: buildUnionOrSingle(encodedTuples),
       };
       this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, tags);
@@ -150,8 +152,6 @@ export class Integration extends IntegrationBase {
       config,
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
-    // eslint-disable-next-line no-restricted-syntax -- accumulated late, acceptable for generator
-    this.#program.unshift(...this.#aliases.values());
     this.#program.push(
       this.makePathType(),
       this.makeMethodType(),
@@ -172,58 +172,18 @@ export class Integration extends IntegrationBase {
       this.makeSubscriptionClass(subscriptionClassName),
     );
 
-    this.#usage.push(
-      ...this.makeUsageStatements(clientClassName, subscriptionClassName),
+    this.#usage = this.makeUsageStatements(
+      clientClassName,
+      subscriptionClassName,
     );
   }
 
-  /**
-   * @deprecated use `new Integration()` without `typescript` option on its argument
-   * @todo remove in the next major — no longer needed
-   * */
-  public static async create(params: Omit<IntegrationParams, "typescript">) {
-    return new Integration({
-      ...params,
-      typescript: loadPeer<typeof ts>("typescript"),
-    });
-  }
-
-  #printUsage(printerOptions?: ts.PrinterOptions) {
-    return this.#usage.length
-      ? this.#usage
-          .map((entry) =>
-            typeof entry === "string"
-              ? entry
-              : this.api.printNode(entry, printerOptions),
-          )
-          .join("\n")
-      : undefined;
-  }
-
   public print(printerOptions?: ts.PrinterOptions) {
-    const usageExampleText = this.#printUsage(printerOptions);
-    const commentNode =
-      usageExampleText &&
-      this.api.ts.addSyntheticLeadingComment(
-        this.api.ts.addSyntheticLeadingComment(
-          this.api.f.createEmptyStatement(),
-          this.api.ts.SyntaxKind.SingleLineCommentTrivia,
-          " Usage example:",
-        ),
-        this.api.ts.SyntaxKind.MultiLineCommentTrivia,
-        `\n${usageExampleText}`,
-      );
-    return this.#program
-      .concat(commentNode || [])
-      .map((node, index) =>
-        this.api.printNode(
-          node,
-          index < this.#program.length
-            ? printerOptions
-            : { ...printerOptions, omitTrailingSemicolon: true },
-        ),
-      )
-      .join("\n\n");
+    const parts = this.#program.map((entry) =>
+      typeof entry === "function" ? entry(printerOptions) : entry,
+    );
+    if (this.#usage) parts.push(`// Usage example:\n/*\n${this.#usage}*/`);
+    return parts.join("\n\n");
   }
 
   public async printFormatted({
@@ -238,10 +198,7 @@ export class Integration extends IntegrationBase {
       } catch {}
     }
 
-    const usageExample = this.#printUsage(printerOptions);
-    this.#usage =
-      usageExample && format ? [await format(usageExample)] : this.#usage;
-
+    if (this.#usage && format) this.#usage = await format(this.#usage);
     const output = this.print(printerOptions);
     return format ? format(output) : output;
   }

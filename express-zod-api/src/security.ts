@@ -46,6 +46,11 @@ interface AuthUrl {
   authorizationUrl: string;
 }
 
+interface DeviceAuthUrl {
+  /** @desc The device authorization URL to use for this flow (RFC 8628). Can be relative to the API server URL. */
+  deviceAuthorizationUrl: string;
+}
+
 interface TokenUrl {
   /** @desc The token URL to use for this flow. Can be relative to the API server URL. */
   tokenUrl: string;
@@ -69,12 +74,21 @@ type AuthCodeFlow<S extends string> = AuthUrl &
 type ImplicitFlow<S extends string> = AuthUrl & RefreshUrl & Scopes<S>;
 type PasswordFlow<S extends string> = TokenUrl & RefreshUrl & Scopes<S>;
 type ClientCredFlow<S extends string> = TokenUrl & RefreshUrl & Scopes<S>;
+type DeviceAuthFlow<S extends string> = DeviceAuthUrl &
+  TokenUrl &
+  RefreshUrl &
+  Scopes<S>;
 
 /**
  * @see https://swagger.io/docs/specification/authentication/oauth2/
  */
 export interface OAuth2Security<S extends string> {
   type: "oauth2";
+  /**
+   * @desc URL to OAuth 2.0 Authorization Server metadata document
+   * @link https://www.rfc-editor.org/rfc/rfc8414
+   * */
+  oauth2MetadataUrl?: string;
   flows?: {
     /** @desc Authorization Code flow (previously called accessCode in OpenAPI 2.0) */
     authorizationCode?: AuthCodeFlow<S>;
@@ -84,6 +98,11 @@ export interface OAuth2Security<S extends string> {
     password?: PasswordFlow<S>;
     /** @desc Client Credentials flow (previously called application in OpenAPI 2.0) */
     clientCredentials?: ClientCredFlow<S>;
+    /**
+     * @desc Device Authorization flow (OAuth 2.0 Device Authorization Grant)
+     * @link https://oauth.net/2/device-flow/
+     * */
+    deviceAuthorization?: DeviceAuthFlow<S>;
   };
 }
 
@@ -92,14 +111,15 @@ export interface OAuth2Security<S extends string> {
  * @param K is an optional input field used by InputSecurity
  * @param S is an optional union of scopes used by OAuth2Security
  * */
-export type Security<K extends string = string, S extends string = string> =
+export type Security<K extends string = string, S extends string = string> = (
   | BasicSecurity
   | BearerSecurity
   | InputSecurity<K>
   | HeaderSecurity
   | CookieSecurity
   | OpenIdSecurity
-  | OAuth2Security<S>;
+  | OAuth2Security<S>
+) & { deprecated?: boolean };
 
 type NamedSecurityType = Extract<Security, { name: string }>["type"];
 

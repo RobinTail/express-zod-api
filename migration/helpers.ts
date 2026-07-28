@@ -61,3 +61,23 @@ export const changeProp = ({
       return changes;
     },
   });
+
+export const removeProp = ({
+  ctx,
+  node,
+}: {
+  ctx: TSESLint.RuleContext<"remove", unknown[]>;
+  node: NamedProp;
+}) =>
+  ctx.report({
+    node,
+    messageId: "remove",
+    data: { subject: `${getPropName(node)} property` },
+    fix: (fixer) => {
+      const next = ctx.sourceCode.getTokenAfter(node);
+      return fixer.removeRange([
+        node.range[0],
+        next?.value === "," ? next.range[1] : node.range[1],
+      ]);
+    },
+  });

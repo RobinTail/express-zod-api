@@ -1,5 +1,5 @@
 import { writeFile } from "node:fs/promises";
-import { Documentation } from "express-zod-api";
+import { Documentation } from "express-zod-api/documentation";
 import { config } from "./config.ts";
 import { routing } from "./routing.ts";
 import manifest from "./package.json" with { type: "json" };
@@ -9,9 +9,8 @@ await writeFile(
   new Documentation({
     routing,
     config,
-    version: manifest.version,
-    title: "Example API",
-    serverUrl: "https://example.com",
+    info: { title: "Example API", version: manifest.version },
+    server: "https://example.com",
     tags: {
       users: "Everything about the users",
       files: "Everything about the files processing",
