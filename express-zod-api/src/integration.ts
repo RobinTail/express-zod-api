@@ -136,13 +136,11 @@ export class Integration extends IntegrationBase {
         }
       }
       this.paths.add(path);
-      const buildUnionOrSingle = (items: string[]) =>
-        items.length === 1 ? items[0]! : items.join(" | ");
       const store = {
         input: inputTypeName,
-        positive: buildUnionOrSingle(positiveBare),
-        negative: buildUnionOrSingle(negativeBare),
-        encoded: buildUnionOrSingle(encodedTuples),
+        positive: positiveBare.join(" | "),
+        negative: negativeBare.join(" | "),
+        encoded: encodedTuples.join(" | "),
       };
       this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, tags);
