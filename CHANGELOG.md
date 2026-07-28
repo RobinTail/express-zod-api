@@ -12,6 +12,23 @@
     `status` string redundant;
   - `DefaultResponse<OUT>` type is simplified to `OUT | { message: string }`;
   - `arrayResultHandler` is not affected — it already returns bare arrays and plain-text errors.
+- Breaking change: The generated `Client::provide()` method returns a `[statusCode, body]` tuple
+  instead of the bare body:
+  - The new `EncodedResponse` interface maps each endpoint to a discriminated union of
+    `[StatusCode, Body]` tuples, with the HTTP status code as the discriminant;
+  - Use destructuring with a status check to narrow the body type:
+
+```typescript
+const [status, body] = await client.provide("get /v1/user/retrieve", {
+  id: "10",
+});
+
+if (status === 200) {
+  body; // narrowed down to { name: string }
+} else if (status === 400) {
+  body; // narrowed down to { message: string }
+}
+```
 
 ```diff
 - { "status": "success", "data": { "greetings": "Hello!" } }
@@ -19,6 +36,9 @@
 
 - { "status": "error", "error": { "message": "Not found" } }
 + { "message": "Not found" }
+
+- const response = await client.provide("post /v1/user/create", { name: "John Doe" });
++ const [status, response] = await client.provide("post /v1/user/create", { name: "John Doe" });
 ```
 
 ## Version 29
