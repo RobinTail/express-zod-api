@@ -88,92 +88,12 @@ const performanceConcerns = [
 
 const tsFactoryConcerns = [
   {
-    selector: "Identifier[name='createConditionalExpression']",
-    message: "use makeTernary()",
-  },
-  {
-    selector: "Identifier[name='createArrowFunction']",
-    message: "use makeArrowFn()",
-  },
-  {
-    selector: "Identifier[name='createTypeParameterDeclaration']",
-    message: "use makeTypeParams()",
-  },
-  {
-    selector: "Identifier[name='createInterfaceDeclaration']",
-    message: "use makeInterface()",
-  },
-  {
-    selector: "Identifier[name='createClassDeclaration']",
-    message: "use makePublicClass()",
-  },
-  {
-    selector: "Identifier[name='createMethodDeclaration']",
-    message: "use makePublicMethod()",
-  },
-  {
-    selector: "Identifier[name='createTypeAliasDeclaration']",
-    message: "use makeType()",
-  },
-  {
-    selector: "Identifier[name='createVariableStatement']",
-    message: "use makeConst()",
-  },
-  {
-    selector: "Identifier[name='createArrayBindingPattern']",
-    message: "use makeDeconstruction()",
-  },
-  {
     selector: "Identifier[name='createPropertySignature']",
     message: "use makeInterfaceProp()",
   },
   {
-    selector: "Identifier[name='createConstructorDeclaration']",
-    message: "use makePublicConstructor()",
-  },
-  {
-    selector: "Identifier[name='createParameterDeclaration']",
-    message: "use makeParam()",
-  },
-  {
-    selector: "Identifier[name='createCallExpression']",
-    message: "use makeCall()",
-  },
-  {
-    selector: "Identifier[name='KeyOfKeyword']",
-    message: "use makeKeyOf()",
-  },
-  {
-    selector: "Identifier[name='createTemplateExpression']",
-    message: "use makeTemplate()",
-  },
-  {
-    selector: "Identifier[name='createNewExpression']",
-    message: "use makeNew()",
-  },
-  {
-    selector: "Literal[value='Promise']",
-    message: "use makePromise()",
-  },
-  {
     selector: "Identifier[name=/^create(TypeReference|KeywordType)Node$/]",
     message: "use ensureTypeNode()",
-  },
-  {
-    selector: "Literal[value='Extract']",
-    message: "use makeExtract()",
-  },
-  {
-    selector: "Identifier[name='EqualsToken']",
-    message: "use makeAssignment()",
-  },
-  {
-    selector: "Identifier[name='createIndexedAccessTypeNode']",
-    message: "use makeIndexed()",
-  },
-  {
-    selector: "Identifier[name='createFunctionTypeNode']",
-    message: "use makeFnType()",
   },
   {
     selector: "Identifier[name='createLiteralTypeNode']",
