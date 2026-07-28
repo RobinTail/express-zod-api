@@ -85,16 +85,18 @@ All properties of publicly available entities (exposed via `index.ts`) must have
 - **`@default`**: Default value (required for optional properties)
 - **`@example`**: Example value (required for literal types, one per variant)
 
-Each directive should aim to fit on one line:
+Each directive should aim to fit on one line. Several directives should be placed in a single multi-line comment:
 
 ```typescript
 interface SampleInterface {
   /** @desc Enables certain feature. */
   sampleRequiredProperty: boolean | SampleOptions;
-  /** @desc Controls another feature. */
-  /** @default true */
-  /** @example true — leads to one thing */
-  /** @example false — leads to another thing */
+  /**
+   * @desc Controls another feature.
+   * @default true
+   * @example true — leads to one thing
+   * @example false — leads to another thing
+   * */
   sampleOptionalProperty?: boolean;
 }
 ```
@@ -226,14 +228,13 @@ Files that generate TypeScript code:
 ```typescript
 // Use helpers:
 makeId("User");
-makeParam("name", { type: "string" });
-makeConst("count", api.literally(0));
-makeInterface("User", [api.makeInterfaceProp("name", "string")]);
+literally(0);
+makeInterfaceProp("name", typeNode);
 
 // Avoid native factory calls:
 ts.factory.createIdentifier("User");
-ts.factory.createParameterDeclaration();
-ts.factory.createVariableStatement();
+ts.factory.createNumericLiteral(0);
+ts.factory.createPropertySignature();
 ```
 
 ### 14. Performance Priority
