@@ -4,8 +4,8 @@
  * */
 export type { Producer } from "./zts-helpers";
 import { z } from "zod";
-import { responseVariants, type ResponseVariant } from "./api-response";
-import { IntegrationBase, interfaces } from "./integration-base";
+import { responseVariants } from "./api-response";
+import { IntegrationBase } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
@@ -109,46 +109,38 @@ export class Integration extends IntegrationBase {
         (opts) =>
           `/** ${request} */\ntype ${inputTypeName} = ${printNode(inputTypeNode, opts)};`,
       );
-      const dictionaries = responseVariants.reduce(
-        (agg, responseVariant) => {
-          const responses = endpoint.getResponses(responseVariant);
-          const props: string[] = [];
-          for (const [
-            idx,
-            { schema, mimeTypes, statusCodes },
-          ] of responses.entries()) {
-            const hasBody = shouldHaveContent(method, mimeTypes);
-            const variantName = entitle(
-              responseVariant,
-              "variant",
-              `${idx + 1}`,
-            );
-            const variantTypeNode = zodToTs(
-              hasBody ? schema : noBodySchema,
-              ctxOut,
-            );
-            this.#program.push(
-              (opts) =>
-                `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
-            );
-            for (const code of statusCodes)
-              props.push(`  ${code}: ${variantName};`);
-          }
-          const dictName = entitle(responseVariant, "response", "variants");
-          this.#program.push(
-            `/** ${request} */\ninterface ${dictName} {\n${props.join("\n")}\n}`,
+      const positiveBare: string[] = [];
+      const negativeBare: string[] = [];
+      const encodedTuples: string[] = [];
+      for (const responseVariant of responseVariants) {
+        const responses = endpoint.getResponses(responseVariant);
+        const target =
+          responseVariant === "positive" ? positiveBare : negativeBare;
+        for (const [idx, { schema, mimeTypes, statusCodes }] of Array.from(
+          responses.entries(),
+        )) {
+          const hasBody = shouldHaveContent(method, mimeTypes);
+          const variantName = entitle(responseVariant, "variant", `${idx + 1}`);
+          const variantTypeNode = zodToTs(
+            hasBody ? schema : noBodySchema,
+            ctxOut,
           );
-          return Object.assign(agg, { [responseVariant]: dictName });
-        },
-        {} as Record<ResponseVariant, string>,
-      );
+          this.#program.push(
+            (opts) =>
+              `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
+          );
+          for (const code of statusCodes) {
+            target.push(variantName);
+            encodedTuples.push(`[${code}, ${variantName}]`);
+          }
+        }
+      }
       this.paths.add(path);
       const store = {
         input: inputTypeName,
-        positive: this.someOf(dictionaries.positive),
-        negative: this.someOf(dictionaries.negative),
-        response: `${interfaces.positive}["${request}"] | ${interfaces.negative}["${request}"]`,
-        encoded: `${dictionaries.positive} & ${dictionaries.negative}`,
+        positive: positiveBare.join(" | "),
+        negative: negativeBare.join(" | "),
+        encoded: encodedTuples.join(" | "),
       };
       this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, tags);
@@ -159,7 +151,6 @@ export class Integration extends IntegrationBase {
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
     this.#program.push(
-      this.makeSomeOfType(),
       this.makePathType(),
       this.makeMethodType(),
       ...this.makePublicInterfaces(),

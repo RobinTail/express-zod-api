@@ -7,7 +7,7 @@ import type {
   OffsetPaginatedResult,
 } from "./paginated-schema";
 
-type IOKind = "input" | "response" | ResponseVariant | "encoded";
+type IOKind = "input" | ResponseVariant | "encoded";
 type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
 type Store = Record<IOKind, string>;
 
@@ -40,17 +40,15 @@ const ids = {
   isJSON: "isJSON",
   source: "source",
   Method: "Method",
-  SomeOf: "SomeOf",
   Request: "Request",
   Pagination: "Pagination",
 } satisfies Record<string, string>;
 
-export const interfaces: Record<IOKind, string> = {
+const interfaces: Record<IOKind, string> = {
   input: "Input",
   positive: "PositiveResponse",
   negative: "NegativeResponse",
   encoded: "EncodedResponse",
-  response: "Response",
 };
 
 const quot = (items: Iterable<string>) => Array.from(items, (s) => `"${s}"`);
@@ -80,23 +78,11 @@ export abstract class IntegrationBase {
   };
 
   /**
-   * @example type SomeOf<T> = T[keyof T];
-   * @internal
-   * */
-  protected makeSomeOfType = () => `type ${ids.SomeOf}<T> = T[keyof T];`;
-
-  /**
    * @example export type Request = keyof Input;
    * @internal
    * */
   protected makeRequestType = () =>
     `export type ${ids.Request} = keyof ${interfaces.input};`;
-
-  /**
-   * @example SomeOf<_>
-   * @internal
-   **/
-  protected someOf = (name: string) => `${ids.SomeOf}<${name}>`;
 
   /**
    * @example export type Path = "/v1/user/retrieve" | ___;
@@ -111,8 +97,8 @@ export abstract class IntegrationBase {
    * @example export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
    * @internal
    * */
-  protected makePublicInterfaces = () =>
-    (Object.keys(interfaces) as IOKind[]).map((kind) => {
+  protected makePublicInterfaces = () => {
+    const result = (Object.keys(interfaces) as IOKind[]).map((kind) => {
       const props = Array.from(this.registry)
         .map(
           ([request, { store, isDeprecated }]) =>
@@ -121,6 +107,11 @@ export abstract class IntegrationBase {
         .join("\n");
       return `export interface ${interfaces[kind]} {\n${props}\n}`;
     });
+    result.push(
+      `/** @deprecated Use EncodedResponse instead. */\nexport type Response = { [K in ${ids.Request}]: ${interfaces.encoded}[K][1] };`,
+    );
+    return result;
+  };
 
   /**
    * @example export const endpointTags = { "get /v1/user/retrieve": ["users"] }
@@ -134,7 +125,7 @@ export abstract class IntegrationBase {
   };
 
   /**
-   * @example export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
+   * @example export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<[number, any]>;
    * @internal
    * */
   protected makeImplementationType = () => {
@@ -144,7 +135,7 @@ export abstract class IntegrationBase {
       `${ids.params}: Record<string, any>`,
       `${ids.ctx}?: T`,
     ].join(",");
-    return `export type ${ids.Implementation}<T = unknown> = (${args}) => Promise<any>;`;
+    return `export type ${ids.Implementation}<T = unknown> = (${args}) => Promise<[number, any]>;`;
   };
 
   /**
@@ -217,9 +208,9 @@ export abstract class IntegrationBase {
       `    ${ids.request}: K,`,
       `    ${ids.params}: ${interfaces.input}[K],`,
       `    ${ids.ctx}?: T,`,
-      `  ): Promise<${interfaces.response}[K]> {`,
+      `  ): Promise<${interfaces.encoded}[K]> {`,
       `    const [${ids.method}, ${ids.path}] = ${ids.parseRequest}(${ids.request});`,
-      `    return this.${ids.implementation}(${callArgs});`,
+      `    return this.${ids.implementation}(${callArgs}) as Promise<${interfaces.encoded}[K]>;`,
       `  }`,
       `  public static hasMore(${ids.response}: ${ids.Pagination}): boolean {`,
       `    if ("${nextCursorProp}" in ${ids.response}) return ${ids.response}.${nextCursorProp} !== null;`,
@@ -257,9 +248,9 @@ export abstract class IntegrationBase {
       `    },`,
       `  );`,
       `  const ${ids.contentType} = ${contentType};`,
-      `  if (!${ids.contentType}) return;`,
+      `  if (!${ids.contentType}) return [${ids.response}.status, ${ids.undefined}];`,
       `  const ${ids.isJSON} = ${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}");`,
-      `  return ${ids.response}[${parser}]();`,
+      `  return [${ids.response}.status, await ${ids.response}[${parser}]()];`,
       `};`,
     ].join("\n");
   };

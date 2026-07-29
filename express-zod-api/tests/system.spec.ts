@@ -204,14 +204,11 @@ describe("App in production mode", () => {
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual({
-        status: "success",
-        data: {
-          anything: 300,
-          doubleKey: "123123",
-          userId: 354,
-          permissions: ["any"],
-          method: "get",
-        },
+        anything: 300,
+        doubleKey: "123123",
+        userId: 354,
+        permissions: ["any"],
+        method: "get",
       });
     });
 
@@ -230,14 +227,11 @@ describe("App in production mode", () => {
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual({
-        status: "success",
-        data: {
-          anything: 300,
-          doubleKey: "123123",
-          userId: 354,
-          permissions: ["any"],
-          method: "post",
-        },
+        anything: 300,
+        doubleKey: "123123",
+        userId: 354,
+        permissions: ["any"],
+        method: "post",
       });
     });
 
@@ -257,14 +251,11 @@ describe("App in production mode", () => {
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual({
-        status: "success",
-        data: {
-          anything: 300,
-          doubleKey: "123123",
-          userId: 354,
-          permissions: ["any"],
-          method: "post",
-        },
+        anything: 300,
+        doubleKey: "123123",
+        userId: 354,
+        permissions: ["any"],
+        method: "post",
       });
     });
 
@@ -290,8 +281,7 @@ describe("App in production mode", () => {
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual({
-        status: "success",
-        data: { corsDone: true },
+        corsDone: true,
       });
       expect(response.headers.get("Access-Control-Allow-Credentials")).toBe(
         "true",
@@ -310,7 +300,7 @@ describe("App in production mode", () => {
       });
       expect(response.status).toBe(200);
       const json = await response.json();
-      expect(json).toEqual({ status: "success", data: {} });
+      expect(json).toEqual({});
     });
 
     test("Should handle raw request", async ({ signal }) => {
@@ -322,7 +312,7 @@ describe("App in production mode", () => {
       });
       expect(response.status).toBe(200);
       const json = await response.json();
-      expect(json).toEqual({ status: "success", data: { crc: 7 } });
+      expect(json).toEqual({ crc: 7 });
     });
 
     test("Should handle upload request", async ({ signal }) => {
@@ -341,7 +331,7 @@ describe("App in production mode", () => {
       });
       expect(response.status).toBe(200);
       const json = await response.json();
-      expect(json).toEqual({ data: {}, status: "success" });
+      expect(json).toEqual({});
     });
   });
 
@@ -411,8 +401,7 @@ describe("App in production mode", () => {
           { signal },
         );
         expect(await response.json()).toEqual({
-          status: "error",
-          error: { message: "Internal Server Error" },
+          message: "Internal Server Error",
         });
         expect(response.status).toBe(500);
       },
@@ -434,8 +423,7 @@ describe("App in production mode", () => {
       expect(response.status).toBe(500);
       const json = await response.json();
       expect(json).toEqual({
-        error: { message: "Internal Server Error" },
-        status: "error",
+        message: "Internal Server Error",
       });
     });
   });
@@ -480,11 +468,9 @@ describe("App in production mode", () => {
       expect(response.status).toBe(400); // Issue #907
       const json = await response.json();
       expect(json).toMatchSnapshot({
-        error: {
-          message: expect.stringMatching(
-            /Unterminated string in JSON at position 25/,
-          ),
-        },
+        message: expect.stringMatching(
+          /Unterminated string in JSON at position 25/,
+        ),
       });
     });
 
@@ -502,8 +488,7 @@ describe("App in production mode", () => {
       expect(response.status).toBe(413);
       const json = await response.json();
       expect(json).toEqual({
-        status: "error",
-        error: { message: "too many parameters" },
+        message: "too many parameters",
       });
     });
 
@@ -517,8 +502,7 @@ describe("App in production mode", () => {
       expect(response.status).toBe(413);
       const json = await response.json();
       expect(json).toEqual({
-        status: "error",
-        error: { message: "request entity too large" },
+        message: "request entity too large",
       });
     });
 

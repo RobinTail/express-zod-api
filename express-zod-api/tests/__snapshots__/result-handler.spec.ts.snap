@@ -56,10 +56,7 @@ exports[`ResultHandler > 'arrayResultHandler' > should generate negative respons
 
 exports[`ResultHandler > 'defaultResultHandler' > Should handle HTTP error 1`] = `
 {
-  "error": {
-    "message": "Something not found",
-  },
-  "status": "error",
+  "message": "Something not found",
 }
 `;
 
@@ -85,33 +82,24 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle generic error 1`
 
 exports[`ResultHandler > 'defaultResultHandler' > Should handle generic error 2`] = `
 {
-  "error": {
-    "message": "Some error",
-  },
-  "status": "error",
+  "message": "Some error",
 }
 `;
 
 exports[`ResultHandler > 'defaultResultHandler' > Should handle regular response 1`] = `
 {
-  "data": {
-    "anything": 118,
-    "items": [
-      "One",
-      "Two",
-      "Three",
-    ],
-  },
-  "status": "success",
+  "anything": 118,
+  "items": [
+    "One",
+    "Two",
+    "Three",
+  ],
 }
 `;
 
 exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`] = `
 {
-  "error": {
-    "message": "something: Expected string, got number",
-  },
-  "status": "error",
+  "message": "something: Expected string, got number",
 }
 `;
 
@@ -119,15 +107,12 @@ exports[`ResultHandler > 'defaultResultHandler' > should forward output schema e
 {
   "examples": [
     {
-      "data": {
-        "items": [
-          "One",
-          "Two",
-          "Three",
-        ],
-        "str": "test",
-      },
-      "status": "success",
+      "items": [
+        "One",
+        "Two",
+        "Three",
+      ],
+      "str": "test",
     },
   ],
 }
@@ -137,10 +122,7 @@ exports[`ResultHandler > 'defaultResultHandler' > should generate negative respo
 {
   "examples": [
     {
-      "error": {
-        "message": "Sample error message",
-      },
-      "status": "error",
+      "message": "Sample error message",
     },
   ],
 }

@@ -501,8 +501,7 @@ describe("Routing", () => {
       });
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getJSONData()).toEqual({
-        status: "success",
-        data: { result: true },
+        result: true,
       });
     });
 

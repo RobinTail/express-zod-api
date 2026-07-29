@@ -103,8 +103,9 @@ describe("Endpoint", () => {
       });
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getJSONData()).toEqual({
-        status: "success",
-        data: { inc2: 455, str: "453.00", transform: 4 },
+        inc2: 455,
+        str: "453.00",
+        transform: 4,
       });
     });
 
@@ -196,8 +197,7 @@ describe("Endpoint", () => {
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
-        status: "error",
-        error: { message: "Something unexpected" },
+        message: "Something unexpected",
       });
     });
   });
@@ -440,8 +440,7 @@ describe("Endpoint", () => {
         },
       });
       expect(responseMock._getJSONData()).toEqual({
-        status: "success",
-        data: { str: "This is fine" },
+        str: "This is fine",
       });
     });
   });
@@ -502,8 +501,7 @@ describe("Endpoint", () => {
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
-        status: "error",
-        error: { message: "Something unexpected" },
+        message: "Something unexpected",
       });
     });
 
@@ -548,8 +546,7 @@ describe("Endpoint", () => {
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
-        status: "error",
-        error: { message: "Something went wrong" },
+        message: "Something went wrong",
       });
     });
   });
@@ -597,10 +594,7 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock._getJSONData()).toEqual({
-        status: "success",
-        data: {},
-      });
+      expect(responseMock._getJSONData()).toEqual({});
       expect(responseMock._getStatusCode()).toBe(200);
     });
 
@@ -616,10 +610,7 @@ describe("Endpoint", () => {
         },
       });
       expect(responseMock._getJSONData()).toEqual({
-        status: "error",
-        error: {
-          message: "dynamicValue: type1Attribute is required if type is type1",
-        },
+        message: "dynamicValue: type1Attribute is required if type is type1",
       });
       expect(responseMock._getStatusCode()).toBe(400);
     });
@@ -637,8 +628,7 @@ describe("Endpoint", () => {
         },
       });
       expect(responseMock._getJSONData()).toEqual({
-        status: "error",
-        error: { message: "output: failure on demand" },
+        message: "output: failure on demand",
       });
       expect(responseMock._getStatusCode()).toBe(500);
     });
@@ -671,10 +661,7 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock._getJSONData()).toEqual({
-        status: "success",
-        data: {},
-      });
+      expect(responseMock._getJSONData()).toEqual({});
       expect(responseMock._getStatusCode()).toBe(200);
     });
 
@@ -687,8 +674,7 @@ describe("Endpoint", () => {
         },
       });
       expect(responseMock._getJSONData()).toEqual({
-        status: "error",
-        error: { message: "Please provide at least one property" },
+        message: "Please provide at least one property",
       });
       expect(responseMock._getStatusCode()).toBe(400);
     });

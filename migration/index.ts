@@ -1,55 +1,23 @@
+import { hasImport, getRangeWithComma } from "./helpers.ts";
 import {
   AST_NODE_TYPES as NT,
   ESLintUtils,
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
-import {
-  queryNamedProp,
-  type NamedProp,
-  getPropName,
-  removeProp,
-} from "./helpers.ts";
 
 interface Queries {
-  integrationCreate: TSESTree.CallExpression;
-  createServerAwait: TSESTree.CallExpression;
-  asyncLifecycleHook: NamedProp;
-  documentationConfig: TSESTree.ObjectExpression;
-  corsConfig: NamedProp;
-  expressZodApiImport: TSESTree.ImportDeclaration;
-  integrationNewTypescript: NamedProp;
+  legacyImport: TSESTree.ImportSpecifier & { imported: TSESTree.Identifier };
+  provideCall: TSESTree.CallExpression;
+  clientNew: TSESTree.NewExpression;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  integrationCreate:
-    `${NT.AwaitExpression} > ` +
-    `${NT.CallExpression}[callee.object.name="Integration"][callee.property.name="create"]`,
-  createServerAwait:
-    `${NT.AwaitExpression} > ` +
-    `${NT.CallExpression}[callee.name="createServer"]`,
-  asyncLifecycleHook:
-    `${NT.CallExpression}[callee.name="createConfig"] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("beforeRouting") +
-    "," +
-    `${NT.CallExpression}[callee.name="createConfig"] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("afterRouting"),
-  documentationConfig:
-    `${NT.NewExpression}[callee.name="Documentation"] > ` +
-    `${NT.ObjectExpression}`,
-  corsConfig:
-    `${NT.CallExpression}[callee.name="createConfig"] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("cors"),
-  expressZodApiImport: `${NT.ImportDeclaration}[source.value="express-zod-api"]`,
-  integrationNewTypescript:
-    `${NT.NewExpression}[callee.name="Integration"] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("typescript"),
+  legacyImport: `ImportSpecifier[imported.name=/^default(ResultHandler|EndpointsFactory)$/]`,
+  provideCall: `CallExpression[callee.property.name="provide"]`,
+  clientNew: `NewExpression[callee.name="Client"][arguments.length>0]`,
 };
 
 const listen = <
@@ -65,10 +33,30 @@ const listen = <
     {},
   );
 
-const moveTargets = new Map<string, string[]>([
-  ["express-zod-api/integration", ["Integration", "Producer"]],
-  ["express-zod-api/documentation", ["Documentation", "Depicter"]],
-]);
+const legacyHandlerCode = [
+  "export const legacyResultHandler = new ResultHandler({",
+  '  positive: (output) => z.object({ status: z.literal("success"), data: output }),',
+  "  negative: z.object({",
+  '    status: z.literal("error"),',
+  "    error: z.object({ message: z.string() }),",
+  "  }),",
+  "  handler: ({ error, input, output, request, response, logger }) => {",
+  "    if (error) {",
+  "      const httpError = ensureHttpError(error);",
+  "      return void response",
+  "        .status(httpError.statusCode)",
+  "        .set(httpError.headers)",
+  "        .json({",
+  '          status: "error",',
+  "          // @todo ensure it's appropriate to expose the error message",
+  "          error: { message: httpError.message },",
+  "        });",
+  "    }",
+  "    response.status(200)",
+  '      .json({ status: "success", data: output });',
+  "  },",
+  "});",
+].join("\n");
 
 const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0]}`;
 
@@ -88,205 +76,154 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
   },
   create: (ctx) =>
     listen({
-      integrationCreate: (node) => {
-        const parent = node.parent;
-        if (!parent || parent.type !== NT.AwaitExpression) return;
+      legacyImport: (node) => {
+        const { name: importName } = node.imported;
+        const replacement = importName.replace("default", "legacy");
         ctx.report({
           node,
           messageId: "change",
           data: {
-            subject: "Integration.create()",
-            from: "await Integration.create()",
-            to: "new Integration()",
+            subject: "import",
+            from: importName,
+            to: replacement,
           },
           fix: (fixer) => {
-            const args = node.arguments
-              .map((a) => ctx.sourceCode.getText(a))
-              .join(", ");
-            return fixer.replaceText(parent, `new Integration(${args})`);
-          },
-        });
-      },
-      createServerAwait: (node) => {
-        const parent = node.parent;
-        if (!parent || parent.type !== NT.AwaitExpression) return;
-        ctx.report({
-          node,
-          messageId: "remove",
-          data: { subject: "await from createServer()" },
-          fix: (fixer) => {
-            const text = ctx.sourceCode.getText(node);
-            return fixer.replaceText(parent, text);
-          },
-        });
-      },
-      asyncLifecycleHook: (node) => {
-        const value = node.value;
-        const isAsync =
-          (value.type === NT.ArrowFunctionExpression ||
-            value.type === NT.FunctionExpression) &&
-          value.async;
-        if (!isAsync) return;
-        const propName = getPropName(node);
-        ctx.report({
-          node,
-          messageId: "remove",
-          data: { subject: `async from ${propName}` },
-          fix: (fixer) => {
-            const firstToken = ctx.sourceCode.getFirstToken(value);
-            if (!firstToken || firstToken.value !== "async") return null;
-            const nextToken = ctx.sourceCode.getTokenAfter(firstToken);
-            const end = nextToken
-              ? nextToken.range[0]
-              : firstToken.range[0] + 5;
-            return fixer.removeRange([firstToken.range[0], end]);
-          },
-        });
-      },
-      corsConfig: (node) => {
-        const { value } = node;
-        const isFunc =
-          value.type === NT.ArrowFunctionExpression ||
-          value.type === NT.FunctionExpression;
-        if (!isFunc) return;
-        const { body, async } = value;
-        const asyncPrefix = async ? "async " : "";
-        let newFunc: string | null = null;
-        if (body.type === NT.ObjectExpression) {
-          newFunc = `${asyncPrefix}(req, res, next) => { res.set(${ctx.sourceCode.getText(body)}); next(); }`;
-        } else if (body.type === NT.BlockStatement) {
-          const returnIndex = body.body.findIndex(
-            (s) => s.type === NT.ReturnStatement,
-          );
-          if (returnIndex < 0) return;
-          const ret = body.body[returnIndex] as TSESTree.ReturnStatement;
-          if (!ret.argument || ret.argument.type !== NT.ObjectExpression)
-            return;
-          const parts: string[] = [];
-          for (let i = 0; i < body.body.length; i++) {
-            if (i === returnIndex) {
-              parts.push(`res.set(${ctx.sourceCode.getText(ret.argument)});`);
-              parts.push(`next();`);
-            } else if (body.body[i]!.type !== NT.ReturnStatement) {
-              parts.push(ctx.sourceCode.getText(body.body[i]!));
-            }
-          }
-          newFunc = `${asyncPrefix}(req, res, next) => {\n${parts.join("\n")}\n}`;
-        }
-        if (!newFunc) return;
-        ctx.report({
-          node,
-          messageId: "change",
-          data: {
-            subject: "cors headers provider",
-            from: "function returning object",
-            to: "request handler",
-          },
-          fix: (fixer) => fixer.replaceText(value, newFunc),
-        });
-      },
-      documentationConfig: (node) => {
-        const parts: string[] = [];
-        let infoItems: string[] | undefined = [];
-        const changelog: Record<string, string> = {};
-
-        for (const prop of node.properties) {
-          if (prop.type !== NT.Property || prop.computed) {
-            parts.push(ctx.sourceCode.getText(prop));
-            continue;
-          }
-          const propName = getPropName(prop as NamedProp);
-          if (propName === "info") {
-            parts.push(ctx.sourceCode.getText(prop));
-            infoItems = undefined;
-          } else if (propName === "title" || propName === "version") {
-            changelog["title, version"] = infoItems ? "info" : "";
-            infoItems?.push(ctx.sourceCode.getText(prop));
-          } else if (propName === "serverUrl") {
-            parts.push(`server: ${ctx.sourceCode.getText(prop.value)}`);
-            changelog.serverUrl = "server";
-          } else {
-            parts.push(ctx.sourceCode.getText(prop));
-          }
-        }
-
-        const entries = Object.entries(changelog);
-        if (!entries.length) return;
-
-        if (infoItems?.length)
-          parts.unshift(`info: { ${infoItems.join(", ")} }`);
-
-        const oldText = ctx.sourceCode.getText(node);
-        const newText = `{ ${parts.join(", ")} }`;
-        if (oldText === newText) return;
-        ctx.report({
-          node,
-          messageId: "change",
-          data: {
-            subject: "Documentation",
-            from: entries.map(([k]) => k).join(", "),
-            to: entries.map(([, v]) => v).join(", "),
-          },
-          fix: (fixer) => fixer.replaceText(node, newText),
-        });
-      },
-      expressZodApiImport: (node) => {
-        const groups = new Map<string, TSESTree.ImportSpecifier[]>();
-        const remaining: TSESTree.ImportSpecifier[] = [];
-        const nonNamed: TSESTree.ImportDeclaration["specifiers"] = [];
-        for (const spec of node.specifiers) {
-          if (spec.type !== NT.ImportSpecifier) {
-            nonNamed.push(spec);
-            continue;
-          }
-          const name =
-            spec.imported.type === NT.Identifier
-              ? spec.imported.name
-              : spec.imported.value;
-          let found = false;
-          for (const [target, names] of moveTargets) {
-            if (names.includes(name)) {
-              if (!groups.has(target)) groups.set(target, []);
-              groups.get(target)!.push(spec);
-              found = true;
-              break;
-            }
-          }
-          if (!found) remaining.push(spec);
-        }
-        if (groups.size === 0) return;
-        const importKind = node.importKind === "type" ? "type " : "";
-        const first = groups.entries().next().value!;
-        const firstName =
-          first[1][0]!.imported.type === NT.Identifier
-            ? first[1][0]!.imported.name
-            : first[1][0]!.imported.value;
-        ctx.report({
-          node,
-          messageId: "move",
-          data: { subject: firstName, to: first[0] },
-          fix: (fixer) => {
-            const parts: string[] = [];
-            const allMain = [...nonNamed, ...remaining];
-            if (allMain.length > 0) {
-              const text = allMain
-                .map((s) => ctx.sourceCode.getText(s))
-                .join(", ");
-              parts.push(
-                `import ${importKind}{ ${text} } from "express-zod-api"`,
+            const { parent: declaration } = node;
+            if (declaration.type !== NT.ImportDeclaration) return null;
+            const lines: string[] = [];
+            if (!hasImport(ctx, "zod")) lines.push(`import { z } from "zod";`);
+            const needed = ["ResultHandler", "ensureHttpError"]
+              .concat(
+                importName === "defaultEndpointsFactory"
+                  ? ["EndpointsFactory"]
+                  : [],
+              )
+              .filter((n) => !hasImport(ctx, "express-zod-api", n));
+            if (needed.length) {
+              lines.push(
+                `import { ${needed.join(", ")} } from "express-zod-api";`,
               );
             }
-            for (const [target, specs] of groups) {
-              const text = specs
-                .map((s) => ctx.sourceCode.getText(s))
-                .join(", ");
-              parts.push(`import ${importKind}{ ${text} } from "${target}"`);
+            lines.push(legacyHandlerCode);
+            if (importName === "defaultEndpointsFactory") {
+              lines.push(
+                `export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);`,
+              );
             }
-            return fixer.replaceText(node, parts.join("\n"));
+            const remaining = declaration.specifiers.filter((s) => s !== node);
+            if (remaining.length) {
+              return [
+                fixer.removeRange(getRangeWithComma(ctx, node)),
+                fixer.insertTextAfterRange(
+                  declaration.range,
+                  `\n\n${lines.join("\n")}`,
+                ),
+              ];
+            }
+            return fixer.replaceTextRange(declaration.range, lines.join("\n"));
           },
         });
       },
-      integrationNewTypescript: (node) => removeProp({ ctx, node }),
+      provideCall: (node) => {
+        const { parent } = node;
+        if (
+          parent.type === NT.AwaitExpression &&
+          parent.parent.type === NT.VariableDeclarator
+        ) {
+          const declarator = parent.parent;
+          if (!declarator.id || declarator.id.type !== NT.Identifier) return;
+          const oldName = ctx.sourceCode.getText(declarator.id);
+          ctx.report({
+            node,
+            messageId: "change",
+            data: {
+              subject: "assignment",
+              from: `${oldName} = await client.provide(`,
+              to: `[status, ${oldName}] = await client.provide(`,
+            },
+            fix: (fixer) => [
+              fixer.insertTextBefore(
+                declarator.parent,
+                `/** @todo discriminate by status === 200 instead of response.status === "success" */\n`,
+              ),
+              fixer.replaceText(declarator.id, `[status, ${oldName}]`),
+            ],
+          });
+        } else if (
+          parent.type === NT.MemberExpression &&
+          parent.property.type === NT.Identifier &&
+          parent.property.name === "then" &&
+          parent.parent.type === NT.CallExpression
+        ) {
+          const thenCall = parent.parent;
+          const callback = thenCall.arguments[0];
+          if (
+            !callback ||
+            (callback.type !== NT.ArrowFunctionExpression &&
+              callback.type !== NT.FunctionExpression)
+          )
+            return;
+          const param = callback.params[0];
+          if (!param || param.type !== NT.Identifier) return;
+          const oldName = ctx.sourceCode.getText(param);
+          ctx.report({
+            node,
+            messageId: "change",
+            data: {
+              subject: "callback",
+              from: `(${oldName}) =>`,
+              to: `([status, ${oldName}]) =>`,
+            },
+            fix: (fixer) => [
+              fixer.insertTextBefore(
+                param,
+                `/** @todo discriminate by status === 200 instead of response.status === "success" */\n`,
+              ),
+              fixer.replaceText(param, `[status, ${oldName}]`),
+            ],
+          });
+        }
+      },
+      clientNew: (node) => {
+        const impl = node.arguments[0];
+        let body: TSESTree.BlockStatement | undefined;
+        if (
+          impl &&
+          (impl.type === NT.ArrowFunctionExpression ||
+            impl.type === NT.FunctionExpression) &&
+          impl.body.type === NT.BlockStatement
+        )
+          body = impl.body;
+
+        if (!body) return;
+        const sourceCode = ctx.sourceCode;
+        for (const stmt of body.body) {
+          if (stmt.type !== NT.ReturnStatement) continue;
+          const retArg = stmt.argument;
+          if (!retArg) continue;
+          const argSource = sourceCode.getText(retArg);
+          const hasAwait = retArg.type === NT.AwaitExpression;
+          ctx.report({
+            node: stmt,
+            messageId: "change",
+            data: {
+              subject: "return",
+              from: `return ${argSource}`,
+              to: `return [response.status, ${hasAwait ? argSource : `await ${argSource}`}]`,
+            },
+            fix: (fixer) => [
+              fixer.insertTextBefore(
+                stmt,
+                `/** @todo ensure response.status is the status-code in the first place of this tuple */\n`,
+              ),
+              fixer.replaceText(
+                retArg,
+                `[response.status, ${hasAwait ? "" : "await "}${argSource}]`,
+              ),
+            ],
+          });
+        }
+      },
     }),
 });
 
