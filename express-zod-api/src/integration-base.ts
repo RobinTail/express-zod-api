@@ -244,8 +244,8 @@ export abstract class IntegrationBase {
       "head",
       "delete",
     ] satisfies ClientMethod[]).join(", ");
-    const headers = `${ids.isBlob} ? { "Content-Type": "${contentTypes.raw}" } : ${ids.hasBody} ? { "Content-Type": "${contentTypes.json}" } : ${ids.undefined}`;
-    const body = `${ids.isBlob} ? ${ids.params} : ${ids.hasBody} ? JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
+    const headers = `${ids.hasBody} ? ${ids.isBlob} ? { "Content-Type": "${contentTypes.raw}" } : { "Content-Type": "${contentTypes.json}" } : ${ids.undefined}`;
+    const body = `${ids.hasBody} ? ${ids.isBlob} ? ${ids.params} : JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
     const parser = `${ids.isJSON} ? "${propOf<Response>("json")}" : "${propOf<Response>("text")}"`;
     return [

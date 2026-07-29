@@ -768,12 +768,12 @@ const defaultImplementation: Implementation = async (method, path, params) => {
     new URL(`${path}${searchParams}`, "http://localhost:8090"),
     {
       method: method.toUpperCase(),
-      headers: isBlob
-        ? { "Content-Type": "application/octet-stream" }
-        : hasBody
-          ? { "Content-Type": "application/json" }
-          : undefined,
-      body: isBlob ? params : hasBody ? JSON.stringify(params) : undefined,
+      headers: hasBody
+        ? isBlob
+          ? { "Content-Type": "application/octet-stream" }
+          : { "Content-Type": "application/json" }
+        : undefined,
+      body: hasBody ? (isBlob ? params : JSON.stringify(params)) : undefined,
     },
   );
   const contentType = response.headers.get("content-type");
