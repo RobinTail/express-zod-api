@@ -38,7 +38,6 @@ const ids = {
   client: "client",
   contentType: "contentType",
   isBlob: "isBlob",
-  isJSON: "isJSON",
   source: "source",
   Method: "Method",
   SomeOf: "SomeOf",
