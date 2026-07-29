@@ -262,7 +262,7 @@ type GetV1AvatarStreamInput = {
 };
 
 /** get /v1/avatar/stream */
-type GetV1AvatarStreamPositiveVariant1 = Buffer;
+type GetV1AvatarStreamPositiveVariant1 = Blob;
 
 /** get /v1/avatar/stream */
 interface GetV1AvatarStreamPositiveResponseVariants {
@@ -337,7 +337,7 @@ interface PostV1AvatarUploadNegativeResponseVariants {
 }
 
 /** post /v1/avatar/raw */
-type PostV1AvatarRawInput = Buffer;
+type PostV1AvatarRawInput = Blob;
 
 /** post /v1/avatar/raw */
 type PostV1AvatarRawPositiveVariant1 = {
@@ -733,7 +733,11 @@ export const endpointTags = {
 const parseRequest = (request: string) =>
   request.split(/ (.+)/, 2) as [Method, Path];
 
-const substitute = (path: string, params: Record<string, any>) => {
+const substitute = (
+  path: string,
+  params: Record<string, any>,
+): [typeof path, typeof params] => {
+  if (params instanceof Blob) return [path, params] as const;
   const rest = { ...params };
   for (const key in params) {
     path = path.replace(`:${key}`, () => {
@@ -756,20 +760,27 @@ type Pagination =
   | { total: number; limit: number; offset: number };
 
 const defaultImplementation: Implementation = async (method, path, params) => {
+  const isBlob = params instanceof Blob;
   const hasBody = !["get", "head", "delete"].includes(method);
-  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
+  const searchParams =
+    isBlob || hasBody ? "" : `?${new URLSearchParams(params)}`;
   const response = await fetch(
     new URL(`${path}${searchParams}`, "http://localhost:8090"),
     {
       method: method.toUpperCase(),
-      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-      body: hasBody ? JSON.stringify(params) : undefined,
+      headers: hasBody
+        ? isBlob
+          ? { "Content-Type": "application/octet-stream" }
+          : { "Content-Type": "application/json" }
+        : undefined,
+      body: hasBody ? (isBlob ? params : JSON.stringify(params)) : undefined,
     },
   );
   const contentType = response.headers.get("content-type");
   if (!contentType) return;
-  const isJSON = contentType.startsWith("application/json");
-  return response[isJSON ? "json" : "text"]();
+  if (contentType.startsWith("application/json")) return response.json();
+  if (contentType.startsWith("text/")) return response.text();
+  return response.blob();
 };
 
 export class Client<T> {

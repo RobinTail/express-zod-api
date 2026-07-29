@@ -219,7 +219,7 @@ const onLazy: Producer = (
   { makeAlias, next },
 ) => makeAlias(def.getter, () => next(def.getter()));
 
-const onBuffer: Producer = () => ensureTypeNode("Buffer");
+const onBuffer: Producer = () => ensureTypeNode("Blob");
 
 const onRaw: Producer = (schema: RawSchema, { next }) =>
   next(schema._zod.def.shape.raw);

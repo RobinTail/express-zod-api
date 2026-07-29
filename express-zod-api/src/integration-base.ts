@@ -37,7 +37,7 @@ const ids = {
   defaultImplementation: "defaultImplementation",
   client: "client",
   contentType: "contentType",
-  isJSON: "isJSON",
+  isBlob: "isBlob",
   source: "source",
   Method: "Method",
   SomeOf: "SomeOf",
@@ -164,10 +164,13 @@ export abstract class IntegrationBase {
    * @internal
    * */
   protected makeSubstituteFn = () => {
-    const args = `${ids.path}: string, ${ids.params}: Record<string, any>`;
+    const paramsType = `Record<string, any>`;
+    const args = `${ids.path}: string, ${ids.params}: ${paramsType}`;
     const placeholder = `\`:\${${ids.key}}\``;
+    const returns = `: [typeof ${ids.path}, typeof ${ids.params}]`;
     return [
-      `const ${ids.substitute} = (${args}) => {\n`,
+      `const ${ids.substitute} = (${args})${returns} => {`,
+      `  if (${ids.params} instanceof Blob) return [${ids.path}, ${ids.params}] as const;`,
       `  const ${ids.rest} = { ...${ids.params} };`,
       `  for (const ${ids.key} in ${ids.params}) {`,
       `    ${ids.path} = ${ids.path}.${propOf<string>("replace")}(${placeholder}, () => {`,
@@ -240,14 +243,18 @@ export abstract class IntegrationBase {
       "head",
       "delete",
     ] satisfies ClientMethod[]).join(", ");
-    const headers = `${ids.hasBody} ? { "Content-Type": "${contentTypes.json}" } : ${ids.undefined}`;
-    const body = `${ids.hasBody} ? JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
+    const raw = `{ "Content-Type": "${contentTypes.raw}" }`;
+    const json = `{ "Content-Type": "${contentTypes.json}" }`;
+    const headers = `${ids.hasBody} ? ${ids.isBlob} ? ${raw} : ${json} : ${ids.undefined}`;
+    const stringified = `JSON.${propOf<JSON>("stringify")}(${ids.params})`;
+    const body = `${ids.hasBody} ? ${ids.isBlob} ? ${ids.params} : ${stringified} : ${ids.undefined}`;
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
-    const parser = `${ids.isJSON} ? "${propOf<Response>("json")}" : "${propOf<Response>("text")}"`;
+    const searchParams = `\`?\${new ${URLSearchParams.name}(${ids.params})}\``;
     return [
       `const ${ids.defaultImplementation}: ${ids.Implementation} = async (${args}) => {`,
+      `  const ${ids.isBlob} = ${ids.params} instanceof Blob;`,
       `  const ${ids.hasBody} = ![${noBodyMethods}].includes(${ids.method});`,
-      `  const ${ids.searchParams} = ${ids.hasBody} ? "" : \`?\${new ${URLSearchParams.name}(${ids.params})}\`;`,
+      `  const ${ids.searchParams} = ${ids.isBlob} || ${ids.hasBody} ? "" : ${searchParams};`,
       `  const ${ids.response} = await ${fetch.name}(`,
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
       `    {`,
@@ -258,8 +265,11 @@ export abstract class IntegrationBase {
       `  );`,
       `  const ${ids.contentType} = ${contentType};`,
       `  if (!${ids.contentType}) return;`,
-      `  const ${ids.isJSON} = ${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}");`,
-      `  return ${ids.response}[${parser}]();`,
+      `  if (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}")) ` +
+        `return ${ids.response}.${propOf<Response>("json")}();`,
+      `  if (${ids.contentType}.${propOf<string>("startsWith")}("text/")) ` +
+        `return ${ids.response}.${propOf<Response>("text")}();`,
+      `  return ${ids.response}.${propOf<Response>("blob")}();`,
       `};`,
     ].join("\n");
   };
