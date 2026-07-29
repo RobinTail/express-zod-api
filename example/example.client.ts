@@ -779,12 +779,7 @@ const defaultImplementation: Implementation = async (method, path, params) => {
   const contentType = response.headers.get("content-type");
   if (!contentType) return;
   if (contentType.startsWith("application/json")) return response.json();
-  if (
-    contentType.startsWith("text/") ||
-    contentType.startsWith("application/xml") ||
-    contentType.includes("+xml")
-  )
-    return response.text();
+  if (contentType.startsWith("text/")) return response.text();
   return response.blob();
 };
 

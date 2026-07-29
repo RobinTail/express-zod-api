@@ -268,10 +268,8 @@ export abstract class IntegrationBase {
       `  if (!${ids.contentType}) return;`,
       `  if (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}")) ` +
         `return ${ids.response}.${propOf<Response>("json")}();`,
-      `  if (${ids.contentType}.${propOf<string>("startsWith")}("text/") ||`,
-      `    ${ids.contentType}.${propOf<string>("startsWith")}("application/xml") ||`,
-      `    ${ids.contentType}.${propOf<string>("includes")}("+xml"))`,
-      `    return ${ids.response}.${propOf<Response>("text")}();`,
+      `  if (${ids.contentType}.${propOf<string>("startsWith")}("text/")) ` +
+        `return ${ids.response}.${propOf<Response>("text")}();`,
       `  return ${ids.response}.${propOf<Response>("blob")}();`,
       `};`,
     ].join("\n");

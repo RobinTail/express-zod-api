@@ -715,6 +715,13 @@ describe("Example", async () => {
       );
       expect(response).toEqual({ status: "success", data: { length: 4 } });
     });
+
+    test("can parse as Blob", async () => {
+      const response = await client.provide("get /v1/avatar/stream", {
+        userId: "10",
+      });
+      expect(response instanceof Blob).toBe(true);
+    });
   });
 
   describe("Rate limiting", () => {
