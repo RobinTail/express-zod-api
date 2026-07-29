@@ -22,7 +22,7 @@ describe("zod-to-ts", () => {
   });
 
   describe("ez.buffer()", () => {
-    test("should be Buffer", () => {
+    test("should be Blob", () => {
       const node = zodToTs(ez.buffer(), { ctx });
       expect(printNode(node)).toMatchSnapshot();
     });

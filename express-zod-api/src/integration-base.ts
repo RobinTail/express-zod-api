@@ -37,6 +37,7 @@ const ids = {
   defaultImplementation: "defaultImplementation",
   client: "client",
   contentType: "contentType",
+  isBlob: "isBlob",
   isJSON: "isJSON",
   source: "source",
   Method: "Method",
@@ -164,10 +165,13 @@ export abstract class IntegrationBase {
    * @internal
    * */
   protected makeSubstituteFn = () => {
-    const args = `${ids.path}: string, ${ids.params}: Record<string, any>`;
+    const paramsType = `Record<string, any>`;
+    const args = `${ids.path}: string, ${ids.params}: ${paramsType}`;
     const placeholder = `\`:\${${ids.key}}\``;
+    const returns = `: [typeof ${ids.path}, typeof ${ids.params}]`;
     return [
-      `const ${ids.substitute} = (${args}) => {\n`,
+      `const ${ids.substitute} = (${args})${returns} => {`,
+      `  if (${ids.params} instanceof Blob) return [${ids.path}, ${ids.params}] as const;`,
       `  const ${ids.rest} = { ...${ids.params} };`,
       `  for (const ${ids.key} in ${ids.params}) {`,
       `    ${ids.path} = ${ids.path}.${propOf<string>("replace")}(${placeholder}, () => {`,
@@ -240,14 +244,15 @@ export abstract class IntegrationBase {
       "head",
       "delete",
     ] satisfies ClientMethod[]).join(", ");
-    const headers = `${ids.hasBody} ? { "Content-Type": "${contentTypes.json}" } : ${ids.undefined}`;
-    const body = `${ids.hasBody} ? JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
+    const headers = `${ids.isBlob} ? { "Content-Type": "${contentTypes.raw}" } : ${ids.hasBody} ? { "Content-Type": "${contentTypes.json}" } : ${ids.undefined}`;
+    const body = `${ids.isBlob} ? ${ids.params} : ${ids.hasBody} ? JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
     const parser = `${ids.isJSON} ? "${propOf<Response>("json")}" : "${propOf<Response>("text")}"`;
     return [
       `const ${ids.defaultImplementation}: ${ids.Implementation} = async (${args}) => {`,
+      `  const ${ids.isBlob} = ${ids.params} instanceof Blob;`,
       `  const ${ids.hasBody} = ![${noBodyMethods}].includes(${ids.method});`,
-      `  const ${ids.searchParams} = ${ids.hasBody} ? "" : \`?\${new ${URLSearchParams.name}(${ids.params})}\`;`,
+      `  const ${ids.searchParams} = ${ids.isBlob} || ${ids.hasBody} ? "" : \`?\${new ${URLSearchParams.name}(${ids.params})}\`;`,
       `  const ${ids.response} = await ${fetch.name}(`,
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
       `    {`,
