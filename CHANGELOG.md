@@ -39,7 +39,7 @@
   - The static async method `create()` removed — use `new Integration()` instead;
   - Removed `typescript` option from constructor — now imported statically;
   - Generated type for `ez.buffer()` is now `Blob` instead of `Buffer` (which didn't exist in browser environments);
-  - The generated `defaultImplementation` now supports `Blob` request bodies.
+  - The default `Client` implementation got improved response parsing and now supports `Blob` in request and response.
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff
