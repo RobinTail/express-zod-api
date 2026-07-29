@@ -244,15 +244,19 @@ export abstract class IntegrationBase {
       "head",
       "delete",
     ] satisfies ClientMethod[]).join(", ");
-    const headers = `${ids.hasBody} ? ${ids.isBlob} ? { "Content-Type": "${contentTypes.raw}" } : { "Content-Type": "${contentTypes.json}" } : ${ids.undefined}`;
-    const body = `${ids.hasBody} ? ${ids.isBlob} ? ${ids.params} : JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
+    const raw = `{ "Content-Type": "${contentTypes.raw}" }`;
+    const json = `{ "Content-Type": "${contentTypes.json}" }`;
+    const headers = `${ids.hasBody} ? ${ids.isBlob} ? ${raw} : ${json} : ${ids.undefined}`;
+    const stringified = `JSON.${propOf<JSON>("stringify")}(${ids.params})`;
+    const body = `${ids.hasBody} ? ${ids.isBlob} ? ${ids.params} : ${stringified} : ${ids.undefined}`;
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
     const parser = `${ids.isJSON} ? "${propOf<Response>("json")}" : "${propOf<Response>("text")}"`;
+    const searchParams = `\`?\${new ${URLSearchParams.name}(${ids.params})}\``;
     return [
       `const ${ids.defaultImplementation}: ${ids.Implementation} = async (${args}) => {`,
       `  const ${ids.isBlob} = ${ids.params} instanceof Blob;`,
       `  const ${ids.hasBody} = ![${noBodyMethods}].includes(${ids.method});`,
-      `  const ${ids.searchParams} = ${ids.isBlob} || ${ids.hasBody} ? "" : \`?\${new ${URLSearchParams.name}(${ids.params})}\`;`,
+      `  const ${ids.searchParams} = ${ids.isBlob} || ${ids.hasBody} ? "" : ${searchParams};`,
       `  const ${ids.response} = await ${fetch.name}(`,
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
       `    {`,
