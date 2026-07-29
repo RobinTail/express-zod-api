@@ -250,7 +250,6 @@ export abstract class IntegrationBase {
     const stringified = `JSON.${propOf<JSON>("stringify")}(${ids.params})`;
     const body = `${ids.hasBody} ? ${ids.isBlob} ? ${ids.params} : ${stringified} : ${ids.undefined}`;
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
-    const parser = `${ids.isJSON} ? "${propOf<Response>("json")}" : "${propOf<Response>("text")}"`;
     const searchParams = `\`?\${new ${URLSearchParams.name}(${ids.params})}\``;
     return [
       `const ${ids.defaultImplementation}: ${ids.Implementation} = async (${args}) => {`,
@@ -267,8 +266,13 @@ export abstract class IntegrationBase {
       `  );`,
       `  const ${ids.contentType} = ${contentType};`,
       `  if (!${ids.contentType}) return;`,
-      `  const ${ids.isJSON} = ${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}");`,
-      `  return ${ids.response}[${parser}]();`,
+      `  if (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}")) ` +
+        `return ${ids.response}.${propOf<Response>("json")}();`,
+      `  if (${ids.contentType}.${propOf<string>("startsWith")}("text/") ||`,
+      `    ${ids.contentType}.${propOf<string>("startsWith")}("application/xml") ||`,
+      `    ${ids.contentType}.${propOf<string>("includes")}("+xml"))`,
+      `    return ${ids.response}.${propOf<Response>("text")}();`,
+      `  return ${ids.response}.${propOf<Response>("blob")}();`,
       `};`,
     ].join("\n");
   };
