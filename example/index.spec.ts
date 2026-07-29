@@ -707,6 +707,14 @@ describe("Example", async () => {
       expect(response).toBeUndefined();
       expectTypeOf(response).toBeUndefined();
     });
+
+    test("can send Blob body", async () => {
+      const response = await client.provide(
+        "post /v1/avatar/raw",
+        new Blob(["test"], { type: "image/svg+xml" }),
+      );
+      expect(response).toEqual({ status: "success", data: { length: 4 } });
+    });
   });
 
   describe("Rate limiting", () => {
