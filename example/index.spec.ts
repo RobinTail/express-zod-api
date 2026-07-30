@@ -284,8 +284,7 @@ describe("Example", async () => {
           body: data,
           headers: {
             Cookie:
-              "session=j%3A%7B%22token%22%3A%22553280ce-ab20-4481-a9dc-fd3fc4f6759c%22%7D; " +
-              "Path=/; HttpOnly; SameSite=Lax",
+              "session=j%3A%7B%22token%22%3A%22553280ce-ab20-4481-a9dc-fd3fc4f6759c%22%7D;",
           },
         },
       );
@@ -303,8 +302,6 @@ describe("Example", async () => {
             num: "123",
             obj: { some: "thing" },
             str: "test string value",
-            Path: "/", // from cookie
-            SameSite: "Lax",
             session: { token: "553280ce-ab20-4481-a9dc-fd3fc4f6759c" },
           },
           size: 48687,
@@ -733,8 +730,7 @@ describe("Example", async () => {
             headers: {
               ...headers,
               Cookie:
-                "session=j%3A%7B%22token%22%3A%22553280ce-ab20-4481-a9dc-fd3fc4f6759c%22%7D; " +
-                "Path=/; HttpOnly; SameSite=Lax",
+                "session=j%3A%7B%22token%22%3A%22553280ce-ab20-4481-a9dc-fd3fc4f6759c%22%7D;",
             },
           }),
         },
