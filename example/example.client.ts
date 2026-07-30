@@ -795,7 +795,7 @@ const defaultImplementation: Implementation<DefaultContext> = async (
     } else if (hasFiles) {
       body = new FormData();
       for (const [key, value] of Object.entries(params))
-        body.append(key, value);
+        if (value !== undefined) body.append(key, value);
     } else {
       body = JSON.stringify(params);
     }

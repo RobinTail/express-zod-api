@@ -282,7 +282,7 @@ export abstract class IntegrationBase {
       `    } else if (${ids.hasFiles}) {`,
       `      ${ids.body} = new ${FormData.name}();`,
       `      for (const [${ids.key}, ${ids.value}] of Object.${propOf<ObjectConstructor>("entries")}(${ids.params}))`,
-      `        ${ids.body}.${propOf<FormData>("append")}(${ids.key}, ${ids.value});`,
+      `        if (${ids.value} !== undefined) ${ids.body}.${propOf<FormData>("append")}(${ids.key}, ${ids.value});`,
       `    } else {`,
       `      ${ids.body} = JSON.${propOf<JSON>("stringify")}(${ids.params});`,
       `    }`,
