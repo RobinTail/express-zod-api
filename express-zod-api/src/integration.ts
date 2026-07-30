@@ -109,7 +109,7 @@ export class Integration extends IntegrationBase {
       const inputTypeNode = zodToTs(inputSchema, ctxIn);
       this.#program.push((opts) => {
         const printed = printNode(inputTypeNode, opts);
-        return `/** ${request} */\ntype ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies) : printed};`;
+        return `/** ${request} */\ntype ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies, "security cookies") : printed};`;
       });
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {

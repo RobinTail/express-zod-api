@@ -306,6 +306,7 @@ type PostV1AvatarUploadInput = Omit<
     };
     avatar: any;
   },
+  /** security cookies */
   "session"
 >;
 
