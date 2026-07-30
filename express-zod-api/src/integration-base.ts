@@ -79,6 +79,9 @@ export abstract class IntegrationBase {
     return `export type ${ids.Method} = ${union};`;
   };
 
+  protected makeOmit = (base: string, props: Iterable<string>) =>
+    `Omit<${base}, ${quot(props).join(" | ")}>`;
+
   /**
    * @example type SomeOf<T> = T[keyof T];
    * @internal
