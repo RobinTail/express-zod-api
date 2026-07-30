@@ -299,12 +299,15 @@ interface HeadV1AvatarStreamNegativeResponseVariants {
 }
 
 /** post /v1/avatar/upload */
-type PostV1AvatarUploadInput = {
-  session: {
-    token: string;
-  };
-  avatar: any;
-};
+type PostV1AvatarUploadInput = Omit<
+  {
+    session: {
+      token: string;
+    };
+    avatar: any;
+  },
+  "session"
+>;
 
 /** post /v1/avatar/upload */
 type PostV1AvatarUploadPositiveVariant1 = {
@@ -769,11 +772,14 @@ const defaultImplementation: Implementation = async (method, path, params) => {
     {
       method: method.toUpperCase(),
       headers: hasBody
-        ? isBlob
-          ? { "Content-Type": "application/octet-stream" }
-          : { "Content-Type": "application/json" }
+        ? {
+            "Content-Type": isBlob
+              ? "application/octet-stream"
+              : "application/json",
+          }
         : undefined,
       body: hasBody ? (isBlob ? params : JSON.stringify(params)) : undefined,
+      credentials: "include",
     },
   );
   const contentType = response.headers.get("content-type");

@@ -39,7 +39,10 @@
   - The static async method `create()` removed — use `new Integration()` instead;
   - Removed `typescript` option from constructor — now imported statically;
   - Generated type for `ez.buffer()` is now `Blob` instead of `Buffer` (which didn't exist in browser environments);
-  - The default `Client` implementation got improved response parsing and now supports `Blob` in request and response.
+  - The generated Client now excludes cookie-based security fields from input types (using `Omit`);
+  - The default `Client` Implementation (remains customizable):
+    - Got improved response parsing and now supports `Blob` in request and response;
+    - Sets `credentials` depending on `cors` setting — cookies are delegated to the browser.
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff

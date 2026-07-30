@@ -236,18 +236,15 @@ export abstract class IntegrationBase {
    * @example export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
    * @internal
    * */
-  protected makeDefaultImplementation = () => {
+  protected makeDefaultImplementation = (hasCors: boolean) => {
     const args = `${ids.method}, ${ids.path}, ${ids.params}`;
     const noBodyMethods = quot([
       "get",
       "head",
       "delete",
     ] satisfies ClientMethod[]).join(", ");
-    const raw = `{ "Content-Type": "${contentTypes.raw}" }`;
-    const json = `{ "Content-Type": "${contentTypes.json}" }`;
-    const headers = `${ids.hasBody} ? ${ids.isBlob} ? ${raw} : ${json} : ${ids.undefined}`;
-    const stringified = `JSON.${propOf<JSON>("stringify")}(${ids.params})`;
-    const body = `${ids.hasBody} ? ${ids.isBlob} ? ${ids.params} : ${stringified} : ${ids.undefined}`;
+    const headers = `${ids.hasBody} ? { "Content-Type": ${ids.isBlob} ? "${contentTypes.raw}" : "${contentTypes.json}" } : ${ids.undefined}`;
+    const body = `${ids.hasBody} ? ${ids.isBlob} ? ${ids.params} : JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
     const searchParams = `\`?\${new ${URLSearchParams.name}(${ids.params})}\``;
     return [
@@ -261,6 +258,7 @@ export abstract class IntegrationBase {
       `      ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
       `      ${propOf<RequestInit>("headers")}: ${headers},`,
       `      ${propOf<RequestInit>("body")}: ${body},`,
+      `      ${propOf<RequestInit>("credentials")}: ${hasCors ? `"include"` : ids.undefined},`,
       `    },`,
       `  );`,
       `  const ${ids.contentType} = ${contentType};`,

@@ -17,6 +17,7 @@ import type { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
 import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
+import { getSecurityNames } from "./security";
 
 interface IntegrationParams {
   routing: Routing;
@@ -104,11 +105,19 @@ export class Integration extends IntegrationBase {
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
       const inputTypeName = entitle("input");
+      const cookies = getSecurityNames(endpoint.security, "cookie");
       const inputTypeNode = zodToTs(inputSchema, ctxIn);
-      this.#program.push(
-        (opts) =>
-          `/** ${request} */\ntype ${inputTypeName} = ${printNode(inputTypeNode, opts)};`,
-      );
+      this.#program.push((opts) => {
+        const printed = printNode(inputTypeNode, opts);
+        const omits =
+          cookies.size &&
+          cookies
+            .values()
+            .map((name) => `"${name}"`)
+            .toArray()
+            .join(" | ");
+        return `/** ${request} */\ntype ${inputTypeName} = ${omits ? `Omit<${printed}, ${omits}>` : printed};`;
+      });
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
@@ -174,7 +183,7 @@ export class Integration extends IntegrationBase {
       this.makeSubstituteFn(),
       this.makeImplementationType(),
       this.makePaginationType(),
-      this.makeDefaultImplementation(),
+      this.makeDefaultImplementation(!!config.cors),
       this.makeClientClass(clientClassName),
       this.makeSubscriptionClass(subscriptionClassName),
     );
