@@ -50,6 +50,7 @@ const ids = {
   SomeOf: "SomeOf",
   Request: "Request",
   Pagination: "Pagination",
+  override: "override",
 } satisfies Record<string, string>;
 
 export const interfaces: Record<IOKind, string> = {
@@ -163,7 +164,7 @@ export abstract class IntegrationBase {
    * @internal
    * */
   protected makeDefaultContextType = () =>
-    `export type ${ids.DefaultContext} = { override?: (init: RequestInit) => RequestInit };`;
+    `export type ${ids.DefaultContext} = { ${ids.override}?: (init: RequestInit) => RequestInit };`;
 
   /**
    * @example const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
@@ -292,7 +293,7 @@ export abstract class IntegrationBase {
       `    ${ids.headers},`,
       `    ${ids.body},`,
       `  };`,
-      `  if (${ids.ctx}?.override) init = ${ids.ctx}.override(init);`,
+      `  if (${ids.ctx}?.${ids.override}) init = ${ids.ctx}.${ids.override}(init);`,
       `  const ${ids.response} = await ${fetch.name}(`,
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
       `    init,`,
