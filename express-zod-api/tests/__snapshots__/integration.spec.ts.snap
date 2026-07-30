@@ -539,13 +539,18 @@ export type Implementation<T extends Record<string, unknown>> = (
   ctx?: T,
 ) => Promise<any>;
 
+export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
+
 type Pagination =
   | { nextCursor: string | null }
   | { total: number; limit: number; offset: number };
 
-const defaultImplementation: Implementation<{
-  override?: (init: RequestInit) => RequestInit;
-}> = async (method, path, params, ctx) => {
+const defaultImplementation: Implementation<DefaultContext> = async (
+  method,
+  path,
+  params,
+  ctx,
+) => {
   const isBlob = params instanceof Blob;
   const hasFiles =
     !isBlob &&
@@ -593,11 +598,7 @@ const defaultImplementation: Implementation<{
   return response.blob();
 };
 
-export class Client<
-  T extends Record<string, unknown> = {
-    override?: (init: RequestInit) => RequestInit;
-  },
-> {
+export class Client<T extends Record<string, unknown> = DefaultContext> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}

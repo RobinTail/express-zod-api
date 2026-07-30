@@ -14,6 +14,7 @@ type Store = Record<IOKind, string>;
 const ids = {
   Path: "Path",
   Implementation: "Implementation",
+  DefaultContext: "DefaultContext",
   key: "key",
   path: "path",
   params: "params",
@@ -158,6 +159,13 @@ export abstract class IntegrationBase {
   };
 
   /**
+   * @example export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
+   * @internal
+   * */
+  protected makeDefaultContextType = () =>
+    `export type ${ids.DefaultContext} = { override?: (init: RequestInit) => RequestInit };`;
+
+  /**
    * @example const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
    * @internal
    * @desc split once, excludes the third empty element
@@ -222,7 +230,7 @@ export abstract class IntegrationBase {
     const totalProp = propOf<OffsetPaginatedResult["output"]["shape"]>("total");
     const callArgs = `${ids.method}, ...${ids.substitute}(${ids.path}, ${ids.params}), ${ids.ctx}`;
     return [
-      `export class ${name}<T extends Record<string, unknown> = { override?: (init: RequestInit) => RequestInit }> {`,
+      `export class ${name}<T extends Record<string, unknown> = ${ids.DefaultContext}> {`,
       `  public constructor(`,
       `    protected readonly ${ids.implementation}: ${ids.Implementation}<T> = ${ids.defaultImplementation},`,
       `  ) {}`,
@@ -259,7 +267,7 @@ export abstract class IntegrationBase {
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
     const searchParams = `\`?\${new ${URLSearchParams.name}(${ids.params})}\``;
     return [
-      `const ${ids.defaultImplementation}: ${ids.Implementation}<{ override?: (init: RequestInit) => RequestInit }> = async (${args}) => {`,
+      `const ${ids.defaultImplementation}: ${ids.Implementation}<${ids.DefaultContext}> = async (${args}) => {`,
       `  const ${ids.isBlob} = ${ids.params} instanceof Blob;`,
       `  const ${ids.hasFiles} = !${ids.isBlob} && Object.${propOf<ObjectConstructor>("values")}(` +
         `${ids.params}).${propOf<unknown[]>("some")}((one) => one instanceof Blob || one instanceof ${ids.File});`,

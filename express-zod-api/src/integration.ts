@@ -189,6 +189,7 @@ export class Integration extends IntegrationBase {
       this.makeParseRequestFn(),
       this.makeSubstituteFn(),
       this.makeImplementationType(),
+      this.makeDefaultContextType(),
       this.makePaginationType(),
       this.makeDefaultImplementation(hasCredentials && hasCookies),
       this.makeClientClass(clientClassName),
