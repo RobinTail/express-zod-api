@@ -294,7 +294,7 @@ export abstract class IntegrationBase {
       `    const ${ids.searchParams} = \`?\${new ${URLSearchParams.name}(${ids.rest})}\`;`,
       `    this.${ids.source} = new EventSource(`,
       `      new URL(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
-      `      ${hasCors ? `{ ${propOf<EventSourceInit>("withCredentials")}: true }` : ids.undefined},`,
+      `      { ${propOf<EventSourceInit>("withCredentials")}: ${hasCors ? "true" : ids.undefined} }`,
       `    );`,
       `  }`,
       `  public ${ids.on}<E extends R["${propOf<SSEShape>("event")}"]>(`,

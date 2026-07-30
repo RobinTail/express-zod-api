@@ -818,7 +818,7 @@ export class Subscription<
     const searchParams = `?${new URLSearchParams(rest)}`;
     this.source = new EventSource(
       new URL(`${path}${searchParams}`, "http://localhost:8090"),
-      undefined,
+      { withCredentials: undefined },
     );
   }
   public on<E extends R["event"]>(
