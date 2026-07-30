@@ -1229,6 +1229,103 @@ describe("Documentation", () => {
     });
   });
 
+  describe("Issue #3570: component deduplication with meta id", () => {
+    const commons = {
+      config: sampleConfig,
+      title: "Issue 3570",
+      version: "1.0.0",
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test("same schema reused as output across two endpoints should produce one component", () => {
+      const item = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "Item" });
+      const spec = new Documentation({
+        routing: {
+          "get /a": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: item,
+            handler: vi.fn(),
+          }),
+          "get /b": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: item,
+            handler: vi.fn(),
+          }),
+        },
+        ...commons,
+      }).getSpec();
+      const schemas = spec.components?.schemas ?? {};
+      const itemKeys = Object.keys(schemas).filter((name) =>
+        name.startsWith("Item"),
+      );
+      expect(itemKeys).toEqual(["Item"]);
+    });
+
+    test("same schema as input and output of one endpoint should produce one component", () => {
+      const item = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "Item" });
+      const spec = new Documentation({
+        routing: {
+          "post /a": defaultEndpointsFactory.build({
+            method: "post",
+            input: item,
+            output: item,
+            handler: vi.fn(),
+          }),
+        },
+        ...commons,
+      }).getSpec();
+      const schemas = spec.components?.schemas ?? {};
+      const itemKeys = Object.keys(schemas).filter((name) =>
+        name.startsWith("Item"),
+      );
+      expect(itemKeys).toEqual(["Item"]);
+    });
+
+    test("multiple distinct meta ids should each appear once when reused", () => {
+      const itemA = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "ItemA" });
+      const itemB = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "ItemB" });
+      const spec = new Documentation({
+        routing: {
+          "get /a": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemA,
+            handler: vi.fn(),
+          }),
+          "get /b": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemA,
+            handler: vi.fn(),
+          }),
+          "get /c": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemB,
+            handler: vi.fn(),
+          }),
+          "get /d": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemB,
+            handler: vi.fn(),
+          }),
+        },
+        ...commons,
+      }).getSpec();
+      const schemas = spec.components?.schemas ?? {};
+      const itemKeys = Object.keys(schemas).filter((name) =>
+        name.startsWith("Item"),
+      );
+      expect(itemKeys).toEqual(["ItemA", "ItemB"]);
+    });
+  });
+
   test("Depicter type should be satisfied", () => {
     expectTypeOf(
       ({
