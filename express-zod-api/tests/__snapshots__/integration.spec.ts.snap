@@ -68,9 +68,14 @@ export type Request = keyof Input;
 
 exports[`Integration > Should support HEAD method by default 0 1`] = `
 "/** get /v1/path */
-type GetV1PathInput = {
-  some: string;
-};
+type GetV1PathInput = Omit<
+  {
+    session: {};
+    some: string;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** get /v1/path */
 type GetV1PathPositiveVariant1 = {
@@ -97,9 +102,14 @@ interface GetV1PathNegativeResponseVariants {
 }
 
 /** head /v1/path */
-type HeadV1PathInput = {
-  some: string;
-};
+type HeadV1PathInput = Omit<
+  {
+    session: {};
+    some: string;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** head /v1/path */
 type HeadV1PathPositiveVariant1 = undefined;
@@ -159,9 +169,14 @@ export type Request = keyof Input;
 
 exports[`Integration > Should support HEAD method by default 1 1`] = `
 "/** get /v1/path */
-type GetV1PathInput = {
-  some: string;
-};
+type GetV1PathInput = Omit<
+  {
+    session: {};
+    some: string;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** get /v1/path */
 type GetV1PathPositiveVariant1 = {
