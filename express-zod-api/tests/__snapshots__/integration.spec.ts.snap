@@ -539,11 +539,11 @@ export type Implementation<T extends Record<string, unknown>> = (
   ctx?: T,
 ) => Promise<any>;
 
-export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
-
 type Pagination =
   | { nextCursor: string | null }
   | { total: number; limit: number; offset: number };
+
+export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
 
 const defaultImplementation: Implementation<DefaultContext> = async (
   method,
