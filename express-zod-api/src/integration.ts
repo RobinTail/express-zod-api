@@ -100,12 +100,15 @@ export class Integration extends IntegrationBase {
     const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
+    const hasCors = !!config.cors;
+    let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path);
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
       const inputTypeName = entitle("input");
       const cookies = getSecurityNames(endpoint.security, "cookie");
+      if (cookies.size) hasCookies = true;
       const inputTypeNode = zodToTs(inputSchema, ctxIn);
       this.#program.push((opts) => {
         const printed = printNode(inputTypeNode, opts);
@@ -179,9 +182,9 @@ export class Integration extends IntegrationBase {
       this.makeSubstituteFn(),
       this.makeImplementationType(),
       this.makePaginationType(),
-      this.makeDefaultImplementation(!!config.cors),
+      this.makeDefaultImplementation(hasCors && hasCookies),
       this.makeClientClass(clientClassName),
-      this.makeSubscriptionClass(subscriptionClassName, !!config.cors),
+      this.makeSubscriptionClass(subscriptionClassName, hasCors && hasCookies),
     );
 
     this.#usage = this.makeUsageStatements(

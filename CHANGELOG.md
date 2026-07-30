@@ -16,6 +16,7 @@
     - The public nature of these types was a workaround for user-side type declarations, but it's solved differently.
 - Breaking change to the `cors` config option:
   - Changed from `boolean | HeadersProvider` to `boolean | RequestHandler`;
+  - When `cors: true` it echoes the request `Origin` and sets `Access-Control-Allow-Credentials` to support cookies;
   - You can now use the well-known `cors` package or pass a conventional `RequestHandler` directly.
 - Body parsers are now applied globally rather than per-endpoint (`createServer` experience only):
   - Endpoints can accept requests in different content types (e.g., either JSON or URL-encoded body);
@@ -41,7 +42,7 @@
   - Generated type for `ez.buffer()` is now `Blob` instead of `Buffer` (which didn't exist in browser environments);
   - The generated Client now excludes cookie-based security fields from input types (using `Omit`);
   - The default `Client` Implementation got improved response parsing and now supports `Blob` in request and response;
-  - Both `Client` and `Subscription` delegate cookies handling (credentials) to the browser.
+  - Both `Client` and `Subscription` delegate cookies handling (credentials) to the browser when `cors` is enabled.
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff

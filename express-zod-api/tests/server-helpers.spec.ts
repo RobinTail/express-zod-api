@@ -425,6 +425,7 @@ describe("Server helpers", () => {
       expect(res._getHeaders()).toEqual({
         "access-control-allow-headers": "content-type",
         "access-control-allow-origin": "*",
+        "access-control-allow-credentials": "true",
       });
       expect(next).toHaveBeenCalledTimes(1);
     });
