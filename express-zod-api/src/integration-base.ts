@@ -79,6 +79,9 @@ export abstract class IntegrationBase {
     return `export type ${ids.Method} = ${union};`;
   };
 
+  protected makeOmit = (base: string, props: Iterable<string>, reason = "") =>
+    `Omit<${base}, ${reason && `\n/** ${reason} */\n`}${quot(props).join(" | ")}>`;
+
   /**
    * @example type SomeOf<T> = T[keyof T];
    * @internal
@@ -236,18 +239,15 @@ export abstract class IntegrationBase {
    * @example export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
    * @internal
    * */
-  protected makeDefaultImplementation = () => {
+  protected makeDefaultImplementation = (hasCredentials: boolean) => {
     const args = `${ids.method}, ${ids.path}, ${ids.params}`;
     const noBodyMethods = quot([
       "get",
       "head",
       "delete",
     ] satisfies ClientMethod[]).join(", ");
-    const raw = `{ "Content-Type": "${contentTypes.raw}" }`;
-    const json = `{ "Content-Type": "${contentTypes.json}" }`;
-    const headers = `${ids.hasBody} ? ${ids.isBlob} ? ${raw} : ${json} : ${ids.undefined}`;
-    const stringified = `JSON.${propOf<JSON>("stringify")}(${ids.params})`;
-    const body = `${ids.hasBody} ? ${ids.isBlob} ? ${ids.params} : ${stringified} : ${ids.undefined}`;
+    const headers = `${ids.hasBody} ? { "Content-Type": ${ids.isBlob} ? "${contentTypes.raw}" : "${contentTypes.json}" } : ${ids.undefined}`;
+    const body = `${ids.hasBody} ? ${ids.isBlob} ? ${ids.params} : JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
     const searchParams = `\`?\${new ${URLSearchParams.name}(${ids.params})}\``;
     return [
@@ -261,6 +261,7 @@ export abstract class IntegrationBase {
       `      ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
       `      ${propOf<RequestInit>("headers")}: ${headers},`,
       `      ${propOf<RequestInit>("body")}: ${body},`,
+      `      ${propOf<RequestInit>("credentials")}: ${hasCredentials ? `"include"` : ids.undefined},`,
       `    },`,
       `  );`,
       `  const ${ids.contentType} = ${contentType};`,
@@ -278,7 +279,7 @@ export abstract class IntegrationBase {
    * @example export class Subscription<K extends Extract<___>, R extends Extract<___>> { ___ }
    * @internal
    * */
-  protected makeSubscriptionClass = (name: string) => {
+  protected makeSubscriptionClass = (name: string, hasCredentials: boolean) => {
     const substitution = `${ids.substitute}(${ids.parseRequest}(${ids.request})[1], ${ids.params})`;
     const dataType = `Extract<R, { ${propOf<SSEShape>("event")}: E }>["${propOf<SSEShape>("data")}"]`;
     const data = `(${ids.msg} as ${MessageEvent.name}).${propOf<SSEShape>("data")}`;
@@ -293,6 +294,7 @@ export abstract class IntegrationBase {
       `    const ${ids.searchParams} = \`?\${new ${URLSearchParams.name}(${ids.rest})}\`;`,
       `    this.${ids.source} = new EventSource(`,
       `      new URL(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
+      `      { ${propOf<EventSourceInit>("withCredentials")}: ${hasCredentials ? "true" : ids.undefined} }`,
       `    );`,
       `  }`,
       `  public ${ids.on}<E extends R["${propOf<SSEShape>("event")}"]>(`,

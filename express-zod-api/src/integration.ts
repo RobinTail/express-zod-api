@@ -17,6 +17,7 @@ import type { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
 import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
+import { getSecurityNames } from "./security";
 
 interface IntegrationParams {
   routing: Routing;
@@ -55,6 +56,14 @@ interface IntegrationParams {
    * @link https://www.npmjs.com/package/@express-zod-api/zod-plugin
    */
   brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
+  /**
+   * @desc Whether the server supports credentials in cross-origin requests.
+   * @desc It sets `credentials: "include"` in Client default Implementation and `withCredentials` in Subscription.
+   * @desc Requires the CORS configuration that includes:
+   * @desc `Access-Control-Allow-Credentials: true` and a specific `Access-Control-Allow-Origin` headers.
+   * @default false
+   * */
+  hasCredentials?: boolean;
 }
 
 interface FormattedPrintingOptions {
@@ -94,21 +103,28 @@ export class Integration extends IntegrationBase {
     serverUrl = "https://example.com",
     noBodySchema = z.undefined(),
     hasHeadMethod = true,
+    hasCredentials = false,
   }: IntegrationParams) {
     super(serverUrl);
     const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
+    let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path);
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
       const inputTypeName = entitle("input");
+      const cookies = getSecurityNames(endpoint.security, "cookie");
+      if (cookies.size) hasCookies = true;
       const inputTypeNode = zodToTs(inputSchema, ctxIn);
-      this.#program.push(
-        (opts) =>
-          `/** ${request} */\ntype ${inputTypeName} = ${printNode(inputTypeNode, opts)};`,
-      );
+      this.#program.push((opts) => {
+        const printed = printNode(inputTypeNode, opts);
+        return [
+          `/** ${request} */`,
+          `type ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies, "security cookies") : printed};`,
+        ].join("\n");
+      });
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
@@ -174,9 +190,12 @@ export class Integration extends IntegrationBase {
       this.makeSubstituteFn(),
       this.makeImplementationType(),
       this.makePaginationType(),
-      this.makeDefaultImplementation(),
+      this.makeDefaultImplementation(hasCredentials && hasCookies),
       this.makeClientClass(clientClassName),
-      this.makeSubscriptionClass(subscriptionClassName),
+      this.makeSubscriptionClass(
+        subscriptionClassName,
+        hasCredentials && hasCookies,
+      ),
     );
 
     this.#usage = this.makeUsageStatements(

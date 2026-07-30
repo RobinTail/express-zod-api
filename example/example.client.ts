@@ -299,12 +299,16 @@ interface HeadV1AvatarStreamNegativeResponseVariants {
 }
 
 /** post /v1/avatar/upload */
-type PostV1AvatarUploadInput = {
-  session: {
-    token: string;
-  };
-  avatar: any;
-};
+type PostV1AvatarUploadInput = Omit<
+  {
+    session: {
+      token: string;
+    };
+    avatar: any;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** post /v1/avatar/upload */
 type PostV1AvatarUploadPositiveVariant1 = {
@@ -769,11 +773,14 @@ const defaultImplementation: Implementation = async (method, path, params) => {
     {
       method: method.toUpperCase(),
       headers: hasBody
-        ? isBlob
-          ? { "Content-Type": "application/octet-stream" }
-          : { "Content-Type": "application/json" }
+        ? {
+            "Content-Type": isBlob
+              ? "application/octet-stream"
+              : "application/json",
+          }
         : undefined,
       body: hasBody ? (isBlob ? params : JSON.stringify(params)) : undefined,
+      credentials: undefined,
     },
   );
   const contentType = response.headers.get("content-type");
@@ -811,6 +818,7 @@ export class Subscription<
     const searchParams = `?${new URLSearchParams(rest)}`;
     this.source = new EventSource(
       new URL(`${path}${searchParams}`, "http://localhost:8090"),
+      { withCredentials: undefined },
     );
   }
   public on<E extends R["event"]>(

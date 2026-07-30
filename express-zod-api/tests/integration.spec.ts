@@ -78,10 +78,16 @@ describe("Integration", () => {
         variant: "types",
         routing: {
           v1: {
-            "get path": defaultEndpointsFactory.buildVoid({
-              input: z.object({ some: z.string() }),
-              handler: vi.fn(),
-            }),
+            "get path": defaultEndpointsFactory
+              .addMiddleware({
+                security: { type: "cookie", name: "session" },
+                input: z.object({ session: z.object() }),
+                handler: vi.fn(),
+              })
+              .buildVoid({
+                input: z.object({ some: z.string() }),
+                handler: vi.fn(),
+              }),
           },
         },
       });

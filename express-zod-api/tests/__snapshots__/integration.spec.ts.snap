@@ -68,9 +68,14 @@ export type Request = keyof Input;
 
 exports[`Integration > Should support HEAD method by default 0 1`] = `
 "/** get /v1/path */
-type GetV1PathInput = {
-  some: string;
-};
+type GetV1PathInput = Omit<
+  {
+    session: {};
+    some: string;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** get /v1/path */
 type GetV1PathPositiveVariant1 = {
@@ -97,9 +102,14 @@ interface GetV1PathNegativeResponseVariants {
 }
 
 /** head /v1/path */
-type HeadV1PathInput = {
-  some: string;
-};
+type HeadV1PathInput = Omit<
+  {
+    session: {};
+    some: string;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** head /v1/path */
 type HeadV1PathPositiveVariant1 = undefined;
@@ -159,9 +169,14 @@ export type Request = keyof Input;
 
 exports[`Integration > Should support HEAD method by default 1 1`] = `
 "/** get /v1/path */
-type GetV1PathInput = {
-  some: string;
-};
+type GetV1PathInput = Omit<
+  {
+    session: {};
+    some: string;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** get /v1/path */
 type GetV1PathPositiveVariant1 = {
@@ -538,11 +553,14 @@ const defaultImplementation: Implementation = async (method, path, params) => {
     {
       method: method.toUpperCase(),
       headers: hasBody
-        ? isBlob
-          ? { "Content-Type": "application/octet-stream" }
-          : { "Content-Type": "application/json" }
+        ? {
+            "Content-Type": isBlob
+              ? "application/octet-stream"
+              : "application/json",
+          }
         : undefined,
       body: hasBody ? (isBlob ? params : JSON.stringify(params)) : undefined,
+      credentials: undefined,
     },
   );
   const contentType = response.headers.get("content-type");
@@ -580,6 +598,7 @@ export class Subscription<
     const searchParams = \`?\${new URLSearchParams(rest)}\`;
     this.source = new EventSource(
       new URL(\`\${path}\${searchParams}\`, "https://example.com"),
+      { withCredentials: undefined },
     );
   }
   public on<E extends R["event"]>(
