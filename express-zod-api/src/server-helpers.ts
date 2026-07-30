@@ -90,10 +90,9 @@ export const ensureCorsMiddleware = (
 ): RequestHandler =>
   typeof cors === "function"
     ? cors
-    : (req, res, next) => {
+    : ({}, res, next) => {
         res.set({
-          "Access-Control-Allow-Origin": req.headers.origin || "*",
-          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Headers": "content-type",
         });
         next();

@@ -100,7 +100,7 @@ export class Integration extends IntegrationBase {
     const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
-    const hasCors = !!config.cors;
+    const hasCors = typeof config.cors === "function"; // custom implementations with Access-Control-Allow-Credentials
     let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path);

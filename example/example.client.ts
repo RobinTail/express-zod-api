@@ -780,7 +780,7 @@ const defaultImplementation: Implementation = async (method, path, params) => {
           }
         : undefined,
       body: hasBody ? (isBlob ? params : JSON.stringify(params)) : undefined,
-      credentials: "include",
+      credentials: undefined,
     },
   );
   const contentType = response.headers.get("content-type");
@@ -818,7 +818,7 @@ export class Subscription<
     const searchParams = `?${new URLSearchParams(rest)}`;
     this.source = new EventSource(
       new URL(`${path}${searchParams}`, "http://localhost:8090"),
-      { withCredentials: true },
+      undefined,
     );
   }
   public on<E extends R["event"]>(
