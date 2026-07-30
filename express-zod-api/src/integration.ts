@@ -2,6 +2,8 @@
  * @fileOverview The entrypoint for generating Integration code
  * @requires typescript
  * */
+import { makeRequestMock } from "./testing.ts";
+
 export type { Producer } from "./zts-helpers";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
@@ -56,6 +58,14 @@ interface IntegrationParams {
    * @link https://www.npmjs.com/package/@express-zod-api/zod-plugin
    */
   brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
+  /**
+   * @desc Whether the server supports credentials in cross-origin requests.
+   * @desc It sets `credentials: "include"` in Client default Implementation and `withCredentials` in Subscription.
+   * @desc Requires the CORS configuration that includes:
+   * @desc `Access-Control-Allow-Credentials: true` and a specific `Access-Control-Allow-Origin` headers.
+   * @default false
+   * */
+  hasCredentials?: boolean;
 }
 
 interface FormattedPrintingOptions {
@@ -95,12 +105,12 @@ export class Integration extends IntegrationBase {
     serverUrl = "https://example.com",
     noBodySchema = z.undefined(),
     hasHeadMethod = true,
+    hasCredentials = false,
   }: IntegrationParams) {
     super(serverUrl);
     const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
-    const hasCors = typeof config.cors === "function"; // custom implementations with Access-Control-Allow-Credentials
     let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path);
@@ -182,9 +192,12 @@ export class Integration extends IntegrationBase {
       this.makeSubstituteFn(),
       this.makeImplementationType(),
       this.makePaginationType(),
-      this.makeDefaultImplementation(hasCors && hasCookies),
+      this.makeDefaultImplementation(hasCredentials && hasCookies),
       this.makeClientClass(clientClassName),
-      this.makeSubscriptionClass(subscriptionClassName, hasCors && hasCookies),
+      this.makeSubscriptionClass(
+        subscriptionClassName,
+        hasCredentials && hasCookies,
+      ),
     );
 
     this.#usage = this.makeUsageStatements(
