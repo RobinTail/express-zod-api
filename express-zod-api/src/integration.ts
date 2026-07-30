@@ -2,8 +2,6 @@
  * @fileOverview The entrypoint for generating Integration code
  * @requires typescript
  * */
-import { makeRequestMock } from "./testing.ts";
-
 export type { Producer } from "./zts-helpers";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
