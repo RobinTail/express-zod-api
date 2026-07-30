@@ -48,7 +48,7 @@ const processEntries = (
         preferMethod && isMethod(_key) && item instanceof AbstractEndpoint
           ? ["/", _key]
           : detachMethod(_key);
-      const path = [parent || ""].concat(trimPath(segment) || []).join("/");
+      const path = [parent || ""].concat(trimPath(segment) || []).join("/") || "/";
       return [path, item, method];
     },
   );
