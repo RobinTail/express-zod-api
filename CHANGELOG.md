@@ -40,6 +40,7 @@
   - Removed `typescript` option from constructor — now imported statically;
   - Generated type for `ez.buffer()` is now `Blob` instead of `Buffer` (which didn't exist in browser environments);
   - The generated Client now excludes cookie-based security fields from input types (using `Omit`);
+  - The `Implementation` type requires `ctx` to be an object, the default one has `override` method for customizations;
   - The default `Client` Implementation got improved response parsing and now supports `Blob` in request and response;
   - Both `Client` and `Subscription` delegate cookies handling (credentials) to the browser when supported;
   - Added `hasCredentials` — an explicit declaration that the API supports credentialed CORS.

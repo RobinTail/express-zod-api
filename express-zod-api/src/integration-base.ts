@@ -143,7 +143,8 @@ export abstract class IntegrationBase {
   };
 
   /**
-   * @example export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
+   * @example export type Implementation<T extends Record<string, unknown>> =
+   *          (method: Method, path: string, params: Record<string, any>, ctx?: T) => Promise<any>;
    * @internal
    * */
   protected makeImplementationType = () => {
@@ -153,7 +154,7 @@ export abstract class IntegrationBase {
       `${ids.params}: Record<string, any>`,
       `${ids.ctx}?: T`,
     ].join(",");
-    return `export type ${ids.Implementation}<T = unknown> = (${args}) => Promise<any>;`;
+    return `export type ${ids.Implementation}<T extends Record<string, unknown>> = (${args}) => Promise<any>;`;
   };
 
   /**
@@ -221,7 +222,7 @@ export abstract class IntegrationBase {
     const totalProp = propOf<OffsetPaginatedResult["output"]["shape"]>("total");
     const callArgs = `${ids.method}, ...${ids.substitute}(${ids.path}, ${ids.params}), ${ids.ctx}`;
     return [
-      `export class ${name}<T> {`,
+      `export class ${name}<T extends Record<string, unknown> = { override?: (init: RequestInit) => RequestInit }> {`,
       `  public constructor(`,
       `    protected readonly ${ids.implementation}: ${ids.Implementation}<T> = ${ids.defaultImplementation},`,
       `  ) {}`,
@@ -242,11 +243,11 @@ export abstract class IntegrationBase {
   };
 
   /**
-   * @example export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
+   * @example const defaultImplementation = async (method, path, params, ctx) => { ___ };
    * @internal
    * */
   protected makeDefaultImplementation = (hasCredentials: boolean) => {
-    const args = `${ids.method}, ${ids.path}, ${ids.params}`;
+    const args = `${ids.method}, ${ids.path}, ${ids.params}, ${ids.ctx}`;
     const noBodyMethods = quot([
       "get",
       "head",
@@ -258,7 +259,7 @@ export abstract class IntegrationBase {
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
     const searchParams = `\`?\${new ${URLSearchParams.name}(${ids.params})}\``;
     return [
-      `const ${ids.defaultImplementation}: ${ids.Implementation} = async (${args}) => {`,
+      `const ${ids.defaultImplementation}: ${ids.Implementation}<{ override?: (init: RequestInit) => RequestInit }> = async (${args}) => {`,
       `  const ${ids.isBlob} = ${ids.params} instanceof Blob;`,
       `  const ${ids.hasFiles} = !${ids.isBlob} && Object.${propOf<ObjectConstructor>("values")}(` +
         `${ids.params}).${propOf<unknown[]>("some")}((one) => one instanceof Blob || one instanceof ${ids.File});`,
@@ -277,14 +278,16 @@ export abstract class IntegrationBase {
       `      ${ids.body} = JSON.${propOf<JSON>("stringify")}(${ids.params});`,
       `    }`,
       `  }`,
+      `  let init: RequestInit = {`,
+      `    ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
+      `    ${propOf<RequestInit>("credentials")}: ${hasCredentials ? `"include"` : ids.undefined},`,
+      `    ${ids.headers},`,
+      `    ${ids.body},`,
+      `  };`,
+      `  if (${ids.ctx}?.override) init = ${ids.ctx}.override(init);`,
       `  const ${ids.response} = await ${fetch.name}(`,
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
-      `    {`,
-      `      ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
-      `      ${propOf<RequestInit>("credentials")}: ${hasCredentials ? `"include"` : ids.undefined},`,
-      `      ${ids.headers},`,
-      `      ${ids.body},`,
-      `    },`,
+      `    init,`,
       `  );`,
       `  const ${ids.contentType} = ${contentType};`,
       `  if (!${ids.contentType}) return;`,

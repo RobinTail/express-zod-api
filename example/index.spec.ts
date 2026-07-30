@@ -724,9 +724,21 @@ describe("Example", async () => {
     });
 
     test("can upload a file", async () => {
-      const response = await client.provide("post /v1/avatar/upload", {
-        avatar: new File(["test"], "test.svg", { type: "image/svg+xml" }),
-      });
+      const response = await client.provide(
+        "post /v1/avatar/upload",
+        { avatar: new File(["test"], "test.svg", { type: "image/svg+xml" }) },
+        {
+          override: ({ headers, ...rest }) => ({
+            ...rest,
+            headers: {
+              ...headers,
+              Cookie:
+                "session=j%3A%7B%22token%22%3A%22553280ce-ab20-4481-a9dc-fd3fc4f6759c%22%7D; " +
+                "Path=/; HttpOnly; SameSite=Lax",
+            },
+          }),
+        },
+      );
       expect(response.status).toBe("success");
     });
   });

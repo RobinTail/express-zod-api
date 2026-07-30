@@ -752,7 +752,7 @@ const substitute = (
   return [path, rest] as const;
 };
 
-export type Implementation<T = unknown> = (
+export type Implementation<T extends Record<string, unknown>> = (
   method: Method,
   path: string,
   params: Record<string, any>,
@@ -763,7 +763,9 @@ type Pagination =
   | { nextCursor: string | null }
   | { total: number; limit: number; offset: number };
 
-const defaultImplementation: Implementation = async (method, path, params) => {
+const defaultImplementation: Implementation<{
+  override?: (init: RequestInit) => RequestInit;
+}> = async (method, path, params, ctx) => {
   const isBlob = params instanceof Blob;
   const hasFiles =
     !isBlob &&
@@ -793,14 +795,16 @@ const defaultImplementation: Implementation = async (method, path, params) => {
       body = JSON.stringify(params);
     }
   }
+  let init: RequestInit = {
+    method: method.toUpperCase(),
+    credentials: undefined,
+    headers,
+    body,
+  };
+  if (ctx?.override) init = ctx.override(init);
   const response = await fetch(
     new URL(`${path}${searchParams}`, "http://localhost:8090"),
-    {
-      method: method.toUpperCase(),
-      credentials: undefined,
-      headers,
-      body,
-    },
+    init,
   );
   const contentType = response.headers.get("content-type");
   if (!contentType) return;
@@ -809,7 +813,11 @@ const defaultImplementation: Implementation = async (method, path, params) => {
   return response.blob();
 };
 
-export class Client<T> {
+export class Client<
+  T extends Record<string, unknown> = {
+    override?: (init: RequestInit) => RequestInit;
+  },
+> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
