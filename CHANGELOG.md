@@ -70,6 +70,11 @@
 
 ## Version 28
 
+### v28.7.7
+
+- Fixes an issue where an empty path could be emitted for the root route by Documentation instead of `/`:
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
 ### v28.7.6
 
 - Added well-known header, recognized by Documentation generator: `want-unencoded-digest`.
