@@ -356,8 +356,10 @@ const fixReferences = (
         const actualName = entry.$ref.split("/").pop()!;
         const depiction = defs[actualName];
         if (depiction) {
+          const cacheKey = // avoiding serialization because changing $ref
+            depiction.id || filterNaming(actualName) || depiction;
           entry.$ref = ctx.makeRef(
-            depiction.id || depiction, // avoiding serialization, because changing $ref
+            cacheKey,
             asOAS(depiction),
             depiction.id || filterNaming(actualName),
           ).$ref;
