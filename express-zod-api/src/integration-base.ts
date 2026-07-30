@@ -35,6 +35,12 @@ const ids = {
   rest: "rest",
   searchParams: "searchParams",
   defaultImplementation: "defaultImplementation",
+  hasFiles: "hasFiles",
+  value: "value",
+  File: "File",
+  FormData: "FormData",
+  headers: "headers",
+  body: "body",
   client: "client",
   contentType: "contentType",
   isBlob: "isBlob",
@@ -246,22 +252,38 @@ export abstract class IntegrationBase {
       "head",
       "delete",
     ] satisfies ClientMethod[]).join(", ");
-    const headers = `${ids.hasBody} ? { "Content-Type": ${ids.isBlob} ? "${contentTypes.raw}" : "${contentTypes.json}" } : ${ids.undefined}`;
-    const body = `${ids.hasBody} ? ${ids.isBlob} ? ${ids.params} : JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
+    const headers =
+      `!${ids.hasBody} || ${ids.hasFiles} ? ${ids.undefined} : ` +
+      `{ "Content-Type": ${ids.isBlob} ? "${contentTypes.raw}" : "${contentTypes.json}" };`;
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
     const searchParams = `\`?\${new ${URLSearchParams.name}(${ids.params})}\``;
     return [
       `const ${ids.defaultImplementation}: ${ids.Implementation} = async (${args}) => {`,
       `  const ${ids.isBlob} = ${ids.params} instanceof Blob;`,
+      `  const ${ids.hasFiles} = !${ids.isBlob} && Object.${propOf<ObjectConstructor>("values")}(` +
+        `${ids.params}).${propOf<unknown[]>("some")}((one) => one instanceof Blob || one instanceof ${ids.File});`,
       `  const ${ids.hasBody} = ![${noBodyMethods}].includes(${ids.method});`,
       `  const ${ids.searchParams} = ${ids.isBlob} || ${ids.hasBody} ? "" : ${searchParams};`,
+      `  const ${ids.headers} = ${headers}`,
+      `  let ${ids.body}: RequestInit["${ids.body}"] = ${ids.undefined};`,
+      `  if (${ids.hasBody}) {`,
+      `    if (${ids.isBlob}) {`,
+      `      ${ids.body} = ${ids.params};`,
+      `    } else if (${ids.hasFiles}) {`,
+      `      ${ids.body} = new ${FormData.name}();`,
+      `      for (const [${ids.key}, ${ids.value}] of Object.${propOf<ObjectConstructor>("entries")}(${ids.params}))`,
+      `        ${ids.body}.${propOf<FormData>("append")}(${ids.key}, ${ids.value});`,
+      `    } else {`,
+      `      ${ids.body} = JSON.${propOf<JSON>("stringify")}(${ids.params});`,
+      `    }`,
+      `  }`,
       `  const ${ids.response} = await ${fetch.name}(`,
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
       `    {`,
       `      ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
-      `      ${propOf<RequestInit>("headers")}: ${headers},`,
-      `      ${propOf<RequestInit>("body")}: ${body},`,
       `      ${propOf<RequestInit>("credentials")}: ${hasCredentials ? `"include"` : ids.undefined},`,
+      `      ${ids.headers},`,
+      `      ${ids.body},`,
       `    },`,
       `  );`,
       `  const ${ids.contentType} = ${contentType};`,

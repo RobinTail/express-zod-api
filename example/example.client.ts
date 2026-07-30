@@ -765,22 +765,41 @@ type Pagination =
 
 const defaultImplementation: Implementation = async (method, path, params) => {
   const isBlob = params instanceof Blob;
+  const hasFiles =
+    !isBlob &&
+    Object.values(params).some(
+      (one) => one instanceof Blob || one instanceof File,
+    );
   const hasBody = !["get", "head", "delete"].includes(method);
   const searchParams =
     isBlob || hasBody ? "" : `?${new URLSearchParams(params)}`;
+  const headers =
+    !hasBody || hasFiles
+      ? undefined
+      : {
+          "Content-Type": isBlob
+            ? "application/octet-stream"
+            : "application/json",
+        };
+  let body: RequestInit["body"] = undefined;
+  if (hasBody) {
+    if (isBlob) {
+      body = params;
+    } else if (hasFiles) {
+      body = new FormData();
+      for (const [key, value] of Object.entries(params))
+        body.append(key, value);
+    } else {
+      body = JSON.stringify(params);
+    }
+  }
   const response = await fetch(
     new URL(`${path}${searchParams}`, "http://localhost:8090"),
     {
       method: method.toUpperCase(),
-      headers: hasBody
-        ? {
-            "Content-Type": isBlob
-              ? "application/octet-stream"
-              : "application/json",
-          }
-        : undefined,
-      body: hasBody ? (isBlob ? params : JSON.stringify(params)) : undefined,
       credentials: undefined,
+      headers,
+      body,
     },
   );
   const contentType = response.headers.get("content-type");

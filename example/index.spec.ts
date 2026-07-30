@@ -722,6 +722,13 @@ describe("Example", async () => {
       });
       expect(response instanceof Blob).toBe(true);
     });
+
+    test("can upload a file", async () => {
+      const response = await client.provide("post /v1/avatar/upload", {
+        avatar: new File(["test"], "test.svg", { type: "image/svg+xml" }),
+      });
+      expect(response.status).toBe("success");
+    });
   });
 
   describe("Rate limiting", () => {
