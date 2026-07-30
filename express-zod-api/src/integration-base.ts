@@ -279,7 +279,7 @@ export abstract class IntegrationBase {
    * @example export class Subscription<K extends Extract<___>, R extends Extract<___>> { ___ }
    * @internal
    * */
-  protected makeSubscriptionClass = (name: string) => {
+  protected makeSubscriptionClass = (name: string, hasCors: boolean) => {
     const substitution = `${ids.substitute}(${ids.parseRequest}(${ids.request})[1], ${ids.params})`;
     const dataType = `Extract<R, { ${propOf<SSEShape>("event")}: E }>["${propOf<SSEShape>("data")}"]`;
     const data = `(${ids.msg} as ${MessageEvent.name}).${propOf<SSEShape>("data")}`;
@@ -294,6 +294,7 @@ export abstract class IntegrationBase {
       `    const ${ids.searchParams} = \`?\${new ${URLSearchParams.name}(${ids.rest})}\`;`,
       `    this.${ids.source} = new EventSource(`,
       `      new URL(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
+      `      ${hasCors ? `{ ${propOf<EventSourceInit>("withCredentials")}: true }` : ids.undefined},`,
       `    );`,
       `  }`,
       `  public ${ids.on}<E extends R["${propOf<SSEShape>("event")}"]>(`,

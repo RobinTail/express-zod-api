@@ -178,7 +178,7 @@ export class Integration extends IntegrationBase {
       this.makePaginationType(),
       this.makeDefaultImplementation(!!config.cors),
       this.makeClientClass(clientClassName),
-      this.makeSubscriptionClass(subscriptionClassName),
+      this.makeSubscriptionClass(subscriptionClassName, !!config.cors),
     );
 
     this.#usage = this.makeUsageStatements(
