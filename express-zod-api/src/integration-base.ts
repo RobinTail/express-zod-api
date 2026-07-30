@@ -239,7 +239,7 @@ export abstract class IntegrationBase {
    * @example export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
    * @internal
    * */
-  protected makeDefaultImplementation = (hasCors: boolean) => {
+  protected makeDefaultImplementation = (hasCredentials: boolean) => {
     const args = `${ids.method}, ${ids.path}, ${ids.params}`;
     const noBodyMethods = quot([
       "get",
@@ -261,7 +261,7 @@ export abstract class IntegrationBase {
       `      ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
       `      ${propOf<RequestInit>("headers")}: ${headers},`,
       `      ${propOf<RequestInit>("body")}: ${body},`,
-      `      ${propOf<RequestInit>("credentials")}: ${hasCors ? `"include"` : ids.undefined},`,
+      `      ${propOf<RequestInit>("credentials")}: ${hasCredentials ? `"include"` : ids.undefined},`,
       `    },`,
       `  );`,
       `  const ${ids.contentType} = ${contentType};`,
@@ -279,7 +279,7 @@ export abstract class IntegrationBase {
    * @example export class Subscription<K extends Extract<___>, R extends Extract<___>> { ___ }
    * @internal
    * */
-  protected makeSubscriptionClass = (name: string, hasCors: boolean) => {
+  protected makeSubscriptionClass = (name: string, hasCredentials: boolean) => {
     const substitution = `${ids.substitute}(${ids.parseRequest}(${ids.request})[1], ${ids.params})`;
     const dataType = `Extract<R, { ${propOf<SSEShape>("event")}: E }>["${propOf<SSEShape>("data")}"]`;
     const data = `(${ids.msg} as ${MessageEvent.name}).${propOf<SSEShape>("data")}`;
@@ -294,7 +294,7 @@ export abstract class IntegrationBase {
       `    const ${ids.searchParams} = \`?\${new ${URLSearchParams.name}(${ids.rest})}\`;`,
       `    this.${ids.source} = new EventSource(`,
       `      new URL(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
-      `      { ${propOf<EventSourceInit>("withCredentials")}: ${hasCors ? "true" : ids.undefined} }`,
+      `      { ${propOf<EventSourceInit>("withCredentials")}: ${hasCredentials ? "true" : ids.undefined} }`,
       `    );`,
       `  }`,
       `  public ${ids.on}<E extends R["${propOf<SSEShape>("event")}"]>(`,
