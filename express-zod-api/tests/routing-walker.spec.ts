@@ -24,4 +24,14 @@ describe("walkRouting()", () => {
     walkRouting({ routing, config: { cors: false }, onEndpoint });
     expect(onEndpoint.mock.calls).toMatchSnapshot();
   });
+
+  test.each<[Routing, string]>([
+    [{ "/": endpoint }, "/"],
+    [{ "": endpoint }, "/"],
+    [{ "get /": endpoint }, "/"],
+  ])("should normalize root path %s to %s", (routing, expectedPath) => {
+    walkRouting({ routing, config: { cors: false }, onEndpoint });
+    expect(onEndpoint).toHaveBeenCalledTimes(1);
+    expect(onEndpoint).toHaveBeenCalledWith("get", expectedPath, endpoint);
+  });
 });
