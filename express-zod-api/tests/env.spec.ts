@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import * as R from "ramda";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { createRequire } from "node:module";
 
 describe("Environment checks", () => {
@@ -211,6 +211,24 @@ describe("Environment checks", () => {
       expect(
         z.toJSONSchema(z.string().meta({ id: "uniq" })),
       ).not.toHaveProperty("id");
+    });
+
+    /**
+     * @link https://github.com/colinhacks/zod/commit/adf65cdef4d8de10b788293808e8d52807adb7c0
+     * @since zod v4.3.0, 29.12.2025
+     * */
+    test("meta id uniqueness is NOT checked", () => {
+      const id = "Shared";
+      const alpha = z.string().meta({ id });
+      let beta: z.ZodType;
+      expect(() => {
+        beta = z.number().meta({ id });
+      }).not.toThrow();
+      const metaAlpha = globalRegistry.get(alpha)!;
+      const metaBeta = globalRegistry.get(beta!)!;
+      expect(metaAlpha).toBeTruthy();
+      expect(metaBeta).toBeTruthy();
+      expect(metaAlpha.id).toBe(metaBeta.id);
     });
   });
 
