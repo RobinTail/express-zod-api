@@ -178,8 +178,8 @@ export class Documentation extends OpenApiBuilder {
   }
 
   #checkDuplicate(method: ClientMethod, path: string) {
-    if (method === "head") return;
-    const normalized = path.includes(":") ? normalizeParams(path) : path;
+    if (method === "head" || !path.includes(":")) return;
+    const normalized = normalizeParams(path);
     const previous = this.#visitedPaths.get(normalized);
     if (previous !== undefined && previous !== path) {
       throw new DocumentationError(
