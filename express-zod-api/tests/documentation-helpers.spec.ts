@@ -2,6 +2,7 @@ import type { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
+import { DocumentationError } from "../src/errors";
 import {
   type OpenAPIContext,
   depictRequestParams,
@@ -411,7 +412,7 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["query", "params"],
           composition: "inline",
-          pathParams: ["id"],
+          pathParams: new Set(["id"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -430,14 +431,14 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["body", "params"],
           composition: "inline",
-          pathParams: ["id"],
+          pathParams: new Set(["id"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();
     });
 
-    test("should depict none if both query and params are disabled", () => {
-      expect(
+    test("should throw when path param cannot be depicted due to disabled input sources", () => {
+      expect(() =>
         depictRequestParams({
           request: {
             properties: {
@@ -449,10 +450,15 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["body"],
           composition: "inline",
-          pathParams: ["id"],
+          pathParams: new Set(["id"]),
           ...requestCtx,
         }),
-      ).toMatchSnapshot();
+      ).toThrow(
+        new DocumentationError(
+          'The input schema is missing the path parameter "id"',
+          { method: "get", path: "/v1/user/:id", isResponse: false },
+        ),
+      );
     });
 
     test("Features 1180 and 2344: should depict header params when enabled", () => {
@@ -471,7 +477,7 @@ describe("Documentation helpers", () => {
           inputSources: ["query", "headers", "params"],
           composition: "inline",
           securityHeaders: new Set(["secure"]),
-          pathParams: ["id"],
+          pathParams: new Set(["id"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -482,16 +488,17 @@ describe("Documentation helpers", () => {
         depictRequestParams({
           request: {
             properties: {
+              id: { type: "string" },
               session: { type: "string" },
               page: { type: "string" },
             },
-            required: ["session", "page"],
+            required: ["id", "session", "page"],
             type: "object",
           },
           inputSources: ["query", "cookies", "params"],
           composition: "inline",
           securityCookies: new Set(["session"]),
-          pathParams: ["id"],
+          pathParams: new Set(["id"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();

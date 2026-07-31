@@ -246,6 +246,17 @@ exports[`Documentation helpers > depictRequestParams() > should depict cookie pa
     "deprecated": undefined,
     "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
+    "in": "path",
+    "name": "id",
+    "required": true,
+    "schema": {
+      "type": "string",
+    },
+  },
+  {
+    "deprecated": undefined,
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
     "in": "cookie",
     "name": "session",
     "required": true,
@@ -266,8 +277,6 @@ exports[`Documentation helpers > depictRequestParams() > should depict cookie pa
   },
 ]
 `;
-
-exports[`Documentation helpers > depictRequestParams() > should depict none if both query and params are disabled 1`] = `[]`;
 
 exports[`Documentation helpers > depictRequestParams() > should depict only path params if query is disabled 1`] = `
 [

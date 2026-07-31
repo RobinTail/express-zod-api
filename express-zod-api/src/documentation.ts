@@ -1,6 +1,5 @@
 import {
   type OperationObject,
-  type ParameterObject,
   type ReferenceObject,
   type ResponsesObject,
   type SchemaObject,
@@ -193,23 +192,6 @@ export class Documentation extends OpenApiBuilder {
     if (previous === undefined) this.#visitedPaths.set(normalized, path);
   }
 
-  #checkMissingPathParams(
-    method: ClientMethod,
-    path: string,
-    depictedParams: ParameterObject[],
-    pathParams: string[],
-  ) {
-    if (method === "head" || !pathParams.length) return;
-    for (const param of pathParams) {
-      if (!depictedParams.find((p) => p.in === "path" && p.name === param)) {
-        throw new DocumentationError(
-          `The input schema is missing the path parameter "${param}"`,
-          { method, path, isResponse: false },
-        );
-      }
-    }
-  }
-
   #makeEndpointHandler({
     config,
     descriptions,
@@ -240,7 +222,7 @@ export class Documentation extends OpenApiBuilder {
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
-        pathParams,
+        pathParams: new Set(pathParams),
         isHeader,
         securityHeaders: getSecurityNames(endpoint.security, "header"),
         securityCookies: getSecurityNames(endpoint.security, "cookie"),
@@ -251,8 +233,6 @@ export class Documentation extends OpenApiBuilder {
           operationId,
         }),
       });
-      this.#checkMissingPathParams(method, path, depictedParams, pathParams);
-
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
         const apiResponses = endpoint.getResponses(variant);
