@@ -322,7 +322,7 @@ export const depictRequestParams = ({
     });
   }, []);
 
-  if (method !== "head" && pathParams.size) {
+  if (pathParams.size) {
     throw new DocumentationError(
       `The input schema is missing the path parameter "${[...pathParams][0]}"`,
       { method, path, isResponse: false },
