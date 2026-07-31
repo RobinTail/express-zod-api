@@ -910,6 +910,54 @@ describe("Documentation", () => {
     });
   });
 
+  describe("Issue #3579: Cross-method normalized path duplicates", () => {
+    test.each([
+      [
+        ["get /users/:id", "delete /users/:userId"],
+        'the normalized path "/users/:1" is already registered with different parameter names at "/users/:id"',
+      ],
+      [
+        ["get /a/:x/b/:y", "post /a/:u/b/:v"],
+        'the normalized path "/a/:1/b/:2" is already registered with different parameter names at "/a/:x/b/:y"',
+      ],
+    ])(
+      "Should detect duplicate normalized paths across methods %#",
+      (paths, expectedMessageSubstring) => {
+        const fn = () =>
+          new Documentation({
+            config: sampleConfig,
+            routing: paths.reduce(
+              (agg, path) => ({
+                ...agg,
+                [path]: defaultEndpointsFactory.buildVoid({ handler: vi.fn() }),
+              }),
+              {},
+            ),
+          });
+        expect(fn).toThrow(DocumentationError);
+        expect(fn).toThrow(expectedMessageSubstring);
+      },
+    );
+
+    test.each([
+      [["get /v1/users", "delete /v1/users"]],
+      [["get /v1/user/:id", "delete /v1/user/:id"]],
+    ])("Should allow same path with different methods %#", (paths) => {
+      const fn = () =>
+        new Documentation({
+          config: sampleConfig,
+          routing: paths.reduce(
+            (agg, path) => ({
+              ...agg,
+              [path]: defaultEndpointsFactory.buildVoid({ handler: vi.fn() }),
+            }),
+            {},
+          ),
+        });
+      expect(fn).not.toThrow();
+    });
+  });
+
   describe("Feature 1180: Headers opt-in params", () => {
     const specificConfig = createConfig({
       ...sampleConfig,

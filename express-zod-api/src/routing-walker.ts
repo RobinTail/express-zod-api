@@ -4,6 +4,7 @@ import { isMethod, type ClientMethod, type Method } from "./method";
 import type { Routing } from "./routing";
 import { ServeStatic, type StaticHandler } from "./serve-static";
 import type { CommonConfig } from "./config-type";
+import { normalizeParams } from "./common-helpers";
 
 export type OnEndpoint<M extends string = Method> = (
   method: M,
@@ -77,9 +78,15 @@ const checkMethodSupported = (
 };
 
 const checkDuplicate = (method: Method, path: string, visited: Set<string>) => {
-  const key = `${method} ${path}`;
-  if (visited.has(key))
-    throw new RoutingError("Route has a duplicate", method, path);
+  const normalized = path.includes(":") ? normalizeParams(path) : path;
+  const key = `${method} ${normalized}`;
+  if (visited.has(key)) {
+    throw new RoutingError(
+      `Route has a duplicate: the normalized path "${normalized}" is already registered`,
+      method,
+      path,
+    );
+  }
   visited.add(key);
 };
 
