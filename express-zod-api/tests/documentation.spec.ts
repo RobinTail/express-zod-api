@@ -11,7 +11,6 @@ import {
   ResultHandler,
   type Depicter,
   type Method,
-  type Routing,
 } from "../src";
 import { contentTypes } from "../src/content-type";
 import { z } from "zod";
@@ -912,77 +911,49 @@ describe("Documentation", () => {
   });
 
   describe("Cross-method normalized path duplicates", () => {
-    test.each<[Routing, string]>([
+    test.each([
       [
-        {
-          "get /users/:id": defaultEndpointsFactory.build({
-            output: z.object({}),
-            handler: async () => ({}),
-          }),
-          "delete /users/:userId": defaultEndpointsFactory.build({
-            method: "delete",
-            input: z.object({}),
-            output: z.object({}),
-            handler: async () => ({}),
-          }),
-        },
+        ["get /users/:id", "delete /users/:userId"],
         'the normalized path "/users/:1" is already registered with different parameter names at "/users/:id"',
       ],
       [
-        {
-          "get /a/:x/b/:y": defaultEndpointsFactory.build({
-            output: z.object({}),
-            handler: async () => ({}),
-          }),
-          "post /a/:u/b/:v": defaultEndpointsFactory.build({
-            method: "post",
-            input: z.object({}),
-            output: z.object({}),
-            handler: async () => ({}),
-          }),
-        },
+        ["get /a/:x/b/:y", "post /a/:u/b/:v"],
         'the normalized path "/a/:1/b/:2" is already registered with different parameter names at "/a/:x/b/:y"',
       ],
     ])(
       "Should detect duplicate normalized paths across methods %#",
-      (routing, expectedMessageSubstring) => {
-        const fn = () => new Documentation({ config: sampleConfig, routing });
+      (paths, expectedMessageSubstring) => {
+        const fn = () =>
+          new Documentation({
+            config: sampleConfig,
+            routing: paths.reduce(
+              (agg, path) => ({
+                ...agg,
+                [path]: defaultEndpointsFactory.buildVoid({ handler: vi.fn() }),
+              }),
+              {},
+            ),
+          });
         expect(fn).toThrow(DocumentationError);
         expect(fn).toThrow(expectedMessageSubstring);
       },
     );
 
-    test.each<[Routing]>([
-      [
-        {
-          "get /v1/users": defaultEndpointsFactory.build({
-            output: z.object({}),
-            handler: async () => ({}),
-          }),
-          "delete /v1/users": defaultEndpointsFactory.build({
-            method: "delete",
-            input: z.object({}),
-            output: z.object({}),
-            handler: async () => ({}),
-          }),
-        },
-      ],
-      [
-        {
-          "get /v1/user/:id": defaultEndpointsFactory.build({
-            output: z.object({}),
-            handler: async () => ({}),
-          }),
-          "delete /v1/user/:id": defaultEndpointsFactory.build({
-            method: "delete",
-            input: z.object({}),
-            output: z.object({}),
-            handler: async () => ({}),
-          }),
-        },
-      ],
-    ])("Should allow same path with different methods %#", (routing) => {
-      const fn = () => new Documentation({ config: sampleConfig, routing });
+    test.each([
+      [["get /v1/users", "delete /v1/users"]],
+      [["get /v1/user/:id", "delete /v1/user/:id"]],
+    ])("Should allow same path with different methods %#", (paths) => {
+      const fn = () =>
+        new Documentation({
+          config: sampleConfig,
+          routing: paths.reduce(
+            (agg, path) => ({
+              ...agg,
+              [path]: defaultEndpointsFactory.buildVoid({ handler: vi.fn() }),
+            }),
+            {},
+          ),
+        });
       expect(fn).not.toThrow();
     });
   });
