@@ -623,6 +623,9 @@ describe("Documentation", () => {
               }),
               ":thing": defaultEndpointsFactory.build({
                 description: "thing is the path parameter",
+                input: z.object({
+                  thing: z.string(),
+                }),
                 output: z.object({}),
                 handler: async () => ({}),
               }),
@@ -923,6 +926,12 @@ describe("Documentation", () => {
     ])(
       "Should detect duplicate normalized paths across methods %#",
       (paths, expectedMessageSubstring) => {
+        const pathToInput = {
+          "get /users/:id": z.object({ id: z.string() }),
+          "delete /users/:userId": z.object({ userId: z.string() }),
+          "get /a/:x/b/:y": z.object({ x: z.string(), y: z.string() }),
+          "post /a/:u/b/:v": z.object({ u: z.string(), v: z.string() }),
+        };
         const fn = () =>
           new Documentation({
             title: "Issue 3579",
@@ -932,7 +941,11 @@ describe("Documentation", () => {
             routing: paths.reduce(
               (agg, path) => ({
                 ...agg,
-                [path]: defaultEndpointsFactory.buildVoid({ handler: vi.fn() }),
+                [path]: defaultEndpointsFactory.build({
+                  input: pathToInput[path as keyof typeof pathToInput],
+                  output: z.object({}),
+                  handler: vi.fn(),
+                }),
               }),
               {},
             ),
@@ -955,7 +968,13 @@ describe("Documentation", () => {
           routing: paths.reduce(
             (agg, path) => ({
               ...agg,
-              [path]: defaultEndpointsFactory.buildVoid({ handler: vi.fn() }),
+              [path]: defaultEndpointsFactory.build({
+                input: path.includes(":id")
+                  ? z.object({ id: z.string() })
+                  : z.object({}),
+                output: z.object({}),
+                handler: vi.fn(),
+              }),
             }),
             {},
           ),
@@ -1556,5 +1575,111 @@ describe("Documentation", () => {
           }),
       ).not.toThrow();
     });
+  });
+
+  describe("Issue #3578: Missing path parameters", () => {
+    const commons = {
+      config: sampleConfig,
+      title: "Issue 3578",
+      version: "1.0.0",
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test.each([
+      ["users/:id", z.object({ name: z.string() }), "id"],
+      ["items/:id/variants/:name", z.object({ id: z.string() }), "name"],
+    ])(
+      "Should throw when path param '%s' is missing from input schema",
+      (routePath, input, missingParam) => {
+        expect(
+          () =>
+            new Documentation({
+              ...commons,
+              routing: {
+                v1: {
+                  [routePath]: defaultEndpointsFactory.build({
+                    input,
+                    output: z.object({}),
+                    handler: vi.fn(),
+                  }),
+                },
+              },
+            }),
+        ).toThrow(
+          new DocumentationError(
+            `The input schema is missing the path parameter "${missingParam}" for the route "/v1/${routePath}"`,
+            {
+              method: "get",
+              path: `/v1/${routePath}`,
+              isResponse: false,
+            },
+          ),
+        );
+      },
+    );
+
+    test("Should not throw when all path params are present in the schema", () => {
+      expect(
+        () =>
+          new Documentation({
+            ...commons,
+            routing: {
+              v1: {
+                "users/:id": defaultEndpointsFactory.build({
+                  input: z.object({
+                    id: z.string(),
+                    name: z.string(),
+                  }),
+                  output: z.object({}),
+                  handler: vi.fn(),
+                }),
+              },
+            },
+          }),
+      ).not.toThrow();
+    });
+
+    test("Should throw when path param is not classified as in:path", () => {
+      const config = createConfig({
+        cors: true,
+        logger: { level: "silent" },
+        http: { listen: givePort() },
+        inputSources: { post: ["body", "query"] },
+      });
+      expect(
+        () =>
+          new Documentation({
+            ...commons,
+            config,
+            routing: {
+              v1: {
+                ":id": defaultEndpointsFactory.build({
+                  method: "post",
+                  input: z.object({ id: z.string() }),
+                  output: z.object({}),
+                  handler: vi.fn(),
+                }),
+              },
+            },
+          }),
+      ).toThrow(
+        new DocumentationError(
+          'The input schema is missing the path parameter "id" for the route "/v1/:id"',
+          { method: "post", path: "/v1/:id", isResponse: false },
+        ),
+      );
+    });
+  });
+
+  test("Depicter type should be satisfied", () => {
+    expectTypeOf(
+      ({
+        jsonSchema,
+      }: {
+        zodSchema: z.core.$ZodType;
+        jsonSchema: z.core.JSONSchema.BaseSchema;
+      }) => jsonSchema,
+    ).toExtend<Depicter>();
   });
 });

@@ -296,6 +296,13 @@ paths:
       operationId: GetV1GetSomeThing2
       summary: thing is the path parameter
       description: thing is the path parameter
+      parameters:
+        - name: thing
+          in: path
+          required: true
+          description: GET /v1/getSome/:thing Parameter
+          schema:
+            type: string
       responses:
         "200":
           description: GET /v1/getSome/:thing Positive response
@@ -347,6 +354,13 @@ paths:
       operationId: HeadV1GetSomeThing2
       summary: thing is the path parameter
       description: thing is the path parameter
+      parameters:
+        - name: thing
+          in: path
+          required: true
+          description: HEAD /v1/getSome/:thing Parameter
+          schema:
+            type: string
       responses:
         "200":
           description: HEAD /v1/getSome/:thing Positive response
