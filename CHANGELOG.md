@@ -6,6 +6,7 @@
 
 - Fixes the issue where the same `.meta({ id })` could be used on different schemas:
   - Zod 4.3 removed the `id` unique constraint, but the `Documentation` generator relies on it for making references;
+  - The Documentation generator will now throw a `DocumentationError` if it meets the same `id` on different schemas;
   - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
 
 ### v28.7.8
