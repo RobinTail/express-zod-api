@@ -386,17 +386,14 @@ const depict = (
         const id = z.globalRegistry.get(zodCtx.zodSchema)?.id;
         if (id) {
           const familiar = ctx.seenIds.get(id);
-          if (familiar) {
-            if (familiar !== zodCtx.zodSchema) {
-              throw new DocumentationError(
-                `The meta id "${id}" is used by two different schemas. ` +
-                  "Please make the ids unique or reuse the same schema instance.",
-                ctx,
-              );
-            }
-          } else {
-            ctx.seenIds.set(id, zodCtx.zodSchema);
+          if (familiar && familiar !== zodCtx.zodSchema) {
+            throw new DocumentationError(
+              `The meta id "${id}" is used by two different schemas. ` +
+                "Please make the ids unique or reuse the same schema instance.",
+              ctx,
+            );
           }
+          ctx.seenIds.set(id, zodCtx.zodSchema);
         }
         const brand = getBrand(zodCtx.zodSchema);
         const depicter =
