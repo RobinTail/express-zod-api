@@ -200,11 +200,8 @@ export class Documentation extends OpenApiBuilder {
     pathParams: string[],
   ) {
     if (method === "head" || !pathParams.length) return;
-    const paramSet = new Set(
-      depictedParams.filter((p) => p.in === "path").map((p) => p.name),
-    );
     for (const param of pathParams) {
-      if (!paramSet.has(param)) {
+      if (!depictedParams.find((p) => p.in === "path" && p.name === param)) {
         throw new DocumentationError(
           `The input schema is missing the path parameter "${param}"`,
           { method, path, isResponse: false },
