@@ -935,7 +935,7 @@ describe("Documentation", () => {
             routing: paths.reduce(
               (agg, path) => ({
                 ...agg,
-                [path]: defaultEndpointsFactory.build({
+                [path]: defaultEndpointsFactory.buildVoid({
                   input: z.object({
                     id: z.string(),
                     userId: z.string(),
@@ -944,7 +944,6 @@ describe("Documentation", () => {
                     u: z.string(),
                     v: z.string(),
                   }),
-                  output: z.object({}),
                   handler: vi.fn(),
                 }),
               }),
@@ -969,11 +968,8 @@ describe("Documentation", () => {
           routing: paths.reduce(
             (agg, path) => ({
               ...agg,
-              [path]: defaultEndpointsFactory.build({
-                input: path.includes(":id")
-                  ? z.object({ id: z.string() })
-                  : z.object({}),
-                output: z.object({}),
+              [path]: defaultEndpointsFactory.buildVoid({
+                input: z.object({ id: z.string() }),
                 handler: vi.fn(),
               }),
             }),
