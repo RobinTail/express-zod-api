@@ -1595,9 +1595,8 @@ describe("Documentation", () => {
               ...commons,
               routing: {
                 v1: {
-                  [routePath]: defaultEndpointsFactory.build({
+                  [routePath]: defaultEndpointsFactory.buildVoid({
                     input,
-                    output: z.object({}),
                     handler: vi.fn(),
                   }),
                 },
@@ -1606,11 +1605,7 @@ describe("Documentation", () => {
         ).toThrow(
           new DocumentationError(
             `The input schema is missing the path parameter "${missingParam}"`,
-            {
-              method: "get",
-              path: `/v1/${routePath}`,
-              isResponse: false,
-            },
+            { method: "get", path: `/v1/${routePath}`, isResponse: false },
           ),
         );
       },
@@ -1623,12 +1618,8 @@ describe("Documentation", () => {
             ...commons,
             routing: {
               v1: {
-                "users/:id": defaultEndpointsFactory.build({
-                  input: z.object({
-                    id: z.string(),
-                    name: z.string(),
-                  }),
-                  output: z.object({}),
+                "users/:id": defaultEndpointsFactory.buildVoid({
+                  input: z.object({ id: z.string(), name: z.string() }),
                   handler: vi.fn(),
                 }),
               },
@@ -1651,10 +1642,9 @@ describe("Documentation", () => {
             config,
             routing: {
               v1: {
-                ":id": defaultEndpointsFactory.build({
+                ":id": defaultEndpointsFactory.buildVoid({
                   method: "post",
                   input: z.object({ id: z.string() }),
-                  output: z.object({}),
                   handler: vi.fn(),
                 }),
               },
