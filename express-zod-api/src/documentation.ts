@@ -199,7 +199,7 @@ export class Documentation extends OpenApiBuilder {
     depictedParams: ParameterObject[],
     pathParams: string[],
   ) {
-    if (method === "head" || !path.includes(":")) return;
+    if (method === "head" || !pathParams.length) return;
     const paramSet = new Set(
       depictedParams.filter((p) => p.in === "path").map((p) => p.name),
     );
