@@ -43,9 +43,18 @@ describe("walkRouting()", () => {
   });
 
   test.each<[Routing, string]>([
-    [{ "get /items/:id": endpoint, "get /items/:slug": endpoint }, "the normalized path \"/items/:1\" is already registered"],
-    [{ "get /users/:id": endpoint, "get /users/:uid": endpoint }, "the normalized path \"/users/:1\" is already registered"],
-    [{ "get /a/:x/b/:y": endpoint, "get /a/:u/b/:v": endpoint }, "the normalized path \"/a/:1/b/:2\" is already registered"],
+    [
+      { "get /items/:id": endpoint, "get /items/:slug": endpoint },
+      'the normalized path "/items/:1" is already registered',
+    ],
+    [
+      { "get /users/:id": endpoint, "get /users/:uid": endpoint },
+      'the normalized path "/users/:1" is already registered',
+    ],
+    [
+      { "get /a/:x/b/:y": endpoint, "get /a/:u/b/:v": endpoint },
+      'the normalized path "/a/:1/b/:2" is already registered',
+    ],
   ])(
     "Should detect duplicate routes with differently named params %#",
     (routing, expectedMessageSubstring) => {
