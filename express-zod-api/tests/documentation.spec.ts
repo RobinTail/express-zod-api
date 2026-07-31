@@ -926,12 +926,6 @@ describe("Documentation", () => {
     ])(
       "Should detect duplicate normalized paths across methods %#",
       (paths, expectedMessageSubstring) => {
-        const pathToInput = {
-          "get /users/:id": z.object({ id: z.string() }),
-          "delete /users/:userId": z.object({ userId: z.string() }),
-          "get /a/:x/b/:y": z.object({ x: z.string(), y: z.string() }),
-          "post /a/:u/b/:v": z.object({ u: z.string(), v: z.string() }),
-        };
         const fn = () =>
           new Documentation({
             title: "Issue 3579",
@@ -942,7 +936,14 @@ describe("Documentation", () => {
               (agg, path) => ({
                 ...agg,
                 [path]: defaultEndpointsFactory.build({
-                  input: pathToInput[path as keyof typeof pathToInput],
+                  input: z.object({
+                    id: z.string(),
+                    userId: z.string(),
+                    x: z.string(),
+                    y: z.string(),
+                    u: z.string(),
+                    v: z.string(),
+                  }),
                   output: z.object({}),
                   handler: vi.fn(),
                 }),
