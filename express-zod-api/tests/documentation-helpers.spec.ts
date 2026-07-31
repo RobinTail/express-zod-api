@@ -29,17 +29,20 @@ import {
 
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
+  const seenIds = new Map<string, z.core.$ZodType>();
   const requestCtx: OpenAPIContext = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
     makeRef: makeRefMock,
+    seenIds,
   };
   const responseCtx: OpenAPIContext = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
     makeRef: makeRefMock,
+    seenIds,
   };
 
   beforeEach(() => {

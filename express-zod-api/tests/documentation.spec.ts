@@ -1326,6 +1326,107 @@ describe("Documentation", () => {
     });
   });
 
+  describe("Issue #3576: meta id uniqueness guard", () => {
+    const commons = {
+      config: sampleConfig,
+      title: "Issue 3576",
+      version: "1.0.0",
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test("two different schemas sharing an id across endpoints should throw", () => {
+      const alpha = z
+        .object({ kind: z.literal("alpha") })
+        .meta({ id: "Shared" });
+      const beta = z.object({ kind: z.literal("beta") }).meta({ id: "Shared" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "get /a": defaultEndpointsFactory.build({
+                input: z.object({}),
+                output: alpha,
+                handler: vi.fn(),
+              }),
+              "get /b": defaultEndpointsFactory.build({
+                input: z.object({}),
+                output: beta,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).toThrow(/Shared/);
+    });
+
+    test("an id reused for a transformation should throw", () => {
+      const obj = z.object({ a: z.number() }).meta({ id: "Shared" });
+      const objToObj = obj
+        .transform(({ a }) => ({ b: String(a) }))
+        .meta({ id: "Shared" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "post /a": defaultEndpointsFactory.build({
+                method: "post",
+                input: obj,
+                output: objToObj,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).toThrow(/Shared/);
+    });
+
+    test("same instance depicted differently as input and output should not throw", () => {
+      const pipe = z
+        .object({ a: z.number() })
+        .transform(({ a }) => ({ b: String(a) }))
+        .meta({ id: "Shared" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "post /a": defaultEndpointsFactory.build({
+                method: "post",
+                input: pipe,
+                output: pipe,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).not.toThrow();
+    });
+
+    test("same schema reused with the same id should not throw", () => {
+      const item = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "Item" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "get /a": defaultEndpointsFactory.build({
+                input: item,
+                output: item,
+                handler: vi.fn(),
+              }),
+              "get /b": defaultEndpointsFactory.build({
+                input: item,
+                output: item,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).not.toThrow();
+    });
+  });
+
   test("Depicter type should be satisfied", () => {
     expectTypeOf(
       ({
