@@ -197,9 +197,9 @@ export class Documentation extends OpenApiBuilder {
     method: ClientMethod,
     path: string,
     depictedParams: ParameterObject[],
+    pathParams: string[],
   ) {
     if (method === "head" || !path.includes(":")) return;
-    const pathParams = getRoutePathParams(path);
     const paramSet = new Set(
       depictedParams.filter((p) => p.in === "path").map((p) => p.name),
     );
@@ -238,10 +238,12 @@ export class Documentation extends OpenApiBuilder {
         endpoint.getOperationId(method),
       );
 
+      const pathParams = getRoutePathParams(path);
       const request = depictRequest({ ...commons, schema: inputSchema });
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
+        pathParams,
         isHeader,
         securityHeaders: getSecurityNames(endpoint.security, "header"),
         securityCookies: getSecurityNames(endpoint.security, "cookie"),
@@ -252,7 +254,7 @@ export class Documentation extends OpenApiBuilder {
           operationId,
         }),
       });
-      this.#checkMissingPathParams(method, path, depictedParams);
+      this.#checkMissingPathParams(method, path, depictedParams, pathParams);
 
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
