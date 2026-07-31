@@ -910,7 +910,7 @@ describe("Documentation", () => {
     });
   });
 
-  describe("Cross-method normalized path duplicates", () => {
+  describe("Issue #3579: Cross-method normalized path duplicates", () => {
     test.each([
       [
         ["get /users/:id", "delete /users/:userId"],
