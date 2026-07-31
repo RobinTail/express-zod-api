@@ -925,6 +925,9 @@ describe("Documentation", () => {
       (paths, expectedMessageSubstring) => {
         const fn = () =>
           new Documentation({
+            title: "Issue 3579",
+            version: "1.0.0",
+            serverUrl: "https://example.com",
             config: sampleConfig,
             routing: paths.reduce(
               (agg, path) => ({
@@ -945,6 +948,9 @@ describe("Documentation", () => {
     ])("Should allow same path with different methods %#", (paths) => {
       const fn = () =>
         new Documentation({
+          title: "Issue 3579",
+          version: "1.0.0",
+          serverUrl: "https://example.com",
           config: sampleConfig,
           routing: paths.reduce(
             (agg, path) => ({
