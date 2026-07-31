@@ -58,14 +58,10 @@ describe("walkRouting()", () => {
   ])(
     "Should detect duplicate routes with differently named params %#",
     (routing, expectedMessageSubstring) => {
-      expect(() =>
-        walkRouting({ routing, config: { cors: false }, onEndpoint }),
-      ).toThrow(RoutingError);
-      try {
+      const fn = () =>
         walkRouting({ routing, config: { cors: false }, onEndpoint });
-      } catch (e) {
-        expect((e as RoutingError).message).toContain(expectedMessageSubstring);
-      }
+      expect(fn).toThrow(RoutingError);
+      expect(fn).toThrow(expectedMessageSubstring);
     },
   );
 
