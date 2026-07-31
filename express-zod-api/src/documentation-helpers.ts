@@ -55,6 +55,7 @@ interface ReqResCommons {
   ) => ReferenceObject;
   path: string;
   method: ClientMethod;
+  seenIds: Map<string, z.core.$ZodType>;
 }
 
 export interface OpenAPIContext extends ReqResCommons {
@@ -382,6 +383,21 @@ const depict = (
       unrepresentable: "any",
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
+        const id = z.globalRegistry.get(zodCtx.zodSchema)?.id;
+        if (id) {
+          const familiar = ctx.seenIds.get(id);
+          if (familiar) {
+            if (familiar !== zodCtx.zodSchema) {
+              throw new DocumentationError(
+                `The meta id "${id}" is used by two different schemas. ` +
+                  "Please make the ids unique or reuse the same schema instance.",
+                ctx,
+              );
+            }
+          } else {
+            ctx.seenIds.set(id, zodCtx.zodSchema);
+          }
+        }
         const brand = getBrand(zodCtx.zodSchema);
         const depicter =
           rules[
@@ -437,6 +453,7 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
+  seenIds,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
@@ -454,7 +471,7 @@ export const depictResponse = ({
   const response = asOAS(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
-      ctx: { isResponse: true, makeRef, path, method },
+      ctx: { isResponse: true, makeRef, path, method, seenIds },
     }),
   );
   const examples = [];
@@ -570,13 +587,14 @@ export const depictRequest = ({
   makeRef,
   path,
   method,
+  seenIds,
 }: ReqResCommons & {
   schema: IOSchema;
   brandHandling?: BrandHandling;
 }) =>
   depict(schema, {
     rules: { ...brandHandling, ...depicters },
-    ctx: { isResponse: false, makeRef, path, method },
+    ctx: { isResponse: false, makeRef, path, method, seenIds },
   });
 
 export const depictBody = ({

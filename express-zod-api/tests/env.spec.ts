@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import { createRequire } from "node:module";
 
 describe("Environment checks", () => {
@@ -224,8 +224,8 @@ describe("Environment checks", () => {
       expect(() => {
         beta = z.number().meta({ id });
       }).not.toThrow();
-      const metaAlpha = globalRegistry.get(alpha)!;
-      const metaBeta = globalRegistry.get(beta!)!;
+      const metaAlpha = z.globalRegistry.get(alpha)!;
+      const metaBeta = z.globalRegistry.get(beta!)!;
       expect(metaAlpha).toBeTruthy();
       expect(metaBeta).toBeTruthy();
       expect(metaAlpha.id).toBe(metaBeta.id);

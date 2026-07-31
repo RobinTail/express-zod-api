@@ -32,6 +32,7 @@ import {
 } from "./documentation-helpers";
 import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
+import { z } from "zod";
 
 type Component =
   `${ResponseVariant}Response` | "requestParameter" | "requestBody";
@@ -179,6 +180,8 @@ export class Documentation extends OpenApiBuilder {
     summarizer = defaultSummarizer,
     composition = "inline",
   }: DocumentationParams): OnEndpoint<ClientMethod> {
+    const makeRef = this.#makeRef.bind(this);
+    const seenIds = new Map<string, z.core.$ZodType>();
     return (method, path, endpoint) => {
       const commons = {
         path,
@@ -186,7 +189,8 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         brandHandling,
-        makeRef: this.#makeRef.bind(this),
+        makeRef,
+        seenIds,
       };
       const { description, summary, scopes, inputSchema } = endpoint;
       const inputSources = getInputSources(method, config.inputSources);
