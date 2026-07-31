@@ -77,10 +77,8 @@ const checkMethodSupported = (
   );
 };
 
-const normalizeParams = (path: string) => {
-  let idx = 1;
-  return path.replace(routePathParamsRegex, () => `:${idx++}`);
-};
+const normalizeParams = (path: string, idx = 1) =>
+  path.replace(routePathParamsRegex, () => `:${idx++}`);
 
 const checkDuplicate = (method: Method, path: string, visited: Set<string>) => {
   const normalized = path.includes(":") ? normalizeParams(path) : path;
