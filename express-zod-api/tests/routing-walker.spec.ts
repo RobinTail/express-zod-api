@@ -1,15 +1,8 @@
 import { defaultEndpointsFactory, type Routing, RoutingError } from "../src";
 import { walkRouting } from "../src/routing-walker";
-import { z } from "zod";
 
 describe("walkRouting()", () => {
   const endpoint = defaultEndpointsFactory.buildVoid({
-    handler: vi.fn(),
-  });
-  const deleteEndpoint = defaultEndpointsFactory.build({
-    method: "delete",
-    input: z.object({}),
-    output: z.object({}),
     handler: vi.fn(),
   });
 
@@ -68,7 +61,7 @@ describe("walkRouting()", () => {
   test("Should allow cross-method routes with differently named params", () => {
     const routing: Routing = {
       "get /users/:id": endpoint,
-      "delete /users/:userId": deleteEndpoint,
+      "delete /users/:userId": endpoint,
     };
     expect(() =>
       walkRouting({ routing, config: { cors: false }, onEndpoint }),
