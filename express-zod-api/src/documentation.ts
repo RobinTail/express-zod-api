@@ -230,6 +230,7 @@ export class Documentation extends OpenApiBuilder {
           operationId,
         }),
       });
+
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
         const apiResponses = endpoint.getResponses(variant);
