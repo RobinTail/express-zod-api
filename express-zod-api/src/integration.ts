@@ -190,6 +190,7 @@ export class Integration extends IntegrationBase {
       this.makeSubstituteFn(),
       this.makeImplementationType(),
       this.makePaginationType(),
+      this.makeDefaultContextType(),
       this.makeDefaultImplementation(hasCredentials && hasCookies),
       this.makeClientClass(clientClassName),
       this.makeSubscriptionClass(

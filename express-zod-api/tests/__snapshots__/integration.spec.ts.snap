@@ -532,7 +532,7 @@ const substitute = (
   return [path, rest] as const;
 };
 
-export type Implementation<T = unknown> = (
+export type Implementation<T extends Record<string, unknown>> = (
   method: Method,
   path: string,
   params: Record<string, any>,
@@ -543,25 +543,53 @@ type Pagination =
   | { nextCursor: string | null }
   | { total: number; limit: number; offset: number };
 
-const defaultImplementation: Implementation = async (method, path, params) => {
+export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
+
+const defaultImplementation: Implementation<DefaultContext> = async (
+  method,
+  path,
+  params,
+  ctx,
+) => {
   const isBlob = params instanceof Blob;
+  const hasFiles =
+    !isBlob &&
+    Object.values(params).some(
+      (one) => one instanceof Blob || one instanceof File,
+    );
   const hasBody = !["get", "head", "delete"].includes(method);
   const searchParams =
     isBlob || hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
+  const headers =
+    !hasBody || hasFiles
+      ? undefined
+      : {
+          "Content-Type": isBlob
+            ? "application/octet-stream"
+            : "application/json",
+        };
+  let body: RequestInit["body"] = undefined;
+  if (hasBody) {
+    if (isBlob) {
+      body = params;
+    } else if (hasFiles) {
+      body = new FormData();
+      for (const [key, value] of Object.entries(params))
+        if (value !== undefined) body.append(key, value);
+    } else {
+      body = JSON.stringify(params);
+    }
+  }
+  let init: RequestInit = {
+    method: method.toUpperCase(),
+    credentials: undefined,
+    headers,
+    body,
+  };
+  if (ctx?.override) init = ctx.override(init);
   const response = await fetch(
     new URL(\`\${path}\${searchParams}\`, "https://example.com"),
-    {
-      method: method.toUpperCase(),
-      headers: hasBody
-        ? {
-            "Content-Type": isBlob
-              ? "application/octet-stream"
-              : "application/json",
-          }
-        : undefined,
-      body: hasBody ? (isBlob ? params : JSON.stringify(params)) : undefined,
-      credentials: undefined,
-    },
+    init,
   );
   const contentType = response.headers.get("content-type");
   if (!contentType) return;
@@ -570,7 +598,7 @@ const defaultImplementation: Implementation = async (method, path, params) => {
   return response.blob();
 };
 
-export class Client<T> {
+export class Client<T extends Record<string, unknown> = DefaultContext> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
