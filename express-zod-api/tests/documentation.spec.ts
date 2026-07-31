@@ -1280,8 +1280,7 @@ describe("Documentation", () => {
   describe("Issue #3570: component deduplication with meta id", () => {
     const commons = {
       config: sampleConfig,
-      title: "Issue 3570",
-      version: "1.0.0",
+      info: { title: "Issue 3570", version: "1.0.0" },
       serverUrl: "http://localhost:8090",
       composition: "components" as const,
     };
@@ -1377,8 +1376,7 @@ describe("Documentation", () => {
   describe("Issue #3576: meta id uniqueness guard", () => {
     const commons = {
       config: sampleConfig,
-      title: "Issue 3576",
-      version: "1.0.0",
+      info: { title: "Issue 3576", version: "1.0.0" },
       serverUrl: "http://localhost:8090",
       composition: "components" as const,
     };
