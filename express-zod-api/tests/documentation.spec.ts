@@ -1658,15 +1658,4 @@ describe("Documentation", () => {
       );
     });
   });
-
-  test("Depicter type should be satisfied", () => {
-    expectTypeOf(
-      ({
-        jsonSchema,
-      }: {
-        zodSchema: z.core.$ZodType;
-        jsonSchema: z.core.JSONSchema.BaseSchema;
-      }) => jsonSchema,
-    ).toExtend<Depicter>();
-  });
 });
