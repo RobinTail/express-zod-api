@@ -83,7 +83,7 @@ const normalizeParams = (path: string) => {
 };
 
 const checkDuplicate = (method: Method, path: string, visited: Set<string>) => {
-  const normalized = normalizeParams(path);
+  const normalized = path.includes(":") ? normalizeParams(path) : path;
   const key = `${method} ${normalized}`;
   if (visited.has(key)) {
     throw new RoutingError(
