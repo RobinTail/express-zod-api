@@ -56,7 +56,7 @@ describe("walkRouting()", () => {
       'the normalized path "/a/:1/b/:2" is already registered',
     ],
   ])(
-    "Should detect duplicate routes with differently named params %#",
+    "Issue #3579: Should detect duplicate routes with differently named params %#",
     (routing, expectedMessageSubstring) => {
       const fn = () =>
         walkRouting({ routing, config: { cors: false }, onEndpoint });
