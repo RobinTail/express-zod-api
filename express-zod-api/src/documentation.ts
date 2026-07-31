@@ -206,7 +206,7 @@ export class Documentation extends OpenApiBuilder {
     for (const param of pathParams) {
       if (!paramSet.has(param)) {
         throw new DocumentationError(
-          `The input schema is missing the path parameter "${param}" for the route "${path}"`,
+          `The input schema is missing the path parameter "${param}"`,
           { method, path, isResponse: false },
         );
       }

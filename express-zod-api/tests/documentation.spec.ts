@@ -1608,7 +1608,7 @@ describe("Documentation", () => {
             }),
         ).toThrow(
           new DocumentationError(
-            `The input schema is missing the path parameter "${missingParam}" for the route "/v1/${routePath}"`,
+            `The input schema is missing the path parameter "${missingParam}"`,
             {
               method: "get",
               path: `/v1/${routePath}`,
@@ -1665,7 +1665,7 @@ describe("Documentation", () => {
           }),
       ).toThrow(
         new DocumentationError(
-          'The input schema is missing the path parameter "id" for the route "/v1/:id"',
+          'The input schema is missing the path parameter "id"',
           { method: "post", path: "/v1/:id", isResponse: false },
         ),
       );
