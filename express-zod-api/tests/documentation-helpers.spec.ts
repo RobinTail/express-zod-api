@@ -412,7 +412,6 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["query", "params"],
           composition: "inline",
-          pathParams: new Set(["id"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -431,7 +430,6 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["body", "params"],
           composition: "inline",
-          pathParams: new Set(["id"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -450,7 +448,6 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["body"],
           composition: "inline",
-          pathParams: new Set(["id"]),
           ...requestCtx,
         }),
       ).toThrow(
@@ -477,7 +474,6 @@ describe("Documentation helpers", () => {
           inputSources: ["query", "headers", "params"],
           composition: "inline",
           securityHeaders: new Set(["secure"]),
-          pathParams: new Set(["id"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -498,7 +494,6 @@ describe("Documentation helpers", () => {
           inputSources: ["query", "cookies", "params"],
           composition: "inline",
           securityCookies: new Set(["session"]),
-          pathParams: new Set(["id"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();

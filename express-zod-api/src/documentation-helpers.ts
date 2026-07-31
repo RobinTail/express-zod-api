@@ -22,6 +22,7 @@ import {
   type FlatObject,
   type Tag,
   shouldHaveContent,
+  getRoutePathParams,
   getTransformedType,
   isObject,
   isSchema,
@@ -258,19 +259,18 @@ export const depictRequestParams = ({
   isHeader,
   securityHeaders,
   securityCookies,
-  pathParams,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResCommons & {
   composition: "inline" | "components";
   description?: string;
   request: z.core.JSONSchema.BaseSchema;
   inputSources: InputSource[];
-  pathParams: Set<string>;
   isHeader?: IsHeader;
   securityHeaders?: Set<string>;
   securityCookies?: Set<string>;
 }) => {
   const flat = flattenIO(request);
+  const pathParams = new Set(getRoutePathParams(path));
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");

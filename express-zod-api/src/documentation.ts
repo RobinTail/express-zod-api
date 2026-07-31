@@ -13,7 +13,6 @@ import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import {
   getInputSources,
-  getRoutePathParams,
   makeCleanId,
   normalizeParams,
 } from "./common-helpers";
@@ -217,12 +216,10 @@ export class Documentation extends OpenApiBuilder {
         endpoint.getOperationId(method),
       );
 
-      const pathParams = getRoutePathParams(path);
       const request = depictRequest({ ...commons, schema: inputSchema });
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
-        pathParams: new Set(pathParams),
         isHeader,
         securityHeaders: getSecurityNames(endpoint.security, "header"),
         securityCookies: getSecurityNames(endpoint.security, "cookie"),
