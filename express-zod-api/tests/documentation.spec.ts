@@ -981,13 +981,10 @@ describe("Documentation", () => {
           }),
         },
       ],
-    ])(
-      "Should allow same path with different methods %#",
-      (routing) => {
-        const fn = () => new Documentation({ config: sampleConfig, routing });
-        expect(fn).not.toThrow();
-      },
-    );
+    ])("Should allow same path with different methods %#", (routing) => {
+      const fn = () => new Documentation({ config: sampleConfig, routing });
+      expect(fn).not.toThrow();
+    });
   });
 
   describe("Feature 1180: Headers opt-in params", () => {
