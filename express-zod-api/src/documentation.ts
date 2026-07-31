@@ -15,7 +15,11 @@ import * as R from "ramda";
 import { type ResponseVariant, responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import { getInputSources, makeCleanId } from "./common-helpers";
+import {
+  getInputSources,
+  makeCleanId,
+  normalizeParams,
+} from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
 import type { ClientMethod } from "./method";
@@ -120,6 +124,7 @@ export class Documentation extends OpenApiBuilder {
   readonly #lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   readonly #lastOperationIdSuffixes = new Map<string, number>();
   readonly #references = new Map<object | string, string>();
+  readonly #visitedPaths = new Map<string, string>(); // normalized:original
 
   #makeRef(
     key: object | string,
@@ -188,6 +193,20 @@ export class Documentation extends OpenApiBuilder {
       this.addServer(typeof one === "string" ? { url: one } : one);
   }
 
+  #checkDuplicate(method: ClientMethod, path: string) {
+    if (method === "head" || !path.includes(":")) return;
+    const normalized = normalizeParams(path);
+    const previous = this.#visitedPaths.get(normalized);
+    if (previous !== undefined && previous !== path) {
+      throw new DocumentationError(
+        `Path has a duplicate: the normalized path "${normalized}" is already registered ` +
+          `with different parameter names at "${previous}"`,
+        { method, path, isResponse: false },
+      );
+    }
+    if (previous === undefined) this.#visitedPaths.set(normalized, path);
+  }
+
   #makeEndpointHandler({
     config,
     descriptions,
@@ -203,6 +222,7 @@ export class Documentation extends OpenApiBuilder {
       seenIds: new Map<string, z.core.$ZodType>(),
     };
     return (method, path, endpoint) => {
+      this.#checkDuplicate(method, path);
       const commons = { ...shared, path, method, endpoint };
       const { description, summary, scopes, inputSchema } = endpoint;
       const inputSources = getInputSources(method, config.inputSources);

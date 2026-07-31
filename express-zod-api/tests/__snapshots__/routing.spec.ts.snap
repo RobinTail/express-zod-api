@@ -36,7 +36,7 @@ RoutingError({
     "method": "get",
     "path": "/v1/test",
   },
-  "message": "Route has a duplicate",
+  "message": "Route has a duplicate: the normalized path "/v1/test" is already registered",
 })
 `;
 

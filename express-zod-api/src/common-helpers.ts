@@ -36,6 +36,9 @@ export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 export const getRoutePathParams = (path: string): string[] =>
   path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
 
+export const normalizeParams = (path: string, idx = 1) =>
+  path.replace(routePathParamsRegex, () => `:${idx++}`);
+
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
   const isUpload = contentType.toLowerCase().startsWith(contentTypes.upload);

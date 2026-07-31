@@ -72,6 +72,16 @@
 
 ## Version 28
 
+### v28.7.10
+
+- Fixed issue for routes having differently named path params:
+  - In case of same method it will now always throw a RoutingError:
+    - Example: having both `get /items/:id` and `get /items/:slug` routes.
+  - If methods are different, Documentation generator will throw `DocumentationError`:
+    - Example: OpenAPI standard does not allow having both `get /users/:id` and `delete /users/:userId`;
+    - See https://spec.openapis.org/oas/v3.1.0#paths-object for details.
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
 ### v28.7.9
 
 - Fixes the issue where the same `.meta({ id })` could be used on different schemas:
