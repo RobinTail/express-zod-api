@@ -11,6 +11,7 @@ import {
   ResultHandler,
   type Depicter,
   type Method,
+  type Routing,
 } from "../src";
 import { contentTypes } from "../src/content-type";
 import { z } from "zod";
@@ -908,6 +909,48 @@ describe("Documentation", () => {
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+  });
+
+  describe("Cross-method normalized path duplicates", () => {
+    test.each<[Routing, string]>([
+      [
+        {
+          "get /users/:id": defaultEndpointsFactory.build({
+            output: z.object({}),
+            handler: async () => ({}),
+          }),
+          "delete /users/:userId": defaultEndpointsFactory.build({
+            method: "delete",
+            input: z.object({}),
+            output: z.object({}),
+            handler: async () => ({}),
+          }),
+        },
+        'the normalized path "/users/:1" is already registered with different parameter names at "/users/:id"',
+      ],
+      [
+        {
+          "get /a/:x/b/:y": defaultEndpointsFactory.build({
+            output: z.object({}),
+            handler: async () => ({}),
+          }),
+          "post /a/:u/b/:v": defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({}),
+            output: z.object({}),
+            handler: async () => ({}),
+          }),
+        },
+        'the normalized path "/a/:1/b/:2" is already registered with different parameter names at "/a/:x/b/:y"',
+      ],
+    ])(
+      "Should detect duplicate normalized paths across methods %#",
+      (routing, expectedMessageSubstring) => {
+        const fn = () => new Documentation({ config: sampleConfig, routing });
+        expect(fn).toThrow(DocumentationError);
+        expect(fn).toThrow(expectedMessageSubstring);
+      },
+    );
   });
 
   describe("Feature 1180: Headers opt-in params", () => {

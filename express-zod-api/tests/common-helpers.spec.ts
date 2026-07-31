@@ -7,6 +7,7 @@ import {
   makeCleanId,
   ensureError,
   getRoutePathParams,
+  normalizeParams,
   shouldHaveContent,
   getInputSources,
   emptySchema,
@@ -68,6 +69,18 @@ describe("Common Helpers", () => {
       expect(getRoutePathParams("/something")).toEqual([]);
       expect(getRoutePathParams("")).toEqual([]);
       expect(getRoutePathParams("\n")).toEqual([]);
+    });
+  });
+
+  describe("normalizeParams()", () => {
+    test.each([
+      ["/users/:id", "/users/:1"],
+      ["/users/:userId/books/:bookId", "/users/:1/books/:2"],
+      ["/a/:x/b/:y", "/a/:1/b/:2"],
+      ["/static/path", "/static/path"],
+      ["", ""],
+    ])("should normalize %s to %s", (input, expected) => {
+      expect(normalizeParams(input)).toBe(expected);
     });
   });
 

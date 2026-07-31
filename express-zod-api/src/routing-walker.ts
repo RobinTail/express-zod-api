@@ -4,7 +4,7 @@ import { isMethod, type ClientMethod, type Method } from "./method";
 import type { Routing } from "./routing";
 import { ServeStatic, type StaticHandler } from "./serve-static";
 import type { CommonConfig } from "./config-type";
-import { routePathParamsRegex } from "./common-helpers";
+import { normalizeParams } from "./common-helpers";
 
 export type OnEndpoint<M extends string = Method> = (
   method: M,
@@ -76,9 +76,6 @@ const checkMethodSupported = (
     path,
   );
 };
-
-const normalizeParams = (path: string, idx = 1) =>
-  path.replace(routePathParamsRegex, () => `:${idx++}`);
 
 const checkDuplicate = (method: Method, path: string, visited: Set<string>) => {
   const normalized = path.includes(":") ? normalizeParams(path) : path;

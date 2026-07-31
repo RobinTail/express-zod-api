@@ -1,11 +1,5 @@
 import { bench } from "vitest";
-
-const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
-
-const normalizeParams = (path: string) => {
-  let idx = 1;
-  return path.replace(routePathParamsRegex, () => `:${idx++}`);
-};
+import { normalizeParams } from "../src/common-helpers";
 
 describe("Experiment for checkDuplicate normalization", () => {
   const pathNoParams = "/users/check/some/stuff";
