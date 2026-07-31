@@ -615,6 +615,9 @@ describe("Documentation", () => {
               }),
               ":thing": defaultEndpointsFactory.build({
                 description: "thing is the path parameter",
+                input: z.object({
+                  thing: z.string(),
+                }),
                 output: z.object({}),
                 handler: async () => ({}),
               }),
@@ -891,7 +894,17 @@ describe("Documentation", () => {
             routing: paths.reduce(
               (agg, path) => ({
                 ...agg,
-                [path]: defaultEndpointsFactory.buildVoid({ handler: vi.fn() }),
+                [path]: defaultEndpointsFactory.buildVoid({
+                  input: z.object({
+                    id: z.string(),
+                    userId: z.string(),
+                    x: z.string(),
+                    y: z.string(),
+                    u: z.string(),
+                    v: z.string(),
+                  }),
+                  handler: vi.fn(),
+                }),
               }),
               {},
             ),
@@ -911,7 +924,10 @@ describe("Documentation", () => {
           routing: paths.reduce(
             (agg, path) => ({
               ...agg,
-              [path]: defaultEndpointsFactory.buildVoid({ handler: vi.fn() }),
+              [path]: defaultEndpointsFactory.buildVoid({
+                input: z.object({ id: z.string() }),
+                handler: vi.fn(),
+              }),
             }),
             {},
           ),
@@ -1470,6 +1486,91 @@ describe("Documentation", () => {
             ...commons,
           }),
       ).not.toThrow();
+    });
+  });
+
+  describe("Issue #3578: Missing path parameters", () => {
+    const commons = {
+      config: sampleConfig,
+      title: "Issue 3578",
+      version: "1.0.0",
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test.each([
+      ["users/:id", z.object({ name: z.string() }), "id"],
+      ["items/:id/variants/:name", z.object({ id: z.string() }), "name"],
+    ])(
+      "Should throw when path param '%s' is missing from input schema",
+      (routePath, input, missingParam) => {
+        expect(
+          () =>
+            new Documentation({
+              ...commons,
+              routing: {
+                v1: {
+                  [routePath]: defaultEndpointsFactory.buildVoid({
+                    input,
+                    handler: vi.fn(),
+                  }),
+                },
+              },
+            }),
+        ).toThrow(
+          new DocumentationError(
+            `The input schema is missing the path parameter "${missingParam}"`,
+            { method: "get", path: `/v1/${routePath}`, isResponse: false },
+          ),
+        );
+      },
+    );
+
+    test("Should not throw when all path params are present in the schema", () => {
+      expect(
+        () =>
+          new Documentation({
+            ...commons,
+            routing: {
+              v1: {
+                "users/:id": defaultEndpointsFactory.buildVoid({
+                  input: z.object({ id: z.string(), name: z.string() }),
+                  handler: vi.fn(),
+                }),
+              },
+            },
+          }),
+      ).not.toThrow();
+    });
+
+    test("Should throw when path param is not classified as in:path", () => {
+      const config = createConfig({
+        cors: true,
+        logger: { level: "silent" },
+        http: { listen: givePort() },
+        inputSources: { post: ["body", "query"] },
+      });
+      expect(
+        () =>
+          new Documentation({
+            ...commons,
+            config,
+            routing: {
+              v1: {
+                ":id": defaultEndpointsFactory.buildVoid({
+                  method: "post",
+                  input: z.object({ id: z.string() }),
+                  handler: vi.fn(),
+                }),
+              },
+            },
+          }),
+      ).toThrow(
+        new DocumentationError(
+          'The input schema is missing the path parameter "id"',
+          { method: "post", path: "/v1/:id", isResponse: false },
+        ),
+      );
     });
   });
 

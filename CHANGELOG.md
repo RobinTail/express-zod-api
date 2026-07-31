@@ -72,6 +72,13 @@
 
 ## Version 28
 
+### v28.7.11
+
+- Added missing path params check to the Documentation generator:
+  - An Endpoint assigned to `get /users/:id` must declare the `id` property on the `input` schema;
+  - Similar check is already implemented in runtime (development mode only);
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
 ### v28.7.10
 
 - Fixed issue for routes having differently named path params:

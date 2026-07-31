@@ -2,6 +2,7 @@ import type { SchemaObjectValue } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
+import { DocumentationError } from "../src/errors";
 import {
   type OpenAPIContext,
   depictRequestParams,
@@ -434,8 +435,8 @@ describe("Documentation helpers", () => {
       ).toMatchSnapshot();
     });
 
-    test("should depict none if both query and params are disabled", () => {
-      expect(
+    test("should throw when path param cannot be depicted due to disabled input sources", () => {
+      expect(() =>
         depictRequestParams({
           request: {
             properties: {
@@ -449,7 +450,12 @@ describe("Documentation helpers", () => {
           composition: "inline",
           ...requestCtx,
         }),
-      ).toMatchSnapshot();
+      ).toThrow(
+        new DocumentationError(
+          'The input schema is missing the path parameter "id"',
+          { method: "get", path: "/v1/user/:id", isResponse: false },
+        ),
+      );
     });
 
     test("Features 1180 and 2344: should depict header params when enabled", () => {
@@ -478,10 +484,11 @@ describe("Documentation helpers", () => {
         depictRequestParams({
           request: {
             properties: {
+              id: { type: "string" },
               session: { type: "string" },
               page: { type: "string" },
             },
-            required: ["session", "page"],
+            required: ["id", "session", "page"],
             type: "object",
           },
           inputSources: ["query", "cookies", "params"],
