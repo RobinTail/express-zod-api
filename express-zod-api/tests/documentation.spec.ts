@@ -951,6 +951,43 @@ describe("Documentation", () => {
         expect(fn).toThrow(expectedMessageSubstring);
       },
     );
+
+    test.each<[Routing]>([
+      [
+        {
+          "get /v1/users": defaultEndpointsFactory.build({
+            output: z.object({}),
+            handler: async () => ({}),
+          }),
+          "delete /v1/users": defaultEndpointsFactory.build({
+            method: "delete",
+            input: z.object({}),
+            output: z.object({}),
+            handler: async () => ({}),
+          }),
+        },
+      ],
+      [
+        {
+          "get /v1/user/:id": defaultEndpointsFactory.build({
+            output: z.object({}),
+            handler: async () => ({}),
+          }),
+          "delete /v1/user/:id": defaultEndpointsFactory.build({
+            method: "delete",
+            input: z.object({}),
+            output: z.object({}),
+            handler: async () => ({}),
+          }),
+        },
+      ],
+    ])(
+      "Should allow same path with different methods %#",
+      (routing) => {
+        const fn = () => new Documentation({ config: sampleConfig, routing });
+        expect(fn).not.toThrow();
+      },
+    );
   });
 
   describe("Feature 1180: Headers opt-in params", () => {
