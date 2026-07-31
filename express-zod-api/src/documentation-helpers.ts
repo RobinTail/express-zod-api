@@ -270,7 +270,7 @@ export const depictRequestParams = ({
   securityCookies?: Set<string>;
 }) => {
   const flat = flattenIO(request);
-  const pathParams = getRoutePathParams(path);
+  const pathParams = new Set(getRoutePathParams(path));
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");
@@ -278,7 +278,8 @@ export const depictRequestParams = ({
     inputSources.includes("cookies") || inputSources.includes("signedCookies");
 
   const getLocation = (name: string) => {
-    if (areParamsEnabled && pathParams.includes(name)) return "path";
+    if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))
+      return "path";
     if (areCookiesEnabled && securityCookies?.has(name)) return "cookie";
     if (
       areHeadersEnabled &&
@@ -288,39 +289,46 @@ export const depictRequestParams = ({
     if (isQueryEnabled) return "query";
   };
 
-  return Object.entries(flat.properties).reduce<ParameterObject[]>(
-    (acc, [name, jsonSchema]) => {
-      if (!isObject(jsonSchema)) return acc;
-      const location = getLocation(name);
-      if (!location) return acc;
-      const depicted = asOAS(jsonSchema);
-      const result =
-        composition === "components"
-          ? makeRef(
-              jsonSchema.id || JSON.stringify(jsonSchema),
-              depicted,
-              jsonSchema.id || makeCleanId(description, name),
-            )
-          : depicted;
-      return acc.concat({
-        name,
-        in: location,
-        deprecated: jsonSchema.deprecated,
-        required: flat.required?.includes(name) || false,
-        description: depicted.description || description,
-        schema: result,
-        examples: enumerateExamples(
-          isSchemaObject(depicted) && depicted.examples?.length
-            ? depicted.examples // own examples or from the flat:
-            : R.pluck(
-                name,
-                flat.examples?.filter(R.both(isObject, R.has(name))) || [],
-              ),
-        ),
-      });
-    },
-    [],
-  );
+  const depictedParams = Object.entries(flat.properties).reduce<
+    ParameterObject[]
+  >((acc, [name, jsonSchema]) => {
+    if (!isObject(jsonSchema)) return acc;
+    const location = getLocation(name);
+    if (!location) return acc;
+    const depicted = asOAS(jsonSchema);
+    const result =
+      composition === "components"
+        ? makeRef(
+            jsonSchema.id || JSON.stringify(jsonSchema),
+            depicted,
+            jsonSchema.id || makeCleanId(description, name),
+          )
+        : depicted;
+    return acc.concat({
+      name,
+      in: location,
+      deprecated: jsonSchema.deprecated,
+      required: flat.required?.includes(name) || false,
+      description: depicted.description || description,
+      schema: result,
+      examples: enumerateExamples(
+        isSchemaObject(depicted) && depicted.examples?.length
+          ? depicted.examples // own examples or from the flat:
+          : R.pluck(
+              name,
+              flat.examples?.filter(R.both(isObject, R.has(name))) || [],
+            ),
+      ),
+    });
+  }, []);
+
+  if (pathParams.size) {
+    throw new DocumentationError(
+      `The input schema is missing the path parameter "${[...pathParams][0]}"`,
+      { method, path, isResponse: false },
+    );
+  }
+  return depictedParams;
 };
 
 const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
