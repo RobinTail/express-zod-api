@@ -504,7 +504,8 @@ describe("Documentation helpers", () => {
       const body = depictBody({
         ...requestCtx,
         schema: ez.raw(),
-        request: { type: "string", format: "binary" },
+        jsonSchema: { type: "string", format: "binary" },
+        hasRequired: false,
         flat: { type: "object", properties: {} },
         composition: "inline",
         mimeType: "application/octet-stream", // raw content type

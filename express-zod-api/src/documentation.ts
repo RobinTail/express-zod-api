@@ -38,6 +38,7 @@ import {
   depictRequest,
   type IsHeader,
   type BrandHandling,
+  excludeParamsFromDepiction,
 } from "./documentation-helpers";
 import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
@@ -272,12 +273,18 @@ export class Documentation extends OpenApiBuilder {
         }
       }
 
+      const paramNames = R.pluck("name", depictedParams);
+      const [bodyJSON, hasRequiredBodyProps] = excludeParamsFromDepiction(
+        request,
+        paramNames,
+      );
       const requestBody = inputSources.includes("body")
         ? depictBody({
             ...commons,
-            request,
+            jsonSchema: bodyJSON,
+            hasRequired: hasRequiredBodyProps,
             flat,
-            paramNames: R.pluck("name", depictedParams),
+            paramNames,
             schema: inputSchema,
             mimeType: contentTypes[endpoint.getProbableRequestType(method)],
             description: descriptions?.requestBody?.({

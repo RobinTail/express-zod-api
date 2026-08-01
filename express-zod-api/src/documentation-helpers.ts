@@ -625,7 +625,8 @@ export const depictBody = ({
   method,
   path,
   schema,
-  request,
+  jsonSchema,
+  hasRequired,
   flat,
   mimeType,
   makeRef,
@@ -636,13 +637,13 @@ export const depictBody = ({
   schema: IOSchema;
   composition: "inline" | "components";
   description?: string;
-  request: z.core.JSONSchema.BaseSchema;
+  jsonSchema: z.core.JSONSchema.BaseSchema;
+  hasRequired: boolean;
   flat: FlattenObjectSchema;
   mimeType: string;
   paramNames: string[];
 }) => {
-  const [_pure, hasRequired] = excludeParamsFromDepiction(request, paramNames);
-  const pure = asOAS(_pure);
+  const pure = asOAS(jsonSchema);
   const examples = [];
   if (isSchemaObject(pure) && pure.examples) {
     examples.push(...pure.examples);
