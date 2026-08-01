@@ -23,7 +23,6 @@ import {
 import type { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
 import type { ClientMethod } from "./method";
-import { getSecurityNames } from "./security";
 import {
   depictBody,
   depictRequestParams,
@@ -224,7 +223,7 @@ export class Documentation extends OpenApiBuilder {
     return (method, path, endpoint) => {
       this.#checkDuplicate(method, path);
       const commons = { ...shared, path, method, endpoint };
-      const { description, summary, scopes, inputSchema } = endpoint;
+      const { description, summary, scopes, inputSchema, security } = endpoint;
       const inputSources = getInputSources(method, config.inputSources);
       const operationId = this.#ensureUniqOperationId(
         path,
@@ -237,9 +236,8 @@ export class Documentation extends OpenApiBuilder {
         ...commons,
         inputSources,
         isHeader,
-        securityHeaders: getSecurityNames(endpoint.security, "header"),
-        securityCookies: getSecurityNames(endpoint.security, "cookie"),
         request,
+        security,
         description: descriptions?.requestParameter?.({
           method,
           path,
@@ -287,7 +285,7 @@ export class Documentation extends OpenApiBuilder {
         : undefined;
 
       const securityRefs = depictSecurityRefs(
-        depictSecurity(processContainers(endpoint.security), inputSources),
+        depictSecurity(processContainers(security), inputSources),
         scopes,
         (securitySchema) => {
           const name = this.#ensureUniqSecuritySchemaName(securitySchema);

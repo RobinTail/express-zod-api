@@ -37,13 +37,13 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import { flattenIO } from "./json-schema-helpers";
-import type { Alternatives } from "./logical-container";
+import type { Alternatives, LogicalContainer } from "./logical-container";
 import { getBrand } from "./metadata";
 import type { ClientMethod } from "./method";
 import type { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
 import type { FirstPartyKind } from "./schema-walker";
-import type { Security } from "./security";
+import { getSecurityNames, type Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import { getWellKnownHeaders } from "./well-known-headers";
 
@@ -257,8 +257,7 @@ export const depictRequestParams = ({
   makeRef,
   composition,
   isHeader,
-  securityHeaders,
-  securityCookies,
+  security,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResCommons & {
   composition: "inline" | "components";
@@ -266,8 +265,7 @@ export const depictRequestParams = ({
   request: z.core.JSONSchema.BaseSchema;
   inputSources: InputSource[];
   isHeader?: IsHeader;
-  securityHeaders?: Set<string>;
-  securityCookies?: Set<string>;
+  security?: LogicalContainer<Security>[];
 }) => {
   const flat = flattenIO(request);
   const pathParams = new Set(getRoutePathParams(path));
@@ -276,6 +274,12 @@ export const depictRequestParams = ({
   const areHeadersEnabled = inputSources.includes("headers");
   const areCookiesEnabled =
     inputSources.includes("cookies") || inputSources.includes("signedCookies");
+  let securityHeaders: Set<string> | undefined;
+  if (areHeadersEnabled && security)
+    securityHeaders = getSecurityNames(security, "header");
+  let securityCookies: Set<string> | undefined;
+  if (areCookiesEnabled && security)
+    securityCookies = getSecurityNames(security, "cookie");
 
   const getLocation = (name: string) => {
     if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))

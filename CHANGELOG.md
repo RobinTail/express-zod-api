@@ -2,6 +2,11 @@
 
 ## Version 29
 
+### v29.0.1
+
+- Minor performance tuning for `Documentation` generator:
+  - Collecting security headers and cookie names only when the corresponding input sources are enabled.
+
 ### v29.0.0
 
 - Supported Node.js versions: `^22.19.0 || ^24.11.0 || ^26.0.0`;

@@ -1,8 +1,7 @@
 import type { SchemaObjectValue } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
-import { ez } from "../src";
-import { DocumentationError } from "../src/errors";
+import { ez, DocumentationError } from "../src";
 import {
   type OpenAPIContext,
   depictRequestParams,
@@ -473,7 +472,7 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["query", "headers", "params"],
           composition: "inline",
-          securityHeaders: new Set(["secure"]),
+          security: [{ type: "header", name: "secure" }],
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -493,7 +492,7 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["query", "cookies", "params"],
           composition: "inline",
-          securityCookies: new Set(["session"]),
+          security: [{ type: "cookie", name: "session" }],
           ...requestCtx,
         }),
       ).toMatchSnapshot();
