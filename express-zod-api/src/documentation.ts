@@ -1,5 +1,5 @@
 /** @fileOverview The entrypoint for generating OpenAPI Documentation */
-import { flattenIO } from "./json-schema-helpers.ts";
+import { flattenIO } from "./json-schema-helpers";
 
 export type { Depicter } from "./documentation-helpers";
 import {
