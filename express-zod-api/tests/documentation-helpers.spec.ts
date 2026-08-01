@@ -401,7 +401,7 @@ describe("Documentation helpers", () => {
     test("should depict query and path params", () => {
       expect(
         depictRequestParams({
-          request: {
+          flat: {
             properties: {
               id: { type: "string" },
               test: { type: "boolean" },
@@ -419,7 +419,7 @@ describe("Documentation helpers", () => {
     test("should depict only path params if query is disabled", () => {
       expect(
         depictRequestParams({
-          request: {
+          flat: {
             properties: {
               id: { type: "string" },
               test: { type: "boolean" },
@@ -437,7 +437,7 @@ describe("Documentation helpers", () => {
     test("should throw when path param cannot be depicted due to disabled input sources", () => {
       expect(() =>
         depictRequestParams({
-          request: {
+          flat: {
             properties: {
               id: { type: "string" },
               test: { type: "boolean" },
@@ -460,7 +460,7 @@ describe("Documentation helpers", () => {
     test("Features 1180 and 2344: should depict header params when enabled", () => {
       expect(
         depictRequestParams({
-          request: {
+          flat: {
             properties: {
               "x-request-id": { type: "string" },
               id: { type: "string" },
@@ -481,7 +481,7 @@ describe("Documentation helpers", () => {
     test("should depict cookie params when enabled via CookieSecurity", () => {
       expect(
         depictRequestParams({
-          request: {
+          flat: {
             properties: {
               id: { type: "string" },
               session: { type: "string" },
@@ -505,6 +505,7 @@ describe("Documentation helpers", () => {
         ...requestCtx,
         schema: ez.raw(),
         request: { type: "string", format: "binary" },
+        flat: { type: "object", properties: {} },
         composition: "inline",
         mimeType: "application/octet-stream", // raw content type
         paramNames: [],

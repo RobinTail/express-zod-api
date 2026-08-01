@@ -1,4 +1,6 @@
 /** @fileOverview The entrypoint for generating OpenAPI Documentation */
+import { flattenIO } from "./json-schema-helpers.ts";
+
 export type { Depicter } from "./documentation-helpers";
 import {
   type InfoObject,
@@ -232,11 +234,12 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
+      const flat = flattenIO(request);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
-        request,
+        flat,
         security,
         description: descriptions?.requestParameter?.({
           method,
@@ -273,6 +276,7 @@ export class Documentation extends OpenApiBuilder {
         ? depictBody({
             ...commons,
             request,
+            flat,
             paramNames: R.pluck("name", depictedParams),
             schema: inputSchema,
             mimeType: contentTypes[endpoint.getProbableRequestType(method)],
