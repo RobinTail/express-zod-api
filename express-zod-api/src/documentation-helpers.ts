@@ -252,7 +252,7 @@ export const defaultIsHeader = (
 export const depictRequestParams = ({
   path,
   method,
-  flat,
+  flatRequest,
   inputSources,
   makeRef,
   composition,
@@ -262,7 +262,7 @@ export const depictRequestParams = ({
 }: ReqResCommons & {
   composition: "inline" | "components";
   description?: string;
-  flat: FlattenObjectSchema;
+  flatRequest: FlattenObjectSchema;
   inputSources: InputSource[];
   isHeader?: IsHeader;
   security?: LogicalContainer<Security>[];
@@ -292,7 +292,7 @@ export const depictRequestParams = ({
     if (isQueryEnabled && method !== "query") return "query";
   };
 
-  const depictedParams = Object.entries(flat.properties).reduce<
+  const depictedParams = Object.entries(flatRequest.properties).reduce<
     ParameterObject[]
   >((acc, [name, jsonSchema]) => {
     if (!isObject(jsonSchema)) return acc;
@@ -311,7 +311,7 @@ export const depictRequestParams = ({
       name,
       in: location,
       deprecated: jsonSchema.deprecated,
-      required: flat.required?.includes(name) || false,
+      required: flatRequest.required?.includes(name) || false,
       description: depicted.description || description,
       schema: result,
       examples: enumerateExamples(
@@ -319,7 +319,7 @@ export const depictRequestParams = ({
           ? depicted.examples // own examples or from the flat:
           : R.pluck(
               name,
-              flat.examples?.filter(R.both(isObject, R.has(name))) || [],
+              flatRequest.examples?.filter(R.both(isObject, R.has(name))) || [],
             ),
       ),
     });
@@ -625,9 +625,9 @@ export const depictBody = ({
   method,
   path,
   schema,
-  jsonSchema,
-  hasRequired,
-  flat,
+  bodyJsonSchema,
+  hasRequiredBodyProps,
+  flatRequest,
   mimeType,
   makeRef,
   composition,
@@ -637,13 +637,13 @@ export const depictBody = ({
   schema: IOSchema;
   composition: "inline" | "components";
   description?: string;
-  jsonSchema: z.core.JSONSchema.BaseSchema;
-  hasRequired: boolean;
-  flat: FlattenObjectSchema;
+  bodyJsonSchema: z.core.JSONSchema.BaseSchema;
+  hasRequiredBodyProps: boolean;
+  flatRequest: FlattenObjectSchema;
   mimeType: string;
   paramNames: string[];
 }) => {
-  const pure = asOAS(jsonSchema);
+  const pure = asOAS(bodyJsonSchema);
   const examples = [];
   if (isSchemaObject(pure) && pure.examples) {
     examples.push(...pure.examples);
@@ -657,7 +657,7 @@ export const depictBody = ({
     examples: enumerateExamples(
       examples.length
         ? examples
-        : flat.examples
+        : flatRequest.examples
             ?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )
@@ -668,7 +668,8 @@ export const depictBody = ({
     description,
     content: { [mimeType]: media },
   };
-  if (hasRequired || mimeType === contentTypes.raw) body.required = true;
+  if (hasRequiredBodyProps || mimeType === contentTypes.raw)
+    body.required = true;
   return body;
 };
 

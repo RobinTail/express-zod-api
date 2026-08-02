@@ -235,12 +235,12 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
-      const flat = flattenIO(request);
+      const flatRequest = flattenIO(request);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
-        flat,
+        flatRequest,
         security,
         description: descriptions?.requestParameter?.({
           method,
@@ -274,16 +274,16 @@ export class Documentation extends OpenApiBuilder {
       }
 
       const paramNames = R.pluck("name", depictedParams);
-      const [bodyJSON, hasRequiredBodyProps] = excludeParamsFromDepiction(
+      const [bodyJsonSchema, hasRequiredBodyProps] = excludeParamsFromDepiction(
         request,
         paramNames,
       );
       const requestBody = inputSources.includes("body")
         ? depictBody({
             ...commons,
-            jsonSchema: bodyJSON,
-            hasRequired: hasRequiredBodyProps,
-            flat,
+            bodyJsonSchema,
+            hasRequiredBodyProps,
+            flatRequest,
             paramNames,
             schema: inputSchema,
             mimeType: contentTypes[endpoint.getProbableRequestType(method)],

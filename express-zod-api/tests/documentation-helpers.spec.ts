@@ -401,7 +401,7 @@ describe("Documentation helpers", () => {
     test("should depict query and path params", () => {
       expect(
         depictRequestParams({
-          flat: {
+          flatRequest: {
             properties: {
               id: { type: "string" },
               test: { type: "boolean" },
@@ -419,7 +419,7 @@ describe("Documentation helpers", () => {
     test("should depict only path params if query is disabled", () => {
       expect(
         depictRequestParams({
-          flat: {
+          flatRequest: {
             properties: {
               id: { type: "string" },
               test: { type: "boolean" },
@@ -437,7 +437,7 @@ describe("Documentation helpers", () => {
     test("should throw when path param cannot be depicted due to disabled input sources", () => {
       expect(() =>
         depictRequestParams({
-          flat: {
+          flatRequest: {
             properties: {
               id: { type: "string" },
               test: { type: "boolean" },
@@ -460,7 +460,7 @@ describe("Documentation helpers", () => {
     test("Features 1180 and 2344: should depict header params when enabled", () => {
       expect(
         depictRequestParams({
-          flat: {
+          flatRequest: {
             properties: {
               "x-request-id": { type: "string" },
               id: { type: "string" },
@@ -481,7 +481,7 @@ describe("Documentation helpers", () => {
     test("should depict cookie params when enabled via CookieSecurity", () => {
       expect(
         depictRequestParams({
-          flat: {
+          flatRequest: {
             properties: {
               id: { type: "string" },
               session: { type: "string" },
@@ -504,9 +504,9 @@ describe("Documentation helpers", () => {
       const body = depictBody({
         ...requestCtx,
         schema: ez.raw(),
-        jsonSchema: { type: "string", format: "binary" },
-        hasRequired: false,
-        flat: { type: "object", properties: {} },
+        bodyJsonSchema: { type: "string", format: "binary" },
+        hasRequiredBodyProps: false,
+        flatRequest: { type: "object", properties: {} },
         composition: "inline",
         mimeType: "application/octet-stream", // raw content type
         paramNames: [],
@@ -518,12 +518,12 @@ describe("Documentation helpers", () => {
       const body = depictBody({
         ...requestCtx,
         schema: ez.raw(),
-        jsonSchema: {
+        bodyJsonSchema: {
           type: "object",
           properties: { other: { type: "string" } },
         },
-        hasRequired: true,
-        flat: {
+        hasRequiredBodyProps: true,
+        flatRequest: {
           type: "object",
           properties: {},
           examples: [
