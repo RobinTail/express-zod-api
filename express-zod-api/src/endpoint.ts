@@ -75,7 +75,7 @@ export abstract class AbstractEndpoint {
   /** @internal */
   public abstract get tags(): ReadonlyArray<string>;
   /** @internal */
-  public abstract get requestType(): ContentType;
+  public abstract getProbableRequestType(method?: ClientMethod): ContentType;
   /** @internal */
   public abstract get isDeprecated(): boolean;
 }
@@ -159,7 +159,8 @@ export class Endpoint<
   }
 
   /** @internal */
-  public override get requestType() {
+  public override getProbableRequestType(method?: ClientMethod) {
+    if (method === "query") return "form";
     return (this.#requestType ??= (() => {
       const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
       if (found) {

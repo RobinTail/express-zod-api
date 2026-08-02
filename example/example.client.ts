@@ -1,14 +1,12 @@
-type Type1 = {
-  title: string;
-  features?: Type1[] | undefined;
-};
-
-type SomeOf<T> = T[keyof T];
-
 /** get /v1/user/retrieve */
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
+};
+
+type Type1 = {
+  title: string;
+  features?: Type1[] | undefined;
 };
 
 /** get /v1/user/retrieve */
@@ -160,49 +158,28 @@ interface PostV1UserCreateNegativeResponseVariants {
   500: PostV1UserCreateNegativeVariant2;
 }
 
-/** get /v1/user/list */
-type GetV1UserListInput = {
+/** query /v1/user/list */
+type QueryV1UserListInput = {
   roles?: ("manager" | "operator" | "admin")[] | undefined;
 };
 
-/** get /v1/user/list */
-type GetV1UserListPositiveVariant1 = {
+/** query /v1/user/list */
+type QueryV1UserListPositiveVariant1 = {
   name: string;
   role: "manager" | "operator" | "admin";
 }[];
 
-/** get /v1/user/list */
-interface GetV1UserListPositiveResponseVariants {
-  200: GetV1UserListPositiveVariant1;
+/** query /v1/user/list */
+interface QueryV1UserListPositiveResponseVariants {
+  200: QueryV1UserListPositiveVariant1;
 }
 
-/** get /v1/user/list */
-type GetV1UserListNegativeVariant1 = string;
+/** query /v1/user/list */
+type QueryV1UserListNegativeVariant1 = string;
 
-/** get /v1/user/list */
-interface GetV1UserListNegativeResponseVariants {
-  400: GetV1UserListNegativeVariant1;
-}
-
-/** head /v1/user/list */
-type HeadV1UserListInput = {
-  roles?: ("manager" | "operator" | "admin")[] | undefined;
-};
-
-/** head /v1/user/list */
-type HeadV1UserListPositiveVariant1 = undefined;
-
-/** head /v1/user/list */
-interface HeadV1UserListPositiveResponseVariants {
-  200: HeadV1UserListPositiveVariant1;
-}
-
-/** head /v1/user/list */
-type HeadV1UserListNegativeVariant1 = undefined;
-
-/** head /v1/user/list */
-interface HeadV1UserListNegativeResponseVariants {
-  400: HeadV1UserListNegativeVariant1;
+/** query /v1/user/list */
+interface QueryV1UserListNegativeResponseVariants {
+  400: QueryV1UserListNegativeVariant1;
 }
 
 /** post /v1/login */
@@ -285,7 +262,7 @@ type GetV1AvatarStreamInput = {
 };
 
 /** get /v1/avatar/stream */
-type GetV1AvatarStreamPositiveVariant1 = Buffer;
+type GetV1AvatarStreamPositiveVariant1 = Blob;
 
 /** get /v1/avatar/stream */
 interface GetV1AvatarStreamPositiveResponseVariants {
@@ -322,12 +299,16 @@ interface HeadV1AvatarStreamNegativeResponseVariants {
 }
 
 /** post /v1/avatar/upload */
-type PostV1AvatarUploadInput = {
-  session: {
-    token: string;
-  };
-  avatar: any;
-};
+type PostV1AvatarUploadInput = Omit<
+  {
+    session: {
+      token: string;
+    };
+    avatar: any;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** post /v1/avatar/upload */
 type PostV1AvatarUploadPositiveVariant1 = {
@@ -360,7 +341,7 @@ interface PostV1AvatarUploadNegativeResponseVariants {
 }
 
 /** post /v1/avatar/raw */
-type PostV1AvatarRawInput = Buffer;
+type PostV1AvatarRawInput = Blob;
 
 /** post /v1/avatar/raw */
 type PostV1AvatarRawPositiveVariant1 = {
@@ -542,6 +523,8 @@ interface HeadV2UsersListNegativeResponseVariants {
   400: HeadV2UsersListNegativeVariant1;
 }
 
+type SomeOf<T> = T[keyof T];
+
 export type Path =
   | "/v1/user/retrieve"
   | "/v1/user/:id/remove"
@@ -557,7 +540,8 @@ export type Path =
   | "/v1/forms/feedback"
   | "/v2/users/list";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
@@ -565,8 +549,7 @@ export interface Input {
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
   "patch /v1/user/:id": PatchV1UserIdInput;
   "post /v1/user/create": PostV1UserCreateInput;
-  "get /v1/user/list": GetV1UserListInput;
-  "head /v1/user/list": HeadV1UserListInput;
+  "query /v1/user/list": QueryV1UserListInput;
   "post /v1/login": PostV1LoginInput;
   /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendInput;
@@ -589,8 +572,7 @@ export interface PositiveResponse {
   "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemovePositiveResponseVariants>;
   "patch /v1/user/:id": SomeOf<PatchV1UserIdPositiveResponseVariants>;
   "post /v1/user/create": SomeOf<PostV1UserCreatePositiveResponseVariants>;
-  "get /v1/user/list": SomeOf<GetV1UserListPositiveResponseVariants>;
-  "head /v1/user/list": SomeOf<HeadV1UserListPositiveResponseVariants>;
+  "query /v1/user/list": SomeOf<QueryV1UserListPositiveResponseVariants>;
   "post /v1/login": SomeOf<PostV1LoginPositiveResponseVariants>;
   /** @deprecated */
   "get /v1/avatar/send": SomeOf<GetV1AvatarSendPositiveResponseVariants>;
@@ -613,8 +595,7 @@ export interface NegativeResponse {
   "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemoveNegativeResponseVariants>;
   "patch /v1/user/:id": SomeOf<PatchV1UserIdNegativeResponseVariants>;
   "post /v1/user/create": SomeOf<PostV1UserCreateNegativeResponseVariants>;
-  "get /v1/user/list": SomeOf<GetV1UserListNegativeResponseVariants>;
-  "head /v1/user/list": SomeOf<HeadV1UserListNegativeResponseVariants>;
+  "query /v1/user/list": SomeOf<QueryV1UserListNegativeResponseVariants>;
   "post /v1/login": SomeOf<PostV1LoginNegativeResponseVariants>;
   /** @deprecated */
   "get /v1/avatar/send": SomeOf<GetV1AvatarSendNegativeResponseVariants>;
@@ -642,10 +623,8 @@ export interface EncodedResponse {
     PatchV1UserIdNegativeResponseVariants;
   "post /v1/user/create": PostV1UserCreatePositiveResponseVariants &
     PostV1UserCreateNegativeResponseVariants;
-  "get /v1/user/list": GetV1UserListPositiveResponseVariants &
-    GetV1UserListNegativeResponseVariants;
-  "head /v1/user/list": HeadV1UserListPositiveResponseVariants &
-    HeadV1UserListNegativeResponseVariants;
+  "query /v1/user/list": QueryV1UserListPositiveResponseVariants &
+    QueryV1UserListNegativeResponseVariants;
   "post /v1/login": PostV1LoginPositiveResponseVariants &
     PostV1LoginNegativeResponseVariants;
   /** @deprecated */
@@ -690,12 +669,9 @@ export interface Response {
   "post /v1/user/create":
     | PositiveResponse["post /v1/user/create"]
     | NegativeResponse["post /v1/user/create"];
-  "get /v1/user/list":
-    | PositiveResponse["get /v1/user/list"]
-    | NegativeResponse["get /v1/user/list"];
-  "head /v1/user/list":
-    | PositiveResponse["head /v1/user/list"]
-    | NegativeResponse["head /v1/user/list"];
+  "query /v1/user/list":
+    | PositiveResponse["query /v1/user/list"]
+    | NegativeResponse["query /v1/user/list"];
   "post /v1/login":
     PositiveResponse["post /v1/login"] | NegativeResponse["post /v1/login"];
   /** @deprecated */
@@ -743,8 +719,7 @@ export const endpointTags = {
   "delete /v1/user/:id/remove": ["users"],
   "patch /v1/user/:id": ["users"],
   "post /v1/user/create": ["users"],
-  "get /v1/user/list": ["users"],
-  "head /v1/user/list": ["users"],
+  "query /v1/user/list": ["users"],
   "post /v1/login": ["cookies"],
   "get /v1/avatar/send": ["files", "users"],
   "head /v1/avatar/send": ["files", "users"],
@@ -762,7 +737,11 @@ export const endpointTags = {
 const parseRequest = (request: string) =>
   request.split(/ (.+)/, 2) as [Method, Path];
 
-const substitute = (path: string, params: Record<string, any>) => {
+const substitute = (
+  path: string,
+  params: Record<string, any>,
+): [typeof path, typeof params] => {
+  if (params instanceof Blob) return [path, params] as const;
   const rest = { ...params };
   for (const key in params) {
     path = path.replace(`:${key}`, () => {
@@ -773,7 +752,7 @@ const substitute = (path: string, params: Record<string, any>) => {
   return [path, rest] as const;
 };
 
-export type Implementation<T = unknown> = (
+export type Implementation<T extends Record<string, unknown>> = (
   method: Method,
   path: string,
   params: Record<string, any>,
@@ -781,33 +760,65 @@ export type Implementation<T = unknown> = (
 ) => Promise<any>;
 
 type Pagination =
-  | {
-      nextCursor: string | null;
-    }
-  | {
-      total: number;
-      limit: number;
-      offset: number;
-    };
+  | { nextCursor: string | null }
+  | { total: number; limit: number; offset: number };
 
-const defaultImplementation: Implementation = async (method, path, params) => {
+export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
+
+const defaultImplementation: Implementation<DefaultContext> = async (
+  method,
+  path,
+  params,
+  ctx,
+) => {
+  const isBlob = params instanceof Blob;
+  const hasFiles =
+    !isBlob &&
+    Object.values(params).some(
+      (one) => one instanceof Blob || one instanceof File,
+    );
   const hasBody = !["get", "head", "delete"].includes(method);
-  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
+  const searchParams =
+    isBlob || hasBody ? "" : `?${new URLSearchParams(params)}`;
+  const headers =
+    !hasBody || hasFiles
+      ? undefined
+      : {
+          "Content-Type": isBlob
+            ? "application/octet-stream"
+            : "application/json",
+        };
+  let body: RequestInit["body"] = undefined;
+  if (hasBody) {
+    if (isBlob) {
+      body = params;
+    } else if (hasFiles) {
+      body = new FormData();
+      for (const [key, value] of Object.entries(params))
+        if (value !== undefined) body.append(key, value);
+    } else {
+      body = JSON.stringify(params);
+    }
+  }
+  let init: RequestInit = {
+    method: method.toUpperCase(),
+    credentials: undefined,
+    headers,
+    body,
+  };
+  if (ctx?.override) init = ctx.override(init);
   const response = await fetch(
     new URL(`${path}${searchParams}`, "http://localhost:8090"),
-    {
-      method: method.toUpperCase(),
-      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-      body: hasBody ? JSON.stringify(params) : undefined,
-    },
+    init,
   );
   const contentType = response.headers.get("content-type");
   if (!contentType) return;
-  const isJSON = contentType.startsWith("application/json");
-  return response[isJSON ? "json" : "text"]();
+  if (contentType.startsWith("application/json")) return response.json();
+  if (contentType.startsWith("text/")) return response.text();
+  return response.blob();
 };
 
-export class Client<T> {
+export class Client<T extends Record<string, unknown> = DefaultContext> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
@@ -835,6 +846,7 @@ export class Subscription<
     const searchParams = `?${new URLSearchParams(rest)}`;
     this.source = new EventSource(
       new URL(`${path}${searchParams}`, "http://localhost:8090"),
+      { withCredentials: undefined },
     );
   }
   public on<E extends R["event"]>(

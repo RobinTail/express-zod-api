@@ -42,18 +42,19 @@ describe("Routing", () => {
           recognizeMethodDependentRoutes: false,
         };
         const factory = new EndpointsFactory(defaultResultHandler);
-        const getEndpoint = factory.build({
-          output: z.object({}),
+        const getEndpoint = factory.buildVoid({
           handler: handlerMock,
         });
-        const postEndpoint = factory.build({
+        const postEndpoint = factory.buildVoid({
           method: "post",
-          output: z.object({}),
           handler: handlerMock,
         });
-        const getAndPostEndpoint = factory.build({
+        const getAndPostEndpoint = factory.buildVoid({
           method: ["get", "post"],
-          output: z.object({}),
+          handler: handlerMock,
+        });
+        const queryEndpoint = factory.buildVoid({
+          method: "query",
           handler: handlerMock,
         });
         const routing: Routing = {
@@ -62,6 +63,7 @@ describe("Routing", () => {
               get: getEndpoint, // should be treated as a path
               set: postEndpoint,
               universal: getAndPostEndpoint,
+              search: queryEndpoint,
             },
           },
         };
@@ -77,16 +79,19 @@ describe("Routing", () => {
         expect(appMock.put).toHaveBeenCalledTimes(0);
         expect(appMock.delete).toHaveBeenCalledTimes(0);
         expect(appMock.patch).toHaveBeenCalledTimes(0);
-        expect(appMock.options).toHaveBeenCalledTimes(3);
+        expect(appMock.query).toHaveBeenCalledTimes(1);
+        expect(appMock.options).toHaveBeenCalledTimes(4);
         expect(appMock.get.mock.calls[0]![0]).toBe("/v1/user/get");
         expect(appMock.get.mock.calls[1]![0]).toBe("/v1/user/universal");
         expect(appMock.post.mock.calls[0]![0]).toBe("/v1/user/set");
         expect(appMock.post.mock.calls[1]![0]).toBe("/v1/user/universal");
+        expect(appMock.query.mock.calls[0]![0]).toBe("/v1/user/search");
         expect(appMock.options.mock.calls[0]![0]).toBe("/v1/user/get");
         expect(appMock.options.mock.calls[1]![0]).toBe("/v1/user/set");
         expect(appMock.options.mock.calls[2]![0]).toBe("/v1/user/universal");
+        expect(appMock.options.mock.calls[3]![0]).toBe("/v1/user/search");
         if (hintAllowedMethods === false) return;
-        expect(appMock.all).toHaveBeenCalledTimes(3);
+        expect(appMock.all).toHaveBeenCalledTimes(4);
         expect(appMock.all.mock.calls[0]![0]).toBe("/v1/user/get");
         expect(appMock.all.mock.calls[1]![0]).toBe("/v1/user/set");
         expect(appMock.all.mock.calls[2]![0]).toBe("/v1/user/universal");
@@ -146,6 +151,7 @@ describe("Routing", () => {
       expect(appMock.put).toHaveBeenCalledTimes(1);
       expect(appMock.patch).toHaveBeenCalledTimes(1);
       expect(appMock.delete).toHaveBeenCalledTimes(0);
+      expect(appMock.query).toHaveBeenCalledTimes(0);
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0]![0]).toBe("/v1/user");
       expect(appMock.post.mock.calls[0]![0]).toBe("/v1/user");
@@ -181,14 +187,8 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
-    test("Issue 705: should set all assigned methods to CORS response header", async () => {
+    test("Issue 705: should set allowed methods to CORS response header", async () => {
       const handler = vi.fn(async () => ({}));
-      const configMock = {
-        cors: (params: { defaultHeaders: Record<string, string> }) => ({
-          ...params.defaultHeaders,
-          "X-Custom-Header": "Testing",
-        }),
-      };
       const factory = new EndpointsFactory(defaultResultHandler);
       const input = z.object({});
       const output = z.object({});
@@ -219,22 +219,19 @@ describe("Routing", () => {
       initRouting({
         app: appMock as unknown as IRouter,
         getLogger: () => logger,
-        config: configMock,
+        config: { cors: true },
         routing,
       });
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0]![0]).toBe("/hello");
       const fn = appMock.options.mock.calls[0]![1];
-      expect(typeof fn).toBe("function"); // async RequestHandler, proprietary CORS middleware
+      expect(typeof fn).toBe("function"); // async RequestHandler, route-level CORS middleware
       const requestMock = makeRequestMock({ method: "PUT" });
       const responseMock = makeResponseMock();
       await fn(requestMock, responseMock, vi.fn());
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
-        "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, PATCH, POST, PUT, HEAD, OPTIONS",
-        "access-control-allow-headers": "content-type",
-        "x-custom-header": "Testing",
       });
     });
 
@@ -361,9 +358,7 @@ describe("Routing", () => {
       await fn(requestMock, responseMock, vi.fn());
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
-        "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, POST, HEAD, OPTIONS",
-        "access-control-allow-headers": "content-type",
       });
     });
 

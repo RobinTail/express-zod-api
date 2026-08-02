@@ -1,9 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Integration > Feature #1470: Custom brands > should by handled accordingly 1`] = `
-"type SomeOf<T> = T[keyof T];
-
-/** post /v1/custom */
+"/** post /v1/custom */
 type PostV1CustomInput = {
   string: boolean;
   regular: string;
@@ -35,9 +33,12 @@ interface PostV1CustomNegativeResponseVariants {
   400: PostV1CustomNegativeVariant1;
 }
 
+type SomeOf<T> = T[keyof T];
+
 export type Path = "/v1/custom";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "post /v1/custom": PostV1CustomInput;
@@ -66,12 +67,15 @@ export type Request = keyof Input;
 `;
 
 exports[`Integration > Should support HEAD method by default 0 1`] = `
-"type SomeOf<T> = T[keyof T];
-
-/** get /v1/path */
-type GetV1PathInput = {
-  some: string;
-};
+"/** get /v1/path */
+type GetV1PathInput = Omit<
+  {
+    session: {};
+    some: string;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** get /v1/path */
 type GetV1PathPositiveVariant1 = {
@@ -98,9 +102,14 @@ interface GetV1PathNegativeResponseVariants {
 }
 
 /** head /v1/path */
-type HeadV1PathInput = {
-  some: string;
-};
+type HeadV1PathInput = Omit<
+  {
+    session: {};
+    some: string;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** head /v1/path */
 type HeadV1PathPositiveVariant1 = undefined;
@@ -118,9 +127,12 @@ interface HeadV1PathNegativeResponseVariants {
   400: HeadV1PathNegativeVariant1;
 }
 
+type SomeOf<T> = T[keyof T];
+
 export type Path = "/v1/path";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "get /v1/path": GetV1PathInput;
@@ -156,12 +168,15 @@ export type Request = keyof Input;
 `;
 
 exports[`Integration > Should support HEAD method by default 1 1`] = `
-"type SomeOf<T> = T[keyof T];
-
-/** get /v1/path */
-type GetV1PathInput = {
-  some: string;
-};
+"/** get /v1/path */
+type GetV1PathInput = Omit<
+  {
+    session: {};
+    some: string;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** get /v1/path */
 type GetV1PathPositiveVariant1 = {
@@ -187,9 +202,12 @@ interface GetV1PathNegativeResponseVariants {
   400: GetV1PathNegativeVariant1;
 }
 
+type SomeOf<T> = T[keyof T];
+
 export type Path = "/v1/path";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "get /v1/path": GetV1PathInput;
@@ -218,9 +236,7 @@ export type Request = keyof Input;
 `;
 
 exports[`Integration > Should support multiple response schemas depending on status code 1`] = `
-"type SomeOf<T> = T[keyof T];
-
-/** post /v1/mtpl */
+"/** post /v1/mtpl */
 type PostV1MtplInput = {
   test: number;
 };
@@ -259,9 +275,12 @@ interface PostV1MtplNegativeResponseVariants {
   500: PostV1MtplNegativeVariant2;
 }
 
+type SomeOf<T> = T[keyof T];
+
 export type Path = "/v1/mtpl";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "post /v1/mtpl": PostV1MtplInput;
@@ -295,64 +314,64 @@ exports[`Integration > Should support types variant and handle recursive schemas
     features: Type1;
 };
 
-type SomeOf<T> = T[keyof T];
-
-/** post /v1/test */
-type PostV1TestInput = {
+/** query /v1/test */
+type QueryV1TestInput = {
     features: Type1;
 };
 
-/** post /v1/test */
-type PostV1TestPositiveVariant1 = {
+/** query /v1/test */
+type QueryV1TestPositiveVariant1 = {
     status: "success";
     data: {};
 };
 
-/** post /v1/test */
-interface PostV1TestPositiveResponseVariants {
-    200: PostV1TestPositiveVariant1;
+/** query /v1/test */
+interface QueryV1TestPositiveResponseVariants {
+  200: QueryV1TestPositiveVariant1;
 }
 
-/** post /v1/test */
-type PostV1TestNegativeVariant1 = {
+/** query /v1/test */
+type QueryV1TestNegativeVariant1 = {
     status: "error";
     error: {
         message: string;
     };
 };
 
-/** post /v1/test */
-interface PostV1TestNegativeResponseVariants {
-    400: PostV1TestNegativeVariant1;
+/** query /v1/test */
+interface QueryV1TestNegativeResponseVariants {
+  400: QueryV1TestNegativeVariant1;
 }
+
+type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/test";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
-    /** @deprecated */
-    "post /v1/test": PostV1TestInput;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestInput;
 }
 
 export interface PositiveResponse {
-    /** @deprecated */
-    "post /v1/test": SomeOf<PostV1TestPositiveResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
-    /** @deprecated */
-    "post /v1/test": SomeOf<PostV1TestNegativeResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
-    /** @deprecated */
-    "post /v1/test": PostV1TestPositiveResponseVariants & PostV1TestNegativeResponseVariants;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
 }
 
 export interface Response {
-    /** @deprecated */
-    "post /v1/test": PositiveResponse["post /v1/test"] | NegativeResponse["post /v1/test"];
+  /** @deprecated */
+  "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
 }
 
 export type Request = keyof Input;"
@@ -364,73 +383,71 @@ exports[`Integration > Should support types variant and handle recursive schemas
     features: Type1;
 };
 
-type SomeOf<T> = T[keyof T];
-
-/** post /v1/test */
-type PostV1TestInput = {
+/** query /v1/test */
+type QueryV1TestInput = {
     features: Type1;
 };
 
-/** post /v1/test */
-type PostV1TestPositiveVariant1 = {
+/** query /v1/test */
+type QueryV1TestPositiveVariant1 = {
     status: "success";
     data: {};
 };
 
-/** post /v1/test */
-interface PostV1TestPositiveResponseVariants {
-    200: PostV1TestPositiveVariant1;
+/** query /v1/test */
+interface QueryV1TestPositiveResponseVariants {
+  200: QueryV1TestPositiveVariant1;
 }
 
-/** post /v1/test */
-type PostV1TestNegativeVariant1 = {
+/** query /v1/test */
+type QueryV1TestNegativeVariant1 = {
     status: "error";
     error: {
         message: string;
     };
 };
 
-/** post /v1/test */
-interface PostV1TestNegativeResponseVariants {
-    400: PostV1TestNegativeVariant1;
+/** query /v1/test */
+interface QueryV1TestNegativeResponseVariants {
+  400: QueryV1TestNegativeVariant1;
 }
+
+type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/test";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
-    /** @deprecated */
-    "post /v1/test": PostV1TestInput;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestInput;
 }
 
 export interface PositiveResponse {
-    /** @deprecated */
-    "post /v1/test": SomeOf<PostV1TestPositiveResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
-    /** @deprecated */
-    "post /v1/test": SomeOf<PostV1TestNegativeResponseVariants>;
+  /** @deprecated */
+  "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
-    /** @deprecated */
-    "post /v1/test": PostV1TestPositiveResponseVariants & PostV1TestNegativeResponseVariants;
+  /** @deprecated */
+  "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
 }
 
 export interface Response {
-    /** @deprecated */
-    "post /v1/test": PositiveResponse["post /v1/test"] | NegativeResponse["post /v1/test"];
+  /** @deprecated */
+  "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
 }
 
 export type Request = keyof Input;"
 `;
 
 exports[`Integration > Should treat optionals the same way as z.infer() by default 1`] = `
-"type SomeOf<T> = T[keyof T];
-
-/** post /v1/test-with-dashes */
+"/** post /v1/test-with-dashes */
 type PostV1TestWithDashesInput = {
   opt?: string | undefined;
 };
@@ -461,9 +478,12 @@ interface PostV1TestWithDashesNegativeResponseVariants {
   400: PostV1TestWithDashesNegativeVariant1;
 }
 
+type SomeOf<T> = T[keyof T];
+
 export type Path = "/v1/test-with-dashes";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method =
+  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
@@ -490,12 +510,18 @@ export interface Response {
 
 export type Request = keyof Input;
 
-export const endpointTags = { "post /v1/test-with-dashes": [] };
+export const endpointTags = {
+  "post /v1/test-with-dashes": [],
+};
 
 const parseRequest = (request: string) =>
   request.split(/ (.+)/, 2) as [Method, Path];
 
-const substitute = (path: string, params: Record<string, any>) => {
+const substitute = (
+  path: string,
+  params: Record<string, any>,
+): [typeof path, typeof params] => {
+  if (params instanceof Blob) return [path, params] as const;
   const rest = { ...params };
   for (const key in params) {
     path = path.replace(\`:\${key}\`, () => {
@@ -506,7 +532,7 @@ const substitute = (path: string, params: Record<string, any>) => {
   return [path, rest] as const;
 };
 
-export type Implementation<T = unknown> = (
+export type Implementation<T extends Record<string, unknown>> = (
   method: Method,
   path: string,
   params: Record<string, any>,
@@ -514,33 +540,65 @@ export type Implementation<T = unknown> = (
 ) => Promise<any>;
 
 type Pagination =
-  | {
-      nextCursor: string | null;
-    }
-  | {
-      total: number;
-      limit: number;
-      offset: number;
-    };
+  | { nextCursor: string | null }
+  | { total: number; limit: number; offset: number };
 
-const defaultImplementation: Implementation = async (method, path, params) => {
+export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
+
+const defaultImplementation: Implementation<DefaultContext> = async (
+  method,
+  path,
+  params,
+  ctx,
+) => {
+  const isBlob = params instanceof Blob;
+  const hasFiles =
+    !isBlob &&
+    Object.values(params).some(
+      (one) => one instanceof Blob || one instanceof File,
+    );
   const hasBody = !["get", "head", "delete"].includes(method);
-  const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
+  const searchParams =
+    isBlob || hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
+  const headers =
+    !hasBody || hasFiles
+      ? undefined
+      : {
+          "Content-Type": isBlob
+            ? "application/octet-stream"
+            : "application/json",
+        };
+  let body: RequestInit["body"] = undefined;
+  if (hasBody) {
+    if (isBlob) {
+      body = params;
+    } else if (hasFiles) {
+      body = new FormData();
+      for (const [key, value] of Object.entries(params))
+        if (value !== undefined) body.append(key, value);
+    } else {
+      body = JSON.stringify(params);
+    }
+  }
+  let init: RequestInit = {
+    method: method.toUpperCase(),
+    credentials: undefined,
+    headers,
+    body,
+  };
+  if (ctx?.override) init = ctx.override(init);
   const response = await fetch(
     new URL(\`\${path}\${searchParams}\`, "https://example.com"),
-    {
-      method: method.toUpperCase(),
-      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-      body: hasBody ? JSON.stringify(params) : undefined,
-    },
+    init,
   );
   const contentType = response.headers.get("content-type");
   if (!contentType) return;
-  const isJSON = contentType.startsWith("application/json");
-  return response[isJSON ? "json" : "text"]();
+  if (contentType.startsWith("application/json")) return response.json();
+  if (contentType.startsWith("text/")) return response.text();
+  return response.blob();
 };
 
-export class Client<T> {
+export class Client<T extends Record<string, unknown> = DefaultContext> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
@@ -568,6 +626,7 @@ export class Subscription<
     const searchParams = \`?\${new URLSearchParams(rest)}\`;
     this.source = new EventSource(
       new URL(\`\${path}\${searchParams}\`, "https://example.com"),
+      { withCredentials: undefined },
     );
   }
   public on<E extends R["event"]>(

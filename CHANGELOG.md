@@ -1,6 +1,121 @@
 # Changelog
 
+## Version 29
+
+### v29.0.1
+
+- Minor performance tuning for `Documentation` generator:
+  - Collecting security headers and cookie names only when the corresponding input sources are enabled;
+  - Reduced some calculations required to depict request body and parameters.
+
+### v29.0.0
+
+- Supported Node.js versions: `^22.19.0 || ^24.11.0 || ^26.0.0`;
+- Major changes to the package distribution:
+  - `Documentation` and `Depicter` type moved to the `express-zod-api/documentation` subpath;
+  - `Integration` and `Producer` type moved to the `express-zod-api/integration` subpath;
+  - Several types and interfaces are no longer exposed:
+    - `CommonConfig`, `AppConfig`, `ServerConfig` — use `createConfig()` instead;
+    - `ApiResponse` — use `createApiResponse()` instead (new);
+    - `CacheControl` and `CachePolicy` — use `createCacheMiddleware()` or `EndpointsFactory::useCacheMiddleware()`;
+    - `FlatObject`, `IOSchema` and every type ending with `Security`;
+    - The public nature of these types was a workaround for user-side type declarations, but it's solved differently.
+- Breaking change to the `cors` config option:
+  - Changed from `boolean | HeadersProvider` to `boolean | RequestHandler`;
+  - You can now use the well-known `cors` package or pass a conventional `RequestHandler` directly.
+- Body parsers are now applied globally rather than per-endpoint (`createServer` experience only):
+  - Endpoints can accept requests in different content types (e.g., either JSON or URL-encoded body);
+  - The `Documentation` generator continues to guess the desired request type from the input schema;
+  - Parsers retain the ability for configuration via `jsonParser`, `formParser`, and `rawParser` config options;
+  - If using `attachRouting()` in a DIY server, parsers have to be installed manually.
+- Potentially breaking changes to the server lifecycle hooks:
+  - The hooks (`beforeRouting` and `afterRouting` config options) are no longer async;
+  - `beforeRouting` now runs after the installation of globally enabled parsers;
+  - Added new `beforeParsers` hook that runs before all parsers are installed.
+- The `createServer()` function is now synchronous — that should simplify the daily routines for beginners;
+- Added HTTP QUERY method support (RFC 10008):
+  - The QUERY method is like GET but with a body — safe, idempotent, and cacheable;
+  - Default input sources for QUERY: `["query", "body", "params"]` (from the lowest priority to highest);
+  - Supported by `Integration` and `Documentation` generators.
+- Changes to `Documentation`:
+  - `serverUrl` constructor option renamed to `server` and now also accepts OpenAPI's ServerObject;
+  - `title` option and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
+  - Now produces OpenAPI 3.2.0 with better SSE support and other features.
+- Changes to `Integration`:
+  - The static async method `create()` removed — use `new Integration()` instead;
+  - Removed `typescript` option from constructor — now imported statically;
+  - Generated type for `ez.buffer()` is now `Blob` instead of `Buffer` (which didn't exist in browser environments);
+  - The generated Client now excludes cookie-based security fields from input types (using `Omit`);
+  - The `Implementation` type requires `ctx` to be an object, the default one has `override` method for customizations;
+  - The default `Client` Implementation got improved response parsing and now supports `Blob` in request and response;
+  - The default `Client` Implementation now also supports uploads from the properties assigned with `File` or `Blob`;
+  - Both `Client` and `Subscription` delegate cookies handling (credentials) to the browser when supported;
+  - Added `hasCredentials` — an explicit declaration that the API supports credentialed CORS.
+- Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
+
+```diff
+- import { Integration, Documentation, type Producer, type Depicter } from "express-zod-api";
++ import { Integration, type Producer } from "express-zod-api/integration";
++ import { Documentation, type Depicter } from "express-zod-api/documentation";
+
+  const config = createConfig({
+-   cors: () => ({ origin: "https://example.com" }),
++   cors: cors({ origin: "https://example.com" }), // import cors from "cors"
+  });
+- await Integration.create({});
++ new Integration({});
+- const {} = await createServer({});
++ const {} = createServer({});
+  new Documentation({
++   info: {
+      title: "Sample API",
+      version: "1.2.3",
++   },
+-   serverUrl: "https://example.com",
++   server: "https://example.com",
+  });
+```
+
 ## Version 28
+
+### v28.7.11
+
+- Added missing path params check to the Documentation generator:
+  - An Endpoint assigned to `get /users/:id` must declare the `id` property on the `input` schema;
+  - Similar check is already implemented in runtime (development mode only);
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.10
+
+- Fixed issue for routes having differently named path params:
+  - In case of same method it will now always throw a RoutingError:
+    - Example: having both `get /items/:id` and `get /items/:slug` routes.
+  - If methods are different, Documentation generator will throw `DocumentationError`:
+    - Example: OpenAPI standard does not allow having both `get /users/:id` and `delete /users/:userId`;
+    - See https://spec.openapis.org/oas/v3.1.0#paths-object for details.
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.9
+
+- Fixes the issue where the same `.meta({ id })` could be used on different schemas:
+  - Zod 4.3 removed the `id` uniqueness constraint, but the `Documentation` generator needs it for making references;
+  - The Documentation generator will now throw a `DocumentationError` if it finds the same `id` on different schemas;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.8
+
+- Fixes component duplication in the generated Documentation:
+  - When a schema with `.meta({ id })` is reused across endpoints with `composition: "components"`;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.7
+
+- Fixes an issue where an empty path could be emitted for the root route by Documentation instead of `/`:
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.6
+
+- Added well-known header, recognized by Documentation generator: `want-unencoded-digest`.
 
 ### v28.7.5
 

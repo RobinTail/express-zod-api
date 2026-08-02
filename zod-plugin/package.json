@@ -1,6 +1,6 @@
 {
   "name": "@express-zod-api/zod-plugin",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "license": "MIT",
   "description": "Zod plugin for express-zod-api",
   "sideEffects": true,
@@ -36,7 +36,7 @@
     "*.md"
   ],
   "engines": {
-    "node": "^22.19.0 || ^24.0.0 || ^26.0.0"
+    "node": "^22.19.0 || ^24.11.0 || ^26.0.0"
   },
   "dependencies": {
     "ramda": "catalog:prod"

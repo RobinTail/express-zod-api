@@ -1,10 +1,7 @@
-import * as R from "ramda";
-import type ts from "typescript";
 import type { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
 import { clientMethods, type ClientMethod } from "./method";
 import type { makeEventSchema } from "./sse";
-import { propOf, TypescriptAPI, type Typeable } from "./typescript-api";
 import type {
   CursorPaginatedResult,
   OffsetPaginatedResult,
@@ -12,11 +9,63 @@ import type {
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
 type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
-type Store = Record<IOKind, ts.TypeNode>;
+type Store = Record<IOKind, string>;
+
+const ids = {
+  Path: "Path",
+  Implementation: "Implementation",
+  DefaultContext: "DefaultContext",
+  key: "key",
+  path: "path",
+  params: "params",
+  ctx: "ctx",
+  method: "method",
+  request: "request",
+  event: "event",
+  data: "data",
+  handler: "handler",
+  msg: "msg",
+  parseRequest: "parseRequest",
+  substitute: "substitute",
+  provide: "provide",
+  on: "on",
+  implementation: "implementation",
+  hasBody: "hasBody",
+  undefined: "undefined",
+  response: "response",
+  rest: "rest",
+  searchParams: "searchParams",
+  defaultImplementation: "defaultImplementation",
+  hasFiles: "hasFiles",
+  value: "value",
+  File: "File",
+  FormData: "FormData",
+  headers: "headers",
+  body: "body",
+  client: "client",
+  contentType: "contentType",
+  isBlob: "isBlob",
+  source: "source",
+  Method: "Method",
+  SomeOf: "SomeOf",
+  Request: "Request",
+  Pagination: "Pagination",
+  override: "override",
+} satisfies Record<string, string>;
+
+export const interfaces: Record<IOKind, string> = {
+  input: "Input",
+  positive: "PositiveResponse",
+  negative: "NegativeResponse",
+  encoded: "EncodedResponse",
+  response: "Response",
+};
+
+const quot = (items: Iterable<string>) => Array.from(items, (s) => `"${s}"`);
+
+const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
 export abstract class IntegrationBase {
-  /** @internal */
-  protected readonly api: TypescriptAPI;
   /** @internal */
   protected paths = new Set<string>();
   /** @internal */
@@ -27,251 +76,131 @@ export abstract class IntegrationBase {
     { store: Store; isDeprecated: boolean }
   >();
 
-  protected constructor(
-    typescript: typeof ts,
-    protected readonly serverUrl: string,
-  ) {
-    this.api = new TypescriptAPI(typescript);
-  }
-
-  readonly #ids = {
-    pathType: "Path",
-    implementationType: "Implementation",
-    keyParameter: "key",
-    pathParameter: "path",
-    paramsArgument: "params",
-    ctxArgument: "ctx",
-    methodParameter: "method",
-    requestParameter: "request",
-    eventParameter: "event",
-    dataParameter: "data",
-    handlerParameter: "handler",
-    msgParameter: "msg",
-    parseRequestFn: "parseRequest",
-    substituteFn: "substitute",
-    provideMethod: "provide",
-    onMethod: "on",
-    implementationArgument: "implementation",
-    hasBodyConst: "hasBody",
-    undefinedValue: "undefined",
-    responseConst: "response",
-    restConst: "rest",
-    searchParamsConst: "searchParams",
-    defaultImplementationConst: "defaultImplementation",
-    clientConst: "client",
-    contentTypeConst: "contentType",
-    isJsonConst: "isJSON",
-    sourceProp: "source",
-    methodType: "Method",
-    someOfType: "SomeOf",
-    requestType: "Request",
-    paginationType: "Pagination",
-  } satisfies Record<string, string>;
-
-  /** @internal */
-  protected interfaces: Record<IOKind, string> = {
-    input: "Input",
-    positive: "PositiveResponse",
-    negative: "NegativeResponse",
-    encoded: "EncodedResponse",
-    response: "Response",
-  };
+  protected constructor(protected readonly serverUrl: string) {}
 
   /**
    * @example export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
    * @internal
    * */
-  protected makeMethodType = () =>
-    this.api.makePublicLiteralType(this.#ids.methodType, clientMethods);
+  protected makeMethodType = () => {
+    const union = quot(clientMethods).join(" | ");
+    return `export type ${ids.Method} = ${union};`;
+  };
+
+  protected makeOmit = (base: string, props: Iterable<string>, reason = "") =>
+    `Omit<${base}, ${reason && `\n/** ${reason} */\n`}${quot(props).join(" | ")}>`;
 
   /**
    * @example type SomeOf<T> = T[keyof T];
    * @internal
    * */
-  protected makeSomeOfType = () =>
-    this.api.makeType(
-      this.#ids.someOfType,
-      this.api.makeIndexed("T", this.api.makeKeyOf("T")),
-      { params: ["T"] },
-    );
+  protected makeSomeOfType = () => `type ${ids.SomeOf}<T> = T[keyof T];`;
 
   /**
    * @example export type Request = keyof Input;
    * @internal
    * */
   protected makeRequestType = () =>
-    this.api.makeType(
-      this.#ids.requestType,
-      this.api.makeKeyOf(this.interfaces.input),
-      { expose: true },
-    );
+    `export type ${ids.Request} = keyof ${interfaces.input};`;
 
   /**
    * @example SomeOf<_>
    * @internal
    **/
-  protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
-    this.api.ensureTypeNode(this.#ids.someOfType, [name]);
+  protected someOf = (name: string) => `${ids.SomeOf}<${name}>`;
 
   /**
    * @example export type Path = "/v1/user/retrieve" | ___;
    * @internal
    * */
-  protected makePathType = () =>
-    this.api.makePublicLiteralType(this.#ids.pathType, Array.from(this.paths));
+  protected makePathType = () => {
+    const union = quot(this.paths).join(" | ");
+    return `export type ${ids.Path} = ${union};`;
+  };
 
   /**
    * @example export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
    * @internal
    * */
   protected makePublicInterfaces = () =>
-    (Object.keys(this.interfaces) as IOKind[]).map((kind) =>
-      this.api.makeInterface(
-        this.interfaces[kind],
-        Array.from(this.registry).map(([request, { store, isDeprecated }]) =>
-          this.api.makeInterfaceProp(request, store[kind], { isDeprecated }),
-        ),
-        { expose: true },
-      ),
-    );
+    (Object.keys(interfaces) as IOKind[]).map((kind) => {
+      const props = Array.from(this.registry)
+        .map(
+          ([request, { store, isDeprecated }]) =>
+            `  ${isDeprecated ? "/** @deprecated */\n  " : ""}"${request}": ${store[kind]};`,
+        )
+        .join("\n");
+      return `export interface ${interfaces[kind]} {\n${props}\n}`;
+    });
 
   /**
    * @example export const endpointTags = { "get /v1/user/retrieve": ["users"] }
    * @internal
    * */
-  protected makeEndpointTags = () =>
-    this.api.makeConst(
-      "endpointTags",
-      this.api.f.createObjectLiteralExpression(
-        Array.from(this.tags).map(([request, tags]) =>
-          this.api.f.createPropertyAssignment(
-            this.api.makePropertyIdentifier(request),
-            this.api.f.createArrayLiteralExpression(
-              R.map(this.api.literally, tags),
-            ),
-          ),
-        ),
-      ),
-      { expose: true },
-    );
+  protected makeEndpointTags = () => {
+    const props = Array.from(this.tags)
+      .map(([request, tags]) => `  "${request}": [${quot(tags).join(", ")}]`)
+      .join(",\n");
+    return `export const endpointTags = {\n${props}\n}`;
+  };
 
   /**
-   * @example export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
+   * @example export type Implementation<T extends Record<string, unknown>> =
+   *          (method: Method, path: string, params: Record<string, any>, ctx?: T) => Promise<any>;
    * @internal
    * */
-  protected makeImplementationType = () =>
-    this.api.makeType(
-      this.#ids.implementationType,
-      this.api.makeFnType(
-        {
-          [this.#ids.methodParameter]: this.#ids.methodType,
-          [this.#ids.pathParameter]: this.api.ts.SyntaxKind.StringKeyword,
-          [this.#ids.paramsArgument]: this.api.makeRecordStringAny(),
-          [this.#ids.ctxArgument]: { optional: true, type: "T" },
-        },
-        this.api.makePromise(this.api.ts.SyntaxKind.AnyKeyword),
-      ),
-      {
-        expose: true,
-        params: { T: { init: this.api.ts.SyntaxKind.UnknownKeyword } },
-      },
-    );
+  protected makeImplementationType = () => {
+    const args = [
+      `${ids.method}: ${ids.Method}`,
+      `${ids.path}: string`,
+      `${ids.params}: Record<string, any>`,
+      `${ids.ctx}?: T`,
+    ].join(",");
+    return `export type ${ids.Implementation}<T extends Record<string, unknown>> = (${args}) => Promise<any>;`;
+  };
+
+  /**
+   * @example export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
+   * @internal
+   * */
+  protected makeDefaultContextType = () =>
+    `export type ${ids.DefaultContext} = { ${ids.override}?: (init: RequestInit) => RequestInit };`;
 
   /**
    * @example const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
    * @internal
+   * @desc split once, excludes the third empty element
    * */
-  protected makeParseRequestFn = () =>
-    this.api.makeConst(
-      this.#ids.parseRequestFn,
-      this.api.makeArrowFn(
-        { [this.#ids.requestParameter]: this.api.ts.SyntaxKind.StringKeyword },
-        this.api.f.createAsExpression(
-          this.api.makeCall(
-            this.#ids.requestParameter,
-            propOf<string>("split"),
-          )(
-            this.api.f.createRegularExpressionLiteral("/ (.+)/"), // split once
-            this.api.literally(2), // excludes third empty element
-          ),
-          this.api.f.createTupleTypeNode([
-            this.api.ensureTypeNode(this.#ids.methodType),
-            this.api.ensureTypeNode(this.#ids.pathType),
-          ]),
-        ),
-      ),
-    );
+  protected makeParseRequestFn = () => {
+    const args = `${ids.request}: string`;
+    const tuple = `[${ids.Method}, ${ids.Path}]`;
+    const implementation = `${ids.request}.${propOf<string>("split")}(/ (.+)/, 2) as ${tuple}`;
+    return `const ${ids.parseRequest} = (${args}) => ${implementation};`;
+  };
 
   /**
    * @example const substitute = (path: string, params: Record<string, any>) => { ___ return [path, rest] as const; }
    * @internal
    * */
-  protected makeSubstituteFn = () =>
-    this.api.makeConst(
-      this.#ids.substituteFn,
-      this.api.makeArrowFn(
-        {
-          [this.#ids.pathParameter]: this.api.ts.SyntaxKind.StringKeyword,
-          [this.#ids.paramsArgument]: this.api.makeRecordStringAny(),
-        },
-        this.api.f.createBlock([
-          this.api.makeConst(
-            this.#ids.restConst,
-            this.api.f.createObjectLiteralExpression([
-              this.api.f.createSpreadAssignment(
-                this.api.makeId(this.#ids.paramsArgument),
-              ),
-            ]),
-          ),
-          this.api.f.createForInStatement(
-            this.api.f.createVariableDeclarationList(
-              [this.api.f.createVariableDeclaration(this.#ids.keyParameter)],
-              this.api.ts.NodeFlags.Const,
-            ),
-            this.api.makeId(this.#ids.paramsArgument),
-            this.api.f.createBlock([
-              this.api.makeAssignment(
-                this.#ids.pathParameter,
-                this.api.makeCall(
-                  this.#ids.pathParameter,
-                  propOf<string>("replace"),
-                )(
-                  this.api.makeTemplate(":", [this.#ids.keyParameter]), // `:${key}`
-                  this.api.makeArrowFn(
-                    [],
-                    this.api.f.createBlock([
-                      this.api.f.createExpressionStatement(
-                        this.api.f.createDeleteExpression(
-                          this.api.f.createElementAccessExpression(
-                            this.api.makeId(this.#ids.restConst),
-                            this.api.makeId(this.#ids.keyParameter),
-                          ),
-                        ),
-                      ),
-                      this.api.f.createReturnStatement(
-                        this.api.f.createElementAccessExpression(
-                          this.api.makeId(this.#ids.paramsArgument),
-                          this.api.makeId(this.#ids.keyParameter),
-                        ),
-                      ),
-                    ]),
-                  ),
-                ),
-              ),
-            ]),
-          ),
-          this.api.f.createReturnStatement(
-            this.api.f.createAsExpression(
-              this.api.f.createArrayLiteralExpression([
-                this.api.makeId(this.#ids.pathParameter),
-                this.api.makeId(this.#ids.restConst),
-              ]),
-              this.api.ensureTypeNode("const"),
-            ),
-          ),
-        ]),
-      ),
-    );
+  protected makeSubstituteFn = () => {
+    const paramsType = `Record<string, any>`;
+    const args = `${ids.path}: string, ${ids.params}: ${paramsType}`;
+    const placeholder = `\`:\${${ids.key}}\``;
+    const returns = `: [typeof ${ids.path}, typeof ${ids.params}]`;
+    return [
+      `const ${ids.substitute} = (${args})${returns} => {`,
+      `  if (${ids.params} instanceof Blob) return [${ids.path}, ${ids.params}] as const;`,
+      `  const ${ids.rest} = { ...${ids.params} };`,
+      `  for (const ${ids.key} in ${ids.params}) {`,
+      `    ${ids.path} = ${ids.path}.${propOf<string>("replace")}(${placeholder}, () => {`,
+      `      delete ${ids.rest}[${ids.key}];`,
+      `      return ${ids.params}[${ids.key}];`,
+      `    });`,
+      `  }`,
+      `  return [${ids.path}, ${ids.rest}] as const;`,
+      `}`,
+    ].join("\n");
+  };
 
   /**
    * @example { nextCursor: string | null } | { total, limit, offset: number }
@@ -284,469 +213,145 @@ export abstract class IntegrationBase {
     const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
     const offsetProp =
       propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
-    const cursorShape = this.api.f.createTypeLiteralNode([
-      this.api.makeInterfaceProp(
-        nextCursorProp,
-        this.api.makeUnion([
-          this.api.ensureTypeNode(this.api.ts.SyntaxKind.StringKeyword),
-          this.api.makeLiteralType(null),
-        ]),
-      ),
-    ]);
-    const offsetShape = this.api.f.createTypeLiteralNode(
-      [totalProp, limitProp, offsetProp].map((prop) =>
-        this.api.makeInterfaceProp(prop, this.api.ts.SyntaxKind.NumberKeyword),
-      ),
-    );
-    return this.api.makeType(
-      this.#ids.paginationType,
-      this.api.makeUnion([cursorShape, offsetShape]),
-    );
+    const cursorVariant = `{ ${nextCursorProp}: string | null }`;
+    const offsetVariant = `{ ${totalProp}: number; ${limitProp}: number; ${offsetProp}: number }`;
+    return `type ${ids.Pagination} = ${cursorVariant} | ${offsetVariant}`;
   };
-
-  /**
-   * static hasMore(response: Pagination): boolean
-   * @internal
-   */
-  #makeHasMoreMethod = () => {
-    const responseId = this.api.makeId(this.#ids.responseConst);
-    const nextCursorProp =
-      propOf<CursorPaginatedResult["output"]["shape"]>("nextCursor");
-    const totalProp = propOf<OffsetPaginatedResult["output"]["shape"]>("total");
-    const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
-    const offsetProp =
-      propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
-    const inExpression = this.api.f.createBinaryExpression(
-      this.api.literally(nextCursorProp),
-      this.api.ts.SyntaxKind.InKeyword,
-      responseId,
-    );
-    const returnCursor = this.api.f.createReturnStatement(
-      this.api.f.createBinaryExpression(
-        this.api.f.createPropertyAccessExpression(responseId, nextCursorProp),
-        this.api.ts.SyntaxKind.ExclamationEqualsEqualsToken,
-        this.api.literally(null),
-      ),
-    );
-    const offsetPlusLimit = this.api.f.createBinaryExpression(
-      this.api.f.createPropertyAccessExpression(responseId, offsetProp),
-      this.api.ts.SyntaxKind.PlusToken,
-      this.api.f.createPropertyAccessExpression(responseId, limitProp),
-    );
-    const returnOffset = this.api.f.createReturnStatement(
-      this.api.f.createBinaryExpression(
-        offsetPlusLimit,
-        this.api.ts.SyntaxKind.LessThanToken,
-        this.api.f.createPropertyAccessExpression(responseId, totalProp),
-      ),
-    );
-    return this.api.makePublicMethod(
-      "hasMore",
-      [this.api.makeParam(responseId, { type: this.#ids.paginationType })],
-      [this.api.f.createIfStatement(inExpression, returnCursor), returnOffset],
-      {
-        returns: this.api.ensureTypeNode(this.api.ts.SyntaxKind.BooleanKeyword),
-        isStatic: true,
-      },
-    );
-  };
-
-  // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {}
-  #makeProvider = () =>
-    this.api.makePublicMethod(
-      this.#ids.provideMethod,
-      this.api.makeParams({
-        [this.#ids.requestParameter]: "K",
-        [this.#ids.paramsArgument]: this.api.makeIndexed(
-          this.interfaces.input,
-          "K",
-        ),
-        [this.#ids.ctxArgument]: { optional: true, type: "T" },
-      }),
-      [
-        this.api.makeConst(
-          // const [method, path] = this.parseRequest(request);
-          this.api.makeDeconstruction(
-            this.#ids.methodParameter,
-            this.#ids.pathParameter,
-          ),
-          this.api.makeCall(this.#ids.parseRequestFn)(
-            this.#ids.requestParameter,
-          ),
-        ),
-        // return this.implementation(___)
-        this.api.f.createReturnStatement(
-          this.api.makeCall(
-            this.api.f.createThis(),
-            this.#ids.implementationArgument,
-          )(
-            this.#ids.methodParameter,
-            this.api.f.createSpreadElement(
-              this.api.makeCall(this.#ids.substituteFn)(
-                this.#ids.pathParameter,
-                this.#ids.paramsArgument,
-              ),
-            ),
-            this.#ids.ctxArgument,
-          ),
-        ),
-      ],
-      {
-        typeParams: { K: this.#ids.requestType },
-        returns: this.api.makePromise(
-          this.api.makeIndexed(this.interfaces.response, "K"),
-        ),
-      },
-    );
 
   /**
    * @example export class Client { ___ }
    * @internal
    * */
-  protected makeClientClass = (name: string) =>
-    this.api.makePublicClass(
-      name,
-      [
-        // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
-        this.api.makePublicConstructor([
-          this.api.makeParam(this.#ids.implementationArgument, {
-            type: this.api.ensureTypeNode(this.#ids.implementationType, ["T"]),
-            mod: this.api.accessModifiers.protectedReadonly,
-            initId: this.#ids.defaultImplementationConst,
-          }),
-        ]),
-        this.#makeProvider(),
-        this.#makeHasMoreMethod(),
-      ],
-      { typeParams: ["T"] },
-    );
-
-  // `?${new URLSearchParams(____)}`
-  #makeSearchParams = (fromId: string) =>
-    this.api.makeTemplate("?", [
-      this.api.makeNew(URLSearchParams.name, this.api.makeId(fromId)),
-    ]);
-
-  // new URL(`${path}${searchParams}`, "http:____")
-  #makeFetchURL = () =>
-    this.api.makeNew(
-      URL.name,
-      this.api.makeTemplate(
-        "",
-        [this.#ids.pathParameter],
-        [this.#ids.searchParamsConst],
-      ),
-      this.api.literally(this.serverUrl),
-    );
-
-  /**
-   * @example export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
-   * @internal
-   * */
-  protected makeDefaultImplementation = () => {
-    // method: method.toUpperCase()
-    const methodProperty = this.api.f.createPropertyAssignment(
-      propOf<RequestInit>("method"),
-      this.api.makeCall(
-        this.#ids.methodParameter,
-        propOf<string>("toUpperCase"),
-      )(),
-    );
-
-    // headers: hasBody ? { "Content-Type": "application/json" } : undefined
-    const headersProperty = this.api.f.createPropertyAssignment(
-      propOf<RequestInit>("headers"),
-      this.api.makeTernary(
-        this.#ids.hasBodyConst,
-        this.api.f.createObjectLiteralExpression([
-          this.api.f.createPropertyAssignment(
-            this.api.literally("Content-Type"),
-            this.api.literally(contentTypes.json),
-          ),
-        ]),
-        this.#ids.undefinedValue,
-      ),
-    );
-
-    // body: hasBody ? JSON.stringify(params) : undefined
-    const bodyProperty = this.api.f.createPropertyAssignment(
-      propOf<RequestInit>("body"),
-      this.api.makeTernary(
-        this.#ids.hasBodyConst,
-        this.api.makeCall(
-          JSON[Symbol.toStringTag],
-          propOf<JSON>("stringify"),
-        )(this.#ids.paramsArgument),
-        this.#ids.undefinedValue,
-      ),
-    );
-
-    // const response = await fetch(new URL(`${path}${searchParams}`, "https://example.com"), { ___ });
-    const responseStatement = this.api.makeConst(
-      this.#ids.responseConst,
-      this.api.f.createAwaitExpression(
-        this.api.makeCall(fetch.name)(
-          this.#makeFetchURL(),
-          this.api.f.createObjectLiteralExpression([
-            methodProperty,
-            headersProperty,
-            bodyProperty,
-          ]),
-        ),
-      ),
-    );
-
-    // const hasBody = !["get", "delete"].includes(method);
-    const hasBodyStatement = this.api.makeConst(
-      this.#ids.hasBodyConst,
-      this.api.f.createLogicalNot(
-        this.api.makeCall(
-          this.api.f.createArrayLiteralExpression([
-            this.api.literally("get" satisfies ClientMethod),
-            this.api.literally("head" satisfies ClientMethod),
-            this.api.literally("delete" satisfies ClientMethod),
-          ]),
-          propOf<string[]>("includes"),
-        )(this.#ids.methodParameter),
-      ),
-    );
-
-    // const searchParams = hasBody ? "" : ___;
-    const searchParamsStatement = this.api.makeConst(
-      this.#ids.searchParamsConst,
-      this.api.makeTernary(
-        this.#ids.hasBodyConst,
-        this.api.literally(""),
-        this.#makeSearchParams(this.#ids.paramsArgument),
-      ),
-    );
-
-    // const contentType = response.headers.get("content-type");
-    const contentTypeStatement = this.api.makeConst(
-      this.#ids.contentTypeConst,
-      this.api.makeCall(
-        this.#ids.responseConst,
-        propOf<Response>("headers"),
-        propOf<Headers>("get"),
-      )(this.api.literally("content-type")),
-    );
-
-    // if (!contentType) return;
-    const noBodyStatement = this.api.f.createIfStatement(
-      this.api.f.createPrefixUnaryExpression(
-        this.api.ts.SyntaxKind.ExclamationToken,
-        this.api.makeId(this.#ids.contentTypeConst),
-      ),
-      this.api.f.createReturnStatement(),
-    );
-
-    // const isJSON = contentType.startsWith("application/json");
-    const isJsonConst = this.api.makeConst(
-      this.#ids.isJsonConst,
-      this.api.makeCall(
-        this.#ids.contentTypeConst,
-        propOf<string>("startsWith"),
-      )(this.api.literally(contentTypes.json)),
-    );
-
-    // return response[isJSON ? "json" : "text"]();
-    const returnStatement = this.api.f.createReturnStatement(
-      this.api.makeCall(
-        this.#ids.responseConst,
-        this.api.makeTernary(
-          this.#ids.isJsonConst,
-          this.api.literally(propOf<Response>("json")),
-          this.api.literally(propOf<Response>("text")),
-        ),
-      )(),
-    );
-
-    return this.api.makeConst(
-      this.#ids.defaultImplementationConst,
-      this.api.makeArrowFn(
-        [
-          this.#ids.methodParameter,
-          this.#ids.pathParameter,
-          this.#ids.paramsArgument,
-        ],
-        this.api.f.createBlock([
-          hasBodyStatement,
-          searchParamsStatement,
-          responseStatement,
-          contentTypeStatement,
-          noBodyStatement,
-          isJsonConst,
-          returnStatement,
-        ]),
-        { isAsync: true },
-      ),
-      { type: this.#ids.implementationType },
-    );
+  protected makeClientClass = (name: string) => {
+    const nextCursorProp =
+      propOf<CursorPaginatedResult["output"]["shape"]>("nextCursor");
+    const offsetProp =
+      propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
+    const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
+    const totalProp = propOf<OffsetPaginatedResult["output"]["shape"]>("total");
+    const callArgs = `${ids.method}, ...${ids.substitute}(${ids.path}, ${ids.params}), ${ids.ctx}`;
+    return [
+      `export class ${name}<T extends Record<string, unknown> = ${ids.DefaultContext}> {`,
+      `  public constructor(`,
+      `    protected readonly ${ids.implementation}: ${ids.Implementation}<T> = ${ids.defaultImplementation},`,
+      `  ) {}`,
+      `  public ${ids.provide}<K extends ${ids.Request}>(`,
+      `    ${ids.request}: K,`,
+      `    ${ids.params}: ${interfaces.input}[K],`,
+      `    ${ids.ctx}?: T,`,
+      `  ): Promise<${interfaces.response}[K]> {`,
+      `    const [${ids.method}, ${ids.path}] = ${ids.parseRequest}(${ids.request});`,
+      `    return this.${ids.implementation}(${callArgs});`,
+      `  }`,
+      `  public static hasMore(${ids.response}: ${ids.Pagination}): boolean {`,
+      `    if ("${nextCursorProp}" in ${ids.response}) return ${ids.response}.${nextCursorProp} !== null;`,
+      `    return ${ids.response}.${offsetProp} + ${ids.response}.${limitProp} < ${ids.response}.${totalProp};`,
+      `  }`,
+      `}`,
+    ].join("\n");
   };
 
-  #makeSubscriptionConstructor = () =>
-    this.api.makePublicConstructor(
-      this.api.makeParams({
-        request: "K",
-        params: this.api.makeIndexed(this.interfaces.input, "K"),
-      }),
-      [
-        this.api.makeConst(
-          this.api.makeDeconstruction(
-            this.#ids.pathParameter,
-            this.#ids.restConst,
-          ),
-          this.api.makeCall(this.#ids.substituteFn)(
-            this.api.f.createElementAccessExpression(
-              this.api.makeCall(this.#ids.parseRequestFn)(
-                this.#ids.requestParameter,
-              ),
-              this.api.literally(1),
-            ),
-            this.#ids.paramsArgument,
-          ),
-        ),
-        this.api.makeConst(
-          this.#ids.searchParamsConst,
-          this.#makeSearchParams(this.#ids.restConst),
-        ),
-        this.api.makeAssignment(
-          this.api.f.createPropertyAccessExpression(
-            this.api.f.createThis(),
-            this.#ids.sourceProp,
-          ),
-          this.api.makeNew("EventSource", this.#makeFetchURL()),
-        ),
-      ],
-    );
-
-  #makeEventNarrow = (value: Typeable) =>
-    this.api.f.createTypeLiteralNode([
-      this.api.makeInterfaceProp(propOf<SSEShape>("event"), value),
-    ]);
-
-  #makeOnMethod = () =>
-    this.api.makePublicMethod(
-      this.#ids.onMethod,
-      this.api.makeParams({
-        [this.#ids.eventParameter]: "E",
-        [this.#ids.handlerParameter]: this.api.makeFnType(
-          {
-            [this.#ids.dataParameter]: this.api.makeIndexed(
-              this.api.makeExtract(
-                "R",
-                this.api.makeOneLine(this.#makeEventNarrow("E")),
-              ),
-              this.api.makeLiteralType(propOf<SSEShape>("data")),
-            ),
-          },
-          this.api.makeMaybeAsync(this.api.ts.SyntaxKind.VoidKeyword),
-        ),
-      }),
-      [
-        this.api.f.createExpressionStatement(
-          this.api.makeCall(
-            this.api.f.createThis(),
-            this.#ids.sourceProp,
-            propOf<EventSource>("addEventListener"),
-          )(
-            this.#ids.eventParameter,
-            this.api.makeArrowFn(
-              [this.#ids.msgParameter],
-              this.api.makeCall(this.#ids.handlerParameter)(
-                this.api.makeCall(
-                  JSON[Symbol.toStringTag],
-                  propOf<JSON>("parse"),
-                )(
-                  this.api.f.createPropertyAccessExpression(
-                    this.api.f.createParenthesizedExpression(
-                      this.api.f.createAsExpression(
-                        this.api.makeId(this.#ids.msgParameter),
-                        this.api.ensureTypeNode(MessageEvent.name),
-                      ),
-                    ),
-                    propOf<SSEShape>("data"),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        this.api.f.createReturnStatement(this.api.f.createThis()),
-      ],
-      {
-        typeParams: {
-          E: this.api.makeIndexed(
-            "R",
-            this.api.makeLiteralType(propOf<SSEShape>("event")),
-          ),
-        },
-      },
-    );
+  /**
+   * @example const defaultImplementation = async (method, path, params, ctx) => { ___ };
+   * @internal
+   * */
+  protected makeDefaultImplementation = (hasCredentials: boolean) => {
+    const args = `${ids.method}, ${ids.path}, ${ids.params}, ${ids.ctx}`;
+    const noBodyMethods = quot([
+      "get",
+      "head",
+      "delete",
+    ] satisfies ClientMethod[]).join(", ");
+    const headers =
+      `!${ids.hasBody} || ${ids.hasFiles} ? ${ids.undefined} : ` +
+      `{ "Content-Type": ${ids.isBlob} ? "${contentTypes.raw}" : "${contentTypes.json}" };`;
+    const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
+    const searchParams = `\`?\${new ${URLSearchParams.name}(${ids.params})}\``;
+    return [
+      `const ${ids.defaultImplementation}: ${ids.Implementation}<${ids.DefaultContext}> = async (${args}) => {`,
+      `  const ${ids.isBlob} = ${ids.params} instanceof Blob;`,
+      `  const ${ids.hasFiles} = !${ids.isBlob} && Object.${propOf<ObjectConstructor>("values")}(` +
+        `${ids.params}).${propOf<unknown[]>("some")}((one) => one instanceof Blob || one instanceof ${ids.File});`,
+      `  const ${ids.hasBody} = ![${noBodyMethods}].includes(${ids.method});`,
+      `  const ${ids.searchParams} = ${ids.isBlob} || ${ids.hasBody} ? "" : ${searchParams};`,
+      `  const ${ids.headers} = ${headers}`,
+      `  let ${ids.body}: RequestInit["${ids.body}"] = ${ids.undefined};`,
+      `  if (${ids.hasBody}) {`,
+      `    if (${ids.isBlob}) {`,
+      `      ${ids.body} = ${ids.params};`,
+      `    } else if (${ids.hasFiles}) {`,
+      `      ${ids.body} = new ${FormData.name}();`,
+      `      for (const [${ids.key}, ${ids.value}] of Object.${propOf<ObjectConstructor>("entries")}(${ids.params}))`,
+      `        if (${ids.value} !== undefined) ${ids.body}.${propOf<FormData>("append")}(${ids.key}, ${ids.value});`,
+      `    } else {`,
+      `      ${ids.body} = JSON.${propOf<JSON>("stringify")}(${ids.params});`,
+      `    }`,
+      `  }`,
+      `  let init: RequestInit = {`,
+      `    ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
+      `    ${propOf<RequestInit>("credentials")}: ${hasCredentials ? `"include"` : ids.undefined},`,
+      `    ${ids.headers},`,
+      `    ${ids.body},`,
+      `  };`,
+      `  if (${ids.ctx}?.${ids.override}) init = ${ids.ctx}.${ids.override}(init);`,
+      `  const ${ids.response} = await ${fetch.name}(`,
+      `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
+      `    init,`,
+      `  );`,
+      `  const ${ids.contentType} = ${contentType};`,
+      `  if (!${ids.contentType}) return;`,
+      `  if (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}")) ` +
+        `return ${ids.response}.${propOf<Response>("json")}();`,
+      `  if (${ids.contentType}.${propOf<string>("startsWith")}("text/")) ` +
+        `return ${ids.response}.${propOf<Response>("text")}();`,
+      `  return ${ids.response}.${propOf<Response>("blob")}();`,
+      `};`,
+    ].join("\n");
+  };
 
   /**
    * @example export class Subscription<K extends Extract<___>, R extends Extract<___>> { ___ }
    * @internal
    * */
-  protected makeSubscriptionClass = (name: string) =>
-    this.api.makePublicClass(
-      name,
-      [
-        this.api.makePublicProperty(this.#ids.sourceProp, "EventSource"),
-        this.#makeSubscriptionConstructor(),
-        this.#makeOnMethod(),
-      ],
-      {
-        typeParams: {
-          K: this.api.makeExtract(
-            this.#ids.requestType,
-            this.api.f.createTemplateLiteralType(
-              this.api.f.createTemplateHead("get "),
-              [
-                this.api.f.createTemplateLiteralTypeSpan(
-                  this.api.ensureTypeNode(this.api.ts.SyntaxKind.StringKeyword),
-                  this.api.f.createTemplateTail(""),
-                ),
-              ],
-            ),
-          ),
-          R: this.api.makeExtract(
-            this.api.makeIndexed(this.interfaces.positive, "K"),
-            this.api.makeOneLine(
-              this.#makeEventNarrow(this.api.ts.SyntaxKind.StringKeyword),
-            ),
-          ),
-        },
-      },
-    );
+  protected makeSubscriptionClass = (name: string, hasCredentials: boolean) => {
+    const substitution = `${ids.substitute}(${ids.parseRequest}(${ids.request})[1], ${ids.params})`;
+    const dataType = `Extract<R, { ${propOf<SSEShape>("event")}: E }>["${propOf<SSEShape>("data")}"]`;
+    const data = `(${ids.msg} as ${MessageEvent.name}).${propOf<SSEShape>("data")}`;
+    return [
+      `export class ${name}<`,
+      `  K extends Extract<${ids.Request}, \`get \${string}\`>,`,
+      `  R extends Extract<${interfaces.positive}[K], { ${propOf<SSEShape>("event")}: string }>,`,
+      `> {`,
+      `  public ${ids.source}: EventSource;`,
+      `  public constructor(${ids.request}: K, ${ids.params}: ${interfaces.input}[K]) {`,
+      `    const [${ids.path}, ${ids.rest}] = ${substitution};`,
+      `    const ${ids.searchParams} = \`?\${new ${URLSearchParams.name}(${ids.rest})}\`;`,
+      `    this.${ids.source} = new EventSource(`,
+      `      new URL(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
+      `      { ${propOf<EventSourceInit>("withCredentials")}: ${hasCredentials ? "true" : ids.undefined} }`,
+      `    );`,
+      `  }`,
+      `  public ${ids.on}<E extends R["${propOf<SSEShape>("event")}"]>(`,
+      `    ${propOf<SSEShape>("event")}: E,`,
+      `    ${ids.handler}: (${ids.data}: ${dataType}) => void | Promise<void>,`,
+      `  ) {`,
+      `    this.${ids.source}.${propOf<EventSource>("addEventListener")}(${ids.event}, (${ids.msg}) =>`,
+      `      ${ids.handler}(JSON.${propOf<JSON>("parse")}(${data})),`,
+      `    );`,
+      `    return this;`,
+      `  }`,
+      `}`,
+    ].join("\n");
+  };
 
   /** @internal */
   protected makeUsageStatements = (
     clientClassName: string,
     subscriptionClassName: string,
-  ): ts.Node[] => [
-    this.api.makeConst(
-      this.#ids.clientConst,
-      this.api.makeNew(clientClassName),
-    ), // const client = new Client();
-    // client.provide("get /v1/user/retrieve", { id: "10" });
-    this.api.makeCall(this.#ids.clientConst, this.#ids.provideMethod)(
-      this.api.literally(`${"get" satisfies ClientMethod} /v1/user/retrieve`),
-      this.api.f.createObjectLiteralExpression([
-        this.api.f.createPropertyAssignment("id", this.api.literally("10")),
-      ]),
-    ),
-    // new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
-    this.api.makeCall(
-      this.api.makeNew(
-        subscriptionClassName,
-        this.api.literally(`${"get" satisfies ClientMethod} /v1/events/stream`),
-        this.api.f.createObjectLiteralExpression(),
-      ),
-      this.#ids.onMethod,
-    )(
-      this.api.literally("time"),
-      this.api.makeArrowFn(["time"], this.api.f.createBlock([])),
-    ),
-  ];
+  ) =>
+    [
+      `const ${ids.client} = new ${clientClassName}();`,
+      `${ids.client}.${ids.provide}("get /v1/user/retrieve", { id: "10" });`,
+      `new ${subscriptionClassName}("get /v1/events/stream", {}).${ids.on}("time", (time) => {});`,
+    ].join("\n");
 }

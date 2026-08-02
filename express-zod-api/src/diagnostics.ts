@@ -34,7 +34,7 @@ export class Diagnostics {
           if (entry[prop]) stack.push(...entry[prop]);
       }
     }
-    if (endpoint.requestType === "json") {
+    if (endpoint.getProbableRequestType() === "json") {
       const reason = findJsonIncompatible(endpoint.inputSchema, "input");
       if (reason) {
         this.logger.warn(

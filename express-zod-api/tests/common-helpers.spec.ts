@@ -7,11 +7,13 @@ import {
   makeCleanId,
   ensureError,
   getRoutePathParams,
+  normalizeParams,
   shouldHaveContent,
   getInputSources,
   emptySchema,
   type EmptySchema,
   type EmptyObject,
+  type FlatObject,
 } from "../src/common-helpers";
 import { z } from "zod";
 import { makeRequestMock } from "../src/testing";
@@ -34,6 +36,12 @@ describe("Common Helpers", () => {
   describe("EmptyObject", () => {
     test("should be a Record of never", () => {
       expectTypeOf<EmptyObject>().toEqualTypeOf<Record<string, never>>();
+    });
+  });
+
+  describe("FlatObject", () => {
+    test("type should satisfy", () => {
+      expectTypeOf({}).toExtend<FlatObject>();
     });
   });
 
@@ -71,6 +79,18 @@ describe("Common Helpers", () => {
     });
   });
 
+  describe("normalizeParams()", () => {
+    test.each([
+      ["/users/:id", "/users/:1"],
+      ["/users/:userId/books/:bookId", "/users/:1/books/:2"],
+      ["/a/:x/b/:y", "/a/:1/b/:2"],
+      ["/static/path", "/static/path"],
+      ["", ""],
+    ])("should normalize %s to %s", (input, expected) => {
+      expect(normalizeParams(input)).toBe(expected);
+    });
+  });
+
   describe("getInputSources()", () => {
     test.each([undefined, {}])(
       "should return empty array for options %#",
@@ -86,6 +106,7 @@ describe("Common Helpers", () => {
         post: ["query"],
         delete: ["params"],
         patch: ["body"],
+        query: ["body"],
       };
       expect(getInputSources(method, userDefined)).toEqual(userDefined[method]);
     });
@@ -104,6 +125,15 @@ describe("Common Helpers", () => {
       (userDefined) => {
         expect(getInputSources("head", userDefined)).toEqual(
           getInputSources("get", userDefined),
+        );
+      },
+    );
+
+    test.each([undefined, {}])(
+      "for QUERY should return the default input sources",
+      (userDefined) => {
+        expect(getInputSources("query", userDefined)).toEqual(
+          defaultInputSources.query,
         );
       },
     );
@@ -150,6 +180,18 @@ describe("Common Helpers", () => {
           undefined,
         ),
       ).toEqual({ a: "query" });
+    });
+    test("should return body and query for QUERY requests by default", () => {
+      expect(
+        getInput(
+          makeRequestMock({
+            query: { q: "search" },
+            body: { filters: "active" },
+            method: "QUERY",
+          }),
+          undefined,
+        ),
+      ).toEqual({ q: "search", filters: "active" });
     });
     test("should return body and query for unknown requests by default", () => {
       expect(

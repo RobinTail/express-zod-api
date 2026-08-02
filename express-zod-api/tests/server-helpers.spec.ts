@@ -7,13 +7,15 @@ import {
   createUploadFailureHandler,
   createUploadLogger,
   createUploadParsers,
+  ensureCorsMiddleware,
   makeGetLogger,
   moveRaw,
   installDeprecationListener,
   installTerminationListener,
   localsID,
 } from "../src/server-helpers";
-import { defaultResultHandler, ResultHandler, type CommonConfig } from "../src";
+import { defaultResultHandler, ResultHandler } from "../src";
+import type { CommonConfig } from "../src/config-type";
 import type { Request } from "express";
 import {
   makeLoggerMock,
@@ -191,14 +193,22 @@ describe("Server helpers", () => {
   });
 
   describe("createUploadLogger()", () => {
-    const logger = makeLoggerMock();
-    const uploadLogger = createUploadLogger(logger);
-
     test("should debug the messages", () => {
-      uploadLogger.log("Express-file-upload: Busboy finished parsing request.");
+      const logger = makeLoggerMock();
+      createUploadLogger(logger).log(
+        "Express-file-upload: Busboy finished parsing request.",
+      );
       expect(logger._getLogs().debug).toEqual([
         ["Express-file-upload: Busboy finished parsing request."],
       ]);
+    });
+
+    test("should ignore messages about not eligible requests", () => {
+      const logger = makeLoggerMock();
+      createUploadLogger(logger).log(
+        "Express-file-upload: request is not eligible",
+      );
+      expect(logger._getLogs().debug).toEqual([]);
     });
   });
 
@@ -402,6 +412,27 @@ describe("Server helpers", () => {
         ["NOT_HAPPEN", expect.any(Function)],
         ["ANOTHER_ONE", expect.any(Function)],
       ]);
+    });
+  });
+
+  describe("ensureCorsMiddleware()", () => {
+    test("should return default middleware when cors is true", () => {
+      const middleware = ensureCorsMiddleware(true);
+      const req = makeRequestMock();
+      const res = makeResponseMock();
+      const next = vi.fn();
+      middleware(req, res, next);
+      expect(res._getHeaders()).toEqual({
+        "access-control-allow-headers": "content-type",
+        "access-control-allow-origin": "*",
+      });
+      expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    test("should return the given function when cors is a RequestHandler", () => {
+      const custom = vi.fn();
+      const middleware = ensureCorsMiddleware(custom);
+      expect(middleware).toBe(custom);
     });
   });
 });

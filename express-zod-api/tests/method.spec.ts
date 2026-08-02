@@ -19,7 +19,14 @@ describe("Method", () => {
 
   describe("methods array", () => {
     test("should be the list of selected keys of express router", () => {
-      expect(methods).toEqual(["get", "post", "put", "delete", "patch"]);
+      expect(methods).toEqual([
+        "get",
+        "post",
+        "put",
+        "delete",
+        "patch",
+        "query",
+      ]);
     });
   });
 
@@ -31,6 +38,7 @@ describe("Method", () => {
         "put",
         "delete",
         "patch",
+        "query",
         "head",
       ]);
     });
@@ -43,6 +51,7 @@ describe("Method", () => {
       expectTypeOf<"put">().toExtend<Method>();
       expectTypeOf<"delete">().toExtend<Method>();
       expectTypeOf<"patch">().toExtend<Method>();
+      expectTypeOf<"query">().toExtend<Method>();
       expectTypeOf<"wrong">().not.toExtend<Method>();
       expectTypeOf<Method>().toExtend<SomeMethod>();
     });
@@ -55,6 +64,7 @@ describe("Method", () => {
       expectTypeOf<"put">().toExtend<ClientMethod>();
       expectTypeOf<"delete">().toExtend<ClientMethod>();
       expectTypeOf<"patch">().toExtend<ClientMethod>();
+      expectTypeOf<"query">().toExtend<ClientMethod>();
       expectTypeOf<"head">().toExtend<ClientMethod>();
       expectTypeOf<"wrong">().not.toExtend<ClientMethod>();
       expectTypeOf<ClientMethod>().toExtend<SomeMethod>();
@@ -68,6 +78,7 @@ describe("Method", () => {
       expectTypeOf<"put">().toExtend<CORSMethod>();
       expectTypeOf<"delete">().toExtend<CORSMethod>();
       expectTypeOf<"patch">().toExtend<CORSMethod>();
+      expectTypeOf<"query">().toExtend<CORSMethod>();
       expectTypeOf<"head">().toExtend<CORSMethod>();
       expectTypeOf<"options">().toExtend<CORSMethod>();
       expectTypeOf<"wrong">().not.toExtend<CORSMethod>();

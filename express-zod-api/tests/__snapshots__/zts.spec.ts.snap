@@ -183,9 +183,9 @@ exports[`zod-to-ts > enums > handles 'quoted string' literals 1`] = `""Two Words
 
 exports[`zod-to-ts > enums > handles 'string' literals 1`] = `""apple" | "banana" | "cantaloupe""`;
 
-exports[`zod-to-ts > ez.buffer() > should be Buffer 1`] = `"Buffer"`;
+exports[`zod-to-ts > ez.buffer() > should be Blob 1`] = `"Blob"`;
 
-exports[`zod-to-ts > ez.raw() > should depict the raw property 1`] = `"Buffer"`;
+exports[`zod-to-ts > ez.raw() > should depict the raw property 1`] = `"Blob"`;
 
 exports[`zod-to-ts > z.array() > outputs correct typescript 1`] = `
 "{

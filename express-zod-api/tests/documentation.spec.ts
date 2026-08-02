@@ -1,7 +1,6 @@
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
 import {
-  Documentation,
   DocumentationError,
   EndpointsFactory,
   createConfig,
@@ -9,9 +8,9 @@ import {
   defaultEndpointsFactory,
   ez,
   ResultHandler,
-  type Depicter,
   type Method,
 } from "../src";
+import { Documentation, type Depicter } from "../src/documentation";
 import { contentTypes } from "../src/content-type";
 import { z } from "zod";
 import { givePort } from "../../tools/ports";
@@ -23,6 +22,53 @@ describe("Documentation", () => {
     cors: true,
     logger: { level: "silent" },
     http: { listen: givePort() },
+  });
+
+  describe("Constructor metadata", () => {
+    test("should use expanded info and server objects with all fields", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {},
+        info: {
+          title: "Expanded API",
+          version: "3.0.0",
+          summary: "Full info object",
+          contact: { name: "Dev", email: "dev@example.com" },
+          license: { name: "MIT", url: "https://opensource.org/licenses/MIT" },
+        },
+        server: {
+          url: "https://{env}.example.com/{ver}",
+          description: "Environment server",
+          variables: {
+            env: { default: "api", enum: ["api", "staging"] },
+            ver: { default: "v1" },
+          },
+        },
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test.each<Pick<ConstructorParameters<typeof Documentation>[0], "server">>([
+      {
+        server: { url: "https://s.example.com", description: "Single" },
+      },
+      {
+        server: [
+          { url: "https://a.example.com", description: "A" },
+          { url: "https://b.example.com", description: "B" },
+        ],
+      },
+      { server: ["https://ex.one", "https://ex.two"] },
+      { server: "https://single.example" },
+    ])("should aggregate servers %#", ({ server }) => {
+      expect(
+        new Documentation({
+          config: sampleConfig,
+          routing: {},
+          server,
+        }).rootDoc.servers,
+      ).toMatchSnapshot();
+    });
   });
 
   describe("Basic cases", () => {
@@ -42,9 +88,6 @@ describe("Documentation", () => {
           },
         },
         config: sampleConfig,
-        version: "3.4.5",
-        title: "Testing DELETE request without body",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -73,9 +116,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Complex Types",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -111,9 +151,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Nullable and Optional Types",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -124,7 +161,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              method: "post",
+              method: "query",
               input: z.object({
                 intersection: z.intersection(
                   z.object({ one: z.string() }),
@@ -145,9 +182,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Intersection and And types",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -172,9 +206,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Union and Or Types",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -204,9 +235,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Discriminated Union Type",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -228,9 +256,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Transformation in response schema",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -262,9 +287,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing additional types",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -291,9 +313,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing record",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -314,9 +333,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing type any",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -347,9 +363,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing numbers",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -386,9 +399,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing strings",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -412,9 +422,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing tuples",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -438,9 +445,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing enums",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -463,9 +467,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing z.preprocess()",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
       expect(string.parse(123)).toBe("123");
@@ -508,9 +509,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Lazy",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -574,9 +572,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Security",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -602,9 +597,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing CookieSecurity",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -623,15 +615,15 @@ describe("Documentation", () => {
               }),
               ":thing": defaultEndpointsFactory.build({
                 description: "thing is the path parameter",
+                input: z.object({
+                  thing: z.string(),
+                }),
                 output: z.object({}),
                 handler: async () => ({}),
               }),
             },
           },
         },
-        version: "3.4.5",
-        title: "Testing Operation IDs",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -652,9 +644,6 @@ describe("Documentation", () => {
             },
           },
         },
-        version: "3.4.5",
-        title: "Testing Operation IDs",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
@@ -677,9 +666,6 @@ describe("Documentation", () => {
             },
           },
         },
-        version: "3.4.5",
-        title: "Testing Operation IDs",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
@@ -719,9 +705,6 @@ describe("Documentation", () => {
                 },
               },
             },
-            version: "3.4.5",
-            title: "Testing Operation IDs",
-            serverUrl: "https://example.com",
           }),
       ).toThrow(expectedError);
     });
@@ -751,9 +734,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing MIME types and status codes",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -776,9 +756,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing issue #98",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -816,9 +793,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing issue #98",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -844,9 +818,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing route path params",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -879,9 +850,6 @@ describe("Documentation", () => {
               }),
             },
           },
-          version: "3.4.5",
-          title: "Testing route path params",
-          serverUrl: "https://example.com",
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -902,11 +870,98 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing route path params",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
+    });
+  });
+
+  describe("Issue #3588: excludeParamsFromDepiction integration", () => {
+    test("should exclude path params from request body schema and its examples", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            ":id": defaultEndpointsFactory.build({
+              method: "post",
+              input: z
+                .object({
+                  id: z.string(),
+                  bodyField: z.boolean(),
+                })
+                .meta({
+                  examples: [
+                    { id: "123", bodyField: true },
+                    { id: "456", bodyField: false },
+                  ],
+                }),
+              output: z.object({}),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
+
+  describe("Issue #3579: Cross-method normalized path duplicates", () => {
+    test.each([
+      [
+        ["get /users/:id", "delete /users/:userId"],
+        'the normalized path "/users/:1" is already registered with different parameter names at "/users/:id"',
+      ],
+      [
+        ["get /a/:x/b/:y", "post /a/:u/b/:v"],
+        'the normalized path "/a/:1/b/:2" is already registered with different parameter names at "/a/:x/b/:y"',
+      ],
+    ])(
+      "Should detect duplicate normalized paths across methods %#",
+      (paths, expectedMessageSubstring) => {
+        const fn = () =>
+          new Documentation({
+            config: sampleConfig,
+            routing: paths.reduce(
+              (agg, path) => ({
+                ...agg,
+                [path]: defaultEndpointsFactory.buildVoid({
+                  input: z.object({
+                    id: z.string(),
+                    userId: z.string(),
+                    x: z.string(),
+                    y: z.string(),
+                    u: z.string(),
+                    v: z.string(),
+                  }),
+                  handler: vi.fn(),
+                }),
+              }),
+              {},
+            ),
+          });
+        expect(fn).toThrow(DocumentationError);
+        expect(fn).toThrow(expectedMessageSubstring);
+      },
+    );
+
+    test.each([
+      [["get /v1/users", "delete /v1/users"]],
+      [["get /v1/user/:id", "delete /v1/user/:id"]],
+    ])("Should allow same path with different methods %#", (paths) => {
+      const fn = () =>
+        new Documentation({
+          config: sampleConfig,
+          routing: paths.reduce(
+            (agg, path) => ({
+              ...agg,
+              [path]: defaultEndpointsFactory.buildVoid({
+                input: z.object({ id: z.string() }),
+                handler: vi.fn(),
+              }),
+            }),
+            {},
+          ),
+        });
+      expect(fn).not.toThrow();
     });
   });
 
@@ -938,9 +993,6 @@ describe("Documentation", () => {
               }),
             },
           },
-          version: "3.4.5",
-          title: "Testing headers params",
-          serverUrl: "https://example.com",
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -970,9 +1022,6 @@ describe("Documentation", () => {
       );
       expect(
         new Documentation({
-          version: "3.4.5",
-          title: "Testing multiple schemas for different status codes",
-          serverUrl: "https://example.com",
           config: sampleConfig,
           routing: {
             v1: {
@@ -1010,9 +1059,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Metadata:description",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1028,9 +1074,6 @@ describe("Documentation", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: { v1: { getSomething: endpoint.deprecated() } },
-        version: "3.4.5",
-        title: "Testing Metadata:deprecations",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1056,9 +1099,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Metadata:description",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1088,9 +1128,6 @@ describe("Documentation", () => {
               }),
             },
           },
-          version: "3.4.5",
-          title: "Testing Metadata:example on IO parameter",
-          serverUrl: "https://example.com",
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -1118,9 +1155,6 @@ describe("Documentation", () => {
               }),
             },
           },
-          version: "3.4.5",
-          title: "Testing Metadata:example on IO schema",
-          serverUrl: "https://example.com",
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },
@@ -1150,9 +1184,6 @@ describe("Documentation", () => {
               }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO schema + middleware",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1179,9 +1210,6 @@ describe("Documentation", () => {
               }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO schema + middleware",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1205,9 +1233,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO parameter",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1240,9 +1265,6 @@ describe("Documentation", () => {
           }),
           [deep]: rule,
         },
-        version: "3.4.5",
-        title: "Testing custom brands handling",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1268,9 +1290,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing top level transformations",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1298,11 +1317,300 @@ describe("Documentation", () => {
             }),
           },
         },
-        version: "3.4.5",
-        title: "Testing top level transformations",
-        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+  });
+
+  describe("Issue #3570: component deduplication with meta id", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Issue 3570", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test("same schema reused as output across two endpoints should produce one component", () => {
+      const item = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "Item" });
+      const spec = new Documentation({
+        routing: {
+          "get /a": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: item,
+            handler: vi.fn(),
+          }),
+          "get /b": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: item,
+            handler: vi.fn(),
+          }),
+        },
+        ...commons,
+      }).getSpec();
+      const schemas = spec.components?.schemas ?? {};
+      const itemKeys = Object.keys(schemas).filter((name) =>
+        name.startsWith("Item"),
+      );
+      expect(itemKeys).toEqual(["Item"]);
+    });
+
+    test("same schema as input and output of one endpoint should produce one component", () => {
+      const item = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "Item" });
+      const spec = new Documentation({
+        routing: {
+          "post /a": defaultEndpointsFactory.build({
+            method: "post",
+            input: item,
+            output: item,
+            handler: vi.fn(),
+          }),
+        },
+        ...commons,
+      }).getSpec();
+      const schemas = spec.components?.schemas ?? {};
+      const itemKeys = Object.keys(schemas).filter((name) =>
+        name.startsWith("Item"),
+      );
+      expect(itemKeys).toEqual(["Item"]);
+    });
+
+    test("multiple distinct meta ids should each appear once when reused", () => {
+      const itemA = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "ItemA" });
+      const itemB = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "ItemB" });
+      const spec = new Documentation({
+        routing: {
+          "get /a": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemA,
+            handler: vi.fn(),
+          }),
+          "get /b": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemA,
+            handler: vi.fn(),
+          }),
+          "get /c": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemB,
+            handler: vi.fn(),
+          }),
+          "get /d": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemB,
+            handler: vi.fn(),
+          }),
+        },
+        ...commons,
+      }).getSpec();
+      const schemas = spec.components?.schemas ?? {};
+      const itemKeys = Object.keys(schemas).filter((name) =>
+        name.startsWith("Item"),
+      );
+      expect(itemKeys).toEqual(["ItemA", "ItemB"]);
+    });
+  });
+
+  describe("Issue #3576: meta id uniqueness guard", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Issue 3576", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test("two different schemas sharing an id across endpoints should throw", () => {
+      const alpha = z
+        .object({ kind: z.literal("alpha") })
+        .meta({ id: "Shared" });
+      const beta = z.object({ kind: z.literal("beta") }).meta({ id: "Shared" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "get /a": defaultEndpointsFactory.build({
+                input: z.object({}),
+                output: alpha,
+                handler: vi.fn(),
+              }),
+              "get /b": defaultEndpointsFactory.build({
+                input: z.object({}),
+                output: beta,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).toThrow(/Shared/);
+    });
+
+    test("an id reused for a transformation should throw", () => {
+      const obj = z.object({ a: z.number() }).meta({ id: "Shared" });
+      const objToObj = obj
+        .transform(({ a }) => ({ b: String(a) }))
+        .meta({ id: "Shared" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "post /a": defaultEndpointsFactory.build({
+                method: "post",
+                input: obj,
+                output: objToObj,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).toThrow(/Shared/);
+    });
+
+    test("same instance depicted differently as input and output should not throw", () => {
+      const pipe = z
+        .object({ a: z.number() })
+        .transform(({ a }) => ({ b: String(a) }))
+        .meta({ id: "Shared" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "post /a": defaultEndpointsFactory.build({
+                method: "post",
+                input: pipe,
+                output: pipe,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).not.toThrow();
+    });
+
+    test("same schema reused with the same id should not throw", () => {
+      const item = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "Item" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "get /a": defaultEndpointsFactory.build({
+                input: item,
+                output: item,
+                handler: vi.fn(),
+              }),
+              "get /b": defaultEndpointsFactory.build({
+                input: item,
+                output: item,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).not.toThrow();
+    });
+  });
+
+  describe("Issue #3578: Missing path parameters", () => {
+    const commons = {
+      config: sampleConfig,
+      title: "Issue 3578",
+      version: "1.0.0",
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test.each([
+      ["users/:id", z.object({ name: z.string() }), "id"],
+      ["items/:id/variants/:name", z.object({ id: z.string() }), "name"],
+    ])(
+      "Should throw when path param '%s' is missing from input schema",
+      (routePath, input, missingParam) => {
+        expect(
+          () =>
+            new Documentation({
+              ...commons,
+              routing: {
+                v1: {
+                  [routePath]: defaultEndpointsFactory.buildVoid({
+                    input,
+                    handler: vi.fn(),
+                  }),
+                },
+              },
+            }),
+        ).toThrow(
+          new DocumentationError(
+            `The input schema is missing the path parameter "${missingParam}"`,
+            { method: "get", path: `/v1/${routePath}`, isResponse: false },
+          ),
+        );
+      },
+    );
+
+    test("Should not throw when all path params are present in the schema", () => {
+      expect(
+        () =>
+          new Documentation({
+            ...commons,
+            routing: {
+              v1: {
+                "users/:id": defaultEndpointsFactory.buildVoid({
+                  input: z.object({ id: z.string(), name: z.string() }),
+                  handler: vi.fn(),
+                }),
+              },
+            },
+          }),
+      ).not.toThrow();
+    });
+
+    test("Should throw when path param is not classified as in:path", () => {
+      const config = createConfig({
+        cors: true,
+        logger: { level: "silent" },
+        http: { listen: givePort() },
+        inputSources: { post: ["body", "query"] },
+      });
+      expect(
+        () =>
+          new Documentation({
+            ...commons,
+            config,
+            routing: {
+              v1: {
+                ":id": defaultEndpointsFactory.buildVoid({
+                  method: "post",
+                  input: z.object({ id: z.string() }),
+                  handler: vi.fn(),
+                }),
+              },
+            },
+          }),
+      ).toThrow(
+        new DocumentationError(
+          'The input schema is missing the path parameter "id"',
+          { method: "post", path: "/v1/:id", isResponse: false },
+        ),
+      );
+    });
+  });
+
+  test("Depicter type should be satisfied", () => {
+    expectTypeOf(
+      ({
+        jsonSchema,
+      }: {
+        zodSchema: z.core.$ZodType;
+        jsonSchema: z.core.JSONSchema.BaseSchema;
+      }) => jsonSchema,
+    ).toExtend<Depicter>();
   });
 });

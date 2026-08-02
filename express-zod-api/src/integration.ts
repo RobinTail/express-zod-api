@@ -1,11 +1,15 @@
-import * as R from "ramda";
-import type ts from "typescript";
+/**
+ * @fileOverview The entrypoint for generating Integration code
+ * @requires typescript
+ * */
+export type { Producer } from "./zts-helpers";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
-import { IntegrationBase } from "./integration-base";
+import { IntegrationBase, interfaces } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
+import { ensureTypeNode, printNode, ts } from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
@@ -13,10 +17,9 @@ import type { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
 import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
+import { getSecurityNames } from "./security";
 
 interface IntegrationParams {
-  /** @default loadPeer("typescript") */
-  typescript?: typeof ts;
   routing: Routing;
   config: CommonConfig;
   /**
@@ -53,6 +56,14 @@ interface IntegrationParams {
    * @link https://www.npmjs.com/package/@express-zod-api/zod-plugin
    */
   brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
+  /**
+   * @desc Whether the server supports credentials in cross-origin requests.
+   * @desc It sets `credentials: "include"` in Client default Implementation and `withCredentials` in Subscription.
+   * @desc Requires the CORS configuration that includes:
+   * @desc `Access-Control-Allow-Credentials: true` and a specific `Access-Control-Allow-Origin` headers.
+   * @default false
+   * */
+  hasCredentials?: boolean;
 }
 
 interface FormattedPrintingOptions {
@@ -66,23 +77,23 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  readonly #program: ts.Node[] = [this.makeSomeOfType()];
-  readonly #aliases = new Map<object, ts.TypeAliasDeclaration>();
-  #usage: Array<ts.Node | string> = [];
+  readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
+    [];
+  readonly #aliases = new Map<object, string>();
+  #usage?: string;
 
   #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
-    let name = this.#aliases.get(key)?.name?.text;
+    let name = this.#aliases.get(key);
     if (!name) {
       name = `Type${this.#aliases.size + 1}`;
-      const temp = this.api.makeLiteralType(null);
-      this.#aliases.set(key, this.api.makeType(name, temp));
-      this.#aliases.set(key, this.api.makeType(name, produce()));
+      this.#aliases.set(key, name);
+      const node = produce();
+      this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
     }
-    return this.api.ensureTypeNode(name);
+    return ensureTypeNode(name);
   }
 
   public constructor({
-    typescript = loadPeer<typeof ts>("typescript"),
     routing,
     config,
     brandHandling,
@@ -92,60 +103,68 @@ export class Integration extends IntegrationBase {
     serverUrl = "https://example.com",
     noBodySchema = z.undefined(),
     hasHeadMethod = true,
+    hasCredentials = false,
   }: IntegrationParams) {
-    super(typescript, serverUrl);
-    const commons = { makeAlias: this.#makeAlias.bind(this), api: this.api };
+    super(serverUrl);
+    const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
+    let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
-      const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+      const entitle = makeCleanId.bind(null, method, path);
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const input = this.api.makeType(
-        entitle("input"),
-        zodToTs(inputSchema, ctxIn),
-        { comment: request },
-      );
-      this.#program.push(input);
+      const inputTypeName = entitle("input");
+      const cookies = getSecurityNames(endpoint.security, "cookie");
+      if (cookies.size) hasCookies = true;
+      const inputTypeNode = zodToTs(inputSchema, ctxIn);
+      this.#program.push((opts) => {
+        const printed = printNode(inputTypeNode, opts);
+        return [
+          `/** ${request} */`,
+          `type ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies, "security cookies") : printed};`,
+        ].join("\n");
+      });
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
-          const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
+          const props: string[] = [];
+          for (const [
+            idx,
+            { schema, mimeTypes, statusCodes },
+          ] of responses.entries()) {
             const hasBody = shouldHaveContent(method, mimeTypes);
-            const variantType = this.api.makeType(
-              entitle(responseVariant, "variant", `${idx + 1}`),
-              zodToTs(hasBody ? schema : noBodySchema, ctxOut),
-              { comment: request },
+            const variantName = entitle(
+              responseVariant,
+              "variant",
+              `${idx + 1}`,
             );
-            this.#program.push(variantType);
-            return statusCodes.map((code) =>
-              this.api.makeInterfaceProp(code, variantType.name),
+            const variantTypeNode = zodToTs(
+              hasBody ? schema : noBodySchema,
+              ctxOut,
             );
-          }, Array.from(responses.entries()));
-          const dict = this.api.makeInterface(
-            entitle(responseVariant, "response", "variants"),
-            props,
-            { comment: request },
+            this.#program.push(
+              (opts) =>
+                `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
+            );
+            for (const code of statusCodes)
+              props.push(`  ${code}: ${variantName};`);
+          }
+          const dictName = entitle(responseVariant, "response", "variants");
+          this.#program.push(
+            `/** ${request} */\ninterface ${dictName} {\n${props.join("\n")}\n}`,
           );
-          this.#program.push(dict);
-          return Object.assign(agg, { [responseVariant]: dict });
+          return Object.assign(agg, { [responseVariant]: dictName });
         },
-        {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
+        {} as Record<ResponseVariant, string>,
       );
       this.paths.add(path);
-      const literalIdx = this.api.makeLiteralType(request);
       const store = {
-        input: this.api.ensureTypeNode(input.name),
+        input: inputTypeName,
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
-        response: this.api.makeUnion([
-          this.api.makeIndexed(this.interfaces.positive, literalIdx),
-          this.api.makeIndexed(this.interfaces.negative, literalIdx),
-        ]),
-        encoded: this.api.f.createIntersectionTypeNode([
-          this.api.ensureTypeNode(dictionaries.positive.name),
-          this.api.ensureTypeNode(dictionaries.negative.name),
-        ]),
+        response: `${interfaces.positive}["${request}"] | ${interfaces.negative}["${request}"]`,
+        encoded: `${dictionaries.positive} & ${dictionaries.negative}`,
       };
       this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, tags);
@@ -155,9 +174,8 @@ export class Integration extends IntegrationBase {
       config,
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
-    // eslint-disable-next-line no-restricted-syntax -- accumulated late, acceptable for generator
-    this.#program.unshift(...this.#aliases.values());
     this.#program.push(
+      this.makeSomeOfType(),
       this.makePathType(),
       this.makeMethodType(),
       ...this.makePublicInterfaces(),
@@ -172,63 +190,27 @@ export class Integration extends IntegrationBase {
       this.makeSubstituteFn(),
       this.makeImplementationType(),
       this.makePaginationType(),
-      this.makeDefaultImplementation(),
+      this.makeDefaultContextType(),
+      this.makeDefaultImplementation(hasCredentials && hasCookies),
       this.makeClientClass(clientClassName),
-      this.makeSubscriptionClass(subscriptionClassName),
+      this.makeSubscriptionClass(
+        subscriptionClassName,
+        hasCredentials && hasCookies,
+      ),
     );
 
-    this.#usage.push(
-      ...this.makeUsageStatements(clientClassName, subscriptionClassName),
+    this.#usage = this.makeUsageStatements(
+      clientClassName,
+      subscriptionClassName,
     );
-  }
-
-  /**
-   * @deprecated use `new Integration()` without `typescript` option on its argument
-   * @todo remove in the next major — no longer needed
-   * */
-  public static async create(params: Omit<IntegrationParams, "typescript">) {
-    return new Integration({
-      ...params,
-      typescript: loadPeer<typeof ts>("typescript"),
-    });
-  }
-
-  #printUsage(printerOptions?: ts.PrinterOptions) {
-    return this.#usage.length
-      ? this.#usage
-          .map((entry) =>
-            typeof entry === "string"
-              ? entry
-              : this.api.printNode(entry, printerOptions),
-          )
-          .join("\n")
-      : undefined;
   }
 
   public print(printerOptions?: ts.PrinterOptions) {
-    const usageExampleText = this.#printUsage(printerOptions);
-    const commentNode =
-      usageExampleText &&
-      this.api.ts.addSyntheticLeadingComment(
-        this.api.ts.addSyntheticLeadingComment(
-          this.api.f.createEmptyStatement(),
-          this.api.ts.SyntaxKind.SingleLineCommentTrivia,
-          " Usage example:",
-        ),
-        this.api.ts.SyntaxKind.MultiLineCommentTrivia,
-        `\n${usageExampleText}`,
-      );
-    return this.#program
-      .concat(commentNode || [])
-      .map((node, index) =>
-        this.api.printNode(
-          node,
-          index < this.#program.length
-            ? printerOptions
-            : { ...printerOptions, omitTrailingSemicolon: true },
-        ),
-      )
-      .join("\n\n");
+    const parts = this.#program.map((entry) =>
+      typeof entry === "function" ? entry(printerOptions) : entry,
+    );
+    if (this.#usage) parts.push(`// Usage example:\n/*\n${this.#usage}*/`);
+    return parts.join("\n\n");
   }
 
   public async printFormatted({
@@ -243,10 +225,7 @@ export class Integration extends IntegrationBase {
       } catch {}
     }
 
-    const usageExample = this.#printUsage(printerOptions);
-    this.#usage =
-      usageExample && format ? [await format(usageExample)] : this.#usage;
-
+    if (this.#usage && format) this.#usage = await format(this.#usage);
     const output = this.print(printerOptions);
     return format ? format(output) : output;
   }

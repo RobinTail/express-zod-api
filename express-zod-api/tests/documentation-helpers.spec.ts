@@ -1,7 +1,7 @@
-import type { SchemaObject } from "openapi3-ts/oas31";
+import type { SchemaObjectValue } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
-import { ez } from "../src";
+import { ez, DocumentationError } from "../src";
 import {
   type OpenAPIContext,
   depictRequestParams,
@@ -29,17 +29,20 @@ import {
 
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
+  const seenIds = new Map<string, z.core.$ZodType>();
   const requestCtx: OpenAPIContext = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
     makeRef: makeRefMock,
+    seenIds,
   };
   const responseCtx: OpenAPIContext = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
     makeRef: makeRefMock,
+    seenIds,
   };
 
   beforeEach(() => {
@@ -291,7 +294,7 @@ describe("Documentation helpers", () => {
       },
     );
 
-    test.each<SchemaObject>([
+    test.each<SchemaObjectValue>([
       { type: "null" },
       {
         anyOf: [{ type: "null" }, { type: "null" }],
@@ -398,7 +401,7 @@ describe("Documentation helpers", () => {
     test("should depict query and path params", () => {
       expect(
         depictRequestParams({
-          request: {
+          flatRequest: {
             properties: {
               id: { type: "string" },
               test: { type: "boolean" },
@@ -416,7 +419,7 @@ describe("Documentation helpers", () => {
     test("should depict only path params if query is disabled", () => {
       expect(
         depictRequestParams({
-          request: {
+          flatRequest: {
             properties: {
               id: { type: "string" },
               test: { type: "boolean" },
@@ -431,10 +434,10 @@ describe("Documentation helpers", () => {
       ).toMatchSnapshot();
     });
 
-    test("should depict none if both query and params are disabled", () => {
-      expect(
+    test("should throw when path param cannot be depicted due to disabled input sources", () => {
+      expect(() =>
         depictRequestParams({
-          request: {
+          flatRequest: {
             properties: {
               id: { type: "string" },
               test: { type: "boolean" },
@@ -446,13 +449,18 @@ describe("Documentation helpers", () => {
           composition: "inline",
           ...requestCtx,
         }),
-      ).toMatchSnapshot();
+      ).toThrow(
+        new DocumentationError(
+          'The input schema is missing the path parameter "id"',
+          { method: "get", path: "/v1/user/:id", isResponse: false },
+        ),
+      );
     });
 
     test("Features 1180 and 2344: should depict header params when enabled", () => {
       expect(
         depictRequestParams({
-          request: {
+          flatRequest: {
             properties: {
               "x-request-id": { type: "string" },
               id: { type: "string" },
@@ -464,7 +472,7 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["query", "headers", "params"],
           composition: "inline",
-          securityHeaders: new Set(["secure"]),
+          security: [{ type: "header", name: "secure" }],
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -473,17 +481,18 @@ describe("Documentation helpers", () => {
     test("should depict cookie params when enabled via CookieSecurity", () => {
       expect(
         depictRequestParams({
-          request: {
+          flatRequest: {
             properties: {
+              id: { type: "string" },
               session: { type: "string" },
               page: { type: "string" },
             },
-            required: ["session", "page"],
+            required: ["id", "session", "page"],
             type: "object",
           },
           inputSources: ["query", "cookies", "params"],
           composition: "inline",
-          securityCookies: new Set(["session"]),
+          security: [{ type: "cookie", name: "session" }],
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -495,12 +504,41 @@ describe("Documentation helpers", () => {
       const body = depictBody({
         ...requestCtx,
         schema: ez.raw(),
-        request: { type: "string", format: "binary" },
+        bodyJsonSchema: { type: "string", format: "binary" },
+        hasRequiredBodyProps: false,
+        flatRequest: { type: "object", properties: {} },
         composition: "inline",
         mimeType: "application/octet-stream", // raw content type
         paramNames: [],
       });
       expect(body.required).toBe(true);
+    });
+
+    test("should omit parameter fields from fallback flat.examples", () => {
+      const body = depictBody({
+        ...requestCtx,
+        schema: ez.raw(),
+        bodyJsonSchema: {
+          type: "object",
+          properties: { other: { type: "string" } },
+        },
+        hasRequiredBodyProps: true,
+        flatRequest: {
+          type: "object",
+          properties: {},
+          examples: [
+            { id: "123", name: "John", other: "stuff" },
+            { id: "456", name: "Jane", other: "data" },
+          ],
+        },
+        composition: "inline",
+        mimeType: "application/json",
+        paramNames: ["id", "name"],
+      });
+      const examples = (
+        body.content?.["application/json"] as Record<string, unknown>
+      )?.examples;
+      expect(examples).toMatchSnapshot();
     });
   });
 
@@ -617,6 +655,35 @@ describe("Documentation helpers", () => {
         ]),
       ).toMatchSnapshot();
     });
+    test("should depict OAuth2 Security with device authorization flow", () => {
+      expect(
+        depictSecurity([
+          [
+            {
+              type: "oauth2",
+              oauth2MetadataUrl:
+                "https://example.com/.well-known/openid-configuration",
+              flows: {
+                deviceAuthorization: {
+                  deviceAuthorizationUrl: "https://example.com/device/auth",
+                  tokenUrl: "https://example.com/device/token",
+                  scopes: { read: "Read access", write: "Write access" },
+                },
+              },
+            },
+          ],
+        ]),
+      ).toMatchSnapshot();
+    });
+    test("should support deprecated flag on security schemes", () => {
+      expect(
+        depictSecurity([
+          [{ type: "basic", deprecated: true }],
+          [{ type: "bearer", deprecated: true }],
+          [{ type: "header", name: "X-API-Key", deprecated: true }],
+        ]),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictSecurityRefs()", () => {
@@ -683,6 +750,34 @@ describe("Documentation helpers", () => {
           files: {
             description: "Everything about files processing",
             url: "https://example.com",
+          },
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test("should accept objects with summary and parent and kind", () => {
+      expect(
+        depictTags({
+          books: {
+            description: "Book catalog and recommendations",
+            summary: "Books & Literature",
+            parent: "products",
+            kind: "nav",
+            externalDocs: {
+              url: "https://docs.example.com",
+              description: "Full API documentation",
+            },
+          },
+          cds: {
+            description: "Music CD catalog and reviews",
+            summary: "Music CDs",
+            parent: "products",
+            kind: "nav",
+            url: "https://example.com/docs", // overrides
+            externalDocs: {
+              url: "https://example.com/old-docs",
+              description: "External docs site",
+            },
           },
         }),
       ).toMatchSnapshot();
