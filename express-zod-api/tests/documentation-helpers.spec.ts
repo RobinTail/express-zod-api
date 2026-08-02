@@ -513,6 +513,33 @@ describe("Documentation helpers", () => {
       });
       expect(body.required).toBe(true);
     });
+
+    test("should omit parameter fields from fallback flat.examples", () => {
+      const body = depictBody({
+        ...requestCtx,
+        schema: ez.raw(),
+        jsonSchema: {
+          type: "object",
+          properties: { other: { type: "string" } },
+        },
+        hasRequired: true,
+        flat: {
+          type: "object",
+          properties: {},
+          examples: [
+            { id: "123", name: "John", other: "stuff" },
+            { id: "456", name: "Jane", other: "data" },
+          ],
+        },
+        composition: "inline",
+        mimeType: "application/json",
+        paramNames: ["id", "name"],
+      });
+      const examples = (
+        body.content?.["application/json"] as Record<string, unknown>
+      )?.examples;
+      expect(examples).toMatchSnapshot();
+    });
   });
 
   describe("depictDateIn", () => {

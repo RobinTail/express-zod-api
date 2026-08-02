@@ -8,6 +8,21 @@ exports[`Documentation helpers > depictBigInt() > should set type:string and for
 }
 `;
 
+exports[`Documentation helpers > depictBody > should omit parameter fields from fallback flat.examples 1`] = `
+{
+  "example1": {
+    "dataValue": {
+      "other": "stuff",
+    },
+  },
+  "example2": {
+    "dataValue": {
+      "other": "data",
+    },
+  },
+}
+`;
+
 exports[`Documentation helpers > depictBuffer() > should set hint with external docs 1`] = `
 {
   "externalDocs": {
