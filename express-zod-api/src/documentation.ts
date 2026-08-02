@@ -45,6 +45,8 @@ import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import { z } from "zod";
 
+export { DocumentationError };
+
 type Component =
   `${ResponseVariant}Response` | "requestParameter" | "requestBody";
 
