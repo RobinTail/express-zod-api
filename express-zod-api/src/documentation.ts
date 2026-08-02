@@ -12,6 +12,7 @@ import {
   type SecuritySchemeType,
   type ServerObject,
   OpenApiBuilder,
+  type RequestBodyObject,
 } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { type ResponseVariant, responseVariants } from "./api-response";
@@ -273,27 +274,26 @@ export class Documentation extends OpenApiBuilder {
         }
       }
 
-      const paramNames = R.pluck("name", depictedParams);
-      const [bodyJsonSchema, hasRequiredBodyProps] = excludeParamsFromDepiction(
-        request,
-        paramNames,
-      );
-      const requestBody = inputSources.includes("body")
-        ? depictBody({
-            ...commons,
-            bodyJsonSchema,
-            hasRequiredBodyProps,
-            flatRequest,
-            paramNames,
-            schema: inputSchema,
-            mimeType: contentTypes[endpoint.getProbableRequestType(method)],
-            description: descriptions?.requestBody?.({
-              method,
-              path,
-              operationId,
-            }),
-          })
-        : undefined;
+      let requestBody: RequestBodyObject | undefined = undefined;
+      if (inputSources.includes("body")) {
+        const paramNames = R.pluck("name", depictedParams);
+        const [bodyJsonSchema, hasRequiredBodyProps] =
+          excludeParamsFromDepiction(request, paramNames);
+        requestBody = depictBody({
+          ...commons,
+          bodyJsonSchema,
+          hasRequiredBodyProps,
+          flatRequest,
+          paramNames,
+          schema: inputSchema,
+          mimeType: contentTypes[endpoint.getProbableRequestType(method)],
+          description: descriptions?.requestBody?.({
+            method,
+            path,
+            operationId,
+          }),
+        });
+      }
 
       const securityRefs = depictSecurityRefs(
         depictSecurity(processContainers(security), inputSources),
