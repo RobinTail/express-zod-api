@@ -875,6 +875,35 @@ describe("Documentation", () => {
     });
   });
 
+  describe("Issue #3588: excludeParamsFromDepiction integration", () => {
+    test("should exclude path params from request body schema and its examples", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            ":id": defaultEndpointsFactory.build({
+              method: "post",
+              input: z
+                .object({
+                  id: z.string(),
+                  bodyField: z.boolean(),
+                })
+                .meta({
+                  examples: [
+                    { id: "123", bodyField: true },
+                    { id: "456", bodyField: false },
+                  ],
+                }),
+              output: z.object({}),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
+
   describe("Issue #3579: Cross-method normalized path duplicates", () => {
     test.each([
       [

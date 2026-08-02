@@ -1,4 +1,6 @@
 /** @fileOverview The entrypoint for generating OpenAPI Documentation */
+import { flattenIO } from "./json-schema-helpers";
+
 export type { Depicter } from "./documentation-helpers";
 import {
   type InfoObject,
@@ -10,6 +12,7 @@ import {
   type SecuritySchemeType,
   type ServerObject,
   OpenApiBuilder,
+  type RequestBodyObject,
 } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { type ResponseVariant, responseVariants } from "./api-response";
@@ -36,6 +39,7 @@ import {
   depictRequest,
   type IsHeader,
   type BrandHandling,
+  excludeParamsFromDepiction,
 } from "./documentation-helpers";
 import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
@@ -232,11 +236,12 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
+      const flatRequest = flattenIO(request);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
-        request,
+        flatRequest,
         security,
         description: descriptions?.requestParameter?.({
           method,
@@ -269,20 +274,26 @@ export class Documentation extends OpenApiBuilder {
         }
       }
 
-      const requestBody = inputSources.includes("body")
-        ? depictBody({
-            ...commons,
-            request,
-            paramNames: R.pluck("name", depictedParams),
-            schema: inputSchema,
-            mimeType: contentTypes[endpoint.getProbableRequestType(method)],
-            description: descriptions?.requestBody?.({
-              method,
-              path,
-              operationId,
-            }),
-          })
-        : undefined;
+      let requestBody: RequestBodyObject | undefined = undefined;
+      if (inputSources.includes("body")) {
+        const paramNames = R.pluck("name", depictedParams);
+        const [bodyJsonSchema, hasRequiredBodyProps] =
+          excludeParamsFromDepiction(request, paramNames);
+        requestBody = depictBody({
+          ...commons,
+          bodyJsonSchema,
+          hasRequiredBodyProps,
+          flatRequest,
+          paramNames,
+          schema: inputSchema,
+          mimeType: contentTypes[endpoint.getProbableRequestType(method)],
+          description: descriptions?.requestBody?.({
+            method,
+            path,
+            operationId,
+          }),
+        });
+      }
 
       const securityRefs = depictSecurityRefs(
         depictSecurity(processContainers(security), inputSources),

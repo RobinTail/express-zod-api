@@ -5,7 +5,8 @@
 ### v29.0.1
 
 - Minor performance tuning for `Documentation` generator:
-  - Collecting security headers and cookie names only when the corresponding input sources are enabled.
+  - Collecting security headers and cookie names only when the corresponding input sources are enabled;
+  - Reduced some calculations required to depict request body and parameters.
 
 ### v29.0.0
 

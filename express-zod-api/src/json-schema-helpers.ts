@@ -4,7 +4,7 @@ import type { z } from "zod";
 import type { SchemaObjectValue } from "openapi3-ts/oas32";
 
 type MergeMode = "coerce" | "throw";
-type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
+export type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
   Required<Pick<z.core.JSONSchema.ObjectSchema, "properties">>;
 
 /** @internal */

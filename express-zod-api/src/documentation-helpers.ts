@@ -36,7 +36,7 @@ import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import type { IOSchema } from "./io-schema";
-import { flattenIO } from "./json-schema-helpers";
+import { flattenIO, type FlattenObjectSchema } from "./json-schema-helpers";
 import type { Alternatives, LogicalContainer } from "./logical-container";
 import { getBrand } from "./metadata";
 import type { ClientMethod } from "./method";
@@ -252,7 +252,7 @@ export const defaultIsHeader = (
 export const depictRequestParams = ({
   path,
   method,
-  request,
+  flatRequest,
   inputSources,
   makeRef,
   composition,
@@ -262,12 +262,11 @@ export const depictRequestParams = ({
 }: ReqResCommons & {
   composition: "inline" | "components";
   description?: string;
-  request: z.core.JSONSchema.BaseSchema;
+  flatRequest: FlattenObjectSchema;
   inputSources: InputSource[];
   isHeader?: IsHeader;
   security?: LogicalContainer<Security>[];
 }) => {
-  const flat = flattenIO(request);
   const pathParams = new Set(getRoutePathParams(path));
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
@@ -293,7 +292,7 @@ export const depictRequestParams = ({
     if (isQueryEnabled && method !== "query") return "query";
   };
 
-  const depictedParams = Object.entries(flat.properties).reduce<
+  const depictedParams = Object.entries(flatRequest.properties).reduce<
     ParameterObject[]
   >((acc, [name, jsonSchema]) => {
     if (!isObject(jsonSchema)) return acc;
@@ -312,7 +311,7 @@ export const depictRequestParams = ({
       name,
       in: location,
       deprecated: jsonSchema.deprecated,
-      required: flat.required?.includes(name) || false,
+      required: flatRequest.required?.includes(name) || false,
       description: depicted.description || description,
       schema: result,
       examples: enumerateExamples(
@@ -320,7 +319,7 @@ export const depictRequestParams = ({
           ? depicted.examples // own examples or from the flat:
           : R.pluck(
               name,
-              flat.examples?.filter(R.both(isObject, R.has(name))) || [],
+              flatRequest.examples?.filter(R.both(isObject, R.has(name))) || [],
             ),
       ),
     });
@@ -626,7 +625,9 @@ export const depictBody = ({
   method,
   path,
   schema,
-  request,
+  bodyJsonSchema,
+  hasRequiredBodyProps,
+  flatRequest,
   mimeType,
   makeRef,
   composition,
@@ -636,12 +637,13 @@ export const depictBody = ({
   schema: IOSchema;
   composition: "inline" | "components";
   description?: string;
-  request: z.core.JSONSchema.BaseSchema;
+  bodyJsonSchema: z.core.JSONSchema.BaseSchema;
+  hasRequiredBodyProps: boolean;
+  flatRequest: FlattenObjectSchema;
   mimeType: string;
   paramNames: string[];
 }) => {
-  const [_pure, hasRequired] = excludeParamsFromDepiction(request, paramNames);
-  const pure = asOAS(_pure);
+  const pure = asOAS(bodyJsonSchema);
   const examples = [];
   if (isSchemaObject(pure) && pure.examples) {
     examples.push(...pure.examples);
@@ -655,8 +657,8 @@ export const depictBody = ({
     examples: enumerateExamples(
       examples.length
         ? examples
-        : flattenIO(request)
-            .examples?.filter(
+        : flatRequest.examples
+            ?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )
             .map(R.omit(paramNames)) || [],
@@ -666,7 +668,8 @@ export const depictBody = ({
     description,
     content: { [mimeType]: media },
   };
-  if (hasRequired || mimeType === contentTypes.raw) body.required = true;
+  if (hasRequiredBodyProps || mimeType === contentTypes.raw)
+    body.required = true;
   return body;
 };
 
