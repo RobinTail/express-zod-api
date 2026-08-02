@@ -7,6 +7,9 @@
 - Minor performance tuning for `Documentation` generator:
   - Collecting security headers and cookie names only when the corresponding input sources are enabled;
   - Reduced some calculations required to depict request body and parameters.
+- Deprecating the `DocumentationError` export from `express-zod-api`:
+  - This export will be removed in the next major version;
+  - Import it from `express-zod-api/documentation` subpath instead.
 
 ### v29.0.0
 

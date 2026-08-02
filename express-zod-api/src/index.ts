@@ -20,7 +20,7 @@ export { createApiResponse } from "./api-response";
 export { ServeStatic } from "./serve-static";
 export { createServer, attachRouting } from "./server";
 export {
-  DocumentationError, // @todo perhaps should be moved to /documentation subpath (breaking?)
+  DocumentationError, // @todo remove in v30
   RoutingError,
   OutputValidationError,
   InputValidationError,
