@@ -10,9 +10,7 @@ export const fixDtsPlugin = (): Rolldown.Plugin => ({
       file.code = (
         await format(
           name,
-          file.code
-            .replaceAll(/#private;\s*/g, "") // rm #private markers (TS6 compatibility)
-            .replaceAll(/\n\s*\n/g, "\n"), // rm double newlines
+          file.code.replaceAll(/\n\s*\n/g, "\n"), // rm double newlines
           { printWidth: 120 },
         )
       ).code;
