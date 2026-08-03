@@ -2,6 +2,10 @@
 
 ## Version 6
 
+### v6.0.1
+
+- Simplified the bundle: Zod augmentation included into the `index.d.ts`.
+
 ### v6.0.0
 
 - Supported Node.js versions: `^22.19.0 || ^24.11.0 || ^26.0.0`.
