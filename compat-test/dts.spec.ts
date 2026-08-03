@@ -7,6 +7,6 @@ describe("DTS", () => {
       "./node_modules/express-zod-api/node_modules/@express-zod-api/zod-plugin/dist/index.d.ts",
       "utf-8",
     );
-    expect(pluginDts).toMatch(`declare module "zod"`);
+    expect(pluginDts).toContain(`declare module "zod"`);
   });
 });
