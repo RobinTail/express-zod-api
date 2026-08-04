@@ -122,11 +122,11 @@ export class Diagnostics {
       const schema = jsonSchema as z.core.JSONSchema.BaseSchema;
       if (isStringSatisfiable(schema)) continue;
       this.logger.warn(
-        `The ${location} parameter ${name} has a schema that most likely would not accept the parsed data, ${
+        `The ${location} parameter "${name}" has a schema that most likely would not accept the parsed data, ${
           location === "path"
             ? "since path parameters always arrive as strings"
-            : "depending on the queryParser config option"
-        }. Convert the parsed value explicitly with z.string().transform(), or, less predictably, with z.coerce.`,
+            : 'depending on the "queryParser" config option'
+        }. Convert the parsed value from "z.string()" using ".transform()" method, or use "z.coerce" at least.`,
         { ...ctx, path, name, jsonSchema: schema },
       );
     }

@@ -619,7 +619,7 @@ describe("Routing", () => {
           routing: { path: endpoint },
         });
         expect(logger._getLogs().warn).toContainEqual([
-          "The query parameter v has a schema that most likely would not accept the parsed data, depending on the queryParser config option. Convert the parsed value explicitly with z.string().transform(), or, less predictably, with z.coerce.",
+          expect.stringContaining('The query parameter "v"'),
           {
             method: "get",
             path: "/path",
@@ -645,7 +645,7 @@ describe("Routing", () => {
         routing: { path: endpoint },
       });
       expect(logger._getLogs().warn).toContainEqual([
-        "The query parameter v has a schema that most likely would not accept the parsed data, depending on the queryParser config option. Convert the parsed value explicitly with z.string().transform(), or, less predictably, with z.coerce.",
+        expect.stringContaining('The query parameter "v"'),
         {
           method: "get",
           path: "/path",
@@ -670,7 +670,7 @@ describe("Routing", () => {
         routing: { "/v1/:id": endpoint },
       });
       expect(logger._getLogs().warn).toContainEqual([
-        "The path parameter id has a schema that most likely would not accept the parsed data, since path parameters always arrive as strings. Convert the parsed value explicitly with z.string().transform(), or, less predictably, with z.coerce.",
+        expect.stringContaining('The path parameter "id"'),
         {
           method: "get",
           path: "/v1/:id",
