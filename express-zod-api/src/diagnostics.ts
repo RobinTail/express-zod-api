@@ -6,7 +6,11 @@ import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
 import { getRequestLocations } from "./documentation-helpers";
 import { AbstractEndpoint } from "./endpoint";
-import { flattenIO, isStringSatisfiable } from "./json-schema-helpers";
+import {
+  coerceMarker,
+  flattenIO,
+  isStringSatisfiable,
+} from "./json-schema-helpers";
 import type { ActualLogger } from "./logger-helpers";
 import type { SomeMethod } from "./method";
 import type { OnEndpoint } from "./routing-walker";
@@ -76,7 +80,7 @@ export class Diagnostics {
             "coerce" in zodSchema._zod.def &&
             zodSchema._zod.def.coerce === true
           )
-            jsonSchema["x-coerce"] = true;
+            jsonSchema[coerceMarker] = true;
         },
       }),
     );
