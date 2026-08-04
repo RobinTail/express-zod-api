@@ -250,7 +250,7 @@ export const defaultIsHeader = (
   name.startsWith("x-") ||
   getWellKnownHeaders().has(name);
 
-export const getRequestLocations = ({
+export const makeParamLocator = ({
   method,
   path,
   security,

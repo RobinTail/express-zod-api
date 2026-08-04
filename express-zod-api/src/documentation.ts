@@ -37,7 +37,7 @@ import {
   reformatParamsInPath,
   nonEmpty,
   depictRequest,
-  getRequestLocations,
+  makeParamLocator,
   type IsHeader,
   type BrandHandling,
   excludeParamsFromDepiction,
@@ -232,7 +232,7 @@ export class Documentation extends OpenApiBuilder {
       const commons = { ...shared, path, method, endpoint };
       const { description, summary, scopes, inputSchema, security } = endpoint;
       const inputSources = getInputSources(method, config.inputSources);
-      const { pathParams, getLocation } = getRequestLocations({
+      const { pathParams, getLocation } = makeParamLocator({
         method,
         path,
         security,

@@ -4,7 +4,7 @@ import { type FlatObject, getInputSources, isObject } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
-import { getRequestLocations } from "./documentation-helpers";
+import { makeParamLocator } from "./documentation-helpers";
 import { AbstractEndpoint } from "./endpoint";
 import {
   coerceMarker,
@@ -94,7 +94,7 @@ export class Diagnostics {
     ctx: FlatObject,
   ): void {
     if (ref.paramsChecked.has(path)) return;
-    const { pathParams, getLocation, isQueryEnabled } = getRequestLocations({
+    const { pathParams, getLocation, isQueryEnabled } = makeParamLocator({
       method,
       path,
       security: endpoint.security,

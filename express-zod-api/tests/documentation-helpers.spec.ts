@@ -5,7 +5,7 @@ import { ez } from "../src";
 import {
   type OpenAPIContext,
   depictRequestParams,
-  getRequestLocations,
+  makeParamLocator,
   depictSecurity,
   depictSecurityRefs,
   depictTags,
@@ -398,9 +398,9 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("getRequestLocations", () => {
+  describe("makeParamLocator", () => {
     test("should handle query and path params", () => {
-      const { pathParams, isQueryEnabled, getLocation } = getRequestLocations({
+      const { pathParams, isQueryEnabled, getLocation } = makeParamLocator({
         ...requestCtx,
         inputSources: ["query", "params"],
       });
@@ -411,7 +411,7 @@ describe("Documentation helpers", () => {
     });
 
     test("should consider the rest is body when query is disabled", () => {
-      const { pathParams, isQueryEnabled, getLocation } = getRequestLocations({
+      const { pathParams, isQueryEnabled, getLocation } = makeParamLocator({
         ...requestCtx,
         inputSources: ["body", "params"],
       });
@@ -422,7 +422,7 @@ describe("Documentation helpers", () => {
     });
 
     test("Features 1180 and 2344: should handle headers when enabled", () => {
-      const { pathParams, isQueryEnabled, getLocation } = getRequestLocations({
+      const { pathParams, isQueryEnabled, getLocation } = makeParamLocator({
         ...requestCtx,
         inputSources: ["query", "headers", "params"],
         security: [{ type: "header", name: "secure" }],
@@ -436,7 +436,7 @@ describe("Documentation helpers", () => {
     });
 
     test("should handle cookies when enabled", () => {
-      const { pathParams, isQueryEnabled, getLocation } = getRequestLocations({
+      const { pathParams, isQueryEnabled, getLocation } = makeParamLocator({
         ...requestCtx,
         inputSources: ["query", "cookies", "params"],
         security: [{ type: "cookie", name: "session" }],
