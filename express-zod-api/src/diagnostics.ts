@@ -24,8 +24,7 @@ import { getSecurityNames } from "./security";
 interface Findings {
   isSchemaChecked: boolean;
   flat?: ReturnType<typeof flattenIO>;
-  paths: Set<string>;
-  stringOnlyChecked: boolean;
+  paramsChecked: Set<string>;
 }
 
 export class Diagnostics {
@@ -90,43 +89,24 @@ export class Diagnostics {
     );
   }
 
-  #checkPathParams(
-    ref: Findings,
-    endpoint: AbstractEndpoint,
-    path: string,
-    ctx: FlatObject,
-  ): void {
-    if (ref.paths.has(path)) return;
-    const params = getRoutePathParams(path);
-    if (params.length === 0) return; // next statement can be expensive
-    ref.flat ??= this.#createFlatInput(endpoint);
-    for (const param of params) {
-      if (param in ref.flat.properties) continue;
-      this.logger.warn(
-        "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
-        { ...ctx, path, param },
-      );
-    }
-    ref.paths.add(path);
-  }
-
-  #checkStringOnlyParams(
+  #checkParams(
     ref: Findings,
     endpoint: AbstractEndpoint,
     method: SomeMethod,
     path: string,
     ctx: FlatObject,
   ): void {
-    if (ref.stringOnlyChecked) return;
+    if (ref.paramsChecked.has(path)) return;
+    const params = getRoutePathParams(path);
     const sources = getInputSources(method, this.config.inputSources);
     const areParamsEnabled = sources.includes("params");
     const areHeadersEnabled = sources.includes("headers");
     const areCookiesEnabled =
       sources.includes("cookies") || sources.includes("signedCookies");
     const isQueryEnabled = sources.includes("query") && method !== "query";
-    if (!areParamsEnabled && !isQueryEnabled) return;
+    if (params.length === 0 && !isQueryEnabled) return; // next statement can be expensive
     ref.flat ??= this.#createFlatInput(endpoint);
-    const pathParams = new Set(getRoutePathParams(path));
+    const pathParams = new Set(params);
     const securityHeaders = areHeadersEnabled
       ? getSecurityNames(endpoint.security, "header")
       : undefined;
@@ -150,7 +130,14 @@ export class Diagnostics {
         { ...ctx, path, name },
       );
     }
-    ref.stringOnlyChecked = true;
+    for (const param of params) {
+      if (param in ref.flat.properties) continue;
+      this.logger.warn(
+        "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
+        { ...ctx, path, param },
+      );
+    }
+    ref.paramsChecked.add(path);
   }
 
   public check: OnEndpoint = (method, path, endpoint) => {
@@ -158,15 +145,11 @@ export class Diagnostics {
     if (!ref) {
       ref = {
         isSchemaChecked: false,
-        paths: new Set(),
-        stringOnlyChecked: false,
+        paramsChecked: new Set(),
       };
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, endpoint, { method, path });
-    this.#checkPathParams(ref, endpoint, path, { method });
-    this.#checkStringOnlyParams(ref, endpoint, method as SomeMethod, path, {
-      method,
-    });
+    this.#checkParams(ref, endpoint, method as SomeMethod, path, { method });
   };
 }

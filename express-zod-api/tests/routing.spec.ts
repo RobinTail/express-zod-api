@@ -665,27 +665,30 @@ describe("Routing", () => {
       ]);
     });
 
-    test.each([z.coerce.number(), z.string(), z.string().transform(Number)])(
-      "should not warn about string-satisfiable query params %#",
-      (schema) => {
-        const endpoint = new EndpointsFactory(defaultResultHandler).build({
-          method: "get",
-          input: z.object({ v: schema }),
-          output: z.object({}),
-          handler: vi.fn(),
-        });
-        const logger = makeLoggerMock();
-        initRouting({
-          app: appMock as unknown as IRouter,
-          getLogger: () => logger,
-          config: { cors: false },
-          routing: { path: endpoint },
-        });
-        expect(
-          logger._getLogs().warn.map((entry) => String((entry as string[])[0])),
-        ).not.toContain(expect.stringContaining("can never be satisfied"));
-      },
-    );
+    test.each([
+      z.coerce.number(),
+      z.string(),
+      z.string().transform(Number),
+      z.array(z.string()),
+      z.object({ nested: z.string() }),
+    ])("should not warn about string-satisfiable query params %#", (schema) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        method: "get",
+        input: z.object({ v: schema }),
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { path: endpoint },
+      });
+      expect(
+        logger._getLogs().warn.map((entry) => String((entry as string[])[0])),
+      ).not.toContain(expect.stringContaining("can never be satisfied"));
+    });
 
     test("should not warn about body params", () => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
