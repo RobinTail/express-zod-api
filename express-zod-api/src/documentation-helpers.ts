@@ -281,8 +281,7 @@ export const getRequestLocations = ({
     if (areCookiesEnabled && securityCookies?.has(name)) return "cookie";
     if (
       areHeadersEnabled &&
-      (isHeader?.(name, method as ClientMethod, path) ??
-        defaultIsHeader(name, securityHeaders))
+      (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders))
     )
       return "header";
     if (isQueryEnabled && method !== "query") return "query";
