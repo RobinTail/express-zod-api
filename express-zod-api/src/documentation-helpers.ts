@@ -275,6 +275,7 @@ export const getRequestLocations = ({
   let securityCookies: Set<string> | undefined;
   if (areCookiesEnabled && security)
     securityCookies = getSecurityNames(security, "cookie");
+  /** @modifies pathParams when the parameter's location is "path" */
   const getLocation = (name: string): ParameterLocation | undefined => {
     if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))
       return "path";
