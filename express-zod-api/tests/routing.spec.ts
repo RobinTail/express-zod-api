@@ -602,6 +602,8 @@ describe("Routing", () => {
       [z.int(), "integer"],
       [z.boolean(), "boolean"],
       [z.literal(42), "number"],
+      [z.literal([42, 43]), "number"],
+      [z.enum({ a: 42, b: 43 }), "number"],
     ])(
       "should warn about non-coercing string-only query params %#",
       (schema, type) => {
