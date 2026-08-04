@@ -646,7 +646,12 @@ describe("Routing", () => {
       });
       expect(logger._getLogs().warn).toContainEqual([
         "The query parameter v has a schema that most likely would not accept the parsed data, depending on the queryParser config option.",
-        { method: "get", path: "/path", name: "v", jsonSchema: { type: "number" } },
+        {
+          method: "get",
+          path: "/path",
+          name: "v",
+          jsonSchema: { type: "number" },
+        },
       ]);
     });
 
