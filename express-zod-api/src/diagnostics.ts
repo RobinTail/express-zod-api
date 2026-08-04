@@ -4,7 +4,6 @@ import {
   type FlatObject,
   getInputSources,
   getRoutePathParams,
-  isObject,
 } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -22,6 +21,11 @@ interface Findings {
   flat?: ReturnType<typeof flattenIO>;
   paramsChecked: Set<string>;
 }
+
+const isJsonSchema = (
+  subject: unknown,
+): subject is z.core.JSONSchema.BaseSchema =>
+  typeof subject === "object" && subject !== null;
 
 export class Diagnostics {
   #verified = new WeakMap<AbstractEndpoint, Findings>();
@@ -78,7 +82,10 @@ export class Diagnostics {
         unrepresentable: "any",
         io: "input",
         override: ({ zodSchema, jsonSchema }) => {
-          if ((zodSchema._zod.def as { coerce?: boolean }).coerce === true)
+          if (
+            "coerce" in zodSchema._zod.def &&
+            zodSchema._zod.def.coerce === true
+          )
             jsonSchema["x-coerce"] = true;
         },
       }),
@@ -116,18 +123,17 @@ export class Diagnostics {
       if (isQueryEnabled) return "query";
     };
     for (const [name, jsonSchema] of Object.entries(ref.flat.properties)) {
-      if (!isObject(jsonSchema)) continue;
+      if (!isJsonSchema(jsonSchema)) continue;
       const location = getLocation(name);
       if (!location) continue;
-      const schema = jsonSchema as z.core.JSONSchema.BaseSchema;
-      if (isStringSatisfiable(schema)) continue;
+      if (isStringSatisfiable(jsonSchema)) continue;
       this.logger.warn(
         `The ${location} parameter "${name}" has a schema that most likely would not accept the parsed data, ${
           location === "path"
             ? "since path parameters always arrive as strings"
             : 'depending on the "queryParser" config option'
         }. Convert the parsed value from "z.string()" using ".transform()" method, or use "z.coerce" at least.`,
-        { ...ctx, path, name, jsonSchema: schema },
+        { ...ctx, path, name, jsonSchema },
       );
     }
     for (const param of params) {
