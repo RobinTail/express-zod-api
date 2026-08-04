@@ -296,10 +296,21 @@ describe("JSON Schema helpers", () => {
       expect(isStringSatisfiable({})).toBe(true);
     });
 
-    test("should consider complex and null schemas satisfiable", () => {
+    test("should consider complex and null schemas satisfiable for query", () => {
       expect(isStringSatisfiable({ type: "array" })).toBe(true);
       expect(isStringSatisfiable({ type: "object" })).toBe(true);
       expect(isStringSatisfiable({ type: "null" })).toBe(true);
+    });
+
+    test.each(["number", "integer", "boolean", "array", "object"] as const)(
+      "should consider %s schema not satisfiable for path",
+      (one) => {
+        expect(isStringSatisfiable({ type: one }, "path")).toBe(false);
+      },
+    );
+
+    test("should consider string schema satisfiable for path", () => {
+      expect(isStringSatisfiable({ type: "string" }, "path")).toBe(true);
     });
 
     test.each(["number", "integer", "boolean"] as const)(

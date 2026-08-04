@@ -652,9 +652,13 @@ describe("Routing", () => {
       ]);
     });
 
-    test("should warn about non-coercing path params", () => {
+    test.each([
+      [z.number(), "number"],
+      [z.object({ nested: z.string() }), "object"],
+      [z.array(z.string()), "array"],
+    ])("should warn about non-coercing path params %#", (schema, type) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
-        input: z.object({ id: z.number() }),
+        input: z.object({ id: schema }),
         handler: vi.fn(),
       });
       const logger = makeLoggerMock();
@@ -670,7 +674,7 @@ describe("Routing", () => {
           method: "get",
           path: "/v1/:id",
           name: "id",
-          jsonSchema: { type: "number" },
+          jsonSchema: expect.objectContaining({ type }),
         },
       ]);
     });

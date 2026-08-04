@@ -106,7 +106,7 @@ export class Diagnostics {
       if (!isObject(jsonSchema)) continue;
       const location = getLocation(name);
       if (location !== "path" && location !== "query") continue;
-      if (isStringSatisfiable(jsonSchema)) continue;
+      if (isStringSatisfiable(jsonSchema, location)) continue;
       this.logger.warn(
         `The ${location} parameter "${name}" has a schema that most likely would not accept the parsed data, ${
           location === "path"
