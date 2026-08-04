@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   flattenIO,
   isJsonObjectSchema,
+  isStringSatisfiable,
   mergeExamples,
   propsMerger,
   canMerge,
@@ -280,6 +281,58 @@ describe("JSON Schema helpers", () => {
         { name: "jane", age: 25 },
         { name: "jane", age: 30 },
       ]);
+    });
+  });
+
+  describe("isStringSatisfiable()", () => {
+    test("should consider coerced schemas satisfiable", () => {
+      expect(isStringSatisfiable({ type: "number", "x-coerce": true })).toBe(
+        true,
+      );
+    });
+
+    test("should consider string and unconstrained schemas satisfiable", () => {
+      expect(isStringSatisfiable({ type: "string" })).toBe(true);
+      expect(isStringSatisfiable({})).toBe(true);
+    });
+
+    test("should consider complex and null schemas satisfiable", () => {
+      expect(isStringSatisfiable({ type: "array" })).toBe(true);
+      expect(isStringSatisfiable({ type: "object" })).toBe(true);
+      expect(isStringSatisfiable({ type: "null" })).toBe(true);
+    });
+
+    test.each(["number", "integer", "boolean"] as const)(
+      "should consider %s schema not satisfiable",
+      (one) => {
+        expect(isStringSatisfiable({ type: one })).toBe(false);
+      },
+    );
+
+    test("should consider a union variant satisfiable when any member is", () => {
+      expect(
+        isStringSatisfiable({
+          oneOf: [{ type: "string" }, { type: "number" }],
+        }),
+      ).toBe(true);
+      expect(
+        isStringSatisfiable({
+          anyOf: [{ type: "number" }, { type: "boolean" }],
+        }),
+      ).toBe(false);
+    });
+
+    test("should consider an allOf satisfiable when all members are", () => {
+      expect(
+        isStringSatisfiable({
+          allOf: [{ type: "string" }, { type: "string" }],
+        }),
+      ).toBe(true);
+      expect(
+        isStringSatisfiable({
+          allOf: [{ type: "string" }, { type: "number" }],
+        }),
+      ).toBe(false);
     });
   });
 

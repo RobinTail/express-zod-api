@@ -1,31 +1,21 @@
 import { z } from "zod";
 import { responseVariants } from "./api-response";
-import {
-  type FlatObject,
-  getInputSources,
-  getRoutePathParams,
-} from "./common-helpers";
+import { type FlatObject, getInputSources, isObject } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { contentTypes } from "./content-type";
-import { findJsonIncompatible, isStringSatisfiable } from "./deep-checks";
-import { defaultIsHeader } from "./documentation-helpers";
+import { findJsonIncompatible } from "./deep-checks";
+import { getRequestLocations } from "./documentation-helpers";
 import { AbstractEndpoint } from "./endpoint";
-import { flattenIO } from "./json-schema-helpers";
+import { flattenIO, isStringSatisfiable } from "./json-schema-helpers";
 import type { ActualLogger } from "./logger-helpers";
 import type { SomeMethod } from "./method";
 import type { OnEndpoint } from "./routing-walker";
-import { getSecurityNames } from "./security";
 
 interface Findings {
   isSchemaChecked: boolean;
   flat?: ReturnType<typeof flattenIO>;
   paramsChecked: Set<string>;
 }
-
-const isJsonSchema = (
-  subject: unknown,
-): subject is z.core.JSONSchema.BaseSchema =>
-  typeof subject === "object" && subject !== null;
 
 export class Diagnostics {
   #verified = new WeakMap<AbstractEndpoint, Findings>();
@@ -100,32 +90,18 @@ export class Diagnostics {
     ctx: FlatObject,
   ): void {
     if (ref.paramsChecked.has(path)) return;
-    const params = getRoutePathParams(path);
-    const sources = getInputSources(method, this.config.inputSources);
-    const areParamsEnabled = sources.includes("params");
-    const areHeadersEnabled = sources.includes("headers");
-    const areCookiesEnabled =
-      sources.includes("cookies") || sources.includes("signedCookies");
-    const isQueryEnabled = sources.includes("query") && method !== "query";
-    if (params.length === 0 && !isQueryEnabled) return; // next statement can be expensive
+    const { pathParams, getLocation, isQueryEnabled } = getRequestLocations({
+      method,
+      path,
+      security: endpoint.security,
+      inputSources: getInputSources(method, this.config.inputSources),
+    });
+    if (pathParams.size === 0 && !isQueryEnabled) return; // next statement can be expensive
     ref.flat ??= this.#createFlatInput(endpoint);
-    const pathParams = new Set(params);
-    const securityHeaders = areHeadersEnabled
-      ? getSecurityNames(endpoint.security, "header")
-      : undefined;
-    const securityCookies = areCookiesEnabled
-      ? getSecurityNames(endpoint.security, "cookie")
-      : undefined;
-    const getLocation = (name: string): "path" | "query" | undefined => {
-      if (areParamsEnabled && pathParams.has(name)) return "path";
-      if (areCookiesEnabled && securityCookies?.has(name)) return;
-      if (areHeadersEnabled && defaultIsHeader(name, securityHeaders)) return;
-      if (isQueryEnabled) return "query";
-    };
     for (const [name, jsonSchema] of Object.entries(ref.flat.properties)) {
-      if (!isJsonSchema(jsonSchema)) continue;
+      if (!isObject(jsonSchema)) continue;
       const location = getLocation(name);
-      if (!location) continue;
+      if (location !== "path" && location !== "query") continue;
       if (isStringSatisfiable(jsonSchema)) continue;
       this.logger.warn(
         `The ${location} parameter "${name}" has a schema that most likely would not accept the parsed data, ${
@@ -136,8 +112,7 @@ export class Diagnostics {
         { ...ctx, path, name, jsonSchema },
       );
     }
-    for (const param of params) {
-      if (param in ref.flat.properties) continue;
+    for (const param of pathParams) {
       this.logger.warn(
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
         { ...ctx, path, param },

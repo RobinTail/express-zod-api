@@ -38,8 +38,8 @@ import { DocumentationError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import { flattenIO, type FlattenObjectSchema } from "./json-schema-helpers";
 import type { Alternatives, LogicalContainer } from "./logical-container";
+import type { ClientMethod, SomeMethod } from "./method";
 import { getBrand } from "./metadata";
-import type { ClientMethod } from "./method";
 import type { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
 import type { FirstPartyKind } from "./schema-walker";
@@ -249,6 +249,49 @@ export const defaultIsHeader = (
   name.startsWith("x-") ||
   getWellKnownHeaders().has(name);
 
+export const getRequestLocations = ({
+  method,
+  path,
+  security,
+  inputSources,
+  isHeader,
+}: {
+  method: SomeMethod;
+  path: string;
+  security?: LogicalContainer<Security>[];
+  inputSources: InputSource[];
+  isHeader?: IsHeader;
+}) => {
+  const pathParams = new Set(getRoutePathParams(path));
+  const areParamsEnabled = inputSources.includes("params");
+  const areHeadersEnabled = inputSources.includes("headers");
+  const areCookiesEnabled =
+    inputSources.includes("cookies") || inputSources.includes("signedCookies");
+  const isQueryEnabled = inputSources.includes("query") && method !== "query";
+  const securityHeaders = areHeadersEnabled
+    ? getSecurityNames(security || [], "header")
+    : undefined;
+  const securityCookies = areCookiesEnabled
+    ? getSecurityNames(security || [], "cookie")
+    : undefined;
+  const getLocation = (
+    name: string,
+  ): "path" | "query" | "cookie" | "header" | undefined => {
+    if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))
+      return "path";
+    if (areCookiesEnabled && securityCookies?.has(name)) return "cookie";
+    if (
+      areHeadersEnabled &&
+      (isHeader?.(name, method as ClientMethod, path) ??
+        defaultIsHeader(name, securityHeaders))
+    )
+      return "header";
+    if (isQueryEnabled) return "query";
+    return undefined;
+  };
+  return { pathParams, getLocation, isQueryEnabled };
+};
+
 export const depictRequestParams = ({
   path,
   method,
@@ -267,30 +310,13 @@ export const depictRequestParams = ({
   isHeader?: IsHeader;
   security?: LogicalContainer<Security>[];
 }) => {
-  const pathParams = new Set(getRoutePathParams(path));
-  const isQueryEnabled = inputSources.includes("query");
-  const areParamsEnabled = inputSources.includes("params");
-  const areHeadersEnabled = inputSources.includes("headers");
-  const areCookiesEnabled =
-    inputSources.includes("cookies") || inputSources.includes("signedCookies");
-  let securityHeaders: Set<string> | undefined;
-  if (areHeadersEnabled && security)
-    securityHeaders = getSecurityNames(security, "header");
-  let securityCookies: Set<string> | undefined;
-  if (areCookiesEnabled && security)
-    securityCookies = getSecurityNames(security, "cookie");
-
-  const getLocation = (name: string) => {
-    if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))
-      return "path";
-    if (areCookiesEnabled && securityCookies?.has(name)) return "cookie";
-    if (
-      areHeadersEnabled &&
-      (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders))
-    )
-      return "header";
-    if (isQueryEnabled && method !== "query") return "query";
-  };
+  const { pathParams, getLocation } = getRequestLocations({
+    method,
+    path,
+    security,
+    inputSources,
+    isHeader,
+  });
 
   const depictedParams = Object.entries(flatRequest.properties).reduce<
     ParameterObject[]

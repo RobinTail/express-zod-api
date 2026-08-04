@@ -139,3 +139,28 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
     },
     [],
   );
+
+/**
+ * Whether a query/path parameter of this JSON type can be satisfied by a
+ * string, which is how such values always arrive. Non-coercing primitives
+ * (`number`, `boolean`) and stringless literals/enums cannot, while coerced
+ * primitives (marked `x-coerce` via the `override` of `toJSONSchema`) and
+ * `string` can, so this is a warning signal rather than an error. Complex
+ * (`array`, `object`, `null`) and unconstrained schemas are treated as
+ * satisfiable to avoid false positives (e.g. `bigint` is already covered by
+ * the JSON-incompatible warning).
+ * */
+export const isStringSatisfiable = (
+  subject: z.core.JSONSchema.BaseSchema,
+): boolean => {
+  if (subject["x-coerce"] === true) return true;
+  if (subject.anyOf) return subject.anyOf.some(isStringSatisfiable);
+  if (subject.oneOf) return subject.oneOf.some(isStringSatisfiable);
+  if (subject.allOf) return subject.allOf.every(isStringSatisfiable);
+  if (subject.type === undefined || subject.type === "string") return true;
+  return (
+    subject.type !== "number" &&
+    subject.type !== "integer" &&
+    subject.type !== "boolean"
+  );
+};
