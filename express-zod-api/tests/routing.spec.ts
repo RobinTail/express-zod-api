@@ -681,7 +681,7 @@ describe("Routing", () => {
       z.string().transform(Number),
       z.array(z.string()),
       z.object({ nested: z.string() }),
-    ])("should not warn about string-satisfiable query params %#", (schema) => {
+    ])("should NOT warn about acceptable query params %#", (schema) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
         input: z.object({ v: schema }),
         handler: vi.fn(),
