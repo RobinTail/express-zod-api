@@ -2,6 +2,7 @@ import {
   type ExamplesObject,
   type MediaTypeObject,
   type OAuthFlowObject,
+  type ParameterLocation,
   type ParameterObject,
   type ReferenceObject,
   type RequestBodyObject,
@@ -76,9 +77,6 @@ export type IsHeader = (
   method: ClientMethod,
   path: string,
 ) => boolean | null | undefined;
-
-/** @desc The location of a request parameter in the HTTP request */
-export type ParameterLocation = "path" | "query" | "cookie" | "header";
 
 export type BrandHandling = Record<string | symbol, Depicter>;
 
