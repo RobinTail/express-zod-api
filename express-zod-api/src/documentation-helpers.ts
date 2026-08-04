@@ -1,5 +1,7 @@
 import {
   type ExamplesObject,
+  isReferenceObject,
+  isSchemaObject,
   type MediaTypeObject,
   type OAuthFlowObject,
   type ParameterLocation,
@@ -12,8 +14,6 @@ import {
   type SecurityRequirementObject,
   type SecuritySchemeObject,
   type TagObject,
-  isReferenceObject,
-  isSchemaObject,
 } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
@@ -21,14 +21,14 @@ import type { NormalizedResponse, ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {
   type FlatObject,
-  type Tag,
-  shouldHaveContent,
   getRoutePathParams,
   getTransformedType,
   isObject,
   isSchema,
   makeCleanId,
   routePathParamsRegex,
+  shouldHaveContent,
+  type Tag,
   ucFirst,
 } from "./common-helpers";
 import type { InputSource } from "./config-type";
@@ -303,12 +303,11 @@ export const depictRequestParams = ({
   flatRequest: FlattenObjectSchema;
   getLocation: (name: string) => ParameterLocation | undefined;
 }) => {
-  const depictedParams = Object.entries(flatRequest.properties).reduce<
-    ParameterObject[]
-  >((acc, [name, jsonSchema]) => {
-    if (!isObject(jsonSchema)) return acc;
+  const depictedParams: ParameterObject[] = [];
+  for (const [name, jsonSchema] of Object.entries(flatRequest.properties)) {
+    if (!isObject(jsonSchema)) continue;
     const location = getLocation(name);
-    if (!location) return acc;
+    if (!location) continue;
     const depicted = asOAS(jsonSchema);
     const result =
       composition === "components"
@@ -318,7 +317,7 @@ export const depictRequestParams = ({
             jsonSchema.id || makeCleanId(description, name),
           )
         : depicted;
-    return acc.concat({
+    depictedParams.push({
       name,
       in: location,
       deprecated: jsonSchema.deprecated,
@@ -334,8 +333,7 @@ export const depictRequestParams = ({
             ),
       ),
     });
-  }, []);
-
+  }
   return depictedParams;
 };
 
