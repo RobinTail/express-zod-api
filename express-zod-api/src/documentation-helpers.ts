@@ -264,17 +264,17 @@ export const getRequestLocations = ({
   isHeader?: IsHeader;
 }) => {
   const pathParams = new Set(getRoutePathParams(path));
+  const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");
   const areCookiesEnabled =
     inputSources.includes("cookies") || inputSources.includes("signedCookies");
-  const isQueryEnabled = inputSources.includes("query");
-  const securityHeaders = areHeadersEnabled
-    ? getSecurityNames(security || [], "header")
-    : undefined;
-  const securityCookies = areCookiesEnabled
-    ? getSecurityNames(security || [], "cookie")
-    : undefined;
+  let securityHeaders: Set<string> | undefined;
+  if (areHeadersEnabled && security)
+    securityHeaders = getSecurityNames(security, "header");
+  let securityCookies: Set<string> | undefined;
+  if (areCookiesEnabled && security)
+    securityCookies = getSecurityNames(security, "cookie");
   const getLocation = (name: string): ParameterLocation | undefined => {
     if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))
       return "path";
