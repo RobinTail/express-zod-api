@@ -579,9 +579,8 @@ describe("Routing", () => {
       z.object({ id: z.string() }),
       z.record(z.literal("id"), z.string()),
     ])("should warn about unused path params %#", (input) => {
-      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
         input,
-        output: z.object({}),
         handler: vi.fn(),
       });
       const logger = makeLoggerMock();
@@ -607,10 +606,8 @@ describe("Routing", () => {
     ])(
       "should warn about non-coercing string-only query params %#",
       (schema, type) => {
-        const endpoint = new EndpointsFactory(defaultResultHandler).build({
-          method: "get",
+        const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
           input: z.object({ v: schema }),
-          output: z.object({}),
           handler: vi.fn(),
         });
         const logger = makeLoggerMock();
@@ -633,10 +630,8 @@ describe("Routing", () => {
     );
 
     test("should warn about query params under a top-level transformation", () => {
-      const endpoint = new EndpointsFactory(defaultResultHandler).build({
-        method: "get",
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
         input: z.object({ v: z.number() }).transform((o) => o),
-        output: z.object({}),
         handler: vi.fn(),
       });
       const logger = makeLoggerMock();
@@ -658,10 +653,8 @@ describe("Routing", () => {
     });
 
     test("should warn about non-coercing path params", () => {
-      const endpoint = new EndpointsFactory(defaultResultHandler).build({
-        method: "get",
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
         input: z.object({ id: z.number() }),
-        output: z.object({}),
         handler: vi.fn(),
       });
       const logger = makeLoggerMock();
@@ -689,10 +682,8 @@ describe("Routing", () => {
       z.array(z.string()),
       z.object({ nested: z.string() }),
     ])("should not warn about string-satisfiable query params %#", (schema) => {
-      const endpoint = new EndpointsFactory(defaultResultHandler).build({
-        method: "get",
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
         input: z.object({ v: schema }),
-        output: z.object({}),
         handler: vi.fn(),
       });
       const logger = makeLoggerMock();
@@ -709,11 +700,10 @@ describe("Routing", () => {
       );
     });
 
-    test("should not warn about body params", () => {
-      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+    test("should not warn about body properties", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
         method: "post",
         input: z.object({ v: z.number() }),
-        output: z.object({}),
         handler: vi.fn(),
       });
       const logger = makeLoggerMock();
