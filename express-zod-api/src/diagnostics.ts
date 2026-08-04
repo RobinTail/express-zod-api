@@ -8,11 +8,7 @@ import {
 } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { contentTypes } from "./content-type";
-import {
-  findJsonIncompatible,
-  isStringSatisfiable,
-  stringifyType,
-} from "./deep-checks";
+import { findJsonIncompatible, isStringSatisfiable } from "./deep-checks";
 import { defaultIsHeader } from "./documentation-helpers";
 import { AbstractEndpoint } from "./endpoint";
 import { flattenIO } from "./json-schema-helpers";
@@ -126,8 +122,12 @@ export class Diagnostics {
       const schema = jsonSchema as z.core.JSONSchema.BaseSchema;
       if (isStringSatisfiable(schema)) continue;
       this.logger.warn(
-        `The ${location} parameter ${name} can never be satisfied: ${stringifyType(schema)} is documented but parameter values always arrive as strings.`,
-        { ...ctx, path, name },
+        `The ${location} parameter ${name} has a schema that most likely would not accept the parsed data, ${
+          location === "path"
+            ? "since path parameters always arrive as strings"
+            : "depending on the queryParser config option"
+        }.`,
+        { ...ctx, path, name, jsonSchema: schema },
       );
     }
     for (const param of params) {

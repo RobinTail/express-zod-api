@@ -619,8 +619,13 @@ describe("Routing", () => {
           routing: { path: endpoint },
         });
         expect(logger._getLogs().warn).toContainEqual([
-          `The query parameter v can never be satisfied: ${type} is documented but parameter values always arrive as strings.`,
-          { method: "get", path: "/path", name: "v" },
+          "The query parameter v has a schema that most likely would not accept the parsed data, depending on the queryParser config option.",
+          {
+            method: "get",
+            path: "/path",
+            name: "v",
+            jsonSchema: expect.objectContaining({ type }),
+          },
         ]);
       },
     );
@@ -640,8 +645,8 @@ describe("Routing", () => {
         routing: { path: endpoint },
       });
       expect(logger._getLogs().warn).toContainEqual([
-        "The query parameter v can never be satisfied: number is documented but parameter values always arrive as strings.",
-        { method: "get", path: "/path", name: "v" },
+        "The query parameter v has a schema that most likely would not accept the parsed data, depending on the queryParser config option.",
+        { method: "get", path: "/path", name: "v", jsonSchema: { type: "number" } },
       ]);
     });
 
@@ -660,8 +665,13 @@ describe("Routing", () => {
         routing: { "/v1/:id": endpoint },
       });
       expect(logger._getLogs().warn).toContainEqual([
-        "The path parameter id can never be satisfied: number is documented but parameter values always arrive as strings.",
-        { method: "get", path: "/v1/:id", name: "id" },
+        "The path parameter id has a schema that most likely would not accept the parsed data, since path parameters always arrive as strings.",
+        {
+          method: "get",
+          path: "/v1/:id",
+          name: "id",
+          jsonSchema: { type: "number" },
+        },
       ]);
     });
 
@@ -687,7 +697,9 @@ describe("Routing", () => {
       });
       expect(
         logger._getLogs().warn.map((entry) => String((entry as string[])[0])),
-      ).not.toContain(expect.stringContaining("can never be satisfied"));
+      ).not.toContain(
+        expect.stringContaining("most likely would not accept the parsed data"),
+      );
     });
 
     test("should not warn about body params", () => {

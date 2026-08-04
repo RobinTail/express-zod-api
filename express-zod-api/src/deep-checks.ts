@@ -122,19 +122,3 @@ export const isStringSatisfiable = (
     subject.type !== "boolean"
   );
 };
-
-/** @internal Human-readable type label of a JSON Schema depiction for a warning message */
-export const stringifyType = (
-  subject: z.core.JSONSchema.BaseSchema,
-): string => {
-  if (typeof subject.type === "string") return subject.type;
-  const branches = subject.anyOf ?? subject.oneOf;
-  if (branches) {
-    const names = branches.map((branch) =>
-      stringifyType(branch as z.core.JSONSchema.BaseSchema),
-    );
-    return Array.from(new Set(names)).join(" | ");
-  }
-  if (typeof subject.const === "string") return "string";
-  return "non-string";
-};
