@@ -2,9 +2,14 @@ import type { SchemaObjectValue } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez, DocumentationError } from "../src";
+import type { InputSource } from "../src/config-type";
+import type { LogicalContainer } from "../src/logical-container";
+import type { Security } from "../src/security";
 import {
   type OpenAPIContext,
+  type IsHeader,
   depictRequestParams,
+  getRequestLocations,
   depictSecurity,
   depictSecurityRefs,
   depictTags,
@@ -48,6 +53,33 @@ describe("Documentation helpers", () => {
   beforeEach(() => {
     makeRefMock.mockClear();
   });
+
+  const makeParamDepiction = ({
+    inputSources,
+    security,
+    isHeader,
+    ...rest
+  }: Omit<Parameters<typeof depictRequestParams>[0], "getLocation"> & {
+    inputSources: InputSource[];
+    security?: LogicalContainer<Security>[];
+    isHeader?: IsHeader;
+  }) => {
+    const { getLocation, pathParams } = getRequestLocations({
+      method: "get",
+      path: "/v1/user/:id",
+      security,
+      inputSources,
+      isHeader,
+    });
+    const result = depictRequestParams({ ...rest, getLocation });
+    if (pathParams.size) {
+      throw new DocumentationError(
+        `The input schema is missing the path parameter "${[...pathParams][0]}"`,
+        { method: "get", path: "/v1/user/:id", isResponse: false },
+      );
+    }
+    return result;
+  };
 
   describe("excludeParamsFromDepiction()", () => {
     test.each<z.core.JSONSchema.BaseSchema>([
@@ -400,7 +432,7 @@ describe("Documentation helpers", () => {
   describe("depictRequestParams()", () => {
     test("should depict query and path params", () => {
       expect(
-        depictRequestParams({
+        makeParamDepiction({
           flatRequest: {
             properties: {
               id: { type: "string" },
@@ -418,7 +450,7 @@ describe("Documentation helpers", () => {
 
     test("should depict only path params if query is disabled", () => {
       expect(
-        depictRequestParams({
+        makeParamDepiction({
           flatRequest: {
             properties: {
               id: { type: "string" },
@@ -436,7 +468,7 @@ describe("Documentation helpers", () => {
 
     test("should throw when path param cannot be depicted due to disabled input sources", () => {
       expect(() =>
-        depictRequestParams({
+        makeParamDepiction({
           flatRequest: {
             properties: {
               id: { type: "string" },
@@ -459,7 +491,7 @@ describe("Documentation helpers", () => {
 
     test("Features 1180 and 2344: should depict header params when enabled", () => {
       expect(
-        depictRequestParams({
+        makeParamDepiction({
           flatRequest: {
             properties: {
               "x-request-id": { type: "string" },
@@ -480,7 +512,7 @@ describe("Documentation helpers", () => {
 
     test("should depict cookie params when enabled via CookieSecurity", () => {
       expect(
-        depictRequestParams({
+        makeParamDepiction({
           flatRequest: {
             properties: {
               id: { type: "string" },

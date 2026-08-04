@@ -37,6 +37,7 @@ import {
   reformatParamsInPath,
   nonEmpty,
   depictRequest,
+  getRequestLocations,
   type IsHeader,
   type BrandHandling,
   excludeParamsFromDepiction,
@@ -231,6 +232,13 @@ export class Documentation extends OpenApiBuilder {
       const commons = { ...shared, path, method, endpoint };
       const { description, summary, scopes, inputSchema, security } = endpoint;
       const inputSources = getInputSources(method, config.inputSources);
+      const { pathParams, getLocation } = getRequestLocations({
+        method,
+        path,
+        security,
+        inputSources,
+        isHeader,
+      });
       const operationId = this.#ensureUniqOperationId(
         path,
         method,
@@ -241,16 +249,20 @@ export class Documentation extends OpenApiBuilder {
       const flatRequest = flattenIO(request);
       const depictedParams = depictRequestParams({
         ...commons,
-        inputSources,
-        isHeader,
+        getLocation,
         flatRequest,
-        security,
         description: descriptions?.requestParameter?.({
           method,
           path,
           operationId,
         }),
       });
+      if (pathParams.size) {
+        throw new DocumentationError(
+          `The input schema is missing the path parameter "${[...pathParams][0]}"`,
+          { method, path, isResponse: false },
+        );
+      }
 
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {

@@ -77,6 +77,9 @@ export type IsHeader = (
   path: string,
 ) => boolean | null | undefined;
 
+/** @desc The location of a request parameter in the HTTP request */
+export type ParameterLocation = "path" | "query" | "cookie" | "header";
+
 export type BrandHandling = Record<string | symbol, Depicter>;
 
 const samples = {
@@ -274,9 +277,7 @@ export const getRequestLocations = ({
   const securityCookies = areCookiesEnabled
     ? getSecurityNames(security || [], "cookie")
     : undefined;
-  const getLocation = (
-    name: string,
-  ): "path" | "query" | "cookie" | "header" | undefined => {
+  const getLocation = (name: string): ParameterLocation | undefined => {
     if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))
       return "path";
     if (areCookiesEnabled && securityCookies?.has(name)) return "cookie";
@@ -296,28 +297,16 @@ export const depictRequestParams = ({
   path,
   method,
   flatRequest,
-  inputSources,
   makeRef,
   composition,
-  isHeader,
-  security,
+  getLocation,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResCommons & {
   composition: "inline" | "components";
   description?: string;
   flatRequest: FlattenObjectSchema;
-  inputSources: InputSource[];
-  isHeader?: IsHeader;
-  security?: LogicalContainer<Security>[];
+  getLocation: (name: string) => ParameterLocation | undefined;
 }) => {
-  const { pathParams, getLocation } = getRequestLocations({
-    method,
-    path,
-    security,
-    inputSources,
-    isHeader,
-  });
-
   const depictedParams = Object.entries(flatRequest.properties).reduce<
     ParameterObject[]
   >((acc, [name, jsonSchema]) => {
@@ -351,12 +340,6 @@ export const depictRequestParams = ({
     });
   }, []);
 
-  if (pathParams.size) {
-    throw new DocumentationError(
-      `The input schema is missing the path parameter "${[...pathParams][0]}"`,
-      { method, path, isResponse: false },
-    );
-  }
   return depictedParams;
 };
 
