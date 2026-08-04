@@ -199,7 +199,7 @@ importers:
         version: 1.18.1(@types/express@5.0.6)(@types/node@26.1.2)
       openapi3-ts:
         specifier: ^4.6.0
-        version: 4.6.0
+        version: 4.6.1
       ramda:
         specifier: catalog:prod
         version: 0.32.0
@@ -1588,8 +1588,8 @@ packages:
       zod:
         optional: true
 
-  openapi3-ts@4.6.0:
-    resolution: {integrity: sha512-a4sfn6L2sIShhtzJqmjGrARvxAW/3F2BJDdyRVvNF9VhAsZSh5hSyI3a9TNvmzBxXmq66nY5LNT5bQcBxYAZZg==}
+  openapi3-ts@4.6.1:
+    resolution: {integrity: sha512-XW9MOldkhoICNeXVzzmXzmOW5G73ppOEGmh7fLCqHjgfdEYCGGN+00MlVCeUZgovjjfC56j9tvtDt1zGabNjjA==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -3313,7 +3313,7 @@ snapshots:
     optionalDependencies:
       zod: 4.4.3
 
-  openapi3-ts@4.6.0:
+  openapi3-ts@4.6.1:
     dependencies:
       yaml: 2.9.0
 
