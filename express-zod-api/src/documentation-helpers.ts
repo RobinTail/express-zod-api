@@ -270,7 +270,7 @@ export const getRequestLocations = ({
   const areHeadersEnabled = inputSources.includes("headers");
   const areCookiesEnabled =
     inputSources.includes("cookies") || inputSources.includes("signedCookies");
-  const isQueryEnabled = inputSources.includes("query") && method !== "query";
+  const isQueryEnabled = inputSources.includes("query");
   const securityHeaders = areHeadersEnabled
     ? getSecurityNames(security || [], "header")
     : undefined;
@@ -287,7 +287,7 @@ export const getRequestLocations = ({
         defaultIsHeader(name, securityHeaders))
     )
       return "header";
-    if (isQueryEnabled) return "query";
+    if (isQueryEnabled && method !== "query") return "query";
     return undefined;
   };
   return { pathParams, getLocation, isQueryEnabled };
