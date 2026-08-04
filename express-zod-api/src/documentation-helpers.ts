@@ -285,7 +285,6 @@ export const getRequestLocations = ({
     )
       return "header";
     if (isQueryEnabled && method !== "query") return "query";
-    return undefined;
   };
   return { pathParams, getLocation, isQueryEnabled };
 };
