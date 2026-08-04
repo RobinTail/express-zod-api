@@ -1,13 +1,9 @@
 import type { SchemaObjectValue } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
-import { ez, DocumentationError } from "../src";
-import type { InputSource } from "../src/config-type";
-import type { LogicalContainer } from "../src/logical-container";
-import type { Security } from "../src/security";
+import { ez } from "../src";
 import {
   type OpenAPIContext,
-  type IsHeader,
   depictRequestParams,
   getRequestLocations,
   depictSecurity,
@@ -53,33 +49,6 @@ describe("Documentation helpers", () => {
   beforeEach(() => {
     makeRefMock.mockClear();
   });
-
-  const makeParamDepiction = ({
-    inputSources,
-    security,
-    isHeader,
-    ...rest
-  }: Omit<Parameters<typeof depictRequestParams>[0], "getLocation"> & {
-    inputSources: InputSource[];
-    security?: LogicalContainer<Security>[];
-    isHeader?: IsHeader;
-  }) => {
-    const { getLocation, pathParams } = getRequestLocations({
-      method: "get",
-      path: "/v1/user/:id",
-      security,
-      inputSources,
-      isHeader,
-    });
-    const result = depictRequestParams({ ...rest, getLocation });
-    if (pathParams.size) {
-      throw new DocumentationError(
-        `The input schema is missing the path parameter "${[...pathParams][0]}"`,
-        { method: "get", path: "/v1/user/:id", isResponse: false },
-      );
-    }
-    return result;
-  };
 
   describe("excludeParamsFromDepiction()", () => {
     test.each<z.core.JSONSchema.BaseSchema>([
@@ -429,10 +398,61 @@ describe("Documentation helpers", () => {
     });
   });
 
+  describe("getRequestLocations", () => {
+    test("should handle query and path params", () => {
+      const { pathParams, isQueryEnabled, getLocation } = getRequestLocations({
+        ...requestCtx,
+        inputSources: ["query", "params"],
+      });
+      expect(pathParams).toEqual(new Set(["id"]));
+      expect(isQueryEnabled).toBe(true);
+      expect(getLocation("id")).toBe("path");
+      expect(getLocation("test")).toBe("query");
+    });
+
+    test("should consider the rest is body when query is disabled", () => {
+      const { pathParams, isQueryEnabled, getLocation } = getRequestLocations({
+        ...requestCtx,
+        inputSources: ["body", "params"],
+      });
+      expect(pathParams).toEqual(new Set(["id"]));
+      expect(isQueryEnabled).toBe(false);
+      expect(getLocation("id")).toBe("path");
+      expect(getLocation("test")).toBeUndefined();
+    });
+
+    test("Features 1180 and 2344: should handle headers when enabled", () => {
+      const { pathParams, isQueryEnabled, getLocation } = getRequestLocations({
+        ...requestCtx,
+        inputSources: ["query", "headers", "params"],
+        security: [{ type: "header", name: "secure" }],
+      });
+      expect(pathParams).toEqual(new Set(["id"]));
+      expect(isQueryEnabled).toBe(true);
+      expect(getLocation("id")).toBe("path");
+      expect(getLocation("test")).toBe("query");
+      expect(getLocation("x-request-id")).toBe("header");
+      expect(getLocation("secure")).toBe("header");
+    });
+
+    test("should handle cookies when enabled", () => {
+      const { pathParams, isQueryEnabled, getLocation } = getRequestLocations({
+        ...requestCtx,
+        inputSources: ["query", "cookies", "params"],
+        security: [{ type: "cookie", name: "session" }],
+      });
+      expect(pathParams).toEqual(new Set(["id"]));
+      expect(isQueryEnabled).toBe(true);
+      expect(getLocation("id")).toBe("path");
+      expect(getLocation("test")).toBe("query");
+      expect(getLocation("session")).toBe("cookie");
+    });
+  });
+
   describe("depictRequestParams()", () => {
     test("should depict query and path params", () => {
       expect(
-        makeParamDepiction({
+        depictRequestParams({
           flatRequest: {
             properties: {
               id: { type: "string" },
@@ -441,57 +461,16 @@ describe("Documentation helpers", () => {
             required: ["id", "test"],
             type: "object",
           },
-          inputSources: ["query", "params"],
+          getLocation: (name) => (name === "id" ? "path" : "query"),
           composition: "inline",
           ...requestCtx,
         }),
       ).toMatchSnapshot();
-    });
-
-    test("should depict only path params if query is disabled", () => {
-      expect(
-        makeParamDepiction({
-          flatRequest: {
-            properties: {
-              id: { type: "string" },
-              test: { type: "boolean" },
-            },
-            required: ["id", "test"],
-            type: "object",
-          },
-          inputSources: ["body", "params"],
-          composition: "inline",
-          ...requestCtx,
-        }),
-      ).toMatchSnapshot();
-    });
-
-    test("should throw when path param cannot be depicted due to disabled input sources", () => {
-      expect(() =>
-        makeParamDepiction({
-          flatRequest: {
-            properties: {
-              id: { type: "string" },
-              test: { type: "boolean" },
-            },
-            required: ["id", "test"],
-            type: "object",
-          },
-          inputSources: ["body"],
-          composition: "inline",
-          ...requestCtx,
-        }),
-      ).toThrow(
-        new DocumentationError(
-          'The input schema is missing the path parameter "id"',
-          { method: "get", path: "/v1/user/:id", isResponse: false },
-        ),
-      );
     });
 
     test("Features 1180 and 2344: should depict header params when enabled", () => {
       expect(
-        makeParamDepiction({
+        depictRequestParams({
           flatRequest: {
             properties: {
               "x-request-id": { type: "string" },
@@ -502,9 +481,13 @@ describe("Documentation helpers", () => {
             required: ["x-request-id", "id", "test", "secure"],
             type: "object",
           },
-          inputSources: ["query", "headers", "params"],
+          getLocation: (name) =>
+            name.startsWith("x-") || name === "secure"
+              ? "header"
+              : name === "id"
+                ? "path"
+                : "query",
           composition: "inline",
-          security: [{ type: "header", name: "secure" }],
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -512,7 +495,7 @@ describe("Documentation helpers", () => {
 
     test("should depict cookie params when enabled via CookieSecurity", () => {
       expect(
-        makeParamDepiction({
+        depictRequestParams({
           flatRequest: {
             properties: {
               id: { type: "string" },
@@ -522,9 +505,9 @@ describe("Documentation helpers", () => {
             required: ["id", "session", "page"],
             type: "object",
           },
-          inputSources: ["query", "cookies", "params"],
+          getLocation: (name) =>
+            name === "session" ? "cookie" : name === "id" ? "path" : "query",
           composition: "inline",
-          security: [{ type: "cookie", name: "session" }],
           ...requestCtx,
         }),
       ).toMatchSnapshot();
