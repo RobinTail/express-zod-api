@@ -468,6 +468,24 @@ describe("Documentation helpers", () => {
       ).toMatchSnapshot();
     });
 
+    test("should depict only path params if query is disabled", () => {
+      expect(
+        depictRequestParams({
+          flatRequest: {
+            properties: {
+              id: { type: "string" },
+              test: { type: "boolean" },
+            },
+            required: ["id", "test"],
+            type: "object",
+          },
+          getLocation: (name) => (name === "id" ? "path" : undefined),
+          composition: "inline",
+          ...requestCtx,
+        }),
+      ).toMatchSnapshot();
+    });
+
     test("Features 1180 and 2344: should depict header params when enabled", () => {
       expect(
         depictRequestParams({
