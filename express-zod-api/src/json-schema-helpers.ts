@@ -149,10 +149,12 @@ export const coerceMarker = "x-coerce";
  * (`number`, `boolean`), stringless literals/enums and, for `path` parameters,
  * `object`/`array` (path segments are single strings) cannot, while coerced
  * primitives (marked via the `override` of `toJSONSchema`) and `string` can,
- * so this is a warning signal rather than an error. Unconstrained schemas and
- * — for `query` parameters — complex (`array`, `object`, `null`) ones are
- * treated as satisfiable to avoid false positives (e.g. `bigint` is already
- * covered by the JSON-incompatible warning).
+ * so this is a warning signal rather than an error. For `query` parameters
+ * complex ones (`array`, `object`) are treated as satisfiable, while for `path`
+ * parameters they are not (path segments are single strings). `null` is never
+ * satisfiable, since query string parsers do not produce null values.
+ * Unconstrained schemas are treated as satisfiable to avoid false positives
+ * (e.g. `bigint` is already covered by the JSON-incompatible warning).
  * */
 export const isStringSatisfiable = (
   subject: z.core.JSONSchema.BaseSchema,
@@ -166,18 +168,6 @@ export const isStringSatisfiable = (
   if (subject.allOf)
     return subject.allOf.every((one) => isStringSatisfiable(one, location));
   if (subject.type === undefined || subject.type === "string") return true;
-  if (location === "path") {
-    return (
-      subject.type !== "number" &&
-      subject.type !== "integer" &&
-      subject.type !== "boolean" &&
-      subject.type !== "object" &&
-      subject.type !== "array"
-    );
-  }
-  return (
-    subject.type !== "number" &&
-    subject.type !== "integer" &&
-    subject.type !== "boolean"
-  );
+  if (["object", "array"].includes(subject.type)) return location === "query";
+  return false;
 };
