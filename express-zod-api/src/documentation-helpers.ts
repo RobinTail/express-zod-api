@@ -39,7 +39,7 @@ import { DocumentationError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import { flattenIO, type FlattenObjectSchema } from "./json-schema-helpers";
 import type { Alternatives, LogicalContainer } from "./logical-container";
-import type { ClientMethod, SomeMethod } from "./method";
+import type { ClientMethod } from "./method";
 import { getBrand } from "./metadata";
 import type { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
@@ -257,7 +257,7 @@ export const getRequestLocations = ({
   inputSources,
   isHeader,
 }: {
-  method: SomeMethod;
+  method: ClientMethod;
   path: string;
   security?: LogicalContainer<Security>[];
   inputSources: InputSource[];

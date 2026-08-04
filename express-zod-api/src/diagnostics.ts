@@ -12,8 +12,8 @@ import {
   isStringSatisfiable,
 } from "./json-schema-helpers";
 import type { ActualLogger } from "./logger-helpers";
-import type { SomeMethod } from "./method";
 import type { OnEndpoint } from "./routing-walker";
+import type { Method } from "./method.ts";
 
 interface Findings {
   isSchemaChecked: boolean;
@@ -89,7 +89,7 @@ export class Diagnostics {
   #checkParams(
     ref: Findings,
     endpoint: AbstractEndpoint,
-    method: SomeMethod,
+    method: Method,
     path: string,
     ctx: FlatObject,
   ): void {
@@ -135,6 +135,6 @@ export class Diagnostics {
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, endpoint, { method, path });
-    this.#checkParams(ref, endpoint, method as SomeMethod, path, { method });
+    this.#checkParams(ref, endpoint, method, path, { method });
   };
 }
