@@ -126,7 +126,7 @@ export class Diagnostics {
           location === "path"
             ? "since path parameters always arrive as strings"
             : "depending on the queryParser config option"
-        }.`,
+        }. Consider coercing the value with z.coerce or converting it with z.string().transform().`,
         { ...ctx, path, name, jsonSchema: schema },
       );
     }
