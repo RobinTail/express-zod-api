@@ -158,7 +158,7 @@ export const coerceMarker = "x-coerce";
  * */
 export const isStringSatisfiable = (
   subject: z.core.JSONSchema.BaseSchema,
-  location: "path" | "query" = "query",
+  location: "path" | "query",
 ): boolean => {
   if (subject[coerceMarker] === true) return true;
   if (subject.anyOf)

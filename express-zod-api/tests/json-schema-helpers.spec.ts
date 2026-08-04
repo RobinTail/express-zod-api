@@ -286,25 +286,25 @@ describe("JSON Schema helpers", () => {
 
   describe("isStringSatisfiable()", () => {
     test("should consider coerced schemas satisfiable", () => {
-      expect(isStringSatisfiable({ type: "number", "x-coerce": true })).toBe(
-        true,
-      );
+      expect(
+        isStringSatisfiable({ type: "number", "x-coerce": true }, "query"),
+      ).toBe(true);
     });
 
     test("should consider string and unconstrained schemas satisfiable", () => {
-      expect(isStringSatisfiable({ type: "string" })).toBe(true);
-      expect(isStringSatisfiable({})).toBe(true);
+      expect(isStringSatisfiable({ type: "string" }, "query")).toBe(true);
+      expect(isStringSatisfiable({}, "query")).toBe(true);
     });
 
     test.each(["array", "object"] as const)(
       "should consider %s schemas satisfiable for query",
       (type) => {
-        expect(isStringSatisfiable({ type })).toBe(true);
+        expect(isStringSatisfiable({ type }, "query")).toBe(true);
       },
     );
 
     test("should consider null schema not satisfiable", () => {
-      expect(isStringSatisfiable({ type: "null" })).toBe(false);
+      expect(isStringSatisfiable({ type: "null" }, "query")).toBe(false);
     });
 
     test.each(["number", "integer", "boolean", "array", "object"] as const)(
@@ -321,33 +321,45 @@ describe("JSON Schema helpers", () => {
     test.each(["number", "integer", "boolean"] as const)(
       "should consider %s schema not satisfiable",
       (one) => {
-        expect(isStringSatisfiable({ type: one })).toBe(false);
+        expect(isStringSatisfiable({ type: one }, "query")).toBe(false);
       },
     );
 
     test("should consider a union variant satisfiable when any member is", () => {
       expect(
-        isStringSatisfiable({
-          oneOf: [{ type: "string" }, { type: "number" }],
-        }),
+        isStringSatisfiable(
+          {
+            oneOf: [{ type: "string" }, { type: "number" }],
+          },
+          "query",
+        ),
       ).toBe(true);
       expect(
-        isStringSatisfiable({
-          anyOf: [{ type: "number" }, { type: "boolean" }],
-        }),
+        isStringSatisfiable(
+          {
+            anyOf: [{ type: "number" }, { type: "boolean" }],
+          },
+          "query",
+        ),
       ).toBe(false);
     });
 
     test("should consider an allOf satisfiable when all members are", () => {
       expect(
-        isStringSatisfiable({
-          allOf: [{ type: "string" }, { type: "string" }],
-        }),
+        isStringSatisfiable(
+          {
+            allOf: [{ type: "string" }, { type: "string" }],
+          },
+          "query",
+        ),
       ).toBe(true);
       expect(
-        isStringSatisfiable({
-          allOf: [{ type: "string" }, { type: "number" }],
-        }),
+        isStringSatisfiable(
+          {
+            allOf: [{ type: "string" }, { type: "number" }],
+          },
+          "query",
+        ),
       ).toBe(false);
     });
   });
