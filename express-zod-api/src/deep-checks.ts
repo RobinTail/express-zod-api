@@ -99,55 +99,42 @@ export const findJsonIncompatible = (
   });
 
 /**
- * Whether a query/path parameter of this type can be satisfied by a string,
- * which is how such values always arrive. Non-coercing primitives (`number`,
- * `boolean`) and stringless literals/enums cannot, while `z.coerce.number()`
- * and `z.string()` can, so this is a warning signal rather than an error.
- * Unsupported and unknown schemas are treated as satisfiable to avoid
- * false positives (e.g. `bigint` is already covered by the JSON-incompatible
- * warning).
+ * Whether a query/path parameter of this JSON type can be satisfied by a
+ * string, which is how such values always arrive. Non-coercing primitives
+ * (`number`, `boolean`) and stringless literals/enums cannot, while coerced
+ * primitives (marked `x-coerce` via the `override` of `toJSONSchema`) and
+ * `string` can, so this is a warning signal rather than an error. Complex
+ * (`array`, `object`, `null`) and unconstrained schemas are treated as
+ * satisfiable to avoid false positives (e.g. `bigint` is already covered by
+ * the JSON-incompatible warning).
  * */
-export const isStringSatisfiable = (subject: z.core.$ZodType): boolean => {
-  const def = subject._zod.def;
-  if (unsupported.includes(def.type)) return true; // already covered elsewhere
-  switch (def.type) {
-    case "string":
-      return true;
-    case "enum":
-      return Object.values((def as z.core.$ZodEnumDef).entries).some(
-        (entry) => typeof entry === "string",
-      );
-    case "literal":
-      return (def as unknown as { values: unknown[] }).values.some(
-        (entry) => typeof entry === "string",
-      );
-    case "optional":
-    case "nullable":
-    case "default":
-      return isStringSatisfiable((def as z.core.$ZodDefaultDef).innerType);
-    case "lazy":
-      return isStringSatisfiable((def as z.core.$ZodLazyDef).getter());
-    case "union":
-      return (def as z.core.$ZodUnionDef).options.some(isStringSatisfiable);
-    case "number":
-    case "boolean":
-      return (def as z.core.$ZodNumberDef).coerce === true;
-    case "pipe":
-      return isStringSatisfiable((def as z.core.$ZodPipeDef).in); // input side
-    default:
-      return true; // unknown types are treated as satisfiable
-  }
+export const isStringSatisfiable = (
+  subject: z.core.JSONSchema.BaseSchema,
+): boolean => {
+  if (subject["x-coerce"] === true) return true;
+  if (subject.anyOf) return subject.anyOf.some(isStringSatisfiable);
+  if (subject.oneOf) return subject.oneOf.some(isStringSatisfiable);
+  if (subject.allOf) return subject.allOf.every(isStringSatisfiable);
+  if (subject.type === undefined || subject.type === "string") return true;
+  return (
+    subject.type !== "number" &&
+    subject.type !== "integer" &&
+    subject.type !== "boolean"
+  );
 };
 
-/** @internal Top-level object properties of an (possibly intersected) input schema */
-export const getObjectProperties = (
-  subject: z.core.$ZodType,
-): Record<string, z.core.$ZodType> => {
-  const def = subject._zod.def;
-  if (def.type === "intersection") {
-    const { left, right } = def as z.core.$ZodIntersectionDef;
-    return { ...getObjectProperties(left), ...getObjectProperties(right) };
+/** @internal Human-readable type label of a JSON Schema depiction for a warning message */
+export const stringifyType = (
+  subject: z.core.JSONSchema.BaseSchema,
+): string => {
+  if (typeof subject.type === "string") return subject.type;
+  const branches = subject.anyOf ?? subject.oneOf;
+  if (branches) {
+    const names = branches.map((branch) =>
+      stringifyType(branch as z.core.JSONSchema.BaseSchema),
+    );
+    return Array.from(new Set(names)).join(" | ");
   }
-  if (def.type === "object") return (def as z.core.$ZodObjectDef).shape;
-  return {};
+  if (typeof subject.const === "string") return "string";
+  return "non-string";
 };

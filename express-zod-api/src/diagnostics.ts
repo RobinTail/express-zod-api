@@ -10,8 +10,8 @@ import type { CommonConfig } from "./config-type";
 import { contentTypes } from "./content-type";
 import {
   findJsonIncompatible,
-  getObjectProperties,
   isStringSatisfiable,
+  stringifyType,
 } from "./deep-checks";
 import { defaultIsHeader } from "./documentation-helpers";
 import { AbstractEndpoint } from "./endpoint";
@@ -77,6 +77,19 @@ export class Diagnostics {
     ref.isSchemaChecked = true;
   }
 
+  #createFlatInput(endpoint: AbstractEndpoint): ReturnType<typeof flattenIO> {
+    return flattenIO(
+      z.toJSONSchema(endpoint.inputSchema, {
+        unrepresentable: "any",
+        io: "input",
+        override: ({ zodSchema, jsonSchema }) => {
+          if ((zodSchema._zod.def as { coerce?: boolean }).coerce === true)
+            jsonSchema["x-coerce"] = true;
+        },
+      }),
+    );
+  }
+
   #checkPathParams(
     ref: Findings,
     endpoint: AbstractEndpoint,
@@ -86,12 +99,7 @@ export class Diagnostics {
     if (ref.paths.has(path)) return;
     const params = getRoutePathParams(path);
     if (params.length === 0) return; // next statement can be expensive
-    ref.flat ??= flattenIO(
-      z.toJSONSchema(endpoint.inputSchema, {
-        unrepresentable: "any",
-        io: "input",
-      }),
-    );
+    ref.flat ??= this.#createFlatInput(endpoint);
     for (const param of params) {
       if (param in ref.flat.properties) continue;
       this.logger.warn(
@@ -117,12 +125,7 @@ export class Diagnostics {
       sources.includes("cookies") || sources.includes("signedCookies");
     const isQueryEnabled = sources.includes("query") && method !== "query";
     if (!areParamsEnabled && !isQueryEnabled) return;
-    ref.flat ??= flattenIO(
-      z.toJSONSchema(endpoint.inputSchema, {
-        unrepresentable: "any",
-        io: "input",
-      }),
-    );
+    ref.flat ??= this.#createFlatInput(endpoint);
     const pathParams = new Set(getRoutePathParams(path));
     const securityHeaders = areHeadersEnabled
       ? getSecurityNames(endpoint.security, "header")
@@ -136,15 +139,14 @@ export class Diagnostics {
       if (areHeadersEnabled && defaultIsHeader(name, securityHeaders)) return;
       if (isQueryEnabled) return "query";
     };
-    const properties = getObjectProperties(endpoint.inputSchema);
     for (const [name, jsonSchema] of Object.entries(ref.flat.properties)) {
       if (!isObject(jsonSchema)) continue;
       const location = getLocation(name);
       if (!location) continue;
-      const schema = properties[name];
-      if (!schema || isStringSatisfiable(schema)) continue;
+      const schema = jsonSchema as z.core.JSONSchema.BaseSchema;
+      if (isStringSatisfiable(schema)) continue;
       this.logger.warn(
-        `The ${location} parameter ${name} can never be satisfied: ${schema._zod.def.type} is documented but parameter values always arrive as strings.`,
+        `The ${location} parameter ${name} can never be satisfied: ${stringifyType(schema)} is documented but parameter values always arrive as strings.`,
         { ...ctx, path, name },
       );
     }

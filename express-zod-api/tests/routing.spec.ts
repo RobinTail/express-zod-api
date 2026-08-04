@@ -599,9 +599,9 @@ describe("Routing", () => {
 
     test.each([
       [z.number(), "number"],
-      [z.int(), "number"],
+      [z.int(), "integer"],
       [z.boolean(), "boolean"],
-      [z.literal(42), "literal"],
+      [z.literal(42), "number"],
     ])(
       "should warn about non-coercing string-only query params %#",
       (schema, type) => {
@@ -624,6 +624,26 @@ describe("Routing", () => {
         ]);
       },
     );
+
+    test("should warn about query params under a top-level transformation", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        method: "get",
+        input: z.object({ v: z.number() }).transform((o) => o),
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { path: endpoint },
+      });
+      expect(logger._getLogs().warn).toContainEqual([
+        "The query parameter v can never be satisfied: number is documented but parameter values always arrive as strings.",
+        { method: "get", path: "/path", name: "v" },
+      ]);
+    });
 
     test("should warn about non-coercing path params", () => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
