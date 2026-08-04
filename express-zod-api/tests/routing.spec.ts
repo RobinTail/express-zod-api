@@ -596,6 +596,93 @@ describe("Routing", () => {
         { method: "get", param: "idx", path: "/v1/:idx" },
       ]);
     });
+
+    test.each([
+      [z.number(), "number"],
+      [z.int(), "number"],
+      [z.boolean(), "boolean"],
+      [z.literal(42), "literal"],
+    ])(
+      "should warn about non-coercing string-only query params %#",
+      (schema, type) => {
+        const endpoint = new EndpointsFactory(defaultResultHandler).build({
+          method: "get",
+          input: z.object({ v: schema }),
+          output: z.object({}),
+          handler: vi.fn(),
+        });
+        const logger = makeLoggerMock();
+        initRouting({
+          app: appMock as unknown as IRouter,
+          getLogger: () => logger,
+          config: { cors: false },
+          routing: { path: endpoint },
+        });
+        expect(logger._getLogs().warn).toContainEqual([
+          `The query parameter v can never be satisfied: ${type} is documented but parameter values always arrive as strings.`,
+          { method: "get", path: "/path", name: "v" },
+        ]);
+      },
+    );
+
+    test("should warn about non-coercing path params", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        method: "get",
+        input: z.object({ id: z.number() }),
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { "/v1/:id": endpoint },
+      });
+      expect(logger._getLogs().warn).toContainEqual([
+        "The path parameter id can never be satisfied: number is documented but parameter values always arrive as strings.",
+        { method: "get", path: "/v1/:id", name: "id" },
+      ]);
+    });
+
+    test.each([z.coerce.number(), z.string(), z.string().transform(Number)])(
+      "should not warn about string-satisfiable query params %#",
+      (schema) => {
+        const endpoint = new EndpointsFactory(defaultResultHandler).build({
+          method: "get",
+          input: z.object({ v: schema }),
+          output: z.object({}),
+          handler: vi.fn(),
+        });
+        const logger = makeLoggerMock();
+        initRouting({
+          app: appMock as unknown as IRouter,
+          getLogger: () => logger,
+          config: { cors: false },
+          routing: { path: endpoint },
+        });
+        expect(
+          logger._getLogs().warn.map((entry) => String((entry as string[])[0])),
+        ).not.toContain(expect.stringContaining("can never be satisfied"));
+      },
+    );
+
+    test("should not warn about body params", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        method: "post",
+        input: z.object({ v: z.number() }),
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { path: endpoint },
+      });
+      expect(logger._getLogs().warn).toHaveLength(0);
+    });
   });
 
   describe("createWrongMethodHandler", () => {
