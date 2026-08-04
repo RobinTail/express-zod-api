@@ -1,7 +1,5 @@
 import {
   type ExamplesObject,
-  isReferenceObject,
-  isSchemaObject,
   type MediaTypeObject,
   type OAuthFlowObject,
   type ParameterLocation,
@@ -14,6 +12,8 @@ import {
   type SecurityRequirementObject,
   type SecuritySchemeObject,
   type TagObject,
+  isReferenceObject,
+  isSchemaObject,
 } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
@@ -21,14 +21,14 @@ import type { NormalizedResponse, ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {
   type FlatObject,
+  type Tag,
+  shouldHaveContent,
   getRoutePathParams,
   getTransformedType,
   isObject,
   isSchema,
   makeCleanId,
   routePathParamsRegex,
-  shouldHaveContent,
-  type Tag,
   ucFirst,
 } from "./common-helpers";
 import type { InputSource } from "./config-type";
@@ -39,8 +39,8 @@ import { DocumentationError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import { flattenIO, type FlattenObjectSchema } from "./json-schema-helpers";
 import type { Alternatives, LogicalContainer } from "./logical-container";
-import type { ClientMethod } from "./method";
 import { getBrand } from "./metadata";
+import type { ClientMethod } from "./method";
 import type { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
 import type { FirstPartyKind } from "./schema-walker";
