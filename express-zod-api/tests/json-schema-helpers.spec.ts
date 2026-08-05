@@ -330,23 +330,32 @@ describe("JSON Schema helpers", () => {
       },
     );
 
-    test.each(["properties", "additionalProperties"] as const)(
-      "object is acceptable in query when its properties are %#",
-      (prop) => {
-        expect(
-          isParamAcceptable(
-            { type: "object", [prop]: { a: { type: "string" } } },
-            "query",
-          ),
-        ).toBe(true);
-        expect(
-          isParamAcceptable(
-            { type: "object", [prop]: { a: { type: "number" } } },
-            "query",
-          ),
-        ).toBe(false);
-      },
-    );
+    test("object is acceptable in query when its properties are %#", () => {
+      expect(
+        isParamAcceptable(
+          { type: "object", properties: { a: { type: "string" } } },
+          "query",
+        ),
+      ).toBe(true);
+      expect(
+        isParamAcceptable(
+          { type: "object", additionalProperties: { type: "string" } },
+          "query",
+        ),
+      ).toBe(true);
+      expect(
+        isParamAcceptable(
+          { type: "object", properties: { a: { type: "number" } } },
+          "query",
+        ),
+      ).toBe(false);
+      expect(
+        isParamAcceptable(
+          { type: "object", additionalProperties: { type: "number" } },
+          "query",
+        ),
+      ).toBe(false);
+    });
 
     test.each(["query", "path"] as const)(
       "oneOf is acceptable in %s when some member is",
