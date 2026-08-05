@@ -604,7 +604,11 @@ describe("Routing", () => {
       [z.literal([42, 43]), "number"],
       [z.enum({ a: 42, b: 43 }), "number"],
       [z.array(z.number()), "array"],
+      [z.tuple([z.string(), z.number()]), "array"],
+      [z.tuple([z.string()]).rest(z.number()), "array"],
       [z.object({ nested: z.number() }), "object"],
+      [z.looseObject({ nested: z.string() }).catchall(z.number()), "object"],
+      [z.record(z.string(), z.number()), "object"],
     ])(
       "should warn about non-coercing string-only query params %#",
       (schema, type) => {
