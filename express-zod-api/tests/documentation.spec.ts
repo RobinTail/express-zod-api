@@ -18,6 +18,7 @@ import { z } from "zod";
 import { givePort } from "../../tools/ports";
 import * as R from "ramda";
 import { brandProperty } from "../src/metadata";
+import type { OpenAPIObject } from "openapi3-ts/oas32";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({
@@ -1633,17 +1634,16 @@ describe("Documentation", () => {
       composition: "components" as const,
     };
 
-    type Spec = ReturnType<Documentation["getSpec"]>;
     const createSpec = (routing: Routing) =>
       new Documentation({
         routing,
         ...commons,
       }).getSpec();
 
-    const resolve = (spec: Spec, ref: { $ref: string }) =>
+    const resolve = (spec: OpenAPIObject, ref: { $ref: string }) =>
       spec.components!.schemas![ref.$ref.split("/").pop()!];
 
-    const bodyRef = (spec: Spec, path: string) =>
+    const bodyRef = (spec: OpenAPIObject, path: string) =>
       (
         spec.paths![path]!.post!.requestBody! as {
           content: Record<string, { schema: { $ref: string } }>;
@@ -1651,10 +1651,9 @@ describe("Documentation", () => {
       ).content["application/json"]!.schema;
 
     const build = (input: IOSchema) =>
-      defaultEndpointsFactory.build({
+      defaultEndpointsFactory.buildVoid({
         method: "post",
         input,
-        output: z.object({ received: z.string() }),
         handler: vi.fn(),
       });
 
