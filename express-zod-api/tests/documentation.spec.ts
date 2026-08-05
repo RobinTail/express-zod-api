@@ -1641,7 +1641,7 @@ describe("Documentation", () => {
       }).getSpec();
 
     const resolve = (spec: OpenAPIObject, ref: { $ref: string }) =>
-      spec.components!.schemas![ref.$ref.split("/").pop()!];
+      R.path(ref.$ref.split("/").slice(1), spec);
 
     const bodyRef = (spec: OpenAPIObject, path: string) =>
       (
