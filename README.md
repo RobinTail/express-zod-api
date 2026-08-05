@@ -514,9 +514,11 @@ square brackets. You can choose between those parsers as well as configure a cus
 
 ## Transformations
 
-Since query and path parameters are generally strings (or sometimes arrays/objects of strings), there is often a need
-to transform them into numbers. Using `.transform()` is recommended for this purpose. Alternatively, you can also use
-`z.coerce` or `z.preprocess()`.
+Query and path parameters should have acceptable input schema. Those parameters are in general expected to be strings
+or coerced primitives that could accept strings. Query parameters can also be parsed as arrays of strings or objects
+having string properties (depends on `queryParser` config option). Therefore, there is often a need to transform their
+values into numbers. Using the `.transform()` schema method is recommended for this purpose. Alternatively, you can
+also use `z.coerce` or `z.preprocess()` schemas.
 
 ```ts
 import { Routing } from "express-zod-api";
