@@ -144,8 +144,8 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
 export const coerceMarker = "x-coerce";
 
 /**
- * @desc Whether a query/path parameter of this JSON type can be satisfied by a string.
- * @desc Unconstrained schemas are treated as satisfiable to avoid false positives.
+ * @desc Whether the given JSON schema is acceptable as a query/path parameter.
+ * @desc Mostly strings or coerced primitives. Query parser can also accept certain arrays and objects.
  * */
 export const isParamAcceptable = (
   subject: z.core.JSONSchema.BaseSchema,
