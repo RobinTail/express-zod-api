@@ -13,6 +13,21 @@
   - The check prints a warning message, runs only at startup and only in development mode;
   - Suggested by [@marco-carvalho](https://github.com/marco-carvalho).
 
+```ts
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  "/v1/users/:groupId": factory.build({
+    input: z.object({
+      // path parameter is originally a string:
+      groupId: z.string().transform(parseInt),
+      // query parser accepts arrays of strings:
+      roleIds: z.array(z.string()).transform((ids) => ids.map(parseInt)),
+    }),
+  }),
+};
+```
+
 ### v29.0.1
 
 - Minor performance tuning for `Documentation` generator:
