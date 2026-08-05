@@ -596,6 +596,49 @@ describe("Routing", () => {
       ]);
     });
 
+    test("should warn about optional path params", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+        input: z.object({ idx: z.string().optional() }),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { v1: { ":idx": endpoint } },
+      });
+      expect(logger._getLogs().warn).toContainEqual([
+        'The path parameter "idx" is declared optional in the input schema, but path parameters are always required since Express matches the route only when the segment is present.',
+        { method: "get", name: "idx", path: "/v1/:idx" },
+      ]);
+    });
+
+    test("should NOT warn about required path params", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+        input: z.object({ idx: z.string() }),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { v1: { ":idx": endpoint } },
+      });
+      expect(
+        logger
+          ._getLogs()
+          .warn.some(
+            (entry) =>
+              Array.isArray(entry) &&
+              String(entry[0]).includes(
+                "declared optional in the input schema",
+              ),
+          ),
+      ).toBe(false);
+    });
+
     test.each([
       [z.number(), "number"],
       [z.int(), "integer"],

@@ -99,6 +99,7 @@ export class Diagnostics {
         },
       }),
     );
+    const pathParamsSnapshot = new Set(pathParams);
     for (const [name, jsonSchema] of Object.entries(ref.flat.properties)) {
       if (!isObject(jsonSchema)) continue;
       const location = getLocation(name);
@@ -119,7 +120,24 @@ export class Diagnostics {
         { ...ctx, path, param },
       );
     }
+    this.#checkOptionalPathParams(ref.flat, pathParamsSnapshot, path, ctx);
     ref.paths.add(path);
+  }
+
+  #checkOptionalPathParams(
+    flat: FlattenObjectSchema,
+    pathParams: Set<string>,
+    path: string,
+    ctx: FlatObject,
+  ): void {
+    for (const name of pathParams) {
+      if (flat.properties[name] && !flat.required?.includes(name)) {
+        this.logger.warn(
+          `The path parameter "${name}" is declared optional in the input schema, but path parameters are always required since Express matches the route only when the segment is present.`,
+          { ...ctx, path, name },
+        );
+      }
+    }
   }
 
   public check: OnEndpoint = (method, path, endpoint) => {
