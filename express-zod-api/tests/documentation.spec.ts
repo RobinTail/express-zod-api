@@ -18,7 +18,7 @@ import { z } from "zod";
 import { givePort } from "../../tools/ports";
 import * as R from "ramda";
 import { brandProperty } from "../src/metadata";
-import type { OpenAPIObject } from "openapi3-ts/oas32";
+import type { OpenAPIObject, ReferenceObject } from "openapi3-ts/oas32";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({
@@ -1640,15 +1640,16 @@ describe("Documentation", () => {
         ...commons,
       }).getSpec();
 
-    const resolve = (spec: OpenAPIObject, ref: { $ref: string }) =>
+    const resolve = (spec: OpenAPIObject, ref: ReferenceObject) =>
       R.path(ref.$ref.split("/").slice(1), spec);
 
     const bodyRef = (spec: OpenAPIObject, path: string) =>
-      (
-        spec.paths![path]!.post!.requestBody! as {
-          content: Record<string, { schema: { $ref: string } }>;
-        }
-      ).content["application/json"]!.schema;
+      R.path<ReferenceObject>(
+        `paths|${path}|post|requestBody|content|${contentTypes.json}|schema`.split(
+          "|",
+        ),
+        spec,
+      );
 
     const build = (input: IOSchema) =>
       defaultEndpointsFactory.buildVoid({
@@ -1665,6 +1666,7 @@ describe("Documentation", () => {
       });
       const refA = bodyRef(spec, "/a/{id}");
       const refB = bodyRef(spec, "/b/{name}");
+      if (!refA || !refB) throw "no body ref";
       expect(refA).not.toEqual(refB);
       expect(resolve(spec, refA)).toEqual({
         type: "object",
@@ -1698,6 +1700,7 @@ describe("Documentation", () => {
       });
       const refA = bodyRef(spec, "/a/{id}");
       const refB = bodyRef(spec, "/b/{name}");
+      if (!refA || !refB) throw "no body ref";
       expect(refA).not.toEqual(refB);
       expect(resolve(spec, refA)).toEqual({
         type: "object",
