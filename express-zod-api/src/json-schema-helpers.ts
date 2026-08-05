@@ -144,19 +144,8 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
 export const coerceMarker = "x-coerce";
 
 /**
- * Whether a query/path parameter of this JSON type can be satisfied by a
- * string, which is how such values always arrive. Non-coercing primitives
- * (`number`, `boolean`), stringless literals/enums and, for `path` parameters,
- * `object`/`array` (path segments are single strings) cannot, while coerced
- * primitives (marked via the `override` of `toJSONSchema`) and `string` can,
- * so this is a warning signal rather than an error. For `path` parameters
- * `object`/`array` are not satisfiable, while for `query` parameters the check
- * is recursive: an `array` requires its `items` and an `object` requires every
- * `properties`/`additionalProperties` to be satisfiable, since query string
- * parsers produce arrays and objects of strings. `null` is never satisfiable,
- * since query string parsers do not produce null values.
- * Unconstrained schemas are treated as satisfiable to avoid false positives
- * (e.g. `bigint` is already covered by the JSON-incompatible warning).
+ * @desc Whether a query/path parameter of this JSON type can be satisfied by a string.
+ * @desc Unsupported types are treated as satisfiable to avoid false positives.
  * */
 export const isParamAcceptable = (
   subject: z.core.JSONSchema.BaseSchema,
