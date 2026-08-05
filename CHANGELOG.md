@@ -2,6 +2,13 @@
 
 ## Version 29
 
+### v29.1.2
+
+- Fixed the generated Documentation having `composition: "components"`:
+  - For routes sharing same input schema but having differed path parameters;
+  - The generator produced a single body component referenced by both operations;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
 ### v29.1.1
 
 - Fixed an issue for path parameters having `.optional()` schema:
