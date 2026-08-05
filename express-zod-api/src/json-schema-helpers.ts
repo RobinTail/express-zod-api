@@ -143,11 +143,6 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
 /** @desc Marks a coerced primitive in the JSON depiction (via the `override` of `toJSONSchema`). */
 export const coerceMarker = "x-coerce";
 
-/** @desc _JSONSchema is `boolean | JSONSchema`; keeps the object variant. */
-const isSchema = (
-  subject: z.core.JSONSchema._JSONSchema,
-): subject is z.core.JSONSchema.JSONSchema => isObject(subject);
-
 /**
  * Whether a query/path parameter of this JSON type can be satisfied by a
  * string, which is how such values always arrive. Non-coercing primitives
@@ -175,27 +170,23 @@ export const isParamAcceptable = (
   if (subject.allOf)
     return subject.allOf.every((one) => isParamAcceptable(one, location));
   if (subject.type === undefined || subject.type === "string") return true;
-  if (subject.type === "array") {
-    if (location === "path") return false;
-    const items = Array.isArray(subject.items)
-      ? subject.items
-      : subject.items === undefined
-        ? []
-        : [subject.items];
-    return items
-      .filter(isSchema)
-      .every((one) => isParamAcceptable(one, location));
-  }
-  if (subject.type === "object") {
-    if (location === "path") return false;
-    return [
-      ...Object.values(subject.properties || {}),
-      ...(isObject(subject.additionalProperties)
-        ? [subject.additionalProperties]
-        : []),
-    ]
-      .filter(isSchema)
-      .every((one) => isParamAcceptable(one, location));
+  if (location === "query" && ["array", "object"].includes(subject.type)) {
+    const sub = [
+      subject.items,
+      subject.prefixItems,
+      subject.additionalItems,
+      Object.values(subject.properties ?? {}),
+      subject.additionalProperties,
+    ];
+    for (const nested of sub) {
+      if (!isObject(nested)) continue;
+      const arr = Array.isArray(nested) ? nested : [nested];
+      for (const item of arr) {
+        if (!isObject(item)) continue;
+        if (!isParamAcceptable(item, location)) return false;
+      }
+    }
+    return true;
   }
   return false;
 };
