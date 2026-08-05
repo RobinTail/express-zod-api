@@ -1635,10 +1635,7 @@ describe("Documentation", () => {
     };
 
     const createSpec = (routing: Routing) =>
-      new Documentation({
-        routing,
-        ...commons,
-      }).getSpec();
+      new Documentation({ ...commons, routing }).getSpec();
 
     const resolve = (spec: OpenAPIObject, ref: ReferenceObject) =>
       R.path(ref.$ref.split("/").slice(1), spec);
