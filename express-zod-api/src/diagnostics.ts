@@ -1,23 +1,34 @@
 import { z } from "zod";
 import { responseVariants } from "./api-response";
-import { type FlatObject, getRoutePathParams } from "./common-helpers";
+import { type FlatObject, getInputSources, isObject } from "./common-helpers";
+import type { CommonConfig } from "./config-type";
 import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
+import { makeParamLocator } from "./documentation-helpers";
 import { AbstractEndpoint } from "./endpoint";
-import { flattenIO } from "./json-schema-helpers";
+import {
+  coerceMarker,
+  flattenIO,
+  type FlattenObjectSchema,
+  isParamAcceptable,
+} from "./json-schema-helpers";
 import type { ActualLogger } from "./logger-helpers";
 import type { OnEndpoint } from "./routing-walker";
+import type { Method } from "./method.ts";
 
 interface Findings {
   isSchemaChecked: boolean;
-  flat?: ReturnType<typeof flattenIO>;
+  flat?: FlattenObjectSchema;
   paths: Set<string>;
 }
 
 export class Diagnostics {
   #verified = new WeakMap<AbstractEndpoint, Findings>();
 
-  constructor(protected logger: ActualLogger) {}
+  constructor(
+    protected logger: ActualLogger,
+    protected config: CommonConfig,
+  ) {}
 
   #checkSchema(
     ref: Findings,
@@ -60,23 +71,49 @@ export class Diagnostics {
     ref.isSchemaChecked = true;
   }
 
-  #checkPathParams(
+  #checkParams(
     ref: Findings,
     endpoint: AbstractEndpoint,
+    method: Method,
     path: string,
     ctx: FlatObject,
   ): void {
     if (ref.paths.has(path)) return;
-    const params = getRoutePathParams(path);
-    if (params.length === 0) return; // next statement can be expensive
+    const { pathParams, getLocation, isQueryEnabled } = makeParamLocator({
+      method,
+      path,
+      security: endpoint.security,
+      inputSources: getInputSources(method, this.config.inputSources),
+    });
+    if (pathParams.size === 0 && !isQueryEnabled) return; // next statement can be expensive
     ref.flat ??= flattenIO(
       z.toJSONSchema(endpoint.inputSchema, {
         unrepresentable: "any",
         io: "input",
+        override: ({ zodSchema, jsonSchema }) => {
+          if (
+            zodSchema._zod.traits.has("$ZodPreprocess") ||
+            ("coerce" in zodSchema._zod.def && zodSchema._zod.def.coerce)
+          )
+            jsonSchema[coerceMarker] = true;
+        },
       }),
     );
-    for (const param of params) {
-      if (param in ref.flat.properties) continue;
+    for (const [name, jsonSchema] of Object.entries(ref.flat.properties)) {
+      if (!isObject(jsonSchema)) continue;
+      const location = getLocation(name);
+      if (location !== "path" && location !== "query") continue;
+      if (isParamAcceptable(jsonSchema, location)) continue;
+      this.logger.warn(
+        `The ${location} parameter "${name}" has a schema that most likely would not accept the parsed data, ${
+          location === "path"
+            ? "since path parameters always arrive as strings"
+            : 'depending on the "queryParser" config option'
+        }. Convert the parsed value from "z.string()" using ".transform()" method, or use "z.coerce" at least.`,
+        { ...ctx, path, name, jsonSchema },
+      );
+    }
+    for (const param of pathParams) {
       this.logger.warn(
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
         { ...ctx, path, param },
@@ -92,6 +129,6 @@ export class Diagnostics {
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, endpoint, { method, path });
-    this.#checkPathParams(ref, endpoint, path, { method });
+    this.#checkParams(ref, endpoint, method, path, { method });
   };
 }

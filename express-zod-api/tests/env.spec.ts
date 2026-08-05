@@ -94,6 +94,13 @@ describe("Environment checks", () => {
       /** @since 4.0.9 4e7a3ef180f6a5525d9021638e9df20b3ca50456 */
       expect(() => z.literal([])).toThrow(/no valid values/);
     });
+
+    test.each([z.coerce.number(), z.preprocess(Number, z.number())])(
+      "z.coerce and z.preprocess have no effect on JSON schema depiction %#",
+      (schema) => {
+        expect(schema.toJSONSchema()).toMatchSnapshot();
+      },
+    );
   });
 
   describe("Zod new features", () => {

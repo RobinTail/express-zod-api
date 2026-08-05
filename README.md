@@ -514,19 +514,27 @@ square brackets. You can choose between those parsers as well as configure a cus
 
 ## Transformations
 
-Since parameters of GET requests come in the form of strings, there is often a need to transform them into numbers.
+Query and path parameters should have acceptable input schema. Those parameters are in general expected to be strings
+or coerced primitives that could accept strings. Query parameters can also be parsed as arrays of strings or objects
+having string properties (depends on `queryParser` config option). Therefore, there is often a need to transform their
+values into numbers. Using the `.transform()` schema method is recommended for this purpose. Alternatively, you can
+also use `z.coerce` or `z.preprocess()` schemas.
 
 ```ts
-import { z } from "zod";
+import { Routing } from "express-zod-api";
 
-const getUserEndpoint = endpointsFactory.buildVoid({
-  input: z.object({
-    id: z.string().transform((id) => parseInt(id, 10)),
+const routing: Routing = {
+  "/v1/users/:groupId": factory.build({
+    input: z.object({
+      // path parameter is originally a string:
+      groupId: z.string().transform((id) => parseInt(id, 10)),
+      // query parser accepts arrays of strings:
+      roleIds: z
+        .array(z.string())
+        .transform((ids) => ids.map((id) => parseInt(id, 10))),
+    }),
   }),
-  handler: async ({ input: { id }, logger }) => {
-    logger.debug("id", typeof id); // number
-  },
-});
+};
 ```
 
 ## Top level transformations and mapping

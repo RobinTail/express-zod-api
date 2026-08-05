@@ -2,6 +2,7 @@ import {
   type ExamplesObject,
   type MediaTypeObject,
   type OAuthFlowObject,
+  type ParameterLocation,
   type ParameterObject,
   type ReferenceObject,
   type RequestBodyObject,
@@ -249,23 +250,18 @@ export const defaultIsHeader = (
   name.startsWith("x-") ||
   getWellKnownHeaders().has(name);
 
-export const depictRequestParams = ({
-  path,
+export const makeParamLocator = ({
   method,
-  flatRequest,
-  inputSources,
-  makeRef,
-  composition,
-  isHeader,
+  path,
   security,
-  description = `${method.toUpperCase()} ${path} Parameter`,
-}: ReqResCommons & {
-  composition: "inline" | "components";
-  description?: string;
-  flatRequest: FlattenObjectSchema;
+  inputSources,
+  isHeader,
+}: {
+  method: ClientMethod;
+  path: string;
+  security?: LogicalContainer<Security>[];
   inputSources: InputSource[];
   isHeader?: IsHeader;
-  security?: LogicalContainer<Security>[];
 }) => {
   const pathParams = new Set(getRoutePathParams(path));
   const isQueryEnabled = inputSources.includes("query");
@@ -279,8 +275,8 @@ export const depictRequestParams = ({
   let securityCookies: Set<string> | undefined;
   if (areCookiesEnabled && security)
     securityCookies = getSecurityNames(security, "cookie");
-
-  const getLocation = (name: string) => {
+  /** @modifies pathParams when the parameter's location is "path" */
+  const getLocation = (name: string): ParameterLocation | undefined => {
     if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))
       return "path";
     if (areCookiesEnabled && securityCookies?.has(name)) return "cookie";
@@ -291,13 +287,28 @@ export const depictRequestParams = ({
       return "header";
     if (isQueryEnabled && method !== "query") return "query";
   };
+  return { pathParams, getLocation, isQueryEnabled };
+};
 
-  const depictedParams = Object.entries(flatRequest.properties).reduce<
-    ParameterObject[]
-  >((acc, [name, jsonSchema]) => {
-    if (!isObject(jsonSchema)) return acc;
+export const depictRequestParams = ({
+  path,
+  method,
+  flatRequest,
+  makeRef,
+  composition,
+  getLocation,
+  description = `${method.toUpperCase()} ${path} Parameter`,
+}: ReqResCommons & {
+  composition: "inline" | "components";
+  description?: string;
+  flatRequest: FlattenObjectSchema;
+  getLocation: (name: string) => ParameterLocation | undefined;
+}) => {
+  const depictedParams: ParameterObject[] = [];
+  for (const [name, jsonSchema] of Object.entries(flatRequest.properties)) {
+    if (!isObject(jsonSchema)) continue;
     const location = getLocation(name);
-    if (!location) return acc;
+    if (!location) continue;
     const depicted = asOAS(jsonSchema);
     const result =
       composition === "components"
@@ -307,7 +318,7 @@ export const depictRequestParams = ({
             jsonSchema.id || makeCleanId(description, name),
           )
         : depicted;
-    return acc.concat({
+    depictedParams.push({
       name,
       in: location,
       deprecated: jsonSchema.deprecated,
@@ -323,13 +334,6 @@ export const depictRequestParams = ({
             ),
       ),
     });
-  }, []);
-
-  if (pathParams.size) {
-    throw new DocumentationError(
-      `The input schema is missing the path parameter "${[...pathParams][0]}"`,
-      { method, path, isResponse: false },
-    );
   }
   return depictedParams;
 };

@@ -2,6 +2,34 @@
 
 ## Version 29
 
+### v29.1.0
+
+- This version checks that query and path parameters have acceptable input schema:
+  - Those parameters are in general expected to be strings or coerced primitives that could accept strings;
+  - Query parameters can also be parsed as arrays of strings or objects having string properties:
+    - That depends on `queryParser` config option;
+  - It's recommended to use `z.string().transform()` schema to handle numbers and booleans in params;
+  - Alternatively, you can use `z.coerce` and `z.preprocess`;
+  - The check prints a warning message, runs only at startup and only in development mode;
+  - Suggested by [@marco-carvalho](https://github.com/marco-carvalho).
+
+```ts
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  "/v1/users/:groupId": factory.build({
+    input: z.object({
+      // path parameter is originally a string:
+      groupId: z.string().transform((id) => parseInt(id, 10)),
+      // query parser accepts arrays of strings:
+      roleIds: z
+        .array(z.string())
+        .transform((ids) => ids.map((id) => parseInt(id, 10))),
+    }),
+  }),
+};
+```
+
 ### v29.0.1
 
 - Minor performance tuning for `Documentation` generator:
