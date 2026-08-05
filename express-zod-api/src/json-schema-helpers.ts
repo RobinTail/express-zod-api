@@ -145,7 +145,7 @@ export const coerceMarker = "x-coerce";
 
 /**
  * @desc Whether a query/path parameter of this JSON type can be satisfied by a string.
- * @desc Unsupported types are treated as satisfiable to avoid false positives.
+ * @desc Unconstrained schemas are treated as satisfiable to avoid false positives.
  * */
 export const isParamAcceptable = (
   subject: z.core.JSONSchema.BaseSchema,
