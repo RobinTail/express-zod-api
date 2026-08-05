@@ -315,18 +315,22 @@ describe("JSON Schema helpers", () => {
     test.each(["items", "additionalItems", "prefixItems"] as const)(
       "array is acceptable in query when its items are %#",
       (prop) => {
-        expect(
-          isParamAcceptable(
-            { type: "array", [prop]: { type: "string" } },
-            "query",
-          ),
-        ).toBe(true);
-        expect(
-          isParamAcceptable(
-            { type: "array", [prop]: { type: "number" } },
-            "query",
-          ),
-        ).toBe(false);
+        for (const variant of [
+          { type: "string" },
+          [{ type: "string" }, { type: "string" }],
+        ]) {
+          expect(
+            isParamAcceptable({ type: "array", [prop]: variant }, "query"),
+          ).toBe(true);
+        }
+        for (const variant of [
+          { type: "number" },
+          [{ type: "string" }, { type: "number" }],
+        ]) {
+          expect(
+            isParamAcceptable({ type: "array", [prop]: variant }, "query"),
+          ).toBe(false);
+        }
       },
     );
 
