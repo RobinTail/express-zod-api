@@ -2,6 +2,17 @@
 
 ## Version 29
 
+### v29.1.0
+
+- This version checks that query and path parameters have acceptable input schema:
+  - Those parameters are in general expected to be strings or coerced primitives that could accept strings;
+  - Query parameters can also be parsed as arrays of strings or objects having string properties:
+    - That depends on `queryParser` config option;
+  - It's recommended to use `z.string().transform()` schema to handle numbers and booleans in params;
+  - Alternatively, you can use `z.coerce` and `z.preprocess`;
+  - The check prints a warning message, runs only at startup and only in development mode;
+  - Suggested by [@marco-carvalho](https://github.com/marco-carvalho).
+
 ### v29.0.1
 
 - Minor performance tuning for `Documentation` generator:
