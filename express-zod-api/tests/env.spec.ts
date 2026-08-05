@@ -98,7 +98,6 @@ describe("Environment checks", () => {
     test.each([z.coerce.number(), z.preprocess(Number, z.number())])(
       "z.coerce and z.preprocess have no effect on JSON schema depiction %#",
       (schema) => {
-        console.log(schema._zod.traits);
         expect(schema.toJSONSchema()).toMatchSnapshot();
       },
     );
