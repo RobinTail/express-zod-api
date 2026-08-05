@@ -78,8 +78,8 @@ export class Diagnostics {
         io: "input",
         override: ({ zodSchema, jsonSchema }) => {
           if (
-            "coerce" in zodSchema._zod.def &&
-            zodSchema._zod.def.coerce === true
+            zodSchema._zod.traits.has("$ZodPreprocess") ||
+            ("coerce" in zodSchema._zod.def && zodSchema._zod.def.coerce)
           )
             jsonSchema[coerceMarker] = true;
         },

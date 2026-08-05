@@ -687,6 +687,7 @@ describe("Routing", () => {
 
     test.each([
       z.coerce.number(),
+      z.preprocess(Number, z.number()),
       z.string(),
       z.string().transform(Number),
       z.array(z.string()),
