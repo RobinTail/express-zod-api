@@ -626,17 +626,7 @@ describe("Routing", () => {
         config: { cors: false },
         routing: { v1: { ":idx": endpoint } },
       });
-      expect(
-        logger
-          ._getLogs()
-          .warn.some(
-            (entry) =>
-              Array.isArray(entry) &&
-              String(entry[0]).includes(
-                "declared optional in the input schema",
-              ),
-          ),
-      ).toBe(false);
+      expect(logger._getLogs().warn).toHaveLength(0);
     });
 
     test.each([
