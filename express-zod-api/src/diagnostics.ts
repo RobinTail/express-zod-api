@@ -71,22 +71,6 @@ export class Diagnostics {
     ref.isSchemaChecked = true;
   }
 
-  #createFlatInput(endpoint: AbstractEndpoint): ReturnType<typeof flattenIO> {
-    return flattenIO(
-      z.toJSONSchema(endpoint.inputSchema, {
-        unrepresentable: "any",
-        io: "input",
-        override: ({ zodSchema, jsonSchema }) => {
-          if (
-            zodSchema._zod.traits.has("$ZodPreprocess") ||
-            ("coerce" in zodSchema._zod.def && zodSchema._zod.def.coerce)
-          )
-            jsonSchema[coerceMarker] = true;
-        },
-      }),
-    );
-  }
-
   #checkParams(
     ref: Findings,
     endpoint: AbstractEndpoint,
@@ -102,7 +86,19 @@ export class Diagnostics {
       inputSources: getInputSources(method, this.config.inputSources),
     });
     if (pathParams.size === 0 && !isQueryEnabled) return; // next statement can be expensive
-    ref.flat ??= this.#createFlatInput(endpoint);
+    ref.flat ??= flattenIO(
+      z.toJSONSchema(endpoint.inputSchema, {
+        unrepresentable: "any",
+        io: "input",
+        override: ({ zodSchema, jsonSchema }) => {
+          if (
+            zodSchema._zod.traits.has("$ZodPreprocess") ||
+            ("coerce" in zodSchema._zod.def && zodSchema._zod.def.coerce)
+          )
+            jsonSchema[coerceMarker] = true;
+        },
+      }),
+    );
     for (const [name, jsonSchema] of Object.entries(ref.flat.properties)) {
       if (!isObject(jsonSchema)) continue;
       const location = getLocation(name);
