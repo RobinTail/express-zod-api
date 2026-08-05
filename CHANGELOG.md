@@ -2,6 +2,13 @@
 
 ## Version 29
 
+### v29.1.1
+
+- Fixed an issue for path parameters having `.optional()` schema:
+  - Since it's invalid, according to the OpenAPI specification, those would be depicted as required;
+  - The self-diagnostic will now report the issue with a warning message (development mode only);
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
 ### v29.1.0
 
 - This version checks that query and path parameters have acceptable input schema:
