@@ -290,12 +290,6 @@ export const makeParamLocator = ({
   return { pathParams, getLocation, isQueryEnabled };
 };
 
-const isParamRequired = (
-  location: ParameterLocation,
-  required: readonly string[] | undefined,
-  name: string,
-): boolean => location === "path" || required?.includes(name) || false;
-
 export const depictRequestParams = ({
   path,
   method,
@@ -328,7 +322,7 @@ export const depictRequestParams = ({
       name,
       in: location,
       deprecated: jsonSchema.deprecated,
-      required: isParamRequired(location, flatRequest.required, name),
+      required: flatRequest.required?.includes(name) || location === "path", // issue #3600
       description: depicted.description || description,
       schema: result,
       examples: enumerateExamples(
