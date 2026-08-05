@@ -12,6 +12,7 @@ import {
   processPropertyNames,
   pullRequestExamples,
 } from "../src/json-schema-helpers";
+import * as R from "ramda";
 
 describe("JSON Schema helpers", () => {
   describe("isJsonObjectSchema()", () => {
@@ -334,32 +335,31 @@ describe("JSON Schema helpers", () => {
       },
     );
 
-    test("object is acceptable in query when its properties are %#", () => {
-      expect(
-        isParamAcceptable(
-          { type: "object", properties: { a: { type: "string" } } },
-          "query",
-        ),
-      ).toBe(true);
-      expect(
-        isParamAcceptable(
-          { type: "object", additionalProperties: { type: "string" } },
-          "query",
-        ),
-      ).toBe(true);
-      expect(
-        isParamAcceptable(
-          { type: "object", properties: { a: { type: "number" } } },
-          "query",
-        ),
-      ).toBe(false);
-      expect(
-        isParamAcceptable(
-          { type: "object", additionalProperties: { type: "number" } },
-          "query",
-        ),
-      ).toBe(false);
-    });
+    test.each(["properties/a", "additionalProperties"])(
+      "object is acceptable in query when its properties are %#",
+      (path) => {
+        expect(
+          isParamAcceptable(
+            R.assocPath(
+              path.split("/"),
+              { type: "string" },
+              { type: "object" },
+            ),
+            "query",
+          ),
+        ).toBe(true);
+        expect(
+          isParamAcceptable(
+            R.assocPath(
+              path.split("/"),
+              { type: "number" },
+              { type: "object" },
+            ),
+            "query",
+          ),
+        ).toBe(false);
+      },
+    );
 
     test.each(["query", "path"] as const)(
       "oneOf is acceptable in %s when some member is",
