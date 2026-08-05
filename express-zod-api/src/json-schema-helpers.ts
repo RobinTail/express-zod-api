@@ -166,6 +166,7 @@ export const isParamAcceptable = (
       subject.additionalItems,
       Object.values(subject.properties ?? {}),
       subject.additionalProperties,
+      subject.propertyNames,
     ];
     for (const nested of sub) {
       if (!isObject(nested)) continue;

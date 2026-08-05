@@ -335,7 +335,7 @@ describe("JSON Schema helpers", () => {
       },
     );
 
-    test.each(["properties/a", "additionalProperties"])(
+    test.each(["properties/a", "additionalProperties", "propertyNames"])(
       "object is acceptable in query when its properties are %#",
       (path) => {
         expect(
