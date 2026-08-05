@@ -105,7 +105,8 @@ export class Diagnostics {
       if (location !== "path" && location !== "query") continue;
       if (location === "path" && !ref.flat.required?.includes(name)) {
         this.logger.warn(
-          `The path parameter "${name}" is declared optional in the input schema, but path parameters are always required since Express matches the route only when the segment is present.`,
+          `The path parameter "${name}" is declared optional in the input schema, but path parameters are ` +
+            "always required since Express matches the route only when the segment is present.",
           { ...ctx, name },
         );
       }
