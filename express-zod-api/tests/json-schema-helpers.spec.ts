@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   flattenIO,
   isJsonObjectSchema,
-  isStringSatisfiable,
+  isParamAcceptable,
   mergeExamples,
   propsMerger,
   canMerge,
@@ -284,15 +284,15 @@ describe("JSON Schema helpers", () => {
     });
   });
 
-  describe("isStringSatisfiable()", () => {
+  describe("isParamAcceptable()", () => {
     test.each(["query", "path"] as const)(
       "ALWAYS acceptable in %s: coercion, strings, any",
       (location) => {
         expect(
-          isStringSatisfiable({ type: "number", "x-coerce": true }, location),
+          isParamAcceptable({ type: "number", "x-coerce": true }, location),
         ).toBe(true);
-        expect(isStringSatisfiable({ type: "string" }, location)).toBe(true);
-        expect(isStringSatisfiable({}, location)).toBe(true);
+        expect(isParamAcceptable({ type: "string" }, location)).toBe(true);
+        expect(isParamAcceptable({}, location)).toBe(true);
       },
     );
 
@@ -300,15 +300,15 @@ describe("JSON Schema helpers", () => {
       "ALWAYS NOT acceptable in %s: null, number, integer, boolean",
       (location) => {
         for (const type of ["null", "number", "integer", "boolean"] as const)
-          expect(isStringSatisfiable({ type }, location)).toBe(false);
+          expect(isParamAcceptable({ type }, location)).toBe(false);
       },
     );
 
     test.each(["array", "object"] as const)(
       "%s is OK in query, but not in path",
       (type) => {
-        expect(isStringSatisfiable({ type }, "query")).toBe(true);
-        expect(isStringSatisfiable({ type }, "path")).toBe(false);
+        expect(isParamAcceptable({ type }, "query")).toBe(true);
+        expect(isParamAcceptable({ type }, "path")).toBe(false);
       },
     );
 
@@ -316,13 +316,13 @@ describe("JSON Schema helpers", () => {
       "oneOf is acceptable in %s when some member is",
       (location) => {
         expect(
-          isStringSatisfiable(
+          isParamAcceptable(
             { oneOf: [{ type: "string" }, { type: "number" }] },
             location,
           ),
         ).toBe(true);
         expect(
-          isStringSatisfiable(
+          isParamAcceptable(
             { oneOf: [{ type: "number" }, { type: "boolean" }] },
             location,
           ),
@@ -334,13 +334,13 @@ describe("JSON Schema helpers", () => {
       "allOf is acceptable in %s when all members are",
       (location) => {
         expect(
-          isStringSatisfiable(
+          isParamAcceptable(
             { allOf: [{ type: "string" }, { type: "string" }] },
             location,
           ),
         ).toBe(true);
         expect(
-          isStringSatisfiable(
+          isParamAcceptable(
             { allOf: [{ type: "string" }, { type: "number" }] },
             location,
           ),

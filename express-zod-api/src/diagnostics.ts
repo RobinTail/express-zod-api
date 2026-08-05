@@ -9,7 +9,7 @@ import { AbstractEndpoint } from "./endpoint";
 import {
   coerceMarker,
   flattenIO,
-  isStringSatisfiable,
+  isParamAcceptable,
 } from "./json-schema-helpers";
 import type { ActualLogger } from "./logger-helpers";
 import type { OnEndpoint } from "./routing-walker";
@@ -106,7 +106,7 @@ export class Diagnostics {
       if (!isObject(jsonSchema)) continue;
       const location = getLocation(name);
       if (location !== "path" && location !== "query") continue;
-      if (isStringSatisfiable(jsonSchema, location)) continue;
+      if (isParamAcceptable(jsonSchema, location)) continue;
       this.logger.warn(
         `The ${location} parameter "${name}" has a schema that most likely would not accept the parsed data, ${
           location === "path"

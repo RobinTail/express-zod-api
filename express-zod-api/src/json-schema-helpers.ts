@@ -156,17 +156,17 @@ export const coerceMarker = "x-coerce";
  * Unconstrained schemas are treated as satisfiable to avoid false positives
  * (e.g. `bigint` is already covered by the JSON-incompatible warning).
  * */
-export const isStringSatisfiable = (
+export const isParamAcceptable = (
   subject: z.core.JSONSchema.BaseSchema,
   location: "path" | "query",
 ): boolean => {
   if (subject[coerceMarker] === true) return true;
   if (subject.anyOf)
-    return subject.anyOf.some((one) => isStringSatisfiable(one, location));
+    return subject.anyOf.some((one) => isParamAcceptable(one, location));
   if (subject.oneOf)
-    return subject.oneOf.some((one) => isStringSatisfiable(one, location));
+    return subject.oneOf.some((one) => isParamAcceptable(one, location));
   if (subject.allOf)
-    return subject.allOf.every((one) => isStringSatisfiable(one, location));
+    return subject.allOf.every((one) => isParamAcceptable(one, location));
   if (subject.type === undefined || subject.type === "string") return true;
   if (["object", "array"].includes(subject.type)) return location === "query";
   return false;
