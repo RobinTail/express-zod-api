@@ -9,6 +9,7 @@ import { AbstractEndpoint } from "./endpoint";
 import {
   coerceMarker,
   flattenIO,
+  type FlattenObjectSchema,
   isParamAcceptable,
 } from "./json-schema-helpers";
 import type { ActualLogger } from "./logger-helpers";
@@ -17,8 +18,8 @@ import type { Method } from "./method.ts";
 
 interface Findings {
   isSchemaChecked: boolean;
-  flat?: ReturnType<typeof flattenIO>;
-  paramsChecked: Set<string>;
+  flat?: FlattenObjectSchema;
+  paths: Set<string>;
 }
 
 export class Diagnostics {
@@ -93,7 +94,7 @@ export class Diagnostics {
     path: string,
     ctx: FlatObject,
   ): void {
-    if (ref.paramsChecked.has(path)) return;
+    if (ref.paths.has(path)) return;
     const { pathParams, getLocation, isQueryEnabled } = makeParamLocator({
       method,
       path,
@@ -122,16 +123,13 @@ export class Diagnostics {
         { ...ctx, path, param },
       );
     }
-    ref.paramsChecked.add(path);
+    ref.paths.add(path);
   }
 
   public check: OnEndpoint = (method, path, endpoint) => {
     let ref = this.#verified.get(endpoint);
     if (!ref) {
-      ref = {
-        isSchemaChecked: false,
-        paramsChecked: new Set(),
-      };
+      ref = { isSchemaChecked: false, paths: new Set() };
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, endpoint, { method, path });
