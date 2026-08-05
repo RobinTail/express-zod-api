@@ -1572,7 +1572,7 @@ describe("Documentation", () => {
       ).not.toThrow();
     });
 
-    test("Should depict optional path params as required", () => {
+    test("Issue #3600: Should depict optional path params as required", () => {
       const spec = new Documentation({
         ...commons,
         routing: {
