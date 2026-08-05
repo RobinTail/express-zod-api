@@ -322,7 +322,7 @@ export const depictRequestParams = ({
       name,
       in: location,
       deprecated: jsonSchema.deprecated,
-      required: flatRequest.required?.includes(name) || false,
+      required: flatRequest.required?.includes(name) || location === "path", // issue #3600
       description: depicted.description || description,
       schema: result,
       examples: enumerateExamples(

@@ -103,6 +103,13 @@ export class Diagnostics {
       if (!isObject(jsonSchema)) continue;
       const location = getLocation(name);
       if (location !== "path" && location !== "query") continue;
+      if (location === "path" && !ref.flat.required?.includes(name)) {
+        this.logger.warn(
+          `The path parameter "${name}" is declared optional in the input schema, but path parameters are ` +
+            "always required since Express matches the route only when the segment is present.",
+          { ...ctx, name },
+        );
+      }
       if (isParamAcceptable(jsonSchema, location)) continue;
       this.logger.warn(
         `The ${location} parameter "${name}" has a schema that most likely would not accept the parsed data, ${
@@ -110,13 +117,13 @@ export class Diagnostics {
             ? "since path parameters always arrive as strings"
             : 'depending on the "queryParser" config option'
         }. Convert the parsed value from "z.string()" using ".transform()" method, or use "z.coerce" at least.`,
-        { ...ctx, path, name, jsonSchema },
+        { ...ctx, name, jsonSchema },
       );
     }
     for (const param of pathParams) {
       this.logger.warn(
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
-        { ...ctx, path, param },
+        { ...ctx, param },
       );
     }
     ref.paths.add(path);
@@ -129,6 +136,6 @@ export class Diagnostics {
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, endpoint, { method, path });
-    this.#checkParams(ref, endpoint, method, path, { method });
+    this.#checkParams(ref, endpoint, method, path, { method, path });
   };
 }

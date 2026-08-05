@@ -1572,6 +1572,26 @@ describe("Documentation", () => {
       ).not.toThrow();
     });
 
+    test("Issue #3600: Should depict optional path params as required", () => {
+      const spec = new Documentation({
+        ...commons,
+        routing: {
+          v1: {
+            "users/:id": defaultEndpointsFactory.buildVoid({
+              input: z.object({ id: z.string().optional() }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      }).getSpec();
+      const operation = spec.paths!["/v1/users/{id}"]!.get!;
+      expect(operation.parameters).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: "id", in: "path", required: true }),
+        ]),
+      );
+    });
+
     test("Should throw when path param is not classified as in:path", () => {
       const config = createConfig({
         cors: true,

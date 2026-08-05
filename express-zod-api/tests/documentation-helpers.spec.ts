@@ -468,6 +468,25 @@ describe("Documentation helpers", () => {
       ).toMatchSnapshot();
     });
 
+    test("Issue #3600: should mark path params as required even when optional in the schema", () => {
+      const result = depictRequestParams({
+        flatRequest: {
+          properties: {
+            id: { type: "string" },
+            test: { type: "boolean" },
+          },
+          type: "object",
+        },
+        getLocation: (name) => (name === "id" ? "path" : "query"),
+        composition: "inline",
+        ...requestCtx,
+      });
+      expect(result).toEqual([
+        expect.objectContaining({ name: "id", in: "path", required: true }),
+        expect.objectContaining({ name: "test", in: "query", required: false }),
+      ]);
+    });
+
     test("should depict only path params if query is disabled", () => {
       expect(
         depictRequestParams({
