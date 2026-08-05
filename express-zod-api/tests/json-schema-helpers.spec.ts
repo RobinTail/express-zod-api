@@ -285,83 +285,68 @@ describe("JSON Schema helpers", () => {
   });
 
   describe("isStringSatisfiable()", () => {
-    test("should consider coerced schemas satisfiable", () => {
-      expect(
-        isStringSatisfiable({ type: "number", "x-coerce": true }, "query"),
-      ).toBe(true);
-    });
+    test.each(["query", "path"] as const)(
+      "ALWAYS acceptable in %s: coercion, strings, any",
+      (location) => {
+        expect(
+          isStringSatisfiable({ type: "number", "x-coerce": true }, location),
+        ).toBe(true);
+        expect(isStringSatisfiable({ type: "string" }, location)).toBe(true);
+        expect(isStringSatisfiable({}, location)).toBe(true);
+      },
+    );
 
-    test("should consider string and unconstrained schemas satisfiable", () => {
-      expect(isStringSatisfiable({ type: "string" }, "query")).toBe(true);
-      expect(isStringSatisfiable({}, "query")).toBe(true);
-    });
+    test.each(["query", "path"] as const)(
+      "ALWAYS NOT acceptable in %s: null, number, integer, boolean",
+      (location) => {
+        for (const type of ["null", "number", "integer", "boolean"] as const)
+          expect(isStringSatisfiable({ type }, location)).toBe(false);
+      },
+    );
 
     test.each(["array", "object"] as const)(
-      "should consider %s schemas satisfiable for query",
+      "%s is OK in query, but not in path",
       (type) => {
         expect(isStringSatisfiable({ type }, "query")).toBe(true);
+        expect(isStringSatisfiable({ type }, "path")).toBe(false);
       },
     );
 
-    test("should consider null schema not satisfiable", () => {
-      expect(isStringSatisfiable({ type: "null" }, "query")).toBe(false);
-    });
-
-    test.each(["number", "integer", "boolean", "array", "object"] as const)(
-      "should consider %s schema not satisfiable for path",
-      (one) => {
-        expect(isStringSatisfiable({ type: one }, "path")).toBe(false);
+    test.each(["query", "path"] as const)(
+      "oneOf is acceptable in %s when some member is",
+      (location) => {
+        expect(
+          isStringSatisfiable(
+            { oneOf: [{ type: "string" }, { type: "number" }] },
+            location,
+          ),
+        ).toBe(true);
+        expect(
+          isStringSatisfiable(
+            { oneOf: [{ type: "number" }, { type: "boolean" }] },
+            location,
+          ),
+        ).toBe(false);
       },
     );
 
-    test("should consider string schema satisfiable for path", () => {
-      expect(isStringSatisfiable({ type: "string" }, "path")).toBe(true);
-    });
-
-    test.each(["number", "integer", "boolean"] as const)(
-      "should consider %s schema not satisfiable",
-      (one) => {
-        expect(isStringSatisfiable({ type: one }, "query")).toBe(false);
+    test.each(["query", "path"] as const)(
+      "allOf is acceptable in %s when all members are",
+      (location) => {
+        expect(
+          isStringSatisfiable(
+            { allOf: [{ type: "string" }, { type: "string" }] },
+            location,
+          ),
+        ).toBe(true);
+        expect(
+          isStringSatisfiable(
+            { allOf: [{ type: "string" }, { type: "number" }] },
+            location,
+          ),
+        ).toBe(false);
       },
     );
-
-    test("should consider a union variant satisfiable when any member is", () => {
-      expect(
-        isStringSatisfiable(
-          {
-            oneOf: [{ type: "string" }, { type: "number" }],
-          },
-          "query",
-        ),
-      ).toBe(true);
-      expect(
-        isStringSatisfiable(
-          {
-            anyOf: [{ type: "number" }, { type: "boolean" }],
-          },
-          "query",
-        ),
-      ).toBe(false);
-    });
-
-    test("should consider an allOf satisfiable when all members are", () => {
-      expect(
-        isStringSatisfiable(
-          {
-            allOf: [{ type: "string" }, { type: "string" }],
-          },
-          "query",
-        ),
-      ).toBe(true);
-      expect(
-        isStringSatisfiable(
-          {
-            allOf: [{ type: "string" }, { type: "number" }],
-          },
-          "query",
-        ),
-      ).toBe(false);
-    });
   });
 
   describe("flattenIO()", () => {
