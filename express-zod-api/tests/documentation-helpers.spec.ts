@@ -468,7 +468,7 @@ describe("Documentation helpers", () => {
       ).toMatchSnapshot();
     });
 
-    test("should mark path params as required even when optional in the schema", () => {
+    test("Issue #3600: should mark path params as required even when optional in the schema", () => {
       const result = depictRequestParams({
         flatRequest: {
           properties: {
