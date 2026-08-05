@@ -1,7 +1,6 @@
 import type { SchemaObjectValue } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
-import { ez } from "../src";
 import {
   type OpenAPIContext,
   depictRequestParams,
@@ -555,7 +554,6 @@ describe("Documentation helpers", () => {
     test("should mark ez.raw() body as required", () => {
       const body = depictBody({
         ...requestCtx,
-        schema: ez.raw(),
         bodyJsonSchema: { type: "string", format: "binary" },
         hasRequiredBodyProps: false,
         flatRequest: { type: "object", properties: {} },
@@ -569,7 +567,6 @@ describe("Documentation helpers", () => {
     test("should omit parameter fields from fallback flat.examples", () => {
       const body = depictBody({
         ...requestCtx,
-        schema: ez.raw(),
         bodyJsonSchema: {
           type: "object",
           properties: { other: { type: "string" } },

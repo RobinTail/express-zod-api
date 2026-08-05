@@ -2,6 +2,13 @@
 
 ## Version 29
 
+### v29.1.2
+
+- Fixed request body components with `composition: "components"` being keyed by the input schema instance:
+  - When two routes shared one input schema instance but differed in path parameters, they produced a single body component `$ref`d by both operations yet describing only one of the bodies;
+  - Body components are now keyed by the depicted body schema, so each route references a component describing its own body;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
 ### v29.1.1
 
 - Fixed an issue for path parameters having `.optional()` schema:

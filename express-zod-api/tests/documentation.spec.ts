@@ -9,9 +9,11 @@ import {
   ez,
   ResultHandler,
   type Method,
+  type Routing,
 } from "../src";
 import { Documentation, type Depicter } from "../src/documentation";
 import { contentTypes } from "../src/content-type";
+import type { IOSchema } from "../src/io-schema";
 import { z } from "zod";
 import { givePort } from "../../tools/ports";
 import * as R from "ramda";
@@ -1620,6 +1622,94 @@ describe("Documentation", () => {
           { method: "post", path: "/v1/:id", isResponse: false },
         ),
       );
+    });
+  });
+
+  describe("Issue #3601: shared input schema should not share the request body component", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Issue 3601", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    type Spec = ReturnType<Documentation["getSpec"]>;
+    const createSpec = (routing: Routing) =>
+      new Documentation({
+        routing,
+        ...commons,
+      }).getSpec();
+
+    const resolve = (spec: Spec, ref: { $ref: string }) =>
+      spec.components!.schemas![ref.$ref.split("/").pop()!];
+
+    const bodyRef = (spec: Spec, path: string) =>
+      (
+        spec.paths![path]!.post!.requestBody! as {
+          content: Record<string, { schema: { $ref: string } }>;
+        }
+      ).content["application/json"]!.schema;
+
+    const build = (input: IOSchema) =>
+      defaultEndpointsFactory.build({
+        method: "post",
+        input,
+        output: z.object({ received: z.string() }),
+        handler: vi.fn(),
+      });
+
+    test("two routes sharing an input schema instance get their own body", () => {
+      const shared = z.object({ id: z.string(), name: z.string() });
+      const spec = createSpec({
+        "post /a/:id": build(shared),
+        "post /b/:name": build(shared),
+      });
+      const refA = bodyRef(spec, "/a/{id}");
+      const refB = bodyRef(spec, "/b/{name}");
+      expect(refA).not.toEqual(refB);
+      expect(resolve(spec, refA)).toEqual({
+        type: "object",
+        properties: { name: { type: "string" } },
+        required: ["name"],
+      });
+      expect(resolve(spec, refB)).toEqual({
+        type: "object",
+        properties: { id: { type: "string" } },
+        required: ["id"],
+      });
+    });
+
+    test("identical bodies across routes sharing a schema instance still dedup", () => {
+      const shared = z.object({ id: z.string(), name: z.string() });
+      const spec = createSpec({
+        "post /a/:id": build(shared),
+        "post /b/:id": build(shared),
+      });
+      const names = Object.keys(spec.components!.schemas ?? {}).filter((name) =>
+        name.includes("RequestBody"),
+      );
+      expect(names).toHaveLength(1);
+    });
+
+    test("one endpoint mounted at two paths gets a distinct body per route", () => {
+      const endpoint = build(z.object({ id: z.string(), name: z.string() }));
+      const spec = createSpec({
+        "post /a/:id": endpoint,
+        "post /b/:name": endpoint,
+      });
+      const refA = bodyRef(spec, "/a/{id}");
+      const refB = bodyRef(spec, "/b/{name}");
+      expect(refA).not.toEqual(refB);
+      expect(resolve(spec, refA)).toEqual({
+        type: "object",
+        properties: { name: { type: "string" } },
+        required: ["name"],
+      });
+      expect(resolve(spec, refB)).toEqual({
+        type: "object",
+        properties: { id: { type: "string" } },
+        required: ["id"],
+      });
     });
   });
 

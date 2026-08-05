@@ -628,7 +628,6 @@ export const depictRequest = ({
 export const depictBody = ({
   method,
   path,
-  schema,
   bodyJsonSchema,
   hasRequiredBodyProps,
   flatRequest,
@@ -638,7 +637,6 @@ export const depictBody = ({
   paramNames,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResCommons & {
-  schema: IOSchema;
   composition: "inline" | "components";
   description?: string;
   bodyJsonSchema: z.core.JSONSchema.BaseSchema;
@@ -656,7 +654,7 @@ export const depictBody = ({
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, pure, makeCleanId(description))
+        ? makeRef(JSON.stringify(pure), pure, makeCleanId(description))
         : pure,
     examples: enumerateExamples(
       examples.length

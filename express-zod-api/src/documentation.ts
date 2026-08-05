@@ -299,7 +299,6 @@ export class Documentation extends OpenApiBuilder {
           hasRequiredBodyProps,
           flatRequest,
           paramNames,
-          schema: inputSchema,
           mimeType: contentTypes[endpoint.getProbableRequestType(method)],
           description: descriptions?.requestBody?.({
             method,
