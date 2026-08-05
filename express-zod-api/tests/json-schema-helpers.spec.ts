@@ -313,6 +313,57 @@ describe("JSON Schema helpers", () => {
     );
 
     test.each(["query", "path"] as const)(
+      "array is acceptable in %s when its items are",
+      (location) => {
+        expect(
+          isParamAcceptable(
+            { type: "array", items: { type: "string" } },
+            location,
+          ),
+        ).toBe(location === "query");
+        expect(
+          isParamAcceptable(
+            { type: "array", items: { type: "number" } },
+            location,
+          ),
+        ).toBe(false);
+      },
+    );
+
+    test.each(["query", "path"] as const)(
+      "object is acceptable in %s when all its properties are",
+      (location) => {
+        expect(
+          isParamAcceptable(
+            { type: "object", properties: { a: { type: "string" } } },
+            location,
+          ),
+        ).toBe(location === "query");
+        expect(
+          isParamAcceptable(
+            { type: "object", properties: { a: { type: "number" } } },
+            location,
+          ),
+        ).toBe(false);
+      },
+    );
+
+    test("object adheres to its record values in query", () => {
+      expect(
+        isParamAcceptable(
+          { type: "object", additionalProperties: { type: "string" } },
+          "query",
+        ),
+      ).toBe(true);
+      expect(
+        isParamAcceptable(
+          { type: "object", additionalProperties: { type: "number" } },
+          "query",
+        ),
+      ).toBe(false);
+    });
+
+    test.each(["query", "path"] as const)(
       "oneOf is acceptable in %s when some member is",
       (location) => {
         expect(

@@ -143,16 +143,23 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
 /** @desc Marks a coerced primitive in the JSON depiction (via the `override` of `toJSONSchema`). */
 export const coerceMarker = "x-coerce";
 
+/** @desc _JSONSchema is `boolean | JSONSchema`; keeps the object variant. */
+const isSchema = (
+  subject: z.core.JSONSchema._JSONSchema,
+): subject is z.core.JSONSchema.JSONSchema => isObject(subject);
+
 /**
  * Whether a query/path parameter of this JSON type can be satisfied by a
  * string, which is how such values always arrive. Non-coercing primitives
  * (`number`, `boolean`), stringless literals/enums and, for `path` parameters,
  * `object`/`array` (path segments are single strings) cannot, while coerced
  * primitives (marked via the `override` of `toJSONSchema`) and `string` can,
- * so this is a warning signal rather than an error. For `query` parameters
- * complex ones (`array`, `object`) are treated as satisfiable, while for `path`
- * parameters they are not (path segments are single strings). `null` is never
- * satisfiable, since query string parsers do not produce null values.
+ * so this is a warning signal rather than an error. For `path` parameters
+ * `object`/`array` are not satisfiable, while for `query` parameters the check
+ * is recursive: an `array` requires its `items` and an `object` requires every
+ * `properties`/`additionalProperties` to be satisfiable, since query string
+ * parsers produce arrays and objects of strings. `null` is never satisfiable,
+ * since query string parsers do not produce null values.
  * Unconstrained schemas are treated as satisfiable to avoid false positives
  * (e.g. `bigint` is already covered by the JSON-incompatible warning).
  * */
@@ -168,6 +175,27 @@ export const isParamAcceptable = (
   if (subject.allOf)
     return subject.allOf.every((one) => isParamAcceptable(one, location));
   if (subject.type === undefined || subject.type === "string") return true;
-  if (["object", "array"].includes(subject.type)) return location === "query";
+  if (subject.type === "array") {
+    if (location === "path") return false;
+    const items = Array.isArray(subject.items)
+      ? subject.items
+      : subject.items === undefined
+        ? []
+        : [subject.items];
+    return items
+      .filter(isSchema)
+      .every((one) => isParamAcceptable(one, location));
+  }
+  if (subject.type === "object") {
+    if (location === "path") return false;
+    return [
+      ...Object.values(subject.properties || {}),
+      ...(isObject(subject.additionalProperties)
+        ? [subject.additionalProperties]
+        : []),
+    ]
+      .filter(isSchema)
+      .every((one) => isParamAcceptable(one, location));
+  }
   return false;
 };
