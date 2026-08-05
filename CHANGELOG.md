@@ -20,9 +20,11 @@ const routing: Routing = {
   "/v1/users/:groupId": factory.build({
     input: z.object({
       // path parameter is originally a string:
-      groupId: z.string().transform(parseInt),
+      groupId: z.string().transform((id) => parseInt(id, 10)),
       // query parser accepts arrays of strings:
-      roleIds: z.array(z.string()).transform((ids) => ids.map(parseInt)),
+      roleIds: z
+        .array(z.string())
+        .transform((ids) => ids.map((id) => parseInt(id, 10))),
     }),
   }),
 };
