@@ -305,63 +305,48 @@ describe("JSON Schema helpers", () => {
     );
 
     test.each(["array", "object"] as const)(
-      "%s is OK in query, but not in path",
+      "empty %s is generally OK in query, but not in path",
       (type) => {
         expect(isParamAcceptable({ type }, "query")).toBe(true);
         expect(isParamAcceptable({ type }, "path")).toBe(false);
       },
     );
 
-    test.each(["query", "path"] as const)(
-      "array is acceptable in %s when its items are",
-      (location) => {
+    test.each(["items", "additionalItems", "prefixItems"] as const)(
+      "array is acceptable in query when its items are %#",
+      (prop) => {
         expect(
           isParamAcceptable(
-            { type: "array", items: { type: "string" } },
-            location,
+            { type: "array", [prop]: { type: "string" } },
+            "query",
           ),
-        ).toBe(location === "query");
+        ).toBe(true);
         expect(
           isParamAcceptable(
-            { type: "array", items: { type: "number" } },
-            location,
-          ),
-        ).toBe(false);
-      },
-    );
-
-    test.each(["query", "path"] as const)(
-      "object is acceptable in %s when all its properties are",
-      (location) => {
-        expect(
-          isParamAcceptable(
-            { type: "object", properties: { a: { type: "string" } } },
-            location,
-          ),
-        ).toBe(location === "query");
-        expect(
-          isParamAcceptable(
-            { type: "object", properties: { a: { type: "number" } } },
-            location,
+            { type: "array", [prop]: { type: "number" } },
+            "query",
           ),
         ).toBe(false);
       },
     );
 
-    test("object adheres to its record values in query", () => {
-      expect(
-        isParamAcceptable(
-          { type: "object", additionalProperties: { type: "string" } },
-          "query",
-        ),
-      ).toBe(true);
-      expect(
-        isParamAcceptable(
-          { type: "object", additionalProperties: { type: "number" } },
-          "query",
-        ),
-      ).toBe(false);
-    });
+    test.each(["properties", "additionalProperties"] as const)(
+      "object is acceptable in query when its properties are %#",
+      (prop) => {
+        expect(
+          isParamAcceptable(
+            { type: "object", [prop]: { a: { type: "string" } } },
+            "query",
+          ),
+        ).toBe(true);
+        expect(
+          isParamAcceptable(
+            { type: "object", [prop]: { a: { type: "number" } } },
+            "query",
+          ),
+        ).toBe(false);
+      },
+    );
 
     test.each(["query", "path"] as const)(
       "oneOf is acceptable in %s when some member is",
