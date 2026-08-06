@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { parser } from "typescript-eslint";
+import parser from "@typescript-eslint/parser";
 import manifest from "./package.json";
 import assert from "node:assert/strict";
 
