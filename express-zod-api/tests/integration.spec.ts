@@ -1,4 +1,3 @@
-import ts from "typescript";
 import { globalRegistry, z } from "zod";
 import {
   EndpointsFactory,
@@ -7,6 +6,7 @@ import {
 } from "../src";
 import { Integration, type Producer } from "../src/integration";
 import { brandProperty } from "../src/metadata";
+import { ensureTypeNode, SyntaxKind } from "../src/typescript-api";
 
 describe("Integration", () => {
   const recursive1: z.ZodType = z.lazy(() =>
@@ -145,8 +145,7 @@ describe("Integration", () => {
         config: configMock,
         variant: "types",
         brandHandling: {
-          CUSTOM: () =>
-            ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+          CUSTOM: () => ensureTypeNode(SyntaxKind.BooleanKeyword),
           DEEP: rule,
         },
         routing: {
@@ -171,7 +170,7 @@ describe("Integration", () => {
 
   test("Producer type should be satisfied", () => {
     expectTypeOf(() =>
-      ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+      ensureTypeNode(SyntaxKind.AnyKeyword),
     ).toExtend<Producer>();
   });
 });
