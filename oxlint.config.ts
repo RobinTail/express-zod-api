@@ -199,6 +199,7 @@ export default defineConfig({
   },
   overrides: [
     {
+      // ALL SOURCES
       files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       rules: {
         "constructor-super": "off",
@@ -225,6 +226,7 @@ export default defineConfig({
       },
     },
     {
+      // FRAMEWORK SOURCES
       files: ["express-zod-api/src/*.ts"],
       rules: {
         complexity: ["error", 16],
@@ -233,6 +235,7 @@ export default defineConfig({
       },
     },
     {
+      // INTEGRATION GENERATOR
       files: [
         "express-zod-api/src/integration.ts",
         "express-zod-api/src/integration-base.ts",
@@ -248,6 +251,7 @@ export default defineConfig({
       },
     },
     {
+      // ZOD PLUGIN
       files: ["zod-plugin/src/*.ts"],
       rules: {
         "allowed/dependencies": ["error", { packageDir: "zod-plugin" }],
@@ -255,12 +259,14 @@ export default defineConfig({
       },
     },
     {
+      // MIGRATION
       files: ["migration/index.ts", "migration/helpers.ts"],
       rules: {
         "allowed/dependencies": ["error", { packageDir: "migration" }],
       },
     },
     {
+      // TESTS
       files: ["**/tests/*.ts", "**/vitest.setup.ts", "**/*.spec.ts"],
       rules: {
         "typescript/no-explicit-any": "off",
@@ -268,6 +274,7 @@ export default defineConfig({
       },
     },
     {
+      // GENERATED CODE
       files: ["*-test/quick-start.ts", "example/example.client.ts"],
       rules: {
         "no-duplicate-imports": "off",
