@@ -1,14 +1,12 @@
-import { RuleTester } from "@typescript-eslint/rule-tester";
-import parser from "@typescript-eslint/parser";
+import { RuleTester } from "oxlint/plugins-dev";
 import manifest from "./package.json";
 import assert from "node:assert/strict";
 
-RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
 RuleTester.it = it;
 
 const tester = new RuleTester({
-  languageOptions: { parser },
+  languageOptions: { parserOptions: { lang: "ts" } },
 });
 
 describe("Migration", async () => {
@@ -359,7 +357,7 @@ describe("Migration", async () => {
       },
       {
         name: "split import type across subpaths",
-        code: `import type { Producer, Depicter } from "express-zod-api"`,
+        code: `import type { Producer, Depicter } from "express-zod-api";`,
         output: `import type { Producer } from "express-zod-api/integration"\nimport type { Depicter } from "express-zod-api/documentation"`,
         errors: [
           {
