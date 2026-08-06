@@ -9,6 +9,6 @@ await writeFile(
     routing,
     config,
     serverUrl: `http://localhost:${config.http!.listen}`,
-  }).printFormatted(), // or just .print()
+  }).printFormatted(), // or just .print(),
   "utf-8",
 );
