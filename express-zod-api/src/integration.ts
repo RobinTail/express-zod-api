@@ -9,7 +9,13 @@ import { IntegrationBase, interfaces } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
-import { ensureTypeNode, printNode, ts } from "./typescript-api";
+import {
+  ensureTypeNode,
+  printNode,
+  type TypeNode,
+  type PrintNodeOptions,
+  type DeferredCode,
+} from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
@@ -55,7 +61,7 @@ interface IntegrationParams {
    * @example { MyBrand: (schema: typeof myBrandSchema, { next }) => createKeywordTypeNode(SyntaxKind.AnyKeyword)
    * @link https://www.npmjs.com/package/@express-zod-api/zod-plugin
    */
-  brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
+  brandHandling?: HandlingRules<TypeNode, ZTSContext>;
   /**
    * @desc Whether the server supports credentials in cross-origin requests.
    * @desc It sets `credentials: "include"` in Client default Implementation and `withCredentials` in Subscription.
@@ -68,7 +74,7 @@ interface IntegrationParams {
 
 interface FormattedPrintingOptions {
   /** @desc Typescript printer options */
-  printerOptions?: ts.PrinterOptions;
+  printerOptions?: PrintNodeOptions;
   /**
    * @desc Typescript code formatter
    * @default prettier.format | oxfmt.format
@@ -77,12 +83,11 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
-    [];
+  readonly #program: Array<string | DeferredCode> = [];
   readonly #aliases = new Map<object, string>();
   #usage?: string;
 
-  #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
+  #makeAlias(key: object, produce: () => TypeNode): TypeNode {
     let name = this.#aliases.get(key);
     if (!name) {
       name = `Type${this.#aliases.size + 1}`;
@@ -205,7 +210,7 @@ export class Integration extends IntegrationBase {
     );
   }
 
-  public print(printerOptions?: ts.PrinterOptions) {
+  public print(printerOptions?: PrintNodeOptions) {
     const parts = this.#program.map((entry) =>
       typeof entry === "function" ? entry(printerOptions) : entry,
     );
