@@ -1,18 +1,19 @@
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript"],
-  "jsPlugins": [
-    { "name": "allowed", "specifier": "eslint-plugin-allowed-dependencies" }
+import { defineConfig } from "oxlint";
+
+export default defineConfig({
+  plugins: ["typescript"],
+  jsPlugins: [
+    { name: "allowed", specifier: "eslint-plugin-allowed-dependencies" },
   ],
-  "categories": {
-    "correctness": "error"
+  categories: {
+    correctness: "error",
   },
-  "env": {
-    "builtin": true,
-    "node": true
+  env: {
+    builtin: true,
+    node: true,
   },
-  "ignorePatterns": ["**/dist/", "**/coverage/", "compat-test"],
-  "rules": {
+  ignorePatterns: ["**/dist/", "**/coverage/", "compat-test"],
+  rules: {
     "unicorn/prefer-node-protocol": "warn",
     "constructor-super": "error",
     "for-direction": "error",
@@ -32,9 +33,9 @@
     "no-dupe-else-if": "error",
     "no-dupe-keys": "error",
     "no-duplicate-case": "error",
-    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-empty": ["error", { allowEmptyCatch: true }],
     "no-empty-character-class": "error",
-    "no-empty-pattern": ["error", { "allowObjectPatternsAsParameters": true }],
+    "no-empty-pattern": ["error", { allowObjectPatternsAsParameters: true }],
     "no-empty-static-block": "error",
     "no-ex-assign": "error",
     "no-extra-boolean-cast": "error",
@@ -76,7 +77,7 @@
     "valid-typeof": "error",
     "no-array-constructor": "error",
     "no-unused-expressions": "error",
-    "curly": ["warn", "multi-or-nest", "consistent"],
+    curly: ["warn", "multi-or-nest", "consistent"],
     "no-duplicate-imports": "warn",
     "no-shadow": "warn",
     "typescript/ban-ts-comment": "error",
@@ -95,12 +96,12 @@
     "typescript/no-wrapper-object-types": "error",
     "typescript/prefer-as-const": "error",
     "typescript/prefer-namespace-keyword": "error",
-    "typescript/triple-slash-reference": "error"
+    "typescript/triple-slash-reference": "error",
   },
-  "overrides": [
+  overrides: [
     {
-      "files": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
-      "rules": {
+      files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      rules: {
         "constructor-super": "off",
         "getter-return": "off",
         "no-class-assign": "off",
@@ -120,45 +121,45 @@
         "no-with": "off",
         "prefer-const": "error",
         "prefer-rest-params": "error",
-        "prefer-spread": "error"
-      }
+        "prefer-spread": "error",
+      },
     },
     {
-      "files": ["express-zod-api/src/*.ts"],
-      "rules": {
-        "complexity": ["error", 16],
-        "allowed/dependencies": ["error", { "packageDir": "express-zod-api" }]
-      }
+      files: ["express-zod-api/src/*.ts"],
+      rules: {
+        complexity: ["error", 16],
+        "allowed/dependencies": ["error", { packageDir: "express-zod-api" }],
+      },
     },
     {
-      "files": ["zod-plugin/src/*.ts"],
-      "rules": {
-        "allowed/dependencies": ["error", { "packageDir": "zod-plugin" }]
-      }
+      files: ["zod-plugin/src/*.ts"],
+      rules: {
+        "allowed/dependencies": ["error", { packageDir: "zod-plugin" }],
+      },
     },
     {
-      "files": ["migration/index.ts", "migration/helpers.ts"],
-      "rules": {
-        "allowed/dependencies": ["error", { "packageDir": "migration" }]
-      }
+      files: ["migration/index.ts", "migration/helpers.ts"],
+      rules: {
+        "allowed/dependencies": ["error", { packageDir: "migration" }],
+      },
     },
     {
-      "files": ["**/tests/*.ts", "**/vitest.setup.ts", "**/*.spec.ts"],
-      "rules": {
+      files: ["**/tests/*.ts", "**/vitest.setup.ts", "**/*.spec.ts"],
+      rules: {
         "typescript/no-explicit-any": "off",
-        "typescript/no-empty-object-type": "warn"
-      }
+        "typescript/no-empty-object-type": "warn",
+      },
     },
     {
-      "files": ["*-test/quick-start.ts", "example/example.client.ts"],
-      "rules": {
+      files: ["*-test/quick-start.ts", "example/example.client.ts"],
+      rules: {
         "no-duplicate-imports": "off",
         "typescript/no-explicit-any": "off",
         "typescript/no-empty-object-type": [
           "error",
-          { "allowObjectTypes": "always" }
-        ]
-      }
-    }
-  ]
-}
+          { allowObjectTypes: "always" },
+        ],
+      },
+    },
+  ],
+});
