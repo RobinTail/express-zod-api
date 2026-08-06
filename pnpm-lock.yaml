@@ -59,6 +59,9 @@ importers:
       '@arethetypeswrong/core':
         specifier: ^0.18.2
         version: 0.18.5
+      '@oxlint/plugins':
+        specifier: ^1.76.0
+        version: 1.76.0
       '@tsconfig/node22':
         specifier: ^22.0.5
         version: 22.0.5
