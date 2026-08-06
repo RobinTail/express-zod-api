@@ -70,6 +70,34 @@ const performanceConcerns = [
   },
 ];
 
+const tsFactoryConcerns = [
+  {
+    selector: "Identifier[name='createPropertySignature']",
+    message: "use makeInterfaceProp()",
+  },
+  {
+    selector: "Identifier[name=/^create(TypeReference|KeywordType)Node$/]",
+    message: "use ensureTypeNode()",
+  },
+  {
+    selector: "Identifier[name='createLiteralTypeNode']",
+    message: "use makeLiteralType()",
+  },
+  {
+    selector:
+      "Identifier[name=/^create(NumericLiteral|StringLiteral|True|False|Null)$/]",
+    message: "use literally()",
+  },
+  {
+    selector: "Identifier[name='createUnionTypeNode']",
+    message: "use makeUnion()",
+  },
+  {
+    selector: "Identifier[name='createIdentifier']",
+    message: "use makeId()",
+  },
+];
+
 export default defineConfig({
   plugins: ["typescript"],
   jsPlugins: [
@@ -202,6 +230,21 @@ export default defineConfig({
         complexity: ["error", 16],
         "allowed/dependencies": ["error", { packageDir: "express-zod-api" }],
         "local/syntax": ["warn", ...importConcerns, ...performanceConcerns],
+      },
+    },
+    {
+      files: [
+        "express-zod-api/src/integration.ts",
+        "express-zod-api/src/integration-base.ts",
+        "express-zod-api/src/zts.ts",
+      ],
+      rules: {
+        "local/syntax": [
+          "warn",
+          ...importConcerns,
+          ...performanceConcerns,
+          ...tsFactoryConcerns,
+        ],
       },
     },
     {
