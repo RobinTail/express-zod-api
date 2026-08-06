@@ -1,9 +1,38 @@
 import { defineConfig } from "oxlint";
 
+// prefixed built-in modules covered by "unicorn/prefer-node-protocol" rule
+const importConcerns = [
+  {
+    selector:
+      "ImportDeclaration[source.value='ramda'] > ImportSpecifier, " +
+      "ImportDeclaration[source.value='ramda'] > ImportDefaultSpecifier",
+    message: "use import * as R from 'ramda'",
+  },
+  {
+    selector: "ImportDeclaration[source.value=/^zod/] > ImportDefaultSpecifier",
+    message: "do import { z } instead",
+  },
+  {
+    selector: "ImportDeclaration[source.value=/\\.js$/]",
+    message: "use .ts extension for relative imports",
+  },
+  {
+    selector: "ImportDeclaration[source.value=/openapi3-ts\\/oas3(0|1)/]",
+    message: "import from /oas32 instead",
+  },
+  {
+    selector:
+      "ImportDeclaration[source.value=/openapi3-ts/] > " +
+      "ImportSpecifier[imported.name='SchemaObject']",
+    message: "import SchemaObjectValue instead",
+  },
+];
+
 export default defineConfig({
   plugins: ["typescript"],
   jsPlugins: [
     { name: "allowed", specifier: "eslint-plugin-allowed-dependencies" },
+    { name: "local", specifier: "./custom-rules.ts" },
   ],
   categories: {
     correctness: "error",
@@ -122,6 +151,7 @@ export default defineConfig({
         "prefer-const": "error",
         "prefer-rest-params": "error",
         "prefer-spread": "error",
+        "local/no-concerning-syntax": ["warn", ...importConcerns],
       },
     },
     {
