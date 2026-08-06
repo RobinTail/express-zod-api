@@ -9,6 +9,11 @@ export default defineConfig({
   deps: {
     neverBundle: true,
   },
+  dts: {
+    generator: "tsgo",
+    tsgo: { path: "./node_modules/tsgo/bin/tsc" },
+    tsconfig: "./tsconfig.build.json",
+  },
   attw: { profile: "esm-only", level: "error" },
   plugins: [fixDtsPlugin()],
   define: {
