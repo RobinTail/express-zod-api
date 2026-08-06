@@ -57,7 +57,7 @@ export const monitor = ({
       return instance;
     },
     shutdown: () => (pending ??= workflow()),
-    get isShuttingDown() { return !!pending; }, // eslint-disable-line prettier/prettier
+    get isShuttingDown() { return !!pending; }, // oxfmt-ignore
   };
   return instance;
 };

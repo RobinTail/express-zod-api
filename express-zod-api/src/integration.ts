@@ -14,7 +14,6 @@ import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import type { ZTSContext } from "./zts-helpers";
-import type Prettier from "prettier";
 import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 import { getSecurityNames } from "./security";
@@ -220,7 +219,9 @@ export class Integration extends IntegrationBase {
     let format = userDefined;
     if (!format) {
       try {
-        const prettierFormat = loadPeer<typeof Prettier>("prettier").format;
+        const prettierFormat = loadPeer<{
+          format: (txt: string, opt: { filepath: string }) => Promise<string>;
+        }>("prettier").format;
         format = (text) => prettierFormat(text, { filepath: "client.ts" });
       } catch {}
     }

@@ -49,7 +49,9 @@ import { z } from "zod";
 export { DocumentationError };
 
 type Component =
-  `${ResponseVariant}Response` | "requestParameter" | "requestBody";
+  | `${ResponseVariant}Response`
+  | "requestParameter"
+  | "requestBody";
 
 /** @desc user defined function that creates a component description from its properties */
 type Descriptor = (

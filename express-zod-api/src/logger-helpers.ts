@@ -46,7 +46,11 @@ export const isHidden = (subject: Severity, gate: Severity) =>
 
 /** @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers */
 type TimeUnit =
-  "nanosecond" | "microsecond" | "millisecond" | "second" | "minute";
+  | "nanosecond"
+  | "microsecond"
+  | "millisecond"
+  | "second"
+  | "minute";
 
 const _makeNumberFormat = (unit: TimeUnit, fraction = 0) =>
   Intl.NumberFormat(undefined, {
