@@ -143,8 +143,8 @@ export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
 
 export const isProduction = R.memoizeWith(
-  () => process.env.TSDOWN_STATIC as string, // oxlint-disable-line no-restricted-syntax -- substituted by TSDOWN
-  () => process.env.NODE_ENV === "production", // oxlint-disable-line no-restricted-syntax -- memoized
+  () => process.env.TSDOWN_STATIC as string, // oxlint-disable-line local/syntax -- substituted by TSDOWN
+  () => process.env.NODE_ENV === "production", // oxlint-disable-line local/syntax -- memoized
 );
 
 export const shouldHaveContent = (

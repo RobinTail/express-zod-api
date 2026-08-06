@@ -28,6 +28,48 @@ const importConcerns = [
   },
 ];
 
+const performanceConcerns = [
+  {
+    selector: "ImportDeclaration[source.value=/assert/]", // #2169
+    message: "assert is slow, use throw",
+  },
+  {
+    selector: "MemberExpression[object.name='process'][property.name='env']", // #2144
+    message: "Reading process.env is slow and must be memoized",
+  },
+  {
+    selector: "MemberExpression[object.name='R'] > Identifier[name='toPairs']", // #2168
+    message: "R.toPairs() is 1.1x slower than Object.entries()",
+  },
+  {
+    selector:
+      "MemberExpression[object.name='R'] > Identifier[name='keys'], " +
+      "MemberExpression[object.name='R'] > Identifier[name='keysIn']", // #2168
+    message: "R.keys() and keysIn() are 1.2x slower than Object.keys()",
+  },
+  {
+    selector: "CallExpression[callee.property.name='flatMap']", // #2209
+    message: "flatMap() is about 1.3x slower than R.chain()",
+  },
+  {
+    selector: "MemberExpression[object.name='R'] > Identifier[name='union']", // #2599
+    message: "R.union() is 1.5x slower than [...Set().add()]",
+  },
+  {
+    selector: "ImportDeclaration[source.value=/package.json$/]", // #2974
+    message: "it can not be tree shaken, use tsdown and process.env instead",
+  },
+  {
+    selector: "CallExpression[callee.property.name=/^(shift|unshift)$/]", // #3343
+    message: "shifting is 2-20x slower than index-based iteration",
+  },
+  {
+    selector:
+      "CallExpression > MemberExpression[property.name='map'] > ArrayExpression > SpreadElement",
+    message: "Set::values().map() would be 5% faster and more memory efficient",
+  },
+];
+
 export default defineConfig({
   plugins: ["typescript"],
   jsPlugins: [
@@ -151,7 +193,7 @@ export default defineConfig({
         "prefer-const": "error",
         "prefer-rest-params": "error",
         "prefer-spread": "error",
-        "local/no-concerning-syntax": ["warn", ...importConcerns],
+        "local/syntax": ["warn", ...importConcerns],
       },
     },
     {
@@ -159,12 +201,14 @@ export default defineConfig({
       rules: {
         complexity: ["error", 16],
         "allowed/dependencies": ["error", { packageDir: "express-zod-api" }],
+        "local/syntax": ["warn", ...importConcerns, ...performanceConcerns],
       },
     },
     {
       files: ["zod-plugin/src/*.ts"],
       rules: {
         "allowed/dependencies": ["error", { packageDir: "zod-plugin" }],
+        "local/syntax": ["warn", ...importConcerns, ...performanceConcerns],
       },
     },
     {

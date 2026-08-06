@@ -1,8 +1,4 @@
-import {
-  eslintCompatPlugin,
-  type Node,
-  type Visitor,
-} from "@oxlint/plugins";
+import { eslintCompatPlugin, type Node, type Visitor } from "@oxlint/plugins";
 
 interface Entry {
   selector: string;
@@ -11,7 +7,7 @@ interface Entry {
 
 const plugin = eslintCompatPlugin({
   rules: {
-    "no-concerning-syntax": {
+    syntax: {
       meta: {
         type: "problem",
         docs: { description: "Prohibits certain AST" },
