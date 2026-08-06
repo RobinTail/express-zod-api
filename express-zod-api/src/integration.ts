@@ -14,6 +14,7 @@ import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import type { ZTSContext } from "./zts-helpers";
+import type * as OxFmt from "oxfmt";
 import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 import { getSecurityNames } from "./security";
@@ -70,7 +71,7 @@ interface FormattedPrintingOptions {
   printerOptions?: ts.PrinterOptions;
   /**
    * @desc Typescript code formatter
-   * @default prettier.format
+   * @default prettier.format | oxfmt.format
    * */
   format?: (program: string) => Promise<string>;
 }
@@ -223,6 +224,10 @@ export class Integration extends IntegrationBase {
           format: (txt: string, opt: { filepath: string }) => Promise<string>;
         }>("prettier").format;
         format = (text) => prettierFormat(text, { filepath: "client.ts" });
+      } catch {}
+      try {
+        const oxFmt = loadPeer<typeof OxFmt>("oxfmt").format;
+        format = async (text) => (await oxFmt("client.ts", text)).code;
       } catch {}
     }
 

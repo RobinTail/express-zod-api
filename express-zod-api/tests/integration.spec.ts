@@ -7,11 +7,8 @@ import {
 } from "../src";
 import { Integration, type Producer } from "../src/integration";
 import { brandProperty } from "../src/metadata";
-import { format } from "oxfmt";
 
 describe("Integration", () => {
-  const oxFmt = async (code: string) => (await format("client.ts", code)).code;
-
   const recursive1: z.ZodType = z.lazy(() =>
     z.object({
       name: z.string(),
@@ -69,7 +66,7 @@ describe("Integration", () => {
         },
       },
     });
-    expect(await client.printFormatted({ format: oxFmt })).toMatchSnapshot();
+    expect(await client.printFormatted()).toMatchSnapshot();
   });
 
   test.each([undefined, false])(
@@ -94,7 +91,7 @@ describe("Integration", () => {
           },
         },
       });
-      expect(await client.printFormatted({ format: oxFmt })).toMatchSnapshot();
+      expect(await client.printFormatted()).toMatchSnapshot();
     },
   );
 
@@ -132,7 +129,7 @@ describe("Integration", () => {
         },
       },
     });
-    expect(await client.printFormatted({ format: oxFmt })).toMatchSnapshot();
+    expect(await client.printFormatted()).toMatchSnapshot();
   });
 
   describe("Feature #1470: Custom brands", () => {
@@ -168,7 +165,7 @@ describe("Integration", () => {
           },
         },
       });
-      expect(await client.printFormatted({ format: oxFmt })).toMatchSnapshot();
+      expect(await client.printFormatted()).toMatchSnapshot();
     });
   });
 
