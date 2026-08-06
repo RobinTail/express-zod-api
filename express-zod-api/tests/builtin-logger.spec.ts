@@ -221,7 +221,7 @@ describe("BuiltinLogger", () => {
         const { logger, logSpy } = makeLogger({ level: "debug", color: false });
         const stop = logger.profile("test");
         const start = performance.now();
-        while (performance.now() - start < delay) {} // eslint-disable-line no-empty -- waits
+        while (performance.now() - start < delay) {} // oxlint-disable-line no-empty -- waits
         stop();
         expect(logSpy).toHaveBeenCalledWith(
           expect.stringMatching(
