@@ -1,6 +1,9 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript"],
+  "jsPlugins": [
+    { "name": "allowed", "specifier": "eslint-plugin-allowed-dependencies" }
+  ],
   "categories": {
     "correctness": "error"
   },
@@ -140,10 +143,7 @@
             "packageDir": "/Users/robin/Documents/content/express-zod-api/express-zod-api"
           }
         ]
-      },
-      "jsPlugins": [
-        { "name": "allowed", "specifier": "eslint-plugin-allowed-dependencies" }
-      ]
+      }
     },
     {
       "files": ["zod-plugin/src/*.ts"],
@@ -154,10 +154,7 @@
             "packageDir": "/Users/robin/Documents/content/express-zod-api/zod-plugin"
           }
         ]
-      },
-      "jsPlugins": [
-        { "name": "allowed", "specifier": "eslint-plugin-allowed-dependencies" }
-      ]
+      }
     },
     {
       "files": ["migration/index.ts", "migration/helpers.ts"],
@@ -168,10 +165,7 @@
             "packageDir": "/Users/robin/Documents/content/express-zod-api/migration"
           }
         ]
-      },
-      "jsPlugins": [
-        { "name": "allowed", "specifier": "eslint-plugin-allowed-dependencies" }
-      ]
+      }
     },
     {
       "files": ["**/tests/*.ts", "**/vitest.setup.ts", "**/*.spec.ts"],
