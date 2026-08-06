@@ -32,19 +32,9 @@
     "no-dupe-else-if": "error",
     "no-dupe-keys": "error",
     "no-duplicate-case": "error",
-    "no-empty": [
-      "error",
-      {
-        "allowEmptyCatch": true
-      }
-    ],
+    "no-empty": ["error", { "allowEmptyCatch": true }],
     "no-empty-character-class": "error",
-    "no-empty-pattern": [
-      "error",
-      {
-        "allowObjectPatternsAsParameters": true
-      }
-    ],
+    "no-empty-pattern": ["error", { "allowObjectPatternsAsParameters": true }],
     "no-empty-static-block": "error",
     "no-ex-assign": "error",
     "no-extra-boolean-cast": "error",
@@ -137,34 +127,19 @@
       "files": ["express-zod-api/src/*.ts"],
       "rules": {
         "complexity": ["error", 16],
-        "allowed/dependencies": [
-          "error",
-          {
-            "packageDir": "/Users/robin/Documents/content/express-zod-api/express-zod-api"
-          }
-        ]
+        "allowed/dependencies": ["error", { "packageDir": "express-zod-api" }]
       }
     },
     {
       "files": ["zod-plugin/src/*.ts"],
       "rules": {
-        "allowed/dependencies": [
-          "error",
-          {
-            "packageDir": "/Users/robin/Documents/content/express-zod-api/zod-plugin"
-          }
-        ]
+        "allowed/dependencies": ["error", { "packageDir": "zod-plugin" }]
       }
     },
     {
       "files": ["migration/index.ts", "migration/helpers.ts"],
       "rules": {
-        "allowed/dependencies": [
-          "error",
-          {
-            "packageDir": "/Users/robin/Documents/content/express-zod-api/migration"
-          }
-        ]
+        "allowed/dependencies": ["error", { "packageDir": "migration" }]
       }
     },
     {
@@ -181,9 +156,7 @@
         "typescript/no-explicit-any": "off",
         "typescript/no-empty-object-type": [
           "error",
-          {
-            "allowObjectTypes": "always"
-          }
+          { "allowObjectTypes": "always" }
         ]
       }
     }
