@@ -42,7 +42,9 @@
     "typescript-eslint": "^8.58.0"
   },
   "devDependencies": {
-    "@typescript-eslint/rule-tester": "catalog:dev",
+    "@typescript-eslint/rule-tester": "^8.59.0",
+    "@typescript-eslint/utils": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
     "typescript": "catalog:dev"
   }
 }

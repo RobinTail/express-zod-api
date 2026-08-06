@@ -3,7 +3,7 @@ import {
   ESLintUtils,
   type TSESLint,
   type TSESTree,
-} from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
+} from "@typescript-eslint/utils"; // oxlint-disable-line allowed/dependencies -- assumed transitive dependency
 import {
   queryNamedProp,
   type NamedProp,

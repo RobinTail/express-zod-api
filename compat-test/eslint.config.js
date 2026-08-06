@@ -1,4 +1,4 @@
-import parser from "@typescript-eslint/parser";
+import { parser } from "typescript-eslint";
 import migration from "@express-zod-api/migration";
 
 export default [
