@@ -1,7 +1,7 @@
 import {
   eslintCompatPlugin,
   type Node,
-  type VisitorWithHooks,
+  type Visitor,
 } from "@oxlint/plugins";
 
 interface Entry {
@@ -31,7 +31,7 @@ const plugin = eslintCompatPlugin({
         },
       },
       create(context) {
-        return context.options.reduce<VisitorWithHooks>((result, _entry) => {
+        return context.options.reduce<Visitor>((result, _entry) => {
           if (typeof _entry !== "object" || !_entry)
             throw new Error("Invalid entry", { cause: _entry });
           const { selector, message } = _entry as unknown as Entry;
