@@ -1,4 +1,4 @@
-import type { brandProperty as brandProp } from "../../zod-plugin/src/brand.ts";
+import type { brandProperty as brandProp } from "@express-zod-api/zod-plugin/brand";
 import { globalRegistry, type z } from "zod";
 
 export const brandProperty = "x-brand" satisfies typeof brandProp;

@@ -36,6 +36,7 @@ catalogs:
     "express-fileupload": "^1.5.2"
     "http-errors": "^2.0.1"
     "typescript": "^6.0.2"
+    "tsgo": "npm:typescript@^7.0.2"
     "zod": "^4.4.3"
 overrides:
   "@scarf/scarf": "-"

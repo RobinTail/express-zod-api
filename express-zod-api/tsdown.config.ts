@@ -17,6 +17,11 @@ export default defineConfig({
     },
   },
   plugins: [fixDtsPlugin()],
+  dts: {
+    generator: "tsgo",
+    tsgo: { path: "./node_modules/tsgo/bin/tsc" },
+    tsconfig: "./tsconfig.build.json",
+  },
   define: {
     "process.env.TSDOWN_SELF": `"${manifest.name}"`, // used by localsID
     "process.env.TSDOWN_BUILD": `"v${manifest.version}"`, // @since v25.0.0 is pure ESM
