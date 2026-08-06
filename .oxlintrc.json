@@ -2,7 +2,7 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript"],
   "categories": {
-    "correctness": "off"
+    "correctness": "error"
   },
   "env": {
     "builtin": true,
