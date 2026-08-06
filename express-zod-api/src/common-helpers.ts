@@ -27,7 +27,7 @@ type NoNever<T, F> = [T] extends [never] ? F : T;
  * @example declare module "express-zod-api" { interface TagOverrides { users: unknown } }
  * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  * */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
+// oxlint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
 export interface TagOverrides {}
 export type Tag = NoNever<keyof TagOverrides, string>;
 
@@ -143,8 +143,8 @@ export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
 
 export const isProduction = R.memoizeWith(
-  () => process.env.TSDOWN_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSDOWN
-  () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
+  () => process.env.TSDOWN_STATIC as string, // oxlint-disable-line no-restricted-syntax -- substituted by TSDOWN
+  () => process.env.NODE_ENV === "production", // oxlint-disable-line no-restricted-syntax -- memoized
 );
 
 export const shouldHaveContent = (

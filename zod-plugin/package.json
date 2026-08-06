@@ -19,7 +19,7 @@
     "pretest": "tsc",
     "test": "vitest run",
     "build": "tsdown",
-    "prepublishOnly": "eslint && pnpm test && pnpm build"
+    "prepublishOnly": "oxlint && pnpm test && pnpm build"
   },
   "type": "module",
   "main": "dist/index.js",
