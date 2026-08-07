@@ -44,6 +44,9 @@ catalogs:
       specifier: ^4.4.3
       version: 4.4.3
   prod:
+    '@oxlint/plugins':
+      specifier: ^1.76.0
+      version: 1.76.0
     ramda:
       specifier: ^0.32.0
       version: 0.32.0
@@ -60,7 +63,7 @@ importers:
         specifier: ^0.18.2
         version: 0.18.5
       '@oxlint/plugins':
-        specifier: ^1.76.0
+        specifier: catalog:prod
         version: 1.76.0
       '@tsconfig/node22':
         specifier: ^22.0.5
@@ -278,6 +281,10 @@ importers:
         version: 4.4.3
 
   migration:
+    dependencies:
+      '@oxlint/plugins':
+        specifier: catalog:prod
+        version: 1.76.0
     devDependencies:
       typescript:
         specifier: catalog:dev
