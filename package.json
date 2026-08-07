@@ -8,7 +8,7 @@
     "pretest": "node tools/make-tests.ts",
     "test": "pnpm -r test",
     "bench": "pnpm -F express-zod-api bench",
-    "lint": "oxlint && oxfmt --check",
+    "lint": "oxlint -c oxlint.config.ts && oxfmt --check",
     "mdfix": "oxfmt *.md **/*.md",
     "precommit": "pnpm lint && pnpm build && pnpm test && git add *.md example/example.* LICENSE",
     "install_hooks": "husky"
