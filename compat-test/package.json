@@ -4,17 +4,15 @@
   "private": true,
   "scripts": {
     "pretest": "echo 'await Integration.create({});' > sample.ts",
-    "test": "eslint --fix && vitest --run",
+    "test": "oxlint --fix && vitest --run",
     "posttest": "rm sample.ts"
   },
   "devDependencies": {
     "@express-zod-api/migration": "workspace:*",
-    "eslint": "npm:eslint@10.0.0",
     "express": "npm:express@5.1.0",
     "express-zod-api": "workspace:*",
     "http-errors": "npm:http-errors@2.0.1",
     "typescript": "npm:typescript@5.1.3",
-    "typescript-eslint": "npm:typescript-eslint@8.58.0",
     "zod": "npm:zod@4.3.4"
   }
 }
