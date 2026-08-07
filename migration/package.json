@@ -41,6 +41,9 @@
     "eslint": "^10.0.0",
     "typescript-eslint": "^8.58.0"
   },
+  "dependencies": {
+    "@oxlint/plugins": "catalog:prod"
+  },
   "devDependencies": {
     "typescript": "catalog:dev"
   }
