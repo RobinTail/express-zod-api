@@ -3,7 +3,7 @@ import {
   eslintCompatPlugin,
   type Rule,
   type Visitor,
-} from "@oxlint/plugins"; // oxlint-disable-line allowed/dependencies -- assumed transitive dependency
+} from "@oxlint/plugins";
 import {
   queryNamedProp,
   type NamedProp,
