@@ -19,7 +19,6 @@ export default defineConfig({
   plugins: [fixDtsPlugin()],
   dts: {
     generator: "tsgo",
-    tsgo: { path: "./node_modules/tsgo/bin/tsc" },
     tsconfig: "./tsconfig.build.json",
   },
   define: {

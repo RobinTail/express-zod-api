@@ -12,7 +12,6 @@ export default defineConfig({
   attw: { profile: "esm-only", level: "error" },
   dts: {
     generator: "tsgo",
-    tsgo: { path: "./node_modules/tsgo/bin/tsc" },
     tsconfig: "./tsconfig.build.json",
   },
   plugins: [fixDtsPlugin()],

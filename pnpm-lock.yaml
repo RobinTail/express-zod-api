@@ -22,6 +22,9 @@ catalogs:
     '@types/ramda':
       specifier: ^0.32.0
       version: 0.32.0
+    '@typescript/native':
+      specifier: npm:typescript@^7.0.2
+      version: 7.0.2
     camelize-ts:
       specifier: ^3.0.0
       version: 3.0.0
@@ -37,12 +40,9 @@ catalogs:
     http-errors:
       specifier: ^2.0.1
       version: 2.0.1
-    tsgo:
-      specifier: npm:typescript@^7.0.2
-      version: 7.0.2
     typescript:
-      specifier: ^6.0.2
-      version: 6.0.3
+      specifier: npm:@typescript/typescript6@^6.0.2
+      version: 6.0.2
     zod:
       specifier: ^4.4.3
       version: 4.4.3
@@ -98,12 +98,12 @@ importers:
 
   cjs-test:
     devDependencies:
+      '@typescript/native':
+        specifier: catalog:dev
+        version: typescript@7.0.2
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
-      tsgo:
-        specifier: catalog:dev
-        version: typescript@7.0.2
       zod:
         specifier: catalog:dev
         version: 4.4.3
@@ -149,6 +149,9 @@ importers:
       '@types/swagger-ui-express':
         specifier: ^4.1.8
         version: 4.1.8
+      '@typescript/native':
+        specifier: catalog:dev
+        version: typescript@7.0.2
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
@@ -161,12 +164,9 @@ importers:
       swagger-ui-express:
         specifier: ^5.0.1
         version: 5.0.1(express@5.2.1)
-      tsgo:
-        specifier: catalog:dev
-        version: typescript@7.0.2
       typescript:
         specifier: catalog:dev
-        version: 6.0.3
+        version: '@typescript/typescript6@6.0.2'
       zod:
         specifier: catalog:dev
         version: 4.4.3
@@ -216,6 +216,9 @@ importers:
       '@types/ramda':
         specifier: catalog:dev
         version: 0.32.0
+      '@typescript/native':
+        specifier: catalog:dev
+        version: typescript@7.0.2
       camelize-ts:
         specifier: catalog:dev
         version: 3.0.0
@@ -249,12 +252,9 @@ importers:
       snakify-ts:
         specifier: ^2.3.0
         version: 2.3.0
-      tsgo:
-        specifier: catalog:dev
-        version: typescript@7.0.2
       typescript:
         specifier: catalog:dev
-        version: 6.0.3
+        version: '@typescript/typescript6@6.0.2'
       undici:
         specifier: ^8.2.0
         version: 8.9.0
@@ -270,12 +270,12 @@ importers:
       '@types/express-fileupload':
         specifier: catalog:dev
         version: 1.5.1
+      '@typescript/native':
+        specifier: catalog:dev
+        version: typescript@7.0.2
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
-      tsgo:
-        specifier: catalog:dev
-        version: typescript@7.0.2
       zod:
         specifier: catalog:dev
         version: 4.4.3
@@ -286,7 +286,7 @@ importers:
         specifier: ^1.76.0
         version: 1.76.0
     devDependencies:
-      tsgo:
+      '@typescript/native':
         specifier: catalog:dev
         version: typescript@7.0.2
 
@@ -299,12 +299,12 @@ importers:
       '@types/ramda':
         specifier: catalog:dev
         version: 0.32.0
+      '@typescript/native':
+        specifier: catalog:dev
+        version: typescript@7.0.2
       camelize-ts:
         specifier: catalog:dev
         version: 3.0.0
-      tsgo:
-        specifier: catalog:dev
-        version: typescript@7.0.2
       zod:
         specifier: catalog:dev
         version: 4.4.3
@@ -918,6 +918,10 @@ packages:
     engines: {node: '>=16.20.0'}
     cpu: [x64]
     os: [win32]
+
+  '@typescript/typescript6@6.0.2':
+    resolution: {integrity: sha512-mbCddXd+jm7hfx7w2YU64/Av4/NqqeG3GoRZgxPcgoTxYjhrcfJRw9ULch71SS4G+Q3bOXFhRvPqjguN0Hyp5w==}
+    hasBin: true
 
   '@vitest/coverage-v8@4.1.10':
     resolution: {integrity: sha512-IM49HmthevbgAO4anp1hwtoT9wYe59w0LR00gr+eagHE+ZJ5lK4sLPeO0ubgoJcwLk6dehU3R24N+FbEEKDc8g==}
@@ -2372,6 +2376,10 @@ snapshots:
 
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
+
+  '@typescript/typescript6@6.0.2':
+    dependencies:
+      '@typescript/old': typescript@6.0.3
 
   '@vitest/coverage-v8@4.1.10(vitest@4.1.10)':
     dependencies:

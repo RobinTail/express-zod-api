@@ -19,7 +19,7 @@
     "http-errors": "catalog:dev",
     "qs": "^6.14.1",
     "swagger-ui-express": "^5.0.1",
-    "tsgo": "catalog:dev",
+    "@typescript/native": "catalog:dev",
     "typescript": "catalog:dev",
     "zod": "catalog:dev"
   }

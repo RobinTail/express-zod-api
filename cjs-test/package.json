@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "express-zod-api": "workspace:*",
-    "tsgo": "catalog:dev",
+    "@typescript/native": "catalog:dev",
     "zod": "catalog:dev"
   }
 }
