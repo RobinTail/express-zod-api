@@ -84,8 +84,8 @@ importers:
         specifier: ^10.1.8
         version: 10.1.8(eslint@10.8.0)
       eslint-plugin-allowed-dependencies:
-        specifier: ^3.0.0
-        version: 3.0.0(eslint@10.8.0)(typescript-eslint@8.65.0)
+        specifier: ^3.1.0
+        version: 3.1.0(eslint@10.8.0)(typescript-eslint@8.65.0)
       eslint-plugin-prettier:
         specifier: ^5.5.5
         version: 5.5.6(eslint-config-prettier@10.1.8)(eslint@10.8.0)(prettier@3.9.6)
@@ -453,6 +453,10 @@ packages:
 
   '@oxc-project/types@0.139.0':
     resolution: {integrity: sha512-r9gHphtCs+1M7J0pw6Sn/hh/Wpa/iQrOOkrNAlVLF/gHq+/CJmHIWKKUUhdWjcD6CIa8idarspCsASiXCXvFUw==}
+
+  '@oxlint/plugins@1.76.0':
+    resolution: {integrity: sha512-twmbsVrYAjkaOw6I2pDiYSAxVLNOV8kcqMzajJ599SpqXzea+GjDCZVad1VUqNR/4thWjM4PER5n+3/TQtTkZQ==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
   '@pkgr/core@0.3.6':
     resolution: {integrity: sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==}
@@ -1138,12 +1142,20 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-allowed-dependencies@3.0.0:
-    resolution: {integrity: sha512-Vt0KoG041tiveV4uh7Xkj6+BwO9X3d/0gqEl4QlTyoO4GQ8iuIWOt790y3fReplQQSLzRYmccAYO9ANN7RrLAg==}
+  eslint-plugin-allowed-dependencies@3.1.0:
+    resolution: {integrity: sha512-2COyhfhAiB86Sx4nU5zWeXkQG6v4iivosCbJw81velgdgGtN88HzBTVeBNU3f12CzADUSnmsBHmIMiMTy6BSgg==}
     engines: {node: ^22.19.0 || ^24.11.0 || ^26.0.0}
     peerDependencies:
       eslint: ^9.0.0 || ^10.0.0
+      oxlint: ^1.76.0
       typescript-eslint: ^8.0.0
+    peerDependenciesMeta:
+      eslint:
+        optional: true
+      oxlint:
+        optional: true
+      typescript-eslint:
+        optional: true
 
   eslint-plugin-prettier@5.5.6:
     resolution: {integrity: sha512-ifetmTcxWfz+4qRW3pH/ujdTq2jQIj59AxJMIN26K5avYgU8dxycUETQonWiW+wPrYXA0j3Try0l1CnwVQtDqQ==}
@@ -2186,6 +2198,8 @@ snapshots:
 
   '@oxc-project/types@0.139.0': {}
 
+  '@oxlint/plugins@1.76.0': {}
+
   '@pkgr/core@0.3.6': {}
 
   '@quansync/fs@1.0.0':
@@ -2847,10 +2861,12 @@ snapshots:
     dependencies:
       eslint: 10.8.0(supports-color@7.2.0)
 
-  eslint-plugin-allowed-dependencies@3.0.0(eslint@10.8.0)(typescript-eslint@8.65.0):
+  eslint-plugin-allowed-dependencies@3.1.0(eslint@10.8.0)(typescript-eslint@8.65.0):
     dependencies:
-      eslint: 10.8.0(supports-color@7.2.0)
+      '@oxlint/plugins': 1.76.0
       ramda: 0.32.0
+    optionalDependencies:
+      eslint: 10.8.0(supports-color@7.2.0)
       typescript-eslint: 8.65.0(eslint@10.8.0)(supports-color@7.2.0)(typescript@6.0.3)
 
   eslint-plugin-prettier@5.5.6(eslint-config-prettier@10.1.8)(eslint@10.8.0)(prettier@3.9.6):
