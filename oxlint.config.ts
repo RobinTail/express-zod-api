@@ -214,6 +214,13 @@ export default defineConfig({
       files: ["express-zod-api/src/*.ts"],
       rules: {
         complexity: ["error", 16],
+        "unicorn/prefer-set-has": "warn",
+        "no-await-in-loop": "warn",
+        "no-useless-call": "warn",
+        "no-accumulating-spread": "warn",
+        "no-map-spread": "warn",
+        "unicorn/prefer-array-find": "warn",
+        "unicorn/prefer-array-flat-map": "warn",
         "allowed/dependencies": ["error", { packageDir: "express-zod-api" }],
         "eslint-js/no-restricted-syntax": [
           "warn",

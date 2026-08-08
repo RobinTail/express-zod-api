@@ -232,6 +232,7 @@ export class Endpoint<
         !(mw instanceof ExpressMiddleware)
       )
         continue;
+      // oxlint-disable-next-line eslint/no-await-in-loop -- the order matters for middlewares
       Object.assign(ctx, await mw.execute({ ...rest, ctx, response, logger }));
       if (response.writableEnded) {
         logger.warn(
