@@ -2,6 +2,11 @@
 
 ## Version 29
 
+### v29.2.0
+
+- Supporting `oxfmt` formatter by the `Integration::printFormatted()` method:
+  - Besides the `prettier` the generator would also try to use `oxfmt` if it's installed.
+
 ### v29.1.2
 
 - Fixed the generated Documentation having `composition: "components"`:
