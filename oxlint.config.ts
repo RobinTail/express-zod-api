@@ -113,6 +113,7 @@ export default defineConfig({
   ignorePatterns: ["**/dist/", "**/coverage/", "compat-test"],
   rules: {
     "unicorn/prefer-node-protocol": "warn",
+    "unicorn/no-abusive-eslint-disable": "warn",
     "constructor-super": "error",
     "for-direction": "error",
     "getter-return": "error",
@@ -178,6 +179,10 @@ export default defineConfig({
     curly: ["warn", "multi-or-nest", "consistent"],
     "no-duplicate-imports": "warn",
     "no-shadow": "warn",
+    "no-var": "error",
+    "prefer-const": "error",
+    "prefer-rest-params": "error",
+    "prefer-spread": "error",
     "typescript/ban-ts-comment": "error",
     "typescript/no-duplicate-enum-values": "error",
     "typescript/no-empty-object-type": "error",
@@ -201,10 +206,6 @@ export default defineConfig({
       // ALL SOURCES
       files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       rules: {
-        "no-var": "error",
-        "prefer-const": "error",
-        "prefer-rest-params": "error",
-        "prefer-spread": "error",
         "eslint-js/no-restricted-syntax": ["warn", ...importConcerns],
       },
     },
