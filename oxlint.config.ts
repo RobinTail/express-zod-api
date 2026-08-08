@@ -99,7 +99,6 @@ const tsFactoryConcerns = [
 ];
 
 export default defineConfig({
-  plugins: ["typescript"],
   jsPlugins: [
     { name: "allowed", specifier: "eslint-plugin-allowed-dependencies" },
     { name: "local", specifier: "./tools/custom-rules.ts" },

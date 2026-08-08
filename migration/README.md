@@ -34,7 +34,6 @@ The minimal configuration to apply migrations automatically using `oxlint --fix`
 import { defineConfig } from "oxlint";
 
 export default defineConfig({
-  plugins: ["typescript"],
   jsPlugins: [{ name: "migration", specifier: "@express-zod-api/migration" }],
   rules: { "migration/v29": "error" },
 });
