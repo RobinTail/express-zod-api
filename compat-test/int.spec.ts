@@ -2,9 +2,9 @@ import { Integration } from "express-zod-api/integration";
 import { describe, test, expect } from "vitest";
 
 describe("Integration", () => {
-  test("should work with minimum supported TypeScript",  () => {
+  test("should work with minimum supported TypeScript", () => {
     expect(
-      new Integration({ config: { cors: false }, routing: {} }).print()
+      new Integration({ config: { cors: false }, routing: {} }).print(),
     ).toContain("export class Client");
   });
 });

@@ -1218,8 +1218,8 @@ import "@express-zod-api/zod-plugin"; // in your routing.ts file
 ## End-to-End Type Safety
 
 You can generate a TypeScript file containing the IO types of your API and a client for it, giving you end-to-end type
-safety between your API and frontend. Make sure you have `typescript` installed. Consider also installing `prettier`
-and using the async `printFormatted()` method.
+safety between your API and frontend. Make sure you have `typescript` installed. Consider also installing either
+`prettier` or `oxfmt` for using the async `printFormatted()` method.
 
 ```ts
 import { Integration } from "express-zod-api/integration";
@@ -1230,7 +1230,7 @@ const client = new Integration({
   variant: "client", // <— optional, see also "types" for a DIY solution
 });
 
-const prettierFormattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
+const formattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
 ```
 
 Alternatively, you can supply your own `format` function into that method or use a regular `print()` method instead.
