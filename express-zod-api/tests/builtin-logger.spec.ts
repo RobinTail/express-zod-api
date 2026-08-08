@@ -1,4 +1,4 @@
-import { performance } from "node:perf_hooks";
+import { setTimeout } from "node:timers/promises";
 import * as util from "node:util";
 import {
   blueMock,
@@ -220,8 +220,7 @@ describe("BuiltinLogger", () => {
       async (delay) => {
         const { logger, logSpy } = makeLogger({ level: "debug", color: false });
         const stop = logger.profile("test");
-        const start = performance.now();
-        while (performance.now() - start < delay) {} // oxlint-disable-line no-empty -- waits
+        await setTimeout(delay);
         stop();
         expect(logSpy).toHaveBeenCalledWith(
           expect.stringMatching(
