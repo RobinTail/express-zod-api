@@ -4,8 +4,8 @@
 
 ### v29.2.0
 
-- Supporting `oxfmt` formatter by the `Integration::printFormatted()` method:
-  - Besides the `prettier` the generator would also try to use `oxfmt` if it's installed.
+- Added support for the `oxfmt` formatter in `Integration::printFormatted()`:
+  - The generator also tries `oxfmt` after `prettier` when `oxfmt` is installed.
 
 ### v29.1.2
 
