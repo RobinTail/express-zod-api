@@ -54,7 +54,7 @@
     }
   },
   "dependencies": {
-    "@oxlint/plugins": "catalog:prod"
+    "@oxlint/plugins": "^1.76.0"
   },
   "devDependencies": {
     "typescript": "catalog:dev"

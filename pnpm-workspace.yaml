@@ -23,7 +23,6 @@ publicHoistPattern:
 catalogs:
   prod:
     "ramda": "^0.32.0"
-    "@oxlint/plugins": "^1.76.0"
   peer:
     "zod": "^4.3.4"
   dev:
