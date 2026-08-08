@@ -202,7 +202,7 @@ describe("Integration", () => {
           config: configMock,
           variant: "types",
           brandHandling: {
-            CUSTOM: () => ts.factory.createTypeReferenceNode("## WRONG ##"),
+            CUSTOM: () => ensureTypeNode("## WRONG ##"),
           },
           routing: {
             v1: {
