@@ -8,7 +8,7 @@ import {
 } from "./meta";
 import { getClasses, getPackages } from "./packages";
 
-// oxlint-disable-next-line local/syntax -- substituted by TSDOWN
+// oxlint-disable-next-line eslint-js/no-restricted-syntax -- substituted by TSDOWN
 const pluginFlag = Symbol.for(process.env.TSDOWN_SELF!);
 
 if (!(pluginFlag in globalThis)) {

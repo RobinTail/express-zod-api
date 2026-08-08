@@ -101,7 +101,7 @@ const tsFactoryConcerns = [
 export default defineConfig({
   jsPlugins: [
     { name: "allowed", specifier: "eslint-plugin-allowed-dependencies" },
-    { name: "local", specifier: "./tools/custom-rules.ts" },
+    { name: "eslint-js", specifier: "oxlint-plugin-eslint" },
   ],
   categories: {
     correctness: "error",
@@ -205,7 +205,7 @@ export default defineConfig({
         "prefer-const": "error",
         "prefer-rest-params": "error",
         "prefer-spread": "error",
-        "local/syntax": ["warn", ...importConcerns],
+        "eslint-js/no-restricted-syntax": ["warn", ...importConcerns],
       },
     },
     {
@@ -214,7 +214,11 @@ export default defineConfig({
       rules: {
         complexity: ["error", 16],
         "allowed/dependencies": ["error", { packageDir: "express-zod-api" }],
-        "local/syntax": ["warn", ...importConcerns, ...performanceConcerns],
+        "eslint-js/no-restricted-syntax": [
+          "warn",
+          ...importConcerns,
+          ...performanceConcerns,
+        ],
       },
     },
     {
@@ -225,7 +229,7 @@ export default defineConfig({
         "express-zod-api/src/zts.ts",
       ],
       rules: {
-        "local/syntax": [
+        "eslint-js/no-restricted-syntax": [
           "warn",
           ...importConcerns,
           ...performanceConcerns,
@@ -238,7 +242,11 @@ export default defineConfig({
       files: ["zod-plugin/src/*.ts"],
       rules: {
         "allowed/dependencies": ["error", { packageDir: "zod-plugin" }],
-        "local/syntax": ["warn", ...importConcerns, ...performanceConcerns],
+        "eslint-js/no-restricted-syntax": [
+          "warn",
+          ...importConcerns,
+          ...performanceConcerns,
+        ],
       },
     },
     {

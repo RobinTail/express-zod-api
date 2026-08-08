@@ -7,6 +7,10 @@
   "minimumReleaseAge": "7 days",
   "packageRules": [
     {
+      "groupName": "OxLint and its plugins",
+      "matchPackageNames": ["oxlint", "oxlint-plugin-*"]
+    },
+    {
       "groupName": "Vitest and its coverage provider",
       "matchPackageNames": ["vitest", "@vitest/*"]
     }
