@@ -357,7 +357,7 @@ describe("Migration", async () => {
       },
       {
         name: "split import type across subpaths",
-        code: `import type { Producer, Depicter } from "express-zod-api";`,
+        code: `import type { Producer, Depicter } from "express-zod-api"`,
         output: `import type { Producer } from "express-zod-api/integration"\nimport type { Depicter } from "express-zod-api/documentation"`,
         errors: [
           {
