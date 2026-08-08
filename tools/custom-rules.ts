@@ -22,7 +22,7 @@ export default eslintCompatPlugin({
             required: ["selector", "message"],
             additionalProperties: false,
           },
-          uniqueItems: !0,
+          uniqueItems: false,
           minItems: 0,
         },
       },
