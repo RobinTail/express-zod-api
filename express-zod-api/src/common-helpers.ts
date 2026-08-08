@@ -27,7 +27,7 @@ type NoNever<T, F> = [T] extends [never] ? F : T;
  * @example declare module "express-zod-api" { interface TagOverrides { users: unknown } }
  * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  * */
-// oxlint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
+// oxlint-disable-next-line typescript/no-empty-object-type -- augmentation
 export interface TagOverrides {}
 export type Tag = NoNever<keyof TagOverrides, string>;
 

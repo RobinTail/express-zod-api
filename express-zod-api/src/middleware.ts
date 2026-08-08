@@ -125,7 +125,7 @@ export class ExpressMiddleware<
   RET extends FlatObject,
 > extends Middleware<FlatObject, RET, string> {
   constructor(
-    // oxlint-disable-next-line @typescript-eslint/no-explicit-any -- issue #2824, assignment compatibility fix
+    // oxlint-disable-next-line typescript/no-explicit-any -- issue #2824, assignment compatibility fix
     nativeMw: (request: R, response: S, next: NextFunction) => any,
     {
       provider = () => ({}) as RET,
