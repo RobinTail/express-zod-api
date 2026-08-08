@@ -1,6 +1,6 @@
 {
   "name": "@express-zod-api/migration",
-  "version": "29.0.0",
+  "version": "29.1.0",
   "license": "MIT",
   "description": "Migration scripts for express-zod-api",
   "repository": {
@@ -39,8 +39,8 @@
   },
   "peerDependencies": {
     "eslint": "^10.0.0",
-    "typescript-eslint": "^8.58.0",
-    "oxlint": "^1.76.0"
+    "oxlint": "^1.76.0",
+    "typescript-eslint": "^8.58.0"
   },
   "peerDependenciesMeta": {
     "eslint": {
