@@ -1,14 +1,12 @@
-import { RuleTester } from "@typescript-eslint/rule-tester";
-import { parser } from "typescript-eslint";
+import { RuleTester } from "oxlint/plugins-dev";
 import manifest from "./package.json";
 import assert from "node:assert/strict";
 
-RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
 RuleTester.it = it;
 
 const tester = new RuleTester({
-  languageOptions: { parser },
+  languageOptions: { parserOptions: { lang: "ts" } },
 });
 
 describe("Migration", async () => {

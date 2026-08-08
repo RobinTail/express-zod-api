@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import ts from "typescript"; // eslint-disable-line allowed/dependencies -- opt-in export
+import ts from "typescript"; // oxlint-disable-line allowed/dependencies -- opt-in export
 
 export { ts };
 

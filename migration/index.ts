@@ -1,9 +1,9 @@
 import {
-  AST_NODE_TYPES as NT,
-  ESLintUtils,
-  type TSESLint,
-  type TSESTree,
-} from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
+  type ESTree,
+  eslintCompatPlugin,
+  type Rule,
+  type Visitor,
+} from "@oxlint/plugins";
 import {
   queryNamedProp,
   type NamedProp,
@@ -12,12 +12,12 @@ import {
 } from "./helpers.ts";
 
 interface Queries {
-  integrationCreate: TSESTree.CallExpression;
-  createServerAwait: TSESTree.CallExpression;
+  integrationCreate: ESTree.CallExpression;
+  createServerAwait: ESTree.CallExpression;
   asyncLifecycleHook: NamedProp;
-  documentationConfig: TSESTree.ObjectExpression;
+  documentationConfig: ESTree.ObjectExpression;
   corsConfig: NamedProp;
-  expressZodApiImport: TSESTree.ImportDeclaration;
+  expressZodApiImport: ESTree.ImportDeclaration;
   integrationNewTypescript: NamedProp;
 }
 
@@ -25,39 +25,35 @@ type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
   integrationCreate:
-    `${NT.AwaitExpression} > ` +
-    `${NT.CallExpression}[callee.object.name="Integration"][callee.property.name="create"]`,
+    `AwaitExpression > ` +
+    `CallExpression[callee.object.name="Integration"][callee.property.name="create"]`,
   createServerAwait:
-    `${NT.AwaitExpression} > ` +
-    `${NT.CallExpression}[callee.name="createServer"]`,
+    `AwaitExpression > ` + `CallExpression[callee.name="createServer"]`,
   asyncLifecycleHook:
-    `${NT.CallExpression}[callee.name="createConfig"] > ` +
-    `${NT.ObjectExpression} > ` +
+    `CallExpression[callee.name="createConfig"] > ` +
+    `ObjectExpression > ` +
     queryNamedProp("beforeRouting") +
     "," +
-    `${NT.CallExpression}[callee.name="createConfig"] > ` +
-    `${NT.ObjectExpression} > ` +
+    `CallExpression[callee.name="createConfig"] > ` +
+    `ObjectExpression > ` +
     queryNamedProp("afterRouting"),
   documentationConfig:
-    `${NT.NewExpression}[callee.name="Documentation"] > ` +
-    `${NT.ObjectExpression}`,
+    `NewExpression[callee.name="Documentation"] > ` + `ObjectExpression`,
   corsConfig:
-    `${NT.CallExpression}[callee.name="createConfig"] > ` +
-    `${NT.ObjectExpression} > ` +
+    `CallExpression[callee.name="createConfig"] > ` +
+    `ObjectExpression > ` +
     queryNamedProp("cors"),
-  expressZodApiImport: `${NT.ImportDeclaration}[source.value="express-zod-api"]`,
+  expressZodApiImport: `ImportDeclaration[source.value="express-zod-api"]`,
   integrationNewTypescript:
-    `${NT.NewExpression}[callee.name="Integration"] > ` +
-    `${NT.ObjectExpression} > ` +
+    `NewExpression[callee.name="Integration"] > ` +
+    `ObjectExpression > ` +
     queryNamedProp("typescript"),
 };
 
-const listen = <
-  S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
->(
+const listen = <S extends { [K in Listener]: (node: Queries[K]) => void }>(
   subject: S,
 ) =>
-  (Object.keys(subject) as Listener[]).reduce<{ [K: string]: S[Listener] }>(
+  (Object.keys(subject) as Listener[]).reduce<Visitor>(
     (agg, key) =>
       Object.assign(agg, {
         [queries[key]]: subject[key],
@@ -72,8 +68,7 @@ const moveTargets = new Map<string, string[]>([
 
 const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0]}`;
 
-const theRule = ESLintUtils.RuleCreator.withoutDocs({
-  name: ruleName,
+const theRule: Rule = {
   meta: {
     type: "problem",
     fixable: "code",
@@ -90,7 +85,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
     listen({
       integrationCreate: (node) => {
         const parent = node.parent;
-        if (!parent || parent.type !== NT.AwaitExpression) return;
+        if (!parent || parent.type !== "AwaitExpression") return;
         ctx.report({
           node,
           messageId: "change",
@@ -109,7 +104,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
       },
       createServerAwait: (node) => {
         const parent = node.parent;
-        if (!parent || parent.type !== NT.AwaitExpression) return;
+        if (!parent || parent.type !== "AwaitExpression") return;
         ctx.report({
           node,
           messageId: "remove",
@@ -123,8 +118,8 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
       asyncLifecycleHook: (node) => {
         const value = node.value;
         const isAsync =
-          (value.type === NT.ArrowFunctionExpression ||
-            value.type === NT.FunctionExpression) &&
+          (value.type === "ArrowFunctionExpression" ||
+            value.type === "FunctionExpression") &&
           value.async;
         if (!isAsync) return;
         const propName = getPropName(node);
@@ -146,28 +141,28 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
       corsConfig: (node) => {
         const { value } = node;
         const isFunc =
-          value.type === NT.ArrowFunctionExpression ||
-          value.type === NT.FunctionExpression;
+          value.type === "ArrowFunctionExpression" ||
+          value.type === "FunctionExpression";
         if (!isFunc) return;
         const { body, async } = value;
+        if (!body) return;
         const asyncPrefix = async ? "async " : "";
         let newFunc: string | null = null;
-        if (body.type === NT.ObjectExpression) {
+        if (body.type === "ObjectExpression") {
           newFunc = `${asyncPrefix}(req, res, next) => { res.set(${ctx.sourceCode.getText(body)}); next(); }`;
-        } else if (body.type === NT.BlockStatement) {
+        } else if (body.type === "BlockStatement") {
           const returnIndex = body.body.findIndex(
-            (s) => s.type === NT.ReturnStatement,
+            (s) => s.type === "ReturnStatement",
           );
           if (returnIndex < 0) return;
-          const ret = body.body[returnIndex] as TSESTree.ReturnStatement;
-          if (!ret.argument || ret.argument.type !== NT.ObjectExpression)
-            return;
+          const ret = body.body[returnIndex] as ESTree.ReturnStatement;
+          if (!ret.argument || ret.argument.type !== "ObjectExpression") return;
           const parts: string[] = [];
           for (let i = 0; i < body.body.length; i++) {
             if (i === returnIndex) {
               parts.push(`res.set(${ctx.sourceCode.getText(ret.argument)});`);
               parts.push(`next();`);
-            } else if (body.body[i]!.type !== NT.ReturnStatement) {
+            } else if (body.body[i]!.type !== "ReturnStatement") {
               parts.push(ctx.sourceCode.getText(body.body[i]!));
             }
           }
@@ -191,7 +186,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         const changelog: Record<string, string> = {};
 
         for (const prop of node.properties) {
-          if (prop.type !== NT.Property || prop.computed) {
+          if (prop.type !== "Property" || prop.computed) {
             parts.push(ctx.sourceCode.getText(prop));
             continue;
           }
@@ -231,16 +226,16 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       expressZodApiImport: (node) => {
-        const groups = new Map<string, TSESTree.ImportSpecifier[]>();
-        const remaining: TSESTree.ImportSpecifier[] = [];
-        const nonNamed: TSESTree.ImportDeclaration["specifiers"] = [];
+        const groups = new Map<string, ESTree.ImportSpecifier[]>();
+        const remaining: ESTree.ImportSpecifier[] = [];
+        const nonNamed: ESTree.ImportDeclaration["specifiers"] = [];
         for (const spec of node.specifiers) {
-          if (spec.type !== NT.ImportSpecifier) {
+          if (spec.type !== "ImportSpecifier") {
             nonNamed.push(spec);
             continue;
           }
           const name =
-            spec.imported.type === NT.Identifier
+            spec.imported.type === "Identifier"
               ? spec.imported.name
               : spec.imported.value;
           let found = false;
@@ -258,7 +253,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         const importKind = node.importKind === "type" ? "type " : "";
         const first = groups.entries().next().value!;
         const firstName =
-          first[1][0]!.imported.type === NT.Identifier
+          first[1][0]!.imported.type === "Identifier"
             ? first[1][0]!.imported.name
             : first[1][0]!.imported.value;
         ctx.report({
@@ -288,8 +283,8 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
       },
       integrationNewTypescript: (node) => removeProp({ ctx, node }),
     }),
-});
+};
 
-export default {
-  rules: { [ruleName]: theRule } as Record<`v${number}`, typeof theRule>,
-} satisfies TSESLint.Linter.Plugin;
+export default eslintCompatPlugin({
+  rules: { [ruleName]: theRule },
+});
