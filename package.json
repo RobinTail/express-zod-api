@@ -9,7 +9,7 @@
     "test": "pnpm -r test",
     "bench": "pnpm -F express-zod-api bench",
     "lint": "eslint && oxfmt --check",
-    "mdfix": "oxfmt *.md **/*.md",
+    "mdfix": "oxfmt '*.md'",
     "precommit": "pnpm lint && pnpm build && pnpm test && git add *.md example/example.* LICENSE",
     "install_hooks": "husky"
   },
