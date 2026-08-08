@@ -57,6 +57,6 @@
     "@oxlint/plugins": "catalog:prod"
   },
   "devDependencies": {
-    "typescript": "catalog:dev"
+    "tsgo": "catalog:dev"
   }
 }
