@@ -7,10 +7,6 @@
   "minimumReleaseAge": "7 days",
   "packageRules": [
     {
-      "groupName": "TypeScript-ESLint and its rule tester",
-      "matchPackageNames": ["typescript-eslint", "@typescript-eslint/*"]
-    },
-    {
       "groupName": "Vitest and its coverage provider",
       "matchPackageNames": ["vitest", "@vitest/*"]
     }
