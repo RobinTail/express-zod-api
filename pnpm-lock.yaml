@@ -97,7 +97,7 @@ importers:
         version: 9.1.7
       openai:
         specifier: ^7.0.0
-        version: 7.2.0(zod@4.4.3)
+        version: 7.3.0(zod@4.4.3)
       prettier:
         specifier: 3.9.6
         version: 3.9.6
@@ -218,7 +218,7 @@ importers:
         version: 2.8.19
       '@types/depd':
         specifier: ^1.1.37
-        version: 1.1.37
+        version: 1.1.38
       '@types/express':
         specifier: catalog:dev
         version: 5.0.6
@@ -598,8 +598,8 @@ packages:
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
 
-  '@types/depd@1.1.37':
-    resolution: {integrity: sha512-PkEYFHnqDFgs+bJXJX0L8mq7sn3DWh+TP0m8BBJUJfZ2WcjRm7jd7Cq68jIJt+c31R1gX0cwSK1ZXOECvN97Rg==}
+  '@types/depd@1.1.38':
+    resolution: {integrity: sha512-CzBVWcYMVwSzZlXJ6/Eyy/9owI65qpgWMFEtCsdqEoTMzSsjIiHlIKPq0Pa1SpBxiApaKeBehL+6bChgsVtYuA==}
 
   '@types/esrecurse@4.3.1':
     resolution: {integrity: sha512-xJBAbDifo5hpffDBuHl0Y8ywswbiAp/Wi7Y/GtAgSlZyIABppyurxVueOPE8LUQOxdlgi6Zqce7uoEpqNTeiUw==}
@@ -1579,8 +1579,8 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  openai@7.2.0:
-    resolution: {integrity: sha512-/P0jZP2WDSwSuiilTTcU4mkepzdSAiRrnTK2e9pk9KOzBoE3L9aHz2oIyIXqGbqnnMsGC0Izr223MOUhG2JuvQ==}
+  openai@7.3.0:
+    resolution: {integrity: sha512-FLnIAkDEP3grs+BSDpqxEWVR37yG97/hs95lajF8SnHuA5nqtssh0uJVXbPhODNEoZqar+nEd+fIeGJgwoLUmg==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
@@ -2303,7 +2303,7 @@ snapshots:
 
   '@types/deep-eql@4.0.2': {}
 
-  '@types/depd@1.1.37':
+  '@types/depd@1.1.38':
     dependencies:
       '@types/node': 26.1.2
 
@@ -3329,7 +3329,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@7.2.0(zod@4.4.3):
+  openai@7.3.0(zod@4.4.3):
     optionalDependencies:
       zod: 4.4.3
 
