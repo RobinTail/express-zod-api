@@ -540,8 +540,7 @@ export type Path =
   | "/v1/forms/feedback"
   | "/v2/users/list";
 
-export type Method =
-  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
@@ -625,8 +624,7 @@ export interface EncodedResponse {
     PostV1UserCreateNegativeResponseVariants;
   "query /v1/user/list": QueryV1UserListPositiveResponseVariants &
     QueryV1UserListNegativeResponseVariants;
-  "post /v1/login": PostV1LoginPositiveResponseVariants &
-    PostV1LoginNegativeResponseVariants;
+  "post /v1/login": PostV1LoginPositiveResponseVariants & PostV1LoginNegativeResponseVariants;
   /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendPositiveResponseVariants &
     GetV1AvatarSendNegativeResponseVariants;
@@ -672,8 +670,7 @@ export interface Response {
   "query /v1/user/list":
     | PositiveResponse["query /v1/user/list"]
     | NegativeResponse["query /v1/user/list"];
-  "post /v1/login":
-    PositiveResponse["post /v1/login"] | NegativeResponse["post /v1/login"];
+  "post /v1/login": PositiveResponse["post /v1/login"] | NegativeResponse["post /v1/login"];
   /** @deprecated */
   "get /v1/avatar/send":
     | PositiveResponse["get /v1/avatar/send"]
@@ -734,13 +731,9 @@ export const endpointTags = {
   "head /v2/users/list": ["users"],
 };
 
-const parseRequest = (request: string) =>
-  request.split(/ (.+)/, 2) as [Method, Path];
+const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
 
-const substitute = (
-  path: string,
-  params: Record<string, any>,
-): [typeof path, typeof params] => {
+const substitute = (path: string, params: Record<string, any>): [typeof path, typeof params] => {
   if (params instanceof Blob) return [path, params] as const;
   const rest = { ...params };
   for (const key in params) {
@@ -759,35 +752,20 @@ export type Implementation<T extends Record<string, unknown>> = (
   ctx?: T,
 ) => Promise<any>;
 
-type Pagination =
-  | { nextCursor: string | null }
-  | { total: number; limit: number; offset: number };
+type Pagination = { nextCursor: string | null } | { total: number; limit: number; offset: number };
 
 export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
 
-const defaultImplementation: Implementation<DefaultContext> = async (
-  method,
-  path,
-  params,
-  ctx,
-) => {
+const defaultImplementation: Implementation<DefaultContext> = async (method, path, params, ctx) => {
   const isBlob = params instanceof Blob;
   const hasFiles =
-    !isBlob &&
-    Object.values(params).some(
-      (one) => one instanceof Blob || one instanceof File,
-    );
+    !isBlob && Object.values(params).some((one) => one instanceof Blob || one instanceof File);
   const hasBody = !["get", "head", "delete"].includes(method);
-  const searchParams =
-    isBlob || hasBody ? "" : `?${new URLSearchParams(params)}`;
+  const searchParams = isBlob || hasBody ? "" : `?${new URLSearchParams(params)}`;
   const headers =
     !hasBody || hasFiles
       ? undefined
-      : {
-          "Content-Type": isBlob
-            ? "application/octet-stream"
-            : "application/json",
-        };
+      : { "Content-Type": isBlob ? "application/octet-stream" : "application/json" };
   let body: RequestInit["body"] = undefined;
   if (hasBody) {
     if (isBlob) {
@@ -807,10 +785,7 @@ const defaultImplementation: Implementation<DefaultContext> = async (
     body,
   };
   if (ctx?.override) init = ctx.override(init);
-  const response = await fetch(
-    new URL(`${path}${searchParams}`, "http://localhost:8090"),
-    init,
-  );
+  const response = await fetch(new URL(`${path}${searchParams}`, "http://localhost:8090"), init);
   const contentType = response.headers.get("content-type");
   if (!contentType) return;
   if (contentType.startsWith("application/json")) return response.json();
@@ -822,11 +797,7 @@ export class Client<T extends Record<string, unknown> = DefaultContext> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
-  public provide<K extends Request>(
-    request: K,
-    params: Input[K],
-    ctx?: T,
-  ): Promise<Response[K]> {
+  public provide<K extends Request>(request: K, params: Input[K], ctx?: T): Promise<Response[K]> {
     const [method, path] = parseRequest(request);
     return this.implementation(method, ...substitute(path, params), ctx);
   }
@@ -844,18 +815,15 @@ export class Subscription<
   public constructor(request: K, params: Input[K]) {
     const [path, rest] = substitute(parseRequest(request)[1], params);
     const searchParams = `?${new URLSearchParams(rest)}`;
-    this.source = new EventSource(
-      new URL(`${path}${searchParams}`, "http://localhost:8090"),
-      { withCredentials: undefined },
-    );
+    this.source = new EventSource(new URL(`${path}${searchParams}`, "http://localhost:8090"), {
+      withCredentials: undefined,
+    });
   }
   public on<E extends R["event"]>(
     event: E,
     handler: (data: Extract<R, { event: E }>["data"]) => void | Promise<void>,
   ) {
-    this.source.addEventListener(event, (msg) =>
-      handler(JSON.parse((msg as MessageEvent).data)),
-    );
+    this.source.addEventListener(event, (msg) => handler(JSON.parse((msg as MessageEvent).data)));
     return this;
   }
 }

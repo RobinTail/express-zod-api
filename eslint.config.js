@@ -1,8 +1,6 @@
 import globals from "globals";
 import jsPlugin from "@eslint/js";
 import tsPlugin from "typescript-eslint";
-import prettierOverrides from "eslint-config-prettier/flat";
-import prettierRules from "eslint-plugin-prettier/recommended";
 import allowedDepsPlugin from "eslint-plugin-allowed-dependencies";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -123,8 +121,6 @@ export default tsPlugin.config(
   },
   jsPlugin.configs.recommended,
   tsPlugin.configs.recommended,
-  prettierOverrides,
-  prettierRules,
   {
     name: "globally/ignored",
     ignores: ["**/dist/", "**/coverage/", "compat-test"],
@@ -206,7 +202,6 @@ export default tsPlugin.config(
     name: "generated/all",
     files: ["*-test/quick-start.ts", "example/example.client.ts"],
     rules: {
-      "prettier/prettier": "off",
       "no-duplicate-imports": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": [

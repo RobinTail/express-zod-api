@@ -3,11 +3,5 @@
   "compilerOptions": {
     "stripInternal": true
   },
-  "include": [
-    "src",
-    "tests",
-    "bench",
-    "*.config.ts",
-    "*.setup.ts"
-  ]
+  "include": ["src", "tests", "bench", "*.config.ts", "*.setup.ts"]
 }
