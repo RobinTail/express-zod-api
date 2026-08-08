@@ -1,6 +1,6 @@
 /* oxlint-disable allowed/dependencies -- experiment ⚠️*/
 import * as R from "ramda";
-import * as f from "tsgo/unstable/ast/factory";
+import * as f from "@typescript/native/unstable/ast/factory";
 import {
   SyntaxKind,
   TokenFlags,
@@ -19,9 +19,12 @@ import {
   type TemplateLiteralTypeSpan,
   type PropertySignatureDeclaration,
   type ComputedPropertyName,
-} from "tsgo/unstable/ast";
-import { isIdentifier, isTypeLiteralNode } from "tsgo/unstable/ast/is";
-import { API, type PrintNodeOptions } from "tsgo/unstable/sync";
+} from "@typescript/native/unstable/ast";
+import {
+  isIdentifier,
+  isTypeLiteralNode,
+} from "@typescript/native/unstable/ast/is";
+import { API, type PrintNodeOptions } from "@typescript/native/unstable/sync";
 
 export {
   f,
