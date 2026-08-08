@@ -13,31 +13,43 @@ import {
   type HandlingRules,
 } from "./schema-walker";
 import {
+  makeInterfacePropText,
   ensureTypeNode,
   f,
   makeInterfaceProp,
   makeLiteralType,
   makeUnion,
-  ts,
+  SyntaxKind,
+  TokenFlags,
+  customizations,
+  isTypeLiteralNode,
+  type TypeNode,
+  type TypeElement,
+  type TemplateLiteralTypeSpan,
+  type PropertySignatureDeclaration,
+  type KeywordTypeSyntaxKind,
+  type ComputedPropertyName,
 } from "./typescript-api";
 import type { Producer, ZTSContext } from "./zts-helpers";
 
 const nodePath = {
   name: R.path([
-    "name" satisfies keyof ts.TypeElement,
+    "name" satisfies keyof PropertySignatureDeclaration,
     "text" satisfies keyof Exclude<
-      NonNullable<ts.TypeElement["name"]>,
-      ts.ComputedPropertyName
+      NonNullable<PropertySignatureDeclaration["name"]>,
+      ComputedPropertyName
     >,
   ]),
-  type: R.path(["type" satisfies keyof ts.PropertySignature]),
-  optional: R.path(["questionToken" satisfies keyof ts.TypeElement]),
+  type: R.path(["type" satisfies keyof PropertySignatureDeclaration]),
+  optional: R.path([
+    "postfixToken" satisfies keyof PropertySignatureDeclaration,
+  ]),
 };
 
 const onLiteral: Producer = ({ _zod: { def } }: z.core.$ZodLiteral) => {
   const values = def.values.map((entry) =>
     entry === undefined
-      ? ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)
+      ? ensureTypeNode(SyntaxKind.UndefinedKeyword)
       : makeLiteralType(entry),
   );
   // ensured by runtime check since Zod 4.0.9 4e7a3ef180f6a5525d9021638e9df20b3ca50456
@@ -60,17 +72,22 @@ const onTemplateLiteral: Producer = (
     }
     return text;
   };
-  const head = f.createTemplateHead(readText());
-  const spans: ts.TemplateLiteralTypeSpan[] = [];
+  const headText = readText();
+  const head = f.createTemplateHead(headText, headText, TokenFlags.None);
+  const spans: TemplateLiteralTypeSpan[] = [];
   while (idx < parts.length) {
     const schema = next(parts[idx++] as z.core.$ZodType);
     const text = readText();
     const textWrapper =
       idx < parts.length ? f.createTemplateMiddle : f.createTemplateTail;
-    spans.push(f.createTemplateLiteralTypeSpan(schema, textWrapper(text)));
+    const span = f.createTemplateLiteralTypeSpan(
+      schema,
+      textWrapper(text, text, TokenFlags.None),
+    );
+    spans.push(span);
   }
   if (!spans.length) return makeLiteralType(head.text);
-  return f.createTemplateLiteralType(head, spans);
+  return f.createTemplateLiteralTypeNode(head, spans);
 };
 
 const onObject: Producer = (
@@ -78,23 +95,36 @@ const onObject: Producer = (
   { isResponse, next, makeAlias },
 ) => {
   const produce = () => {
-    const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
-      ([key, value]) => {
-        const { description: comment, deprecated: isDeprecated } =
-          globalRegistry.get(value) || {};
-        const isOptional =
-          (isResponse ? value._zod.optout : value._zod.optin) === "optional";
-        const hasUndefined =
-          isOptional && !(value instanceof z.core.$ZodExactOptional);
-        return makeInterfaceProp(key, next(value), {
-          comment,
-          isDeprecated,
+    const entries = Object.entries(obj._zod.def.shape);
+    const members = entries.map<TypeElement>(([key, value]) => {
+      const { description: comment, deprecated: isDeprecated } =
+        globalRegistry.get(value) || {};
+      const isOptional =
+        (isResponse ? value._zod.optout : value._zod.optin) === "optional";
+      const hasUndefined =
+        isOptional && !(value instanceof z.core.$ZodExactOptional);
+      const typeNode = next(value);
+      const member = makeInterfaceProp(key, typeNode, {
+        isOptional,
+        hasUndefined,
+      });
+      customizations.set(
+        member,
+        makeInterfacePropText(key, typeNode, {
           isOptional,
           hasUndefined,
-        });
-      },
-    );
-    return f.createTypeLiteralNode(members);
+          isDeprecated,
+          comment,
+        }),
+      );
+      return member;
+    });
+    const typeNode = f.createTypeLiteralNode(members);
+    customizations.set(typeNode, (opts) => {
+      const propTexts = members.map((one) => customizations.get(one)?.(opts));
+      return propTexts.length ? `{\n${propTexts.join("\n")}\n}` : "{}";
+    });
+    return typeNode;
   };
   return hasCycle(obj, { io: isResponse ? "output" : "input" })
     ? makeAlias(obj, produce)
@@ -136,8 +166,8 @@ const onRecord: Producer = ({ _zod: { def } }: z.core.$ZodRecord, { next }) => {
 };
 
 const intersect = R.tryCatch(
-  (nodes: ts.TypeNode[]) => {
-    if (!nodes.every(ts.isTypeLiteralNode)) throw new Error("Not objects");
+  (nodes: TypeNode[]) => {
+    if (!nodes.every(isTypeLiteralNode)) throw new Error("Not objects");
     const members = R.chain(R.prop("members"), nodes);
     const uniqs = R.uniqWith((...props) => {
       if (!R.eqBy(nodePath.name, ...props)) return false;
@@ -145,7 +175,15 @@ const intersect = R.tryCatch(
         return true;
       throw new Error("Has conflicting prop");
     }, members);
-    return f.createTypeLiteralNode(uniqs);
+    const typeNode = f.createTypeLiteralNode(uniqs);
+    const propFns = uniqs.map((m) => customizations.get(m));
+    if (propFns.every(Boolean)) {
+      customizations.set(typeNode, (opts) => {
+        const propTexts = propFns.map((fn) => fn!(opts));
+        return `{\n${propTexts.join("\n")}\n}`;
+      });
+    }
+    return typeNode;
   },
   (_err, nodes) => f.createIntersectionTypeNode(nodes),
 );
@@ -156,7 +194,7 @@ const onIntersection: Producer = (
 ) => intersect([def.left, def.right].map(next));
 
 const onPrimitive =
-  (syntaxKind: ts.KeywordTypeSyntaxKind): Producer =>
+  (syntaxKind: KeywordTypeSyntaxKind): Producer =>
   () =>
     ensureTypeNode(syntaxKind);
 
@@ -175,7 +213,7 @@ const onWrapped: Producer = (
 
 const getFallback = (isResponse: boolean) =>
   ensureTypeNode(
-    isResponse ? ts.SyntaxKind.UnknownKeyword : ts.SyntaxKind.AnyKeyword,
+    isResponse ? SyntaxKind.UnknownKeyword : SyntaxKind.AnyKeyword,
   );
 
 const onPipeline: Producer = (
@@ -187,25 +225,25 @@ const onPipeline: Producer = (
   if (!isSchema<z.core.$ZodTransform>(target, "transform")) return next(target);
   const opposingType = next(opposite);
   const samples = {
-    [ts.SyntaxKind.AnyKeyword]: "",
-    [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
-    [ts.SyntaxKind.BooleanKeyword]: false,
-    [ts.SyntaxKind.NumberKeyword]: 0,
-    [ts.SyntaxKind.ObjectKeyword]: {},
-    [ts.SyntaxKind.StringKeyword]: "",
-    [ts.SyntaxKind.UndefinedKeyword]: undefined,
-  } satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
+    [SyntaxKind.AnyKeyword]: "",
+    [SyntaxKind.BigIntKeyword]: BigInt(0),
+    [SyntaxKind.BooleanKeyword]: false,
+    [SyntaxKind.NumberKeyword]: 0,
+    [SyntaxKind.ObjectKeyword]: {},
+    [SyntaxKind.StringKeyword]: "",
+    [SyntaxKind.UndefinedKeyword]: undefined,
+  } satisfies Partial<Record<KeywordTypeSyntaxKind, unknown>>;
   const sample = samples[opposingType.kind as keyof typeof samples];
   const targetType = getTransformedType(target, sample);
   const resolutions: Partial<
-    Record<NonNullable<typeof targetType>, ts.KeywordTypeSyntaxKind>
+    Record<NonNullable<typeof targetType>, KeywordTypeSyntaxKind>
   > = {
-    number: ts.SyntaxKind.NumberKeyword,
-    bigint: ts.SyntaxKind.BigIntKeyword,
-    boolean: ts.SyntaxKind.BooleanKeyword,
-    string: ts.SyntaxKind.StringKeyword,
-    undefined: ts.SyntaxKind.UndefinedKeyword,
-    object: ts.SyntaxKind.ObjectKeyword,
+    number: SyntaxKind.NumberKeyword,
+    bigint: SyntaxKind.BigIntKeyword,
+    boolean: SyntaxKind.BooleanKeyword,
+    string: SyntaxKind.StringKeyword,
+    undefined: SyntaxKind.UndefinedKeyword,
+    object: SyntaxKind.ObjectKeyword,
   };
   return ensureTypeNode(
     (targetType && resolutions[targetType]) || getFallback(isResponse),
@@ -225,21 +263,21 @@ const onRaw: Producer = (schema: RawSchema, { next }) =>
   next(schema._zod.def.shape.raw);
 
 const producers: HandlingRules<
-  ts.TypeNode,
+  TypeNode,
   ZTSContext,
   FirstPartyKind | ProprietaryBrand
 > = {
-  string: onPrimitive(ts.SyntaxKind.StringKeyword),
-  number: onPrimitive(ts.SyntaxKind.NumberKeyword),
-  bigint: onPrimitive(ts.SyntaxKind.BigIntKeyword),
-  boolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
-  any: onPrimitive(ts.SyntaxKind.AnyKeyword),
-  undefined: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
-  [ezDateInBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
-  [ezDateOutBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
-  never: onPrimitive(ts.SyntaxKind.NeverKeyword),
-  void: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
-  unknown: onPrimitive(ts.SyntaxKind.UnknownKeyword),
+  string: onPrimitive(SyntaxKind.StringKeyword),
+  number: onPrimitive(SyntaxKind.NumberKeyword),
+  bigint: onPrimitive(SyntaxKind.BigIntKeyword),
+  boolean: onPrimitive(SyntaxKind.BooleanKeyword),
+  any: onPrimitive(SyntaxKind.AnyKeyword),
+  undefined: onPrimitive(SyntaxKind.UndefinedKeyword),
+  [ezDateInBrand]: onPrimitive(SyntaxKind.StringKeyword),
+  [ezDateOutBrand]: onPrimitive(SyntaxKind.StringKeyword),
+  never: onPrimitive(SyntaxKind.NeverKeyword),
+  void: onPrimitive(SyntaxKind.UndefinedKeyword),
+  unknown: onPrimitive(SyntaxKind.UnknownKeyword),
   null: onNull,
   array: onArray,
   tuple: onTuple,
@@ -268,7 +306,7 @@ export const zodToTs = (
     brandHandling,
     ctx,
   }: {
-    brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
+    brandHandling?: HandlingRules<TypeNode, ZTSContext>;
     ctx: ZTSContext;
   },
 ) =>

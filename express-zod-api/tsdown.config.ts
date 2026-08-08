@@ -15,6 +15,7 @@ export default defineConfig({
     dts: {
       neverBundle: ["express-serve-static-core", "qs"],
     },
+    neverBundle: [/tsgo/],
   },
   plugins: [fixDtsPlugin()],
   dts: {
