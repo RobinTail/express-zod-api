@@ -7,7 +7,7 @@ export default defineConfig({
   fixedExtension: false,
   minify: true,
   deps: {
-    skipNodeModulesBundle: true,
+    neverBundle: true,
   },
   attw: { profile: "esm-only", level: "error" },
   plugins: [fixDtsPlugin()],
