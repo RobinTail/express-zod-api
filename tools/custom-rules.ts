@@ -5,7 +5,7 @@ interface Entry {
   message: string;
 }
 
-const plugin = eslintCompatPlugin({
+export default eslintCompatPlugin({
   rules: {
     syntax: {
       meta: {
@@ -26,8 +26,8 @@ const plugin = eslintCompatPlugin({
           minItems: 0,
         },
       },
-      create(context) {
-        return context.options.reduce<Visitor>((result, _entry) => {
+      create: (context) =>
+        context.options.reduce<Visitor>((result, _entry) => {
           if (typeof _entry !== "object" || !_entry)
             throw new Error("Invalid entry", { cause: _entry });
           const { selector, message } = _entry as unknown as Entry;
@@ -36,10 +36,7 @@ const plugin = eslintCompatPlugin({
               context.report({ node, message });
             },
           });
-        }, {});
-      },
+        }, {}),
     },
   },
 });
-
-export default plugin;
