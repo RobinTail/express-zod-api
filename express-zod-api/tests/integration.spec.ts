@@ -169,6 +169,39 @@ describe("Integration", () => {
     });
   });
 
+  describe("Feature #3604: OxFmt support", () => {
+    test("should throw if it failed to format", async () => {
+      await expect(() =>
+        new Integration({
+          config: configMock,
+          variant: "types",
+          brandHandling: {
+            CUSTOM: () => ts.factory.createTypeReferenceNode("## WRONG ##"),
+          },
+          routing: {
+            v1: {
+              custom: defaultEndpointsFactory.buildVoid({
+                method: "post",
+                input: z.object({
+                  string: z.string().meta({ [brandProperty]: "CUSTOM" }),
+                }),
+                handler: vi.fn(),
+              }),
+            },
+          },
+        }).printFormatted(),
+      ).rejects.toThrow(
+        new Error("OxFmt failed to format the code", {
+          cause: [
+            expect.objectContaining({
+              codeframe: expect.stringContaining("## WRONG ##"),
+            }),
+          ],
+        }),
+      );
+    });
+  });
+
   test("Producer type should be satisfied", () => {
     expectTypeOf(() =>
       ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),

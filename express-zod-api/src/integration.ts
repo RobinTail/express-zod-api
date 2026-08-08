@@ -227,7 +227,15 @@ export class Integration extends IntegrationBase {
       } catch {}
       try {
         const oxFmt = loadPeer<typeof OxFmt>("oxfmt").format;
-        format = async (text) => (await oxFmt("client.ts", text)).code;
+        format = async (text) => {
+          const { code, errors } = await oxFmt("client.ts", text);
+          if (errors.length) {
+            throw new Error("OxFmt failed to format the code", {
+              cause: errors,
+            });
+          }
+          return code;
+        };
       } catch {}
     }
 
