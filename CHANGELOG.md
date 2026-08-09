@@ -2,6 +2,10 @@
 
 ## Version 29
 
+### v29.2.1
+
+- Tiny performance tuning for self-diagnostics at startup (development mode only).
+
 ### v29.2.0
 
 - Added support for the `oxfmt` formatter in `Integration::printFormatted()`:
