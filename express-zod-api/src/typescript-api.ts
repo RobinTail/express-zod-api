@@ -142,7 +142,7 @@ export const makeInterfacePropText = (
   typeNode: TypeNode,
   {
     isOptional,
-    hasUndefined,
+    hasUndefined = isOptional,
     isDeprecated,
     comment,
   }: {
