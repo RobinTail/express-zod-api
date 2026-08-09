@@ -11,7 +11,7 @@
     "@types/express": "catalog:dev",
     "@types/express-fileupload": "catalog:dev",
     "express-zod-api": "workspace:*",
-    "@typescript/native": "catalog:dev",
+    "@typescript/native-preview": "catalog:dev",
     "zod": "catalog:dev"
   }
 }

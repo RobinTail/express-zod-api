@@ -57,6 +57,6 @@
     "@oxlint/plugins": "^1.76.0"
   },
   "devDependencies": {
-    "@typescript/native": "catalog:dev"
+    "@typescript/native-preview": "catalog:dev"
   }
 }
