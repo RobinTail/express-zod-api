@@ -1,3 +1,4 @@
+import { ensureTypeNode, ts } from "../src/typescript-api";
 import { globalRegistry, z } from "zod";
 import {
   EndpointsFactory,
@@ -6,7 +7,6 @@ import {
 } from "../src";
 import { Integration, type Producer } from "../src/integration";
 import { brandProperty } from "../src/metadata";
-import { ensureTypeNode, ts } from "../src/typescript-api";
 
 describe("Integration", () => {
   const recursive1: z.ZodType = z.lazy(() =>
