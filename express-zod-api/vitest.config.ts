@@ -6,7 +6,7 @@ import manifest from "./package.json" with { type: "json" };
 export default defineConfig({
   define: {
     "import.meta.TSDOWN_SELF": `"${manifest.name}"`,
-    "import.meta.TSDOWN_VERSION": `"${manifest.version}"`,
+    "import.meta.TSDOWN_BUILD": `"v${manifest.version}"`,
   },
   test: {
     globals: true,
