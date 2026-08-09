@@ -64,7 +64,7 @@ describe("BuiltinLogger", () => {
       "Level can be omitted and depends on env",
       (mode) => {
         vi.stubEnv("NODE_ENV", mode);
-        isProduction._reset();
+        isProduction._cache = undefined;
         const { logger } = makeLogger();
         expect(logger["config"]["level"]).toBe(
           mode === "production" ? "warn" : "debug",

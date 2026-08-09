@@ -20,7 +20,7 @@ import { isProduction } from "../src/common-helpers.ts";
 
 describe("App in production mode", () => {
   vi.stubEnv("NODE_ENV", "production");
-  isProduction._reset();
+  isProduction._cache = undefined;
   const port = givePort();
   const logger = new BuiltinLogger({ level: "silent" });
   const infoMethod = vi.spyOn(logger, "info");

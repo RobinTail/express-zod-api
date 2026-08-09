@@ -250,7 +250,7 @@ describe("AbstractResultHandler", () => {
     describe.each(["development", "production"])("%s mode", (mode) => {
       beforeAll(() => {
         vi.stubEnv("NODE_ENV", mode);
-        isProduction._reset();
+        isProduction._cache = undefined;
       });
       afterAll(() => vi.unstubAllEnvs());
 
