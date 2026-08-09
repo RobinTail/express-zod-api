@@ -2,6 +2,8 @@
 import * as R from "ramda";
 import * as f from "@typescript/native-preview/unstable/ast/factory";
 import {
+  isIdentifier,
+  isTypeLiteralNode,
   SyntaxKind,
   TokenFlags,
   NodeFlags,
@@ -20,10 +22,6 @@ import {
   type PropertySignatureDeclaration,
   type ComputedPropertyName,
 } from "@typescript/native-preview/unstable/ast";
-import {
-  isIdentifier,
-  isTypeLiteralNode,
-} from "@typescript/native-preview/unstable/ast/is";
 import {
   API,
   type PrintNodeOptions,
