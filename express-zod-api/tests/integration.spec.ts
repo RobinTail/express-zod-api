@@ -6,7 +6,7 @@ import {
 } from "../src";
 import { Integration, type Producer } from "../src/integration";
 import { brandProperty } from "../src/metadata";
-import { ensureTypeNode, SyntaxKind } from "../src/typescript-api";
+import { ensureTypeNode, ts } from "../src/typescript-api";
 
 describe("Integration", () => {
   const recursive1: z.ZodType = z.lazy(() =>
@@ -142,7 +142,7 @@ describe("Integration", () => {
         config: configMock,
         variant: "types",
         brandHandling: {
-          CUSTOM: () => ensureTypeNode(SyntaxKind.BooleanKeyword),
+          CUSTOM: () => ensureTypeNode(ts.SyntaxKind.BooleanKeyword),
           DEEP: rule,
         },
         routing: {
@@ -200,7 +200,7 @@ describe("Integration", () => {
 
   test("Producer type should be satisfied", () => {
     expectTypeOf(() =>
-      ensureTypeNode(SyntaxKind.AnyKeyword),
+      ensureTypeNode(ts.SyntaxKind.AnyKeyword),
     ).toExtend<Producer>();
   });
 });

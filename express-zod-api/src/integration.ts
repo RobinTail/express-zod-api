@@ -12,7 +12,7 @@ import type { Routing } from "./routing";
 import {
   ensureTypeNode,
   printNode,
-  type TypeNode,
+  type ts,
   type PrintNodeOptions,
   type DeferredCode,
 } from "./typescript-api";
@@ -61,7 +61,7 @@ interface IntegrationParams {
    * @example { MyBrand: (schema: typeof myBrandSchema, { next }) => createKeywordTypeNode(SyntaxKind.AnyKeyword)
    * @link https://www.npmjs.com/package/@express-zod-api/zod-plugin
    */
-  brandHandling?: HandlingRules<TypeNode, ZTSContext>;
+  brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
   /**
    * @desc Whether the server supports credentials in cross-origin requests.
    * @desc It sets `credentials: "include"` in Client default Implementation and `withCredentials` in Subscription.
@@ -87,7 +87,7 @@ export class Integration extends IntegrationBase {
   readonly #aliases = new Map<object, string>();
   #usage?: string;
 
-  #makeAlias(key: object, produce: () => TypeNode): TypeNode {
+  #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
     let name = this.#aliases.get(key);
     if (!name) {
       name = `Type${this.#aliases.size + 1}`;

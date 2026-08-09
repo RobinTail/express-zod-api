@@ -1,80 +1,50 @@
 /* oxlint-disable allowed/dependencies -- experiment ⚠️*/
 import * as R from "ramda";
 import * as f from "@typescript/native-preview/unstable/ast/factory";
-import {
-  isIdentifier,
-  isTypeLiteralNode,
-  SyntaxKind,
-  TokenFlags,
-  NodeFlags,
-  type TypeNode,
-  type Node,
-  type Identifier,
-  type KeywordTypeSyntaxKind,
-  type KeywordTypeNode,
-  type BooleanLiteral,
-  type NumericLiteral,
-  type StringLiteral,
-  type BigIntLiteral,
-  type NullLiteral,
-  type TypeElement,
-  type TemplateLiteralTypeSpan,
-  type PropertySignatureDeclaration,
-  type ComputedPropertyName,
-} from "@typescript/native-preview/unstable/ast";
+import * as ts from "@typescript/native-preview/unstable/ast";
 import {
   API,
   type PrintNodeOptions,
 } from "@typescript/native-preview/unstable/sync";
 
-export {
-  f,
-  isIdentifier,
-  isTypeLiteralNode,
-  SyntaxKind,
-  TokenFlags,
-  NodeFlags,
-  type TypeNode,
-  type PrintNodeOptions,
-  type KeywordTypeSyntaxKind,
-  type TypeElement,
-  type TemplateLiteralTypeSpan,
-  type PropertySignatureDeclaration,
-  type ComputedPropertyName,
-};
+export { f, ts, type PrintNodeOptions };
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
-const primitives = new Set<SyntaxKind>([
-  SyntaxKind.AnyKeyword,
-  SyntaxKind.BigIntKeyword,
-  SyntaxKind.BooleanKeyword,
-  SyntaxKind.NeverKeyword,
-  SyntaxKind.NumberKeyword,
-  SyntaxKind.ObjectKeyword,
-  SyntaxKind.StringKeyword,
-  SyntaxKind.SymbolKeyword,
-  SyntaxKind.UndefinedKeyword,
-  SyntaxKind.UnknownKeyword,
-  SyntaxKind.VoidKeyword,
-] satisfies KeywordTypeSyntaxKind[]);
+const primitives = new Set<ts.SyntaxKind>([
+  ts.SyntaxKind.AnyKeyword,
+  ts.SyntaxKind.BigIntKeyword,
+  ts.SyntaxKind.BooleanKeyword,
+  ts.SyntaxKind.NeverKeyword,
+  ts.SyntaxKind.NumberKeyword,
+  ts.SyntaxKind.ObjectKeyword,
+  ts.SyntaxKind.StringKeyword,
+  ts.SyntaxKind.SymbolKeyword,
+  ts.SyntaxKind.UndefinedKeyword,
+  ts.SyntaxKind.UnknownKeyword,
+  ts.SyntaxKind.VoidKeyword,
+] satisfies ts.KeywordTypeSyntaxKind[]);
 
-export type Typeable = TypeNode | Identifier | string | KeywordTypeSyntaxKind;
+export type Typeable =
+  | ts.TypeNode
+  | ts.Identifier
+  | string
+  | ts.KeywordTypeSyntaxKind;
 export type DeferredCode = (opts?: PrintNodeOptions) => string;
 
 // oxfmt-ignore
 export const literally = <T extends string | null | boolean | number | bigint>(
   subj: T,
 ) => (
-  typeof subj === "number" ? f.createNumericLiteral(subj.toString(), TokenFlags.None)
-  : typeof subj === "bigint" ? f.createBigIntLiteral(subj.toString(), TokenFlags.None)
+  typeof subj === "number" ? f.createNumericLiteral(subj.toString(), ts.TokenFlags.None)
+  : typeof subj === "bigint" ? f.createBigIntLiteral(subj.toString(), ts.TokenFlags.None)
   : typeof subj === "boolean" ? subj
-    ? f.createKeywordExpression(SyntaxKind.TrueKeyword)
-    : f.createKeywordExpression(SyntaxKind.FalseKeyword)
-  : subj === null ? f.createKeywordExpression(SyntaxKind.NullKeyword)
-  : f.createStringLiteral(subj, TokenFlags.None)
-) as T extends string ? StringLiteral : T extends number ? NumericLiteral
-  : T extends boolean ? BooleanLiteral : T extends bigint ? BigIntLiteral : NullLiteral;
+    ? f.createKeywordExpression(ts.SyntaxKind.TrueKeyword)
+    : f.createKeywordExpression(ts.SyntaxKind.FalseKeyword)
+  : subj === null ? f.createKeywordExpression(ts.SyntaxKind.NullKeyword)
+  : f.createStringLiteral(subj, ts.TokenFlags.None)
+) as T extends string ? ts.StringLiteral : T extends number ? ts.NumericLiteral
+  : T extends boolean ? ts.BooleanLiteral : T extends bigint ? ts.BigIntLiteral : ts.NullLiteral;
 
 export const makeId = (name: string) => f.createIdentifier(name);
 
@@ -86,10 +56,10 @@ export const makePropertyIdentifier = (name: string | number) =>
 export const ensureTypeNode = (
   subject: Typeable,
   args?: Typeable[], // only for string and id
-): TypeNode =>
+): ts.TypeNode =>
   typeof subject === "number"
     ? f.createKeywordTypeNode(subject)
-    : typeof subject === "string" || isIdentifier(subject)
+    : typeof subject === "string" || ts.isIdentifier(subject)
       ? f.createTypeReferenceNode(
           typeof subject === "string" ? makeId(subject) : subject,
           args && R.map(ensureTypeNode, args),
@@ -100,21 +70,21 @@ export const ensureTypeNode = (
  * @internal
  * ensures distinct union (unique primitives)
  * */
-export const makeUnion = (entries: TypeNode[]) => {
-  const nodes = new Map<TypeNode | KeywordTypeSyntaxKind, TypeNode>();
+export const makeUnion = (entries: ts.TypeNode[]) => {
+  const nodes = new Map<ts.TypeNode | ts.KeywordTypeSyntaxKind, ts.TypeNode>();
   for (const entry of entries)
     nodes.set(isPrimitive(entry) ? entry.kind : entry, entry);
   return f.createUnionTypeNode(Array.from(nodes.values()));
 };
 
-const isPrimitive = (node: TypeNode): node is KeywordTypeNode =>
+const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
   primitives.has(node.kind);
 
 /**
  * @internal this entity exists to enable JSDoc injection due to the missing addSyntheticLeadingComment in tsgo API
  * @todo remove if implemented in tsgo API
  * */
-export const customizations = new WeakMap<Node, DeferredCode>();
+export const customizations = new WeakMap<ts.Node, DeferredCode>();
 
 let emitter: ReturnType<typeof getProject>["emitter"] | undefined;
 const getProject = () => {
@@ -123,7 +93,7 @@ const getProject = () => {
   return snapshot.getProject("tsconfig.json")!;
 };
 
-export const printNode = (node: Node, opts?: PrintNodeOptions) =>
+export const printNode = (node: ts.Node, opts?: PrintNodeOptions) =>
   customizations.get(node)?.(opts) ??
   (emitter ??= getProject().emitter).printNode(node, opts);
 
@@ -137,7 +107,7 @@ const reindent = (text: string, offset: number): string =>
 
 export const makeInterfacePropText = (
   key: string | number,
-  typeNode: TypeNode,
+  typeNode: ts.TypeNode,
   {
     isOptional,
     hasUndefined = isOptional,
@@ -180,11 +150,11 @@ export const makeInterfaceProp = (
   return f.createPropertySignatureDeclaration(
     undefined,
     makePropertyIdentifier(name),
-    isOptional ? f.createToken(SyntaxKind.QuestionToken) : undefined,
+    isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     hasUndefined
-      ? makeUnion([propType, ensureTypeNode(SyntaxKind.UndefinedKeyword)])
+      ? makeUnion([propType, ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)])
       : propType,
-    f.createKeywordExpression(SyntaxKind.NullKeyword), // placeholder initializer, weird tsgo requirement
+    f.createKeywordExpression(ts.SyntaxKind.NullKeyword), // placeholder initializer, weird tsgo requirement
   );
 };
 
