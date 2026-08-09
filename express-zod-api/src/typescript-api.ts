@@ -109,7 +109,10 @@ export const makeUnion = (entries: TypeNode[]) => {
 const isPrimitive = (node: TypeNode): node is KeywordTypeNode =>
   primitives.has(node.kind);
 
-/** @internal this entity exists to enable JSDoc injection due to the missing addSyntheticLeadingComment in tsgo API */
+/**
+ * @internal this entity exists to enable JSDoc injection due to the missing addSyntheticLeadingComment in tsgo API
+ * @todo remove if implemented in tsgo API
+ * */
 export const customizations = new WeakMap<Node, DeferredCode>();
 
 let emitter: ReturnType<typeof getProject>["emitter"] | undefined;
