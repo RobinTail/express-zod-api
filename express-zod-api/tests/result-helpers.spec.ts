@@ -9,7 +9,7 @@ import {
   pullResponseExamples,
 } from "../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../src/testing";
-import { runtime } from "../src/common-helpers.ts";
+import { runtime } from "../src/common-helpers";
 
 describe("Result helpers", () => {
   describe("normalize()", () => {

@@ -9,7 +9,7 @@ import {
 } from "./ansis-mock";
 import * as R from "ramda";
 import { BuiltinLogger, type BuiltinLoggerConfig } from "../src/builtin-logger";
-import { runtime } from "../src/common-helpers.ts";
+import { runtime } from "../src/common-helpers";
 
 vi.mock("node:util", { spy: true });
 

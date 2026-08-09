@@ -15,7 +15,7 @@ import {
   makeResponseMock,
 } from "../src/testing";
 import { expect } from "vitest";
-import { runtime } from "../src/common-helpers.ts";
+import { runtime } from "../src/common-helpers";
 
 describe("ResultHandler", () => {
   describe("constructor()", () => {
