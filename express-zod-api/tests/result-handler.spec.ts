@@ -15,6 +15,7 @@ import {
   makeResponseMock,
 } from "../src/testing";
 import { expect } from "vitest";
+import { isProduction } from "../src/common-helpers.ts";
 
 describe("ResultHandler", () => {
   describe("constructor()", () => {
@@ -248,8 +249,8 @@ describe("AbstractResultHandler", () => {
   describe("lastResort()", () => {
     describe.each(["development", "production"])("%s mode", (mode) => {
       beforeAll(() => {
-        vi.stubEnv("TSDOWN_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
+        isProduction._reset();
       });
       afterAll(() => vi.unstubAllEnvs());
 

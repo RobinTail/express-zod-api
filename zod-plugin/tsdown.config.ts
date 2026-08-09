@@ -2,6 +2,12 @@ import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
 import { fixDtsPlugin } from "../tools/fixDts.ts";
 
+declare global {
+  interface ImportMeta {
+    TSDOWN_SELF: string;
+  }
+}
+
 export default defineConfig({
   entry: {
     index: "src/index.ts",
@@ -16,6 +22,6 @@ export default defineConfig({
   },
   plugins: [fixDtsPlugin()],
   define: {
-    "process.env.TSDOWN_SELF": `"${manifest.name}"`, // used by pluginFlag
+    "import.meta.TSDOWN_SELF": `"${manifest.name}"`, // used by pluginFlag
   },
 });

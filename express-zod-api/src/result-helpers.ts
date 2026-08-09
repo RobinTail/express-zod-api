@@ -84,7 +84,7 @@ export const ensureHttpError = (error: Error): HttpError => {
 };
 
 export const getPublicErrorMessage = (error: HttpError): string =>
-  isProduction() && !error.expose
+  isProduction.value && !error.expose
     ? createHttpError(error.statusCode).message // default message for that code
     : error.message;
 

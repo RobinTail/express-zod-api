@@ -9,6 +9,7 @@ import {
 } from "./ansis-mock";
 import * as R from "ramda";
 import { BuiltinLogger, type BuiltinLoggerConfig } from "../src/builtin-logger";
+import { isProduction } from "../src/common-helpers.ts";
 
 vi.mock("node:util", { spy: true });
 
@@ -62,8 +63,8 @@ describe("BuiltinLogger", () => {
     test.each(["development", "production"])(
       "Level can be omitted and depends on env",
       (mode) => {
-        vi.stubEnv("TSDOWN_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
+        isProduction._reset();
         const { logger } = makeLogger();
         expect(logger["config"]["level"]).toBe(
           mode === "production" ? "warn" : "debug",

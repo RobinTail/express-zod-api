@@ -1,8 +1,13 @@
 import { defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import manifest from "./package.json" with { type: "json" };
 
 export default defineConfig({
+  define: {
+    "import.meta.TSDOWN_SELF": `"${manifest.name}"`,
+    "import.meta.TSDOWN_VERSION": `"${manifest.version}"`,
+  },
   test: {
     globals: true,
     pool: "threads",

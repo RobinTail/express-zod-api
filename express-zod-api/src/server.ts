@@ -34,7 +34,7 @@ const makeCommonEntities = (config: CommonConfig) => {
     ? config.logger
     : new BuiltinLogger(config.logger);
   logger.debug("Running", {
-    build: process.env.TSDOWN_BUILD || "from sources", // oxlint-disable-line eslint-js/no-restricted-syntax -- substituted by TSDOWN
+    build: import.meta.TSDOWN_BUILD || "from sources",
     env: process.env.NODE_ENV || "development", // oxlint-disable-line eslint-js/no-restricted-syntax -- intentionally for debug
   });
   installDeprecationListener(logger);

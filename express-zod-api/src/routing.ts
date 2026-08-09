@@ -50,7 +50,9 @@ type Siblings = Map<CORSMethod, AbstractEndpoint>;
 
 /** This fn exists to reduce the complexity of initRouting and to ensure the disposal of Diagnostics ASAP */
 const collectSiblings = ({ app, getLogger, config, routing }: InitProps) => {
-  const doc = isProduction() ? undefined : new Diagnostics(getLogger(), config);
+  const doc = isProduction.value
+    ? undefined
+    : new Diagnostics(getLogger(), config);
   const familiar = new Map<string, Siblings>();
   const onEndpoint: OnEndpoint = (method, path, endpoint) => {
     doc?.check(method, path, endpoint);

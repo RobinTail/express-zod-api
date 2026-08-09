@@ -9,6 +9,7 @@ import {
   pullResponseExamples,
 } from "../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../src/testing";
+import { isProduction } from "../src/common-helpers.ts";
 
 describe("Result helpers", () => {
   describe("normalize()", () => {
@@ -116,8 +117,8 @@ describe("Result helpers", () => {
     "getPublicErrorMessage() in %s mode",
     (mode) => {
       beforeAll(() => {
-        vi.stubEnv("TSDOWN_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
+        isProduction._reset();
       });
       afterAll(() => vi.unstubAllEnvs());
 

@@ -142,10 +142,16 @@ export const getTransformedType = R.tryCatch(
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
 
-export const isProduction = R.memoizeWith(
-  () => process.env.TSDOWN_STATIC as string, // oxlint-disable-line eslint-js/no-restricted-syntax -- substituted by TSDOWN
-  () => process.env.NODE_ENV === "production", // oxlint-disable-line eslint-js/no-restricted-syntax -- memoized
-);
+export const isProduction = {
+  _cache: undefined as boolean | undefined,
+  _reset() {
+    isProduction._cache = undefined;
+  },
+  get value() {
+    // oxlint-disable-next-line eslint-js/no-restricted-syntax -- memoized
+    return (isProduction._cache ??= process.env.NODE_ENV === "production");
+  },
+};
 
 export const shouldHaveContent = (
   method: ClientMethod,
