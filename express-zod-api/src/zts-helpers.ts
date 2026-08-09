@@ -1,10 +1,10 @@
+import type { ts } from "./typescript-api";
 import type { FlatObject } from "./common-helpers";
 import type { SchemaHandler } from "./schema-walker";
-import type { TypeNode } from "./typescript-api";
 
 export interface ZTSContext extends FlatObject {
   isResponse: boolean;
-  makeAlias: (key: object, produce: () => TypeNode) => TypeNode;
+  makeAlias: (key: object, produce: () => ts.TypeNode) => ts.TypeNode;
 }
 
-export type Producer = SchemaHandler<TypeNode, ZTSContext>;
+export type Producer = SchemaHandler<ts.TypeNode, ZTSContext>;
