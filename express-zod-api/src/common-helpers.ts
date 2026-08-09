@@ -145,7 +145,7 @@ export const isObject = (subject: unknown) =>
 export const isProduction = {
   _cache: undefined as boolean | undefined,
   get value() {
-    // oxlint-disable-next-line eslint-js/no-restricted-syntax -- memoized
+    // oxlint-disable-next-line eslint-js/no-restricted-syntax -- cached
     return (isProduction._cache ??= process.env.NODE_ENV === "production");
   },
 };
