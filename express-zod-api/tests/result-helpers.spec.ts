@@ -9,7 +9,7 @@ import {
   pullResponseExamples,
 } from "../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../src/testing";
-import { isProduction } from "../src/common-helpers.ts";
+import { runtime } from "../src/common-helpers.ts";
 
 describe("Result helpers", () => {
   describe("normalize()", () => {
@@ -118,7 +118,7 @@ describe("Result helpers", () => {
     (mode) => {
       beforeAll(() => {
         vi.stubEnv("NODE_ENV", mode);
-        isProduction._cache = undefined;
+        runtime._cache = undefined;
       });
       afterAll(() => vi.unstubAllEnvs());
 

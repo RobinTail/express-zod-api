@@ -142,12 +142,13 @@ export const getTransformedType = R.tryCatch(
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
 
-export const isProduction = {
-  _cache: undefined as boolean | undefined,
-  get value() {
+export const runtime = {
+  _cache: undefined as string | undefined,
+  get env() {
     // oxlint-disable-next-line eslint-js/no-restricted-syntax -- cached
-    return (isProduction._cache ??= process.env.NODE_ENV === "production");
+    return (runtime._cache ??= process.env.NODE_ENV ?? "development");
   },
+  get isProduction() { return runtime.env === "production"; }, // oxfmt-ignore
 };
 
 export const shouldHaveContent = (

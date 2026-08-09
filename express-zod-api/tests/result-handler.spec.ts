@@ -15,7 +15,7 @@ import {
   makeResponseMock,
 } from "../src/testing";
 import { expect } from "vitest";
-import { isProduction } from "../src/common-helpers.ts";
+import { runtime } from "../src/common-helpers.ts";
 
 describe("ResultHandler", () => {
   describe("constructor()", () => {
@@ -250,7 +250,7 @@ describe("AbstractResultHandler", () => {
     describe.each(["development", "production"])("%s mode", (mode) => {
       beforeAll(() => {
         vi.stubEnv("NODE_ENV", mode);
-        isProduction._cache = undefined;
+        runtime._cache = undefined;
       });
       afterAll(() => vi.unstubAllEnvs());
 

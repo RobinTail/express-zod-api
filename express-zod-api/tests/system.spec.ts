@@ -16,11 +16,11 @@ import {
 } from "../src";
 import { givePort } from "../../tools/ports";
 import { setTimeout } from "node:timers/promises";
-import { isProduction } from "../src/common-helpers.ts";
+import { runtime } from "../src/common-helpers.ts";
 
 describe("App in production mode", () => {
   vi.stubEnv("NODE_ENV", "production");
-  isProduction._cache = undefined;
+  runtime._cache = undefined;
   const port = givePort();
   const logger = new BuiltinLogger({ level: "silent" });
   const infoMethod = vi.spyOn(logger, "info");

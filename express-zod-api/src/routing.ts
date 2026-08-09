@@ -1,6 +1,6 @@
 import type { IRouter, RequestHandler } from "express";
 import createHttpError from "http-errors";
-import { isProduction } from "./common-helpers";
+import { runtime } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { Diagnostics } from "./diagnostics";
 import type { AbstractEndpoint } from "./endpoint";
@@ -50,7 +50,7 @@ type Siblings = Map<CORSMethod, AbstractEndpoint>;
 
 /** This fn exists to reduce the complexity of initRouting and to ensure the disposal of Diagnostics ASAP */
 const collectSiblings = ({ app, getLogger, config, routing }: InitProps) => {
-  const doc = isProduction.value
+  const doc = runtime.isProduction
     ? undefined
     : new Diagnostics(getLogger(), config);
   const familiar = new Map<string, Siblings>();
