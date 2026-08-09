@@ -26,7 +26,7 @@ import {
   installTerminationListener,
 } from "./server-helpers";
 import { printStartupLogo } from "./startup-logo";
-import { runtime } from "./common-helpers.ts";
+import { runtime } from "./common-helpers";
 
 const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) printStartupLogo(process.stdout);
