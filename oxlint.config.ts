@@ -1,4 +1,8 @@
 import { defineConfig } from "oxlint";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const cwd = dirname(fileURLToPath(import.meta.url));
 
 // prefixed built-in modules covered by "unicorn/prefer-node-protocol" rule
 const importConcerns = [
@@ -221,7 +225,10 @@ export default defineConfig({
         "no-map-spread": "warn",
         "unicorn/prefer-array-find": "warn",
         "unicorn/prefer-array-flat-map": "warn",
-        "allowed/dependencies": ["error", { packageDir: "express-zod-api" }],
+        "allowed/dependencies": [
+          "error",
+          { packageDir: join(cwd, "express-zod-api") },
+        ],
         "eslint-js/no-restricted-syntax": [
           "warn",
           ...importConcerns,
@@ -249,7 +256,10 @@ export default defineConfig({
       // ZOD PLUGIN
       files: ["zod-plugin/src/*.ts"],
       rules: {
-        "allowed/dependencies": ["error", { packageDir: "zod-plugin" }],
+        "allowed/dependencies": [
+          "error",
+          { packageDir: join(cwd, "zod-plugin") },
+        ],
         "eslint-js/no-restricted-syntax": [
           "warn",
           ...importConcerns,
@@ -261,7 +271,10 @@ export default defineConfig({
       // MIGRATION
       files: ["migration/index.ts", "migration/helpers.ts"],
       rules: {
-        "allowed/dependencies": ["error", { packageDir: "migration" }],
+        "allowed/dependencies": [
+          "error",
+          { packageDir: join(cwd, "migration") },
+        ],
       },
     },
     {
