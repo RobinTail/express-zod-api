@@ -8,7 +8,7 @@
   "packageRules": [
     {
       "groupName": "OxLint and its plugins",
-      "matchPackageNames": ["oxlint", "oxlint-plugin-*"]
+      "matchPackageNames": ["oxlint", "@oxlint/plugins", "oxlint-plugin-*"]
     },
     {
       "groupName": "Vitest and its coverage provider",
