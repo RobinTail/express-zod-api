@@ -2,6 +2,7 @@ import {
   type ExamplesObject,
   type MediaTypeObject,
   type OAuthFlowObject,
+  type ParameterLocation,
   type ParameterObject,
   type ReferenceObject,
   type RequestBodyObject,
@@ -36,14 +37,14 @@ import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import type { IOSchema } from "./io-schema";
-import { flattenIO } from "./json-schema-helpers";
-import type { Alternatives } from "./logical-container";
+import { flattenIO, type FlattenObjectSchema } from "./json-schema-helpers";
+import type { Alternatives, LogicalContainer } from "./logical-container";
 import { getBrand } from "./metadata";
 import type { ClientMethod } from "./method";
 import type { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
 import type { FirstPartyKind } from "./schema-walker";
-import type { Security } from "./security";
+import { getSecurityNames, type Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import { getWellKnownHeaders } from "./well-known-headers";
 
@@ -55,6 +56,7 @@ interface ReqResCommons {
   ) => ReferenceObject;
   path: string;
   method: ClientMethod;
+  seenIds: Map<string, z.core.$ZodType>;
 }
 
 export interface OpenAPIContext extends ReqResCommons {
@@ -248,36 +250,35 @@ export const defaultIsHeader = (
   name.startsWith("x-") ||
   getWellKnownHeaders().has(name);
 
-export const depictRequestParams = ({
-  path,
+export const makeParamLocator = ({
   method,
-  request,
+  path,
+  security,
   inputSources,
-  makeRef,
-  composition,
   isHeader,
-  securityHeaders,
-  securityCookies,
-  description = `${method.toUpperCase()} ${path} Parameter`,
-}: ReqResCommons & {
-  composition: "inline" | "components";
-  description?: string;
-  request: z.core.JSONSchema.BaseSchema;
+}: {
+  method: ClientMethod;
+  path: string;
+  security?: LogicalContainer<Security>[];
   inputSources: InputSource[];
   isHeader?: IsHeader;
-  securityHeaders?: Set<string>;
-  securityCookies?: Set<string>;
 }) => {
-  const flat = flattenIO(request);
-  const pathParams = getRoutePathParams(path);
+  const pathParams = new Set(getRoutePathParams(path));
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");
   const areCookiesEnabled =
     inputSources.includes("cookies") || inputSources.includes("signedCookies");
-
-  const getLocation = (name: string) => {
-    if (areParamsEnabled && pathParams.includes(name)) return "path";
+  let securityHeaders: Set<string> | undefined;
+  if (areHeadersEnabled && security)
+    securityHeaders = getSecurityNames(security, "header");
+  let securityCookies: Set<string> | undefined;
+  if (areCookiesEnabled && security)
+    securityCookies = getSecurityNames(security, "cookie");
+  /** @modifies pathParams when the parameter's location is "path" */
+  const getLocation = (name: string): ParameterLocation | undefined => {
+    if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))
+      return "path";
     if (areCookiesEnabled && securityCookies?.has(name)) return "cookie";
     if (
       areHeadersEnabled &&
@@ -286,40 +287,55 @@ export const depictRequestParams = ({
       return "header";
     if (isQueryEnabled && method !== "query") return "query";
   };
+  return { pathParams, getLocation, isQueryEnabled };
+};
 
-  return Object.entries(flat.properties).reduce<ParameterObject[]>(
-    (acc, [name, jsonSchema]) => {
-      if (!isObject(jsonSchema)) return acc;
-      const location = getLocation(name);
-      if (!location) return acc;
-      const depicted = asOAS(jsonSchema);
-      const result =
-        composition === "components"
-          ? makeRef(
-              jsonSchema.id || JSON.stringify(jsonSchema),
-              depicted,
-              jsonSchema.id || makeCleanId(description, name),
-            )
-          : depicted;
-      return acc.concat({
-        name,
-        in: location,
-        deprecated: jsonSchema.deprecated,
-        required: flat.required?.includes(name) || false,
-        description: depicted.description || description,
-        schema: result,
-        examples: enumerateExamples(
-          isSchemaObject(depicted) && depicted.examples?.length
-            ? depicted.examples // own examples or from the flat:
-            : R.pluck(
-                name,
-                flat.examples?.filter(R.both(isObject, R.has(name))) || [],
-              ),
-        ),
-      });
-    },
-    [],
-  );
+export const depictRequestParams = ({
+  path,
+  method,
+  flatRequest,
+  makeRef,
+  composition,
+  getLocation,
+  description = `${method.toUpperCase()} ${path} Parameter`,
+}: ReqResCommons & {
+  composition: "inline" | "components";
+  description?: string;
+  flatRequest: FlattenObjectSchema;
+  getLocation: (name: string) => ParameterLocation | undefined;
+}) => {
+  const depictedParams: ParameterObject[] = [];
+  for (const [name, jsonSchema] of Object.entries(flatRequest.properties)) {
+    if (!isObject(jsonSchema)) continue;
+    const location = getLocation(name);
+    if (!location) continue;
+    const depicted = asOAS(jsonSchema);
+    const result =
+      composition === "components"
+        ? makeRef(
+            jsonSchema.id || JSON.stringify(jsonSchema),
+            depicted,
+            jsonSchema.id || makeCleanId(description, name),
+          )
+        : depicted;
+    depictedParams.push({
+      name,
+      in: location,
+      deprecated: jsonSchema.deprecated,
+      required: flatRequest.required?.includes(name) || location === "path", // issue #3600
+      description: depicted.description || description,
+      schema: result,
+      examples: enumerateExamples(
+        isSchemaObject(depicted) && depicted.examples?.length
+          ? depicted.examples // own examples or from the flat:
+          : R.pluck(
+              name,
+              flatRequest.examples?.filter(R.both(isObject, R.has(name))) || [],
+            ),
+      ),
+    });
+  }
+  return depictedParams;
 };
 
 const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
@@ -356,10 +372,11 @@ const fixReferences = (
         const actualName = entry.$ref.split("/").pop()!;
         const depiction = defs[actualName];
         if (depiction) {
+          const cacheKey = depiction.id || filterNaming(actualName);
           entry.$ref = ctx.makeRef(
-            depiction.id || depiction, // avoiding serialization, because changing $ref
+            cacheKey || depiction, // avoiding serialization because changing $ref
             asOAS(depiction),
-            depiction.id || filterNaming(actualName),
+            cacheKey,
           ).$ref;
         }
         continue;
@@ -381,6 +398,18 @@ const depict = (
       unrepresentable: "any",
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
+        const id = z.globalRegistry.get(zodCtx.zodSchema)?.id;
+        if (id) {
+          const familiar = ctx.seenIds.get(id);
+          if (familiar && familiar !== zodCtx.zodSchema) {
+            throw new DocumentationError(
+              `The meta id "${id}" is used by two different schemas. ` +
+                "Please make the ids unique or reuse the same schema instance.",
+              ctx,
+            );
+          }
+          ctx.seenIds.set(id, zodCtx.zodSchema);
+        }
         const brand = getBrand(zodCtx.zodSchema);
         const depicter =
           rules[
@@ -436,6 +465,7 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
+  seenIds,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
@@ -453,7 +483,7 @@ export const depictResponse = ({
   const response = asOAS(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
-      ctx: { isResponse: true, makeRef, path, method },
+      ctx: { isResponse: true, makeRef, path, method, seenIds },
     }),
   );
   const examples: unknown[] = [];
@@ -585,35 +615,37 @@ export const depictRequest = ({
   makeRef,
   path,
   method,
+  seenIds,
 }: ReqResCommons & {
   schema: IOSchema;
   brandHandling?: BrandHandling;
 }) =>
   depict(schema, {
     rules: { ...brandHandling, ...depicters },
-    ctx: { isResponse: false, makeRef, path, method },
+    ctx: { isResponse: false, makeRef, path, method, seenIds },
   });
 
 export const depictBody = ({
   method,
   path,
-  schema,
-  request,
+  bodyJsonSchema,
+  hasRequiredBodyProps,
+  flatRequest,
   mimeType,
   makeRef,
   composition,
   paramNames,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResCommons & {
-  schema: IOSchema;
   composition: "inline" | "components";
   description?: string;
-  request: z.core.JSONSchema.BaseSchema;
+  bodyJsonSchema: z.core.JSONSchema.BaseSchema;
+  hasRequiredBodyProps: boolean;
+  flatRequest: FlattenObjectSchema;
   mimeType: string;
   paramNames: string[];
 }) => {
-  const [_pure, hasRequired] = excludeParamsFromDepiction(request, paramNames);
-  const pure = asOAS(_pure);
+  const pure = asOAS(bodyJsonSchema);
   const examples = [];
   if (isSchemaObject(pure) && pure.examples) {
     examples.push(...pure.examples);
@@ -622,13 +654,13 @@ export const depictBody = ({
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, pure, makeCleanId(description))
+        ? makeRef(JSON.stringify(pure), pure, makeCleanId(description))
         : pure,
     examples: enumerateExamples(
       examples.length
         ? examples
-        : flattenIO(request)
-            .examples?.filter(
+        : flatRequest.examples
+            ?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )
             .map(R.omit(paramNames)) || [],
@@ -638,7 +670,8 @@ export const depictBody = ({
     description,
     content: { [mimeType]: media },
   };
-  if (hasRequired || mimeType === contentTypes.raw) body.required = true;
+  if (hasRequiredBodyProps || mimeType === contentTypes.raw)
+    body.required = true;
   return body;
 };
 

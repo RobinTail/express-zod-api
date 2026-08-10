@@ -1,4 +1,6 @@
 /** @fileOverview The entrypoint for generating OpenAPI Documentation */
+import { flattenIO } from "./json-schema-helpers";
+
 export type { Depicter } from "./documentation-helpers";
 import {
   type InfoObject,
@@ -10,16 +12,20 @@ import {
   type SecuritySchemeType,
   type ServerObject,
   OpenApiBuilder,
+  type RequestBodyObject,
 } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { type ResponseVariant, responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import { getInputSources, makeCleanId } from "./common-helpers";
+import {
+  getInputSources,
+  makeCleanId,
+  normalizeParams,
+} from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
 import type { ClientMethod } from "./method";
-import { getSecurityNames } from "./security";
 import {
   depictBody,
   depictRequestParams,
@@ -31,14 +37,21 @@ import {
   reformatParamsInPath,
   nonEmpty,
   depictRequest,
+  makeParamLocator,
   type IsHeader,
   type BrandHandling,
+  excludeParamsFromDepiction,
 } from "./documentation-helpers";
 import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
+import { z } from "zod";
+
+export { DocumentationError };
 
 type Component =
-  `${ResponseVariant}Response` | "requestParameter" | "requestBody";
+  | `${ResponseVariant}Response`
+  | "requestParameter"
+  | "requestBody";
 
 /** @desc user defined function that creates a component description from its properties */
 type Descriptor = (
@@ -119,6 +132,7 @@ export class Documentation extends OpenApiBuilder {
   readonly #lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   readonly #lastOperationIdSuffixes = new Map<string, number>();
   readonly #references = new Map<object | string, string>();
+  readonly #visitedPaths = new Map<string, string>(); // normalized:original
 
   #makeRef(
     key: object | string,
@@ -187,6 +201,20 @@ export class Documentation extends OpenApiBuilder {
       this.addServer(typeof one === "string" ? { url: one } : one);
   }
 
+  #checkDuplicate(method: ClientMethod, path: string) {
+    if (method === "head" || !path.includes(":")) return;
+    const normalized = normalizeParams(path);
+    const previous = this.#visitedPaths.get(normalized);
+    if (previous !== undefined && previous !== path) {
+      throw new DocumentationError(
+        `Path has a duplicate: the normalized path "${normalized}" is already registered ` +
+          `with different parameter names at "${previous}"`,
+        { method, path, isResponse: false },
+      );
+    }
+    if (previous === undefined) this.#visitedPaths.set(normalized, path);
+  }
+
   #makeEndpointHandler({
     config,
     descriptions,
@@ -195,17 +223,24 @@ export class Documentation extends OpenApiBuilder {
     summarizer = defaultSummarizer,
     composition = "inline",
   }: DocumentationParams): OnEndpoint<ClientMethod> {
+    const shared = {
+      composition,
+      brandHandling,
+      makeRef: this.#makeRef.bind(this),
+      seenIds: new Map<string, z.core.$ZodType>(),
+    };
     return (method, path, endpoint) => {
-      const commons = {
-        path,
-        method,
-        endpoint,
-        composition,
-        brandHandling,
-        makeRef: this.#makeRef.bind(this),
-      };
-      const { description, summary, scopes, inputSchema } = endpoint;
+      this.#checkDuplicate(method, path);
+      const commons = { ...shared, path, method, endpoint };
+      const { description, summary, scopes, inputSchema, security } = endpoint;
       const inputSources = getInputSources(method, config.inputSources);
+      const { pathParams, getLocation } = makeParamLocator({
+        method,
+        path,
+        security,
+        inputSources,
+        isHeader,
+      });
       const operationId = this.#ensureUniqOperationId(
         path,
         method,
@@ -213,19 +248,23 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
+      const flatRequest = flattenIO(request);
       const depictedParams = depictRequestParams({
         ...commons,
-        inputSources,
-        isHeader,
-        securityHeaders: getSecurityNames(endpoint.security, "header"),
-        securityCookies: getSecurityNames(endpoint.security, "cookie"),
-        request,
+        getLocation,
+        flatRequest,
         description: descriptions?.requestParameter?.({
           method,
           path,
           operationId,
         }),
       });
+      if (pathParams.size) {
+        throw new DocumentationError(
+          `The input schema is missing the path parameter "${[...pathParams][0]}"`,
+          { method, path, isResponse: false },
+        );
+      }
 
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
@@ -251,23 +290,28 @@ export class Documentation extends OpenApiBuilder {
         }
       }
 
-      const requestBody = inputSources.includes("body")
-        ? depictBody({
-            ...commons,
-            request,
-            paramNames: R.pluck("name", depictedParams),
-            schema: inputSchema,
-            mimeType: contentTypes[endpoint.getProbableRequestType(method)],
-            description: descriptions?.requestBody?.({
-              method,
-              path,
-              operationId,
-            }),
-          })
-        : undefined;
+      let requestBody: RequestBodyObject | undefined = undefined;
+      if (inputSources.includes("body")) {
+        const paramNames = R.pluck("name", depictedParams);
+        const [bodyJsonSchema, hasRequiredBodyProps] =
+          excludeParamsFromDepiction(request, paramNames);
+        requestBody = depictBody({
+          ...commons,
+          bodyJsonSchema,
+          hasRequiredBodyProps,
+          flatRequest,
+          paramNames,
+          mimeType: contentTypes[endpoint.getProbableRequestType(method)],
+          description: descriptions?.requestBody?.({
+            method,
+            path,
+            operationId,
+          }),
+        });
+      }
 
       const securityRefs = depictSecurityRefs(
-        depictSecurity(processContainers(endpoint.security), inputSources),
+        depictSecurity(processContainers(security), inputSources),
         scopes,
         (securitySchema) => {
           const name = this.#ensureUniqSecuritySchemaName(securitySchema);

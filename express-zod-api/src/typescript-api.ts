@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import ts from "typescript"; // eslint-disable-line allowed/dependencies -- opt-in export
+import ts from "typescript"; // oxlint-disable-line allowed/dependencies -- opt-in export
 
 export { ts };
 
@@ -22,9 +22,12 @@ const primitives: ts.KeywordTypeSyntaxKind[] = [
 ];
 
 export type Typeable =
-  ts.TypeNode | ts.Identifier | string | ts.KeywordTypeSyntaxKind;
+  | ts.TypeNode
+  | ts.Identifier
+  | string
+  | ts.KeywordTypeSyntaxKind;
 
-/* eslint-disable prettier/prettier -- shorter and works better this way than overrides */
+// oxfmt-ignore
 export const literally = <T extends string | null | boolean | number | bigint>(subj: T) => (
   typeof subj === "number" ? f.createNumericLiteral(subj)
     : typeof subj === "bigint" ? f.createBigIntLiteral(subj.toString())
@@ -32,7 +35,6 @@ export const literally = <T extends string | null | boolean | number | bigint>(s
         : subj === null ? f.createNull() : f.createStringLiteral(subj)
 ) as T extends string ? ts.StringLiteral : T extends number ? ts.NumericLiteral
   : T extends boolean ? ts.BooleanLiteral : T extends bigint ? ts.BigIntLiteral : ts.NullLiteral;
-/* eslint-enable prettier/prettier */
 
 export const makeId = (name: string) => f.createIdentifier(name);
 

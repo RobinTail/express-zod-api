@@ -1,6 +1,6 @@
 {
   "name": "@express-zod-api/zod-plugin",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "license": "MIT",
   "description": "Zod plugin for express-zod-api",
   "sideEffects": true,
@@ -19,7 +19,7 @@
     "pretest": "tsc",
     "test": "vitest run",
     "build": "tsdown",
-    "prepublishOnly": "eslint && pnpm test && pnpm build"
+    "prepublishOnly": "oxlint && pnpm test && pnpm build"
   },
   "type": "module",
   "main": "dist/index.js",
@@ -29,6 +29,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./brand": {
+      "types": "./dist/brand.d.ts",
+      "default": "./dist/brand.js"
     }
   },
   "files": [
@@ -47,7 +51,7 @@
   "devDependencies": {
     "@types/ramda": "catalog:dev",
     "camelize-ts": "catalog:dev",
-    "typescript": "catalog:dev",
+    "@typescript/native-preview": "catalog:dev",
     "zod": "catalog:dev"
   },
   "keywords": [

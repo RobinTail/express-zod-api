@@ -78,10 +78,16 @@ describe("Integration", () => {
         variant: "types",
         routing: {
           v1: {
-            "get path": defaultEndpointsFactory.buildVoid({
-              input: z.object({ some: z.string() }),
-              handler: vi.fn(),
-            }),
+            "get path": defaultEndpointsFactory
+              .addMiddleware({
+                security: { type: "cookie", name: "session" },
+                input: z.object({ session: z.object() }),
+                handler: vi.fn(),
+              })
+              .buildVoid({
+                input: z.object({ some: z.string() }),
+                handler: vi.fn(),
+              }),
           },
         },
       });
@@ -160,6 +166,39 @@ describe("Integration", () => {
         },
       });
       expect(await client.printFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("Feature #3604: OxFmt support", () => {
+    test("should throw if it failed to format", async () => {
+      await expect(() =>
+        new Integration({
+          config: configMock,
+          variant: "types",
+          brandHandling: {
+            CUSTOM: () => ts.factory.createTypeReferenceNode("## WRONG ##"),
+          },
+          routing: {
+            v1: {
+              custom: defaultEndpointsFactory.buildVoid({
+                method: "post",
+                input: z.object({
+                  string: z.string().meta({ [brandProperty]: "CUSTOM" }),
+                }),
+                handler: vi.fn(),
+              }),
+            },
+          },
+        }).printFormatted(),
+      ).rejects.toThrow(
+        new Error("OxFmt failed to format the code", {
+          cause: [
+            expect.objectContaining({
+              codeframe: expect.stringContaining("## WRONG ##"),
+            }),
+          ],
+        }),
+      );
     });
   });
 

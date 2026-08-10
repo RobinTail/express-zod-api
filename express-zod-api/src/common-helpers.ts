@@ -27,7 +27,7 @@ type NoNever<T, F> = [T] extends [never] ? F : T;
  * @example declare module "express-zod-api" { interface TagOverrides { users: unknown } }
  * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  * */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
+// oxlint-disable-next-line typescript/no-empty-object-type -- augmentation
 export interface TagOverrides {}
 export type Tag = NoNever<keyof TagOverrides, string>;
 
@@ -35,6 +35,9 @@ export type Tag = NoNever<keyof TagOverrides, string>;
 export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 export const getRoutePathParams = (path: string): string[] =>
   path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
+
+export const normalizeParams = (path: string, idx = 1) =>
+  path.replace(routePathParamsRegex, () => `:${idx++}`);
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
@@ -139,10 +142,14 @@ export const getTransformedType = R.tryCatch(
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
 
-export const isProduction = R.memoizeWith(
-  () => process.env.TSDOWN_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSDOWN
-  () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
-);
+export const runtime = {
+  _cache: undefined as string | undefined,
+  get env() {
+    // oxlint-disable-next-line eslint-js/no-restricted-syntax -- cached
+    return (runtime._cache ??= process.env.NODE_ENV ?? "development");
+  },
+  get isProduction() { return runtime.env === "production"; }, // oxfmt-ignore
+};
 
 export const shouldHaveContent = (
   method: ClientMethod,

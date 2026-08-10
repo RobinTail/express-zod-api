@@ -1,15 +1,15 @@
 import { hasImport, getRangeWithComma } from "./helpers.ts";
 import {
-  AST_NODE_TYPES as NT,
-  ESLintUtils,
-  type TSESLint,
-  type TSESTree,
-} from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
+  type ESTree,
+  eslintCompatPlugin,
+  type Rule,
+  type Visitor,
+} from "@oxlint/plugins";
 
 interface Queries {
-  legacyImport: TSESTree.ImportSpecifier & { imported: TSESTree.Identifier };
-  provideCall: TSESTree.CallExpression;
-  clientNew: TSESTree.NewExpression;
+  legacyImport: ESTree.ImportSpecifier & { imported: ESTree.IdentifierName };
+  provideCall: ESTree.CallExpression;
+  clientNew: ESTree.NewExpression;
 }
 
 type Listener = keyof Queries;
@@ -20,12 +20,10 @@ const queries: Record<Listener, string> = {
   clientNew: `NewExpression[callee.name="Client"][arguments.length>0]`,
 };
 
-const listen = <
-  S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
->(
+const listen = <S extends { [K in Listener]: (node: Queries[K]) => void }>(
   subject: S,
 ) =>
-  (Object.keys(subject) as Listener[]).reduce<{ [K: string]: S[Listener] }>(
+  (Object.keys(subject) as Listener[]).reduce<Visitor>(
     (agg, key) =>
       Object.assign(agg, {
         [queries[key]]: subject[key],
@@ -58,10 +56,9 @@ const legacyHandlerCode = [
   "});",
 ].join("\n");
 
-const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0]}`;
+const ruleName = `v${import.meta.TSDOWN_VERSION.split(".")[0]}`;
 
-const theRule = ESLintUtils.RuleCreator.withoutDocs({
-  name: ruleName,
+const theRule: Rule = {
   meta: {
     type: "problem",
     fixable: "code",
@@ -89,7 +86,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           },
           fix: (fixer) => {
             const { parent: declaration } = node;
-            if (declaration.type !== NT.ImportDeclaration) return null;
+            if (declaration.type !== "ImportDeclaration") return null;
             const lines: string[] = [];
             if (!hasImport(ctx, "zod")) lines.push(`import { z } from "zod";`);
             const needed = ["ResultHandler", "ensureHttpError"]
@@ -127,11 +124,11 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
       provideCall: (node) => {
         const { parent } = node;
         if (
-          parent.type === NT.AwaitExpression &&
-          parent.parent.type === NT.VariableDeclarator
+          parent.type === "AwaitExpression" &&
+          parent.parent.type === "VariableDeclarator"
         ) {
           const declarator = parent.parent;
-          if (!declarator.id || declarator.id.type !== NT.Identifier) return;
+          if (!declarator.id || declarator.id.type !== "Identifier") return;
           const oldName = ctx.sourceCode.getText(declarator.id);
           ctx.report({
             node,
@@ -150,21 +147,21 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             ],
           });
         } else if (
-          parent.type === NT.MemberExpression &&
-          parent.property.type === NT.Identifier &&
+          parent.type === "MemberExpression" &&
+          parent.property.type === "Identifier" &&
           parent.property.name === "then" &&
-          parent.parent.type === NT.CallExpression
+          parent.parent.type === "CallExpression"
         ) {
           const thenCall = parent.parent;
           const callback = thenCall.arguments[0];
           if (
             !callback ||
-            (callback.type !== NT.ArrowFunctionExpression &&
-              callback.type !== NT.FunctionExpression)
+            (callback.type !== "ArrowFunctionExpression" &&
+              callback.type !== "FunctionExpression")
           )
             return;
           const param = callback.params[0];
-          if (!param || param.type !== NT.Identifier) return;
+          if (!param || param.type !== "Identifier") return;
           const oldName = ctx.sourceCode.getText(param);
           ctx.report({
             node,
@@ -186,23 +183,23 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
       },
       clientNew: (node) => {
         const impl = node.arguments[0];
-        let body: TSESTree.BlockStatement | undefined;
+        let body: ESTree.BlockStatement | undefined;
         if (
           impl &&
-          (impl.type === NT.ArrowFunctionExpression ||
-            impl.type === NT.FunctionExpression) &&
-          impl.body.type === NT.BlockStatement
+          (impl.type === "ArrowFunctionExpression" ||
+            impl.type === "FunctionExpression") &&
+          impl.body?.type === "BlockStatement"
         )
           body = impl.body;
 
         if (!body) return;
         const sourceCode = ctx.sourceCode;
         for (const stmt of body.body) {
-          if (stmt.type !== NT.ReturnStatement) continue;
+          if (stmt.type !== "ReturnStatement") continue;
           const retArg = stmt.argument;
           if (!retArg) continue;
           const argSource = sourceCode.getText(retArg);
-          const hasAwait = retArg.type === NT.AwaitExpression;
+          const hasAwait = retArg.type === "AwaitExpression";
           ctx.report({
             node: stmt,
             messageId: "change",
@@ -225,8 +222,8 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         }
       },
     }),
-});
+};
 
-export default {
-  rules: { [ruleName]: theRule } as Record<`v${number}`, typeof theRule>,
-} satisfies TSESLint.Linter.Plugin;
+export default eslintCompatPlugin({
+  rules: { [ruleName]: theRule },
+});

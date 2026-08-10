@@ -22,7 +22,7 @@ export type Severity = keyof typeof severity;
 /** @desc You can use any logger compatible with this type. */
 export type AbstractLogger = Record<
   Severity,
-  (message: string, meta?: any) => any // eslint-disable-line @typescript-eslint/no-explicit-any -- for compatibility
+  (message: string, meta?: any) => any // oxlint-disable-line typescript/no-explicit-any -- for compatibility
 >;
 
 /**
@@ -30,7 +30,7 @@ export type AbstractLogger = Record<
  * @example declare module "express-zod-api" { interface LoggerOverrides extends winston.Logger {} }
  * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  * */
-export interface LoggerOverrides {} // eslint-disable-line @typescript-eslint/no-empty-object-type -- for augmentation
+export interface LoggerOverrides {} // oxlint-disable-line typescript/no-empty-object-type -- for augmentation
 
 export type ActualLogger = AbstractLogger & LoggerOverrides;
 
@@ -46,7 +46,11 @@ export const isHidden = (subject: Severity, gate: Severity) =>
 
 /** @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers */
 type TimeUnit =
-  "nanosecond" | "microsecond" | "millisecond" | "second" | "minute";
+  | "nanosecond"
+  | "microsecond"
+  | "millisecond"
+  | "second"
+  | "minute";
 
 const _makeNumberFormat = (unit: TimeUnit, fraction = 0) =>
   Intl.NumberFormat(undefined, {

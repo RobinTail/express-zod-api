@@ -88,6 +88,7 @@ Therefore, many basic tasks can be achieved faster and easier, in particular:
 
 These people contributed to the improvement of the framework by reporting bugs, making changes, and suggesting ideas:
 
+[<img src="https://github.com/marco-carvalho.png" alt="@marco-carvalho" width="50" />](https://github.com/marco-carvalho)
 [<img src="https://github.com/pycanis.png" alt="@pycanis" width="50" />](https://github.com/pycanis)
 [<img src="https://github.com/arlyon.png" alt="@arlyon" width="50" />](https://github.com/arlyon)
 [<img src="https://github.com/Upsilon-Iridani.png" alt="@Upsilon-Iridani" width="50" />](https://github.com/Upsilon-Iridani)
@@ -513,19 +514,27 @@ square brackets. You can choose between those parsers as well as configure a cus
 
 ## Transformations
 
-Since parameters of GET requests come in the form of strings, there is often a need to transform them into numbers.
+Query and path parameters should have acceptable input schema. Those parameters are in general expected to be strings
+or coerced primitives that could accept strings. Query parameters can also be parsed as arrays of strings or objects
+having string properties (depends on `queryParser` config option). Therefore, there is often a need to transform their
+values into numbers. Using the `.transform()` schema method is recommended for this purpose. Alternatively, you can
+also use `z.coerce` or `z.preprocess()` schemas.
 
 ```ts
-import { z } from "zod";
+import { Routing } from "express-zod-api";
 
-const getUserEndpoint = endpointsFactory.buildVoid({
-  input: z.object({
-    id: z.string().transform((id) => parseInt(id, 10)),
+const routing: Routing = {
+  "/v1/users/:groupId": factory.build({
+    input: z.object({
+      // path parameter is originally a string:
+      groupId: z.string().transform((id) => parseInt(id, 10)),
+      // query parser accepts arrays of strings:
+      roleIds: z
+        .array(z.string())
+        .transform((ids) => ids.map((id) => parseInt(id, 10))),
+    }),
   }),
-  handler: async ({ input: { id }, logger }) => {
-    logger.debug("id", typeof id); // number
-  },
-});
+};
 ```
 
 ## Top level transformations and mapping
@@ -1209,8 +1218,8 @@ import "@express-zod-api/zod-plugin"; // in your routing.ts file
 ## End-to-End Type Safety
 
 You can generate a TypeScript file containing the IO types of your API and a client for it, giving you end-to-end type
-safety between your API and frontend. Make sure you have `typescript` installed. Consider also installing `prettier`
-and using the async `printFormatted()` method.
+safety between your API and frontend. Make sure you have `typescript` installed. Consider also installing either
+`prettier` or `oxfmt` for using the async `printFormatted()` method.
 
 ```ts
 import { Integration } from "express-zod-api/integration";
@@ -1221,7 +1230,7 @@ const client = new Integration({
   variant: "client", // <— optional, see also "types" for a DIY solution
 });
 
-const prettierFormattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
+const formattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
 ```
 
 Alternatively, you can supply your own `format` function into that method or use a regular `print()` method instead.

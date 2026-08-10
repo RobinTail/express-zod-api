@@ -4,10 +4,13 @@ ESLint plugin for migrating Express Zod API to its next major version.
 
 ## Requirements
 
-- `eslint@^10.0.0`;
-- `typescript-eslint@^8.58.0`
+- Either:
+  - `eslint@^10.0.0` and `typescript-eslint@^8.58.0`;
+  - or `oxlint@^1.76.0`.
 
 ## Usage
+
+### with ESLint and TypeScript-ESLint
 
 The minimal configuration to apply migrations automatically using `eslint --fix`:
 
@@ -20,4 +23,18 @@ export default [
   { languageOptions: { parser }, plugins: { migration } },
   { files: ["**/*.ts"], rules: { "migration/v29": "error" } },
 ];
+```
+
+### with OxLint
+
+The minimal configuration to apply migrations automatically using `oxlint --fix`:
+
+```ts
+// oxlint.config.ts
+import { defineConfig } from "oxlint";
+
+export default defineConfig({
+  jsPlugins: [{ name: "migration", specifier: "@express-zod-api/migration" }],
+  rules: { "migration/v29": "error" },
+});
 ```

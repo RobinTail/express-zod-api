@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "trailingComma": "all",
+  "ignorePatterns": [
+    ".github",
+    "package.json",
+    "*-test/quick-start.ts",
+    "example/example.client.ts"
+  ]
+}

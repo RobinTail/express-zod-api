@@ -26,6 +26,7 @@ import {
   installTerminationListener,
 } from "./server-helpers";
 import { printStartupLogo } from "./startup-logo";
+import { runtime } from "./common-helpers";
 
 const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) printStartupLogo(process.stdout);
@@ -34,8 +35,8 @@ const makeCommonEntities = (config: CommonConfig) => {
     ? config.logger
     : new BuiltinLogger(config.logger);
   logger.debug("Running", {
-    build: process.env.TSDOWN_BUILD || "from sources", // eslint-disable-line no-restricted-syntax -- substituted by TSDOWN
-    env: process.env.NODE_ENV || "development", // eslint-disable-line no-restricted-syntax -- intentionally for debug
+    build: import.meta.TSDOWN_BUILD || "from sources",
+    env: runtime.env,
   });
   installDeprecationListener(logger);
   const loggingMiddleware = createLoggingMiddleware({ logger, config });

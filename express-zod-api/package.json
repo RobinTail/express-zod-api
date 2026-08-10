@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "29.0.0-beta.5",
+  "version": "29.2.1",
   "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -20,7 +20,7 @@
     "pretest": "tsc",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
-    "prepublishOnly": "eslint && pnpm -r build && pnpm test",
+    "prepublishOnly": "oxlint && pnpm -r build && pnpm test",
     "prepack": "find .. -maxdepth 1 \\( -name '*.md' ! -name 'AGENTS.md' -o -name 'LICENSE' \\) -exec cp {} . \\;"
   },
   "type": "module",
@@ -132,6 +132,7 @@
     "node-forge": "^1.3.3",
     "snakify-ts": "^2.3.0",
     "typescript": "catalog:dev",
+    "@typescript/native-preview": "catalog:dev",
     "undici": "^8.2.0",
     "zod": "catalog:dev"
   },

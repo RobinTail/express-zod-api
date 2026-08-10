@@ -51,7 +51,7 @@ describe("Server", () => {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
             method: ["get", "post"],
-            input: z.object({ n: z.number() }),
+            input: z.object({ n: z.string() }),
             output: z.object({ b: z.boolean() }),
             handler: vi.fn(),
           }),

@@ -4,7 +4,7 @@ import type { z } from "zod";
 import type { SchemaObjectValue } from "openapi3-ts/oas32";
 
 type MergeMode = "coerce" | "throw";
-type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
+export type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
   Required<Pick<z.core.JSONSchema.ObjectSchema, "properties">>;
 
 /** @internal */
@@ -139,3 +139,44 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
     },
     [],
   );
+
+/** @desc Marks a coerced primitive in the JSON depiction (via the `override` of `toJSONSchema`). */
+export const coerceMarker = "x-coerce";
+
+/**
+ * @desc Whether the given JSON schema is acceptable as a query/path parameter.
+ * @desc Mostly strings or coerced primitives. Query parser can also accept certain arrays and objects.
+ * */
+export const isParamAcceptable = (
+  subject: z.core.JSONSchema.BaseSchema,
+  location: "path" | "query",
+): boolean => {
+  if (subject[coerceMarker] === true) return true;
+  if (subject.anyOf)
+    return subject.anyOf.some((one) => isParamAcceptable(one, location));
+  if (subject.oneOf)
+    return subject.oneOf.some((one) => isParamAcceptable(one, location));
+  if (subject.allOf)
+    return subject.allOf.every((one) => isParamAcceptable(one, location));
+  if (subject.type === undefined || subject.type === "string") return true;
+  if (location === "query" && ["array", "object"].includes(subject.type)) {
+    const sub = [
+      subject.items,
+      subject.prefixItems,
+      subject.additionalItems,
+      Object.values(subject.properties ?? {}),
+      subject.additionalProperties,
+      subject.propertyNames,
+    ];
+    for (const nested of sub) {
+      if (!isObject(nested)) continue;
+      const arr = Array.isArray(nested) ? nested : [nested];
+      for (const item of arr) {
+        if (!isObject(item)) continue;
+        if (!isParamAcceptable(item, location)) return false;
+      }
+    }
+    return true;
+  }
+  return false;
+};

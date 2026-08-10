@@ -1,4 +1,4 @@
-import { performance } from "node:perf_hooks";
+import { setTimeout } from "node:timers/promises";
 import * as util from "node:util";
 import {
   blueMock,
@@ -9,6 +9,7 @@ import {
 } from "./ansis-mock";
 import * as R from "ramda";
 import { BuiltinLogger, type BuiltinLoggerConfig } from "../src/builtin-logger";
+import { runtime } from "../src/common-helpers";
 
 vi.mock("node:util", { spy: true });
 
@@ -62,8 +63,8 @@ describe("BuiltinLogger", () => {
     test.each(["development", "production"])(
       "Level can be omitted and depends on env",
       (mode) => {
-        vi.stubEnv("TSDOWN_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
+        runtime._cache = undefined;
         const { logger } = makeLogger();
         expect(logger["config"]["level"]).toBe(
           mode === "production" ? "warn" : "debug",
@@ -220,8 +221,7 @@ describe("BuiltinLogger", () => {
       async (delay) => {
         const { logger, logSpy } = makeLogger({ level: "debug", color: false });
         const stop = logger.profile("test");
-        const start = performance.now();
-        while (performance.now() - start < delay) {} // eslint-disable-line no-empty -- waits
+        await setTimeout(delay);
         stop();
         expect(logSpy).toHaveBeenCalledWith(
           expect.stringMatching(

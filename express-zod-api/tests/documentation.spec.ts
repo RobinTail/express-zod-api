@@ -9,13 +9,16 @@ import {
   ez,
   ResultHandler,
   type Method,
+  type Routing,
 } from "../src";
 import { Documentation, type Depicter } from "../src/documentation";
 import { contentTypes } from "../src/content-type";
+import type { IOSchema } from "../src/io-schema";
 import { z } from "zod";
 import { givePort } from "../../tools/ports";
 import * as R from "ramda";
 import { brandProperty } from "../src/metadata";
+import type { OpenAPIObject, ReferenceObject } from "openapi3-ts/oas32";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({
@@ -615,6 +618,9 @@ describe("Documentation", () => {
               }),
               ":thing": defaultEndpointsFactory.build({
                 description: "thing is the path parameter",
+                input: z.object({
+                  thing: z.string(),
+                }),
                 output: z.object({}),
                 handler: async () => ({}),
               }),
@@ -869,6 +875,96 @@ describe("Documentation", () => {
         },
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
+    });
+  });
+
+  describe("Issue #3588: excludeParamsFromDepiction integration", () => {
+    test("should exclude path params from request body schema and its examples", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            ":id": defaultEndpointsFactory.build({
+              method: "post",
+              input: z
+                .object({
+                  id: z.string(),
+                  bodyField: z.boolean(),
+                })
+                .meta({
+                  examples: [
+                    { id: "123", bodyField: true },
+                    { id: "456", bodyField: false },
+                  ],
+                }),
+              output: z.object({}),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
+
+  describe("Issue #3579: Cross-method normalized path duplicates", () => {
+    test.each([
+      [
+        ["get /users/:id", "delete /users/:userId"],
+        'the normalized path "/users/:1" is already registered with different parameter names at "/users/:id"',
+      ],
+      [
+        ["get /a/:x/b/:y", "post /a/:u/b/:v"],
+        'the normalized path "/a/:1/b/:2" is already registered with different parameter names at "/a/:x/b/:y"',
+      ],
+    ])(
+      "Should detect duplicate normalized paths across methods %#",
+      (paths, expectedMessageSubstring) => {
+        const fn = () =>
+          new Documentation({
+            config: sampleConfig,
+            routing: paths.reduce(
+              (agg, path) => ({
+                ...agg,
+                [path]: defaultEndpointsFactory.buildVoid({
+                  input: z.object({
+                    id: z.string(),
+                    userId: z.string(),
+                    x: z.string(),
+                    y: z.string(),
+                    u: z.string(),
+                    v: z.string(),
+                  }),
+                  handler: vi.fn(),
+                }),
+              }),
+              {},
+            ),
+          });
+        expect(fn).toThrow(DocumentationError);
+        expect(fn).toThrow(expectedMessageSubstring);
+      },
+    );
+
+    test.each([
+      [["get /v1/users", "delete /v1/users"]],
+      [["get /v1/user/:id", "delete /v1/user/:id"]],
+    ])("Should allow same path with different methods %#", (paths) => {
+      const fn = () =>
+        new Documentation({
+          config: sampleConfig,
+          routing: paths.reduce(
+            (agg, path) => ({
+              ...agg,
+              [path]: defaultEndpointsFactory.buildVoid({
+                input: z.object({ id: z.string() }),
+                handler: vi.fn(),
+              }),
+            }),
+            {},
+          ),
+        });
+      expect(fn).not.toThrow();
     });
   });
 
@@ -1226,6 +1322,393 @@ describe("Documentation", () => {
         },
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
+    });
+  });
+
+  describe("Issue #3570: component deduplication with meta id", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Issue 3570", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test("same schema reused as output across two endpoints should produce one component", () => {
+      const item = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "Item" });
+      const spec = new Documentation({
+        routing: {
+          "get /a": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: item,
+            handler: vi.fn(),
+          }),
+          "get /b": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: item,
+            handler: vi.fn(),
+          }),
+        },
+        ...commons,
+      }).getSpec();
+      const schemas = spec.components?.schemas ?? {};
+      const itemKeys = Object.keys(schemas).filter((name) =>
+        name.startsWith("Item"),
+      );
+      expect(itemKeys).toEqual(["Item"]);
+    });
+
+    test("same schema as input and output of one endpoint should produce one component", () => {
+      const item = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "Item" });
+      const spec = new Documentation({
+        routing: {
+          "post /a": defaultEndpointsFactory.build({
+            method: "post",
+            input: item,
+            output: item,
+            handler: vi.fn(),
+          }),
+        },
+        ...commons,
+      }).getSpec();
+      const schemas = spec.components?.schemas ?? {};
+      const itemKeys = Object.keys(schemas).filter((name) =>
+        name.startsWith("Item"),
+      );
+      expect(itemKeys).toEqual(["Item"]);
+    });
+
+    test("multiple distinct meta ids should each appear once when reused", () => {
+      const itemA = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "ItemA" });
+      const itemB = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "ItemB" });
+      const spec = new Documentation({
+        routing: {
+          "get /a": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemA,
+            handler: vi.fn(),
+          }),
+          "get /b": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemA,
+            handler: vi.fn(),
+          }),
+          "get /c": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemB,
+            handler: vi.fn(),
+          }),
+          "get /d": defaultEndpointsFactory.build({
+            input: z.object({}),
+            output: itemB,
+            handler: vi.fn(),
+          }),
+        },
+        ...commons,
+      }).getSpec();
+      const schemas = spec.components?.schemas ?? {};
+      const itemKeys = Object.keys(schemas).filter((name) =>
+        name.startsWith("Item"),
+      );
+      expect(itemKeys).toEqual(["ItemA", "ItemB"]);
+    });
+  });
+
+  describe("Issue #3576: meta id uniqueness guard", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Issue 3576", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test("two different schemas sharing an id across endpoints should throw", () => {
+      const alpha = z
+        .object({ kind: z.literal("alpha") })
+        .meta({ id: "Shared" });
+      const beta = z.object({ kind: z.literal("beta") }).meta({ id: "Shared" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "get /a": defaultEndpointsFactory.build({
+                input: z.object({}),
+                output: alpha,
+                handler: vi.fn(),
+              }),
+              "get /b": defaultEndpointsFactory.build({
+                input: z.object({}),
+                output: beta,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).toThrow(/Shared/);
+    });
+
+    test("an id reused for a transformation should throw", () => {
+      const obj = z.object({ a: z.number() }).meta({ id: "Shared" });
+      const objToObj = obj
+        .transform(({ a }) => ({ b: String(a) }))
+        .meta({ id: "Shared" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "post /a": defaultEndpointsFactory.build({
+                method: "post",
+                input: obj,
+                output: objToObj,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).toThrow(/Shared/);
+    });
+
+    test("same instance depicted differently as input and output should not throw", () => {
+      const pipe = z
+        .object({ a: z.number() })
+        .transform(({ a }) => ({ b: String(a) }))
+        .meta({ id: "Shared" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "post /a": defaultEndpointsFactory.build({
+                method: "post",
+                input: pipe,
+                output: pipe,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).not.toThrow();
+    });
+
+    test("same schema reused with the same id should not throw", () => {
+      const item = z
+        .object({ id: z.uuid(), name: z.string() })
+        .meta({ id: "Item" });
+      expect(
+        () =>
+          new Documentation({
+            routing: {
+              "get /a": defaultEndpointsFactory.build({
+                input: item,
+                output: item,
+                handler: vi.fn(),
+              }),
+              "get /b": defaultEndpointsFactory.build({
+                input: item,
+                output: item,
+                handler: vi.fn(),
+              }),
+            },
+            ...commons,
+          }),
+      ).not.toThrow();
+    });
+  });
+
+  describe("Issue #3578: Missing path parameters", () => {
+    const commons = {
+      config: sampleConfig,
+      title: "Issue 3578",
+      version: "1.0.0",
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test.each([
+      ["users/:id", z.object({ name: z.string() }), "id"],
+      ["items/:id/variants/:name", z.object({ id: z.string() }), "name"],
+    ])(
+      "Should throw when path param '%s' is missing from input schema",
+      (routePath, input, missingParam) => {
+        expect(
+          () =>
+            new Documentation({
+              ...commons,
+              routing: {
+                v1: {
+                  [routePath]: defaultEndpointsFactory.buildVoid({
+                    input,
+                    handler: vi.fn(),
+                  }),
+                },
+              },
+            }),
+        ).toThrow(
+          new DocumentationError(
+            `The input schema is missing the path parameter "${missingParam}"`,
+            { method: "get", path: `/v1/${routePath}`, isResponse: false },
+          ),
+        );
+      },
+    );
+
+    test("Should not throw when all path params are present in the schema", () => {
+      expect(
+        () =>
+          new Documentation({
+            ...commons,
+            routing: {
+              v1: {
+                "users/:id": defaultEndpointsFactory.buildVoid({
+                  input: z.object({ id: z.string(), name: z.string() }),
+                  handler: vi.fn(),
+                }),
+              },
+            },
+          }),
+      ).not.toThrow();
+    });
+
+    test("Issue #3600: Should depict optional path params as required", () => {
+      const spec = new Documentation({
+        ...commons,
+        routing: {
+          v1: {
+            "users/:id": defaultEndpointsFactory.buildVoid({
+              input: z.object({ id: z.string().optional() }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      }).getSpec();
+      const operation = spec.paths!["/v1/users/{id}"]!.get!;
+      expect(operation.parameters).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: "id", in: "path", required: true }),
+        ]),
+      );
+    });
+
+    test("Should throw when path param is not classified as in:path", () => {
+      const config = createConfig({
+        cors: true,
+        logger: { level: "silent" },
+        http: { listen: givePort() },
+        inputSources: { post: ["body", "query"] },
+      });
+      expect(
+        () =>
+          new Documentation({
+            ...commons,
+            config,
+            routing: {
+              v1: {
+                ":id": defaultEndpointsFactory.buildVoid({
+                  method: "post",
+                  input: z.object({ id: z.string() }),
+                  handler: vi.fn(),
+                }),
+              },
+            },
+          }),
+      ).toThrow(
+        new DocumentationError(
+          'The input schema is missing the path parameter "id"',
+          { method: "post", path: "/v1/:id", isResponse: false },
+        ),
+      );
+    });
+  });
+
+  describe("Issue #3601: shared input schema should not share the request body component", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Issue 3601", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    const createSpec = (routing: Routing) =>
+      new Documentation({ ...commons, routing }).getSpec();
+
+    const resolve = (spec: OpenAPIObject, ref: ReferenceObject) =>
+      R.path(ref.$ref.split("/").slice(1), spec);
+
+    const bodyRef = (spec: OpenAPIObject, path: string) =>
+      R.path<ReferenceObject>(
+        `paths|${path}|post|requestBody|content|${contentTypes.json}|schema`.split(
+          "|",
+        ),
+        spec,
+      );
+
+    const build = (input: IOSchema) =>
+      defaultEndpointsFactory.buildVoid({
+        method: "post",
+        input,
+        handler: vi.fn(),
+      });
+
+    test("two routes sharing an input schema instance get their own body", () => {
+      const shared = z.object({ id: z.string(), name: z.string() });
+      const spec = createSpec({
+        "post /a/:id": build(shared),
+        "post /b/:name": build(shared),
+      });
+      const refA = bodyRef(spec, "/a/{id}");
+      const refB = bodyRef(spec, "/b/{name}");
+      if (!refA || !refB) throw "no body ref";
+      expect(refA).not.toEqual(refB);
+      expect(resolve(spec, refA)).toEqual({
+        type: "object",
+        properties: { name: { type: "string" } },
+        required: ["name"],
+      });
+      expect(resolve(spec, refB)).toEqual({
+        type: "object",
+        properties: { id: { type: "string" } },
+        required: ["id"],
+      });
+    });
+
+    test("identical bodies across routes sharing a schema instance still dedup", () => {
+      const shared = z.object({ id: z.string(), name: z.string() });
+      const spec = createSpec({
+        "post /a/:id": build(shared),
+        "post /b/:id": build(shared),
+      });
+      const names = Object.keys(spec.components!.schemas ?? {}).filter((name) =>
+        name.includes("RequestBody"),
+      );
+      expect(names).toHaveLength(1);
+    });
+
+    test("one endpoint mounted at two paths gets a distinct body per route", () => {
+      const endpoint = build(z.object({ id: z.string(), name: z.string() }));
+      const spec = createSpec({
+        "post /a/:id": endpoint,
+        "post /b/:name": endpoint,
+      });
+      const refA = bodyRef(spec, "/a/{id}");
+      const refB = bodyRef(spec, "/b/{name}");
+      if (!refA || !refB) throw "no body ref";
+      expect(refA).not.toEqual(refB);
+      expect(resolve(spec, refA)).toEqual({
+        type: "object",
+        properties: { name: { type: "string" } },
+        required: ["name"],
+      });
+      expect(resolve(spec, refB)).toEqual({
+        type: "object",
+        properties: { id: { type: "string" } },
+        required: ["id"],
+      });
     });
   });
 

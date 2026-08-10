@@ -43,6 +43,66 @@ if (status === 200) {
 
 ## Version 29
 
+### v29.2.1
+
+- Tiny performance tuning for self-diagnostics at startup (development mode only).
+
+### v29.2.0
+
+- Added support for the `oxfmt` formatter in `Integration::printFormatted()`:
+  - The generator also tries `oxfmt` after `prettier` when `oxfmt` is installed.
+
+### v29.1.2
+
+- Fixed the generated Documentation having `composition: "components"`:
+  - For routes sharing same input schema but having differed path parameters;
+  - The generator produced a single body component referenced by both operations;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v29.1.1
+
+- Fixed an issue for path parameters having `.optional()` schema:
+  - Since it's invalid, according to the OpenAPI specification, those would be depicted as required;
+  - The self-diagnostic will now report the issue with a warning message (development mode only);
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v29.1.0
+
+- This version checks that query and path parameters have acceptable input schema:
+  - Those parameters are in general expected to be strings or coerced primitives that could accept strings;
+  - Query parameters can also be parsed as arrays of strings or objects having string properties:
+    - That depends on `queryParser` config option;
+  - It's recommended to use `z.string().transform()` schema to handle numbers and booleans in params;
+  - Alternatively, you can use `z.coerce` and `z.preprocess`;
+  - The check prints a warning message, runs only at startup and only in development mode;
+  - Suggested by [@marco-carvalho](https://github.com/marco-carvalho).
+
+```ts
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  "/v1/users/:groupId": factory.build({
+    input: z.object({
+      // path parameter is originally a string:
+      groupId: z.string().transform((id) => parseInt(id, 10)),
+      // query parser accepts arrays of strings:
+      roleIds: z
+        .array(z.string())
+        .transform((ids) => ids.map((id) => parseInt(id, 10))),
+    }),
+  }),
+};
+```
+
+### v29.0.1
+
+- Minor performance tuning for `Documentation` generator:
+  - Collecting security headers and cookie names only when the corresponding input sources are enabled;
+  - Reduced some calculations required to depict request body and parameters.
+- Deprecating the `DocumentationError` export from `express-zod-api`:
+  - This export will be removed in the next major version;
+  - Import it from `express-zod-api/documentation` subpath instead.
+
 ### v29.0.0
 
 - Supported Node.js versions: `^22.19.0 || ^24.11.0 || ^26.0.0`;
@@ -78,7 +138,14 @@ if (status === 200) {
   - Now produces OpenAPI 3.2.0 with better SSE support and other features.
 - Changes to `Integration`:
   - The static async method `create()` removed — use `new Integration()` instead;
-  - Removed `typescript` option from constructor — now imported statically.
+  - Removed `typescript` option from constructor — now imported statically;
+  - Generated type for `ez.buffer()` is now `Blob` instead of `Buffer` (which didn't exist in browser environments);
+  - The generated Client now excludes cookie-based security fields from input types (using `Omit`);
+  - The `Implementation` type requires `ctx` to be an object, the default one has `override` method for customizations;
+  - The default `Client` Implementation got improved response parsing and now supports `Blob` in request and response;
+  - The default `Client` Implementation now also supports uploads from the properties assigned with `File` or `Blob`;
+  - Both `Client` and `Subscription` delegate cookies handling (credentials) to the browser when supported;
+  - Added `hasCredentials` — an explicit declaration that the API supports credentialed CORS.
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff
@@ -105,6 +172,41 @@ if (status === 200) {
 ```
 
 ## Version 28
+
+### v28.7.11
+
+- Added missing path params check to the Documentation generator:
+  - An Endpoint assigned to `get /users/:id` must declare the `id` property on the `input` schema;
+  - Similar check is already implemented in runtime (development mode only);
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.10
+
+- Fixed issue for routes having differently named path params:
+  - In case of same method it will now always throw a RoutingError:
+    - Example: having both `get /items/:id` and `get /items/:slug` routes.
+  - If methods are different, Documentation generator will throw `DocumentationError`:
+    - Example: OpenAPI standard does not allow having both `get /users/:id` and `delete /users/:userId`;
+    - See https://spec.openapis.org/oas/v3.1.0#paths-object for details.
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.9
+
+- Fixes the issue where the same `.meta({ id })` could be used on different schemas:
+  - Zod 4.3 removed the `id` uniqueness constraint, but the `Documentation` generator needs it for making references;
+  - The Documentation generator will now throw a `DocumentationError` if it finds the same `id` on different schemas;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.8
+
+- Fixes component duplication in the generated Documentation:
+  - When a schema with `.meta({ id })` is reused across endpoints with `composition: "components"`;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.7
+
+- Fixes an issue where an empty path could be emitted for the root route by Documentation instead of `/`:
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
 
 ### v28.7.6
 

@@ -14,6 +14,7 @@ type Store = Record<IOKind, string>;
 const ids = {
   Path: "Path",
   Implementation: "Implementation",
+  DefaultContext: "DefaultContext",
   key: "key",
   path: "path",
   params: "params",
@@ -35,13 +36,20 @@ const ids = {
   rest: "rest",
   searchParams: "searchParams",
   defaultImplementation: "defaultImplementation",
+  hasFiles: "hasFiles",
+  value: "value",
+  File: "File",
+  FormData: "FormData",
+  headers: "headers",
+  body: "body",
   client: "client",
   contentType: "contentType",
-  isJSON: "isJSON",
+  isBlob: "isBlob",
   source: "source",
   Method: "Method",
   Request: "Request",
   Pagination: "Pagination",
+  override: "override",
 } satisfies Record<string, string>;
 
 const interfaces: Record<IOKind, string> = {
@@ -76,6 +84,9 @@ export abstract class IntegrationBase {
     const union = quot(clientMethods).join(" | ");
     return `export type ${ids.Method} = ${union};`;
   };
+
+  protected makeOmit = (base: string, props: Iterable<string>, reason = "") =>
+    `Omit<${base}, ${reason && `\n/** ${reason} */\n`}${quot(props).join(" | ")}>`;
 
   /**
    * @example export type Request = keyof Input;
@@ -125,7 +136,8 @@ export abstract class IntegrationBase {
   };
 
   /**
-   * @example export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<[number, any]>;
+   * @example export type Implementation<T extends Record<string, unknown>> =
+   *          (method: Method, path: string, params: Record<string, any>, ctx?: T) => Promise<[number, any]>;
    * @internal
    * */
   protected makeImplementationType = () => {
@@ -135,8 +147,15 @@ export abstract class IntegrationBase {
       `${ids.params}: Record<string, any>`,
       `${ids.ctx}?: T`,
     ].join(",");
-    return `export type ${ids.Implementation}<T = unknown> = (${args}) => Promise<[number, any]>;`;
+    return `export type ${ids.Implementation}<T extends Record<string, unknown>> = (${args}) => Promise<[number, any]>;`;
   };
+
+  /**
+   * @example export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
+   * @internal
+   * */
+  protected makeDefaultContextType = () =>
+    `export type ${ids.DefaultContext} = { ${ids.override}?: (init: RequestInit) => RequestInit };`;
 
   /**
    * @example const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
@@ -155,10 +174,13 @@ export abstract class IntegrationBase {
    * @internal
    * */
   protected makeSubstituteFn = () => {
-    const args = `${ids.path}: string, ${ids.params}: Record<string, any>`;
+    const paramsType = `Record<string, any>`;
+    const args = `${ids.path}: string, ${ids.params}: ${paramsType}`;
     const placeholder = `\`:\${${ids.key}}\``;
+    const returns = `: [typeof ${ids.path}, typeof ${ids.params}]`;
     return [
-      `const ${ids.substitute} = (${args}) => {\n`,
+      `const ${ids.substitute} = (${args})${returns} => {`,
+      `  if (${ids.params} instanceof Blob) return [${ids.path}, ${ids.params}] as const;`,
       `  const ${ids.rest} = { ...${ids.params} };`,
       `  for (const ${ids.key} in ${ids.params}) {`,
       `    ${ids.path} = ${ids.path}.${propOf<string>("replace")}(${placeholder}, () => {`,
@@ -200,7 +222,7 @@ export abstract class IntegrationBase {
     const totalProp = propOf<OffsetPaginatedResult["output"]["shape"]>("total");
     const callArgs = `${ids.method}, ...${ids.substitute}(${ids.path}, ${ids.params}), ${ids.ctx}`;
     return [
-      `export class ${name}<T> {`,
+      `export class ${name}<T extends Record<string, unknown> = ${ids.DefaultContext}> {`,
       `  public constructor(`,
       `    protected readonly ${ids.implementation}: ${ids.Implementation}<T> = ${ids.defaultImplementation},`,
       `  ) {}`,
@@ -221,36 +243,59 @@ export abstract class IntegrationBase {
   };
 
   /**
-   * @example export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
+   * @example const defaultImplementation = async (method, path, params, ctx) => { ___ };
    * @internal
    * */
-  protected makeDefaultImplementation = () => {
-    const args = `${ids.method}, ${ids.path}, ${ids.params}`;
+  protected makeDefaultImplementation = (hasCredentials: boolean) => {
+    const args = `${ids.method}, ${ids.path}, ${ids.params}, ${ids.ctx}`;
     const noBodyMethods = quot([
       "get",
       "head",
       "delete",
     ] satisfies ClientMethod[]).join(", ");
-    const headers = `${ids.hasBody} ? { "Content-Type": "${contentTypes.json}" } : ${ids.undefined}`;
-    const body = `${ids.hasBody} ? JSON.${propOf<JSON>("stringify")}(${ids.params}) : ${ids.undefined}`;
+    const headers =
+      `!${ids.hasBody} || ${ids.hasFiles} ? ${ids.undefined} : ` +
+      `{ "Content-Type": ${ids.isBlob} ? "${contentTypes.raw}" : "${contentTypes.json}" };`;
     const contentType = `${ids.response}.${propOf<Response>("headers")}.${propOf<Headers>("get")}("content-type")`;
-    const parser = `${ids.isJSON} ? "${propOf<Response>("json")}" : "${propOf<Response>("text")}"`;
+    const searchParams = `\`?\${new ${URLSearchParams.name}(${ids.params})}\``;
     return [
-      `const ${ids.defaultImplementation}: ${ids.Implementation} = async (${args}) => {`,
+      `const ${ids.defaultImplementation}: ${ids.Implementation}<${ids.DefaultContext}> = async (${args}) => {`,
+      `  const ${ids.isBlob} = ${ids.params} instanceof Blob;`,
+      `  const ${ids.hasFiles} = !${ids.isBlob} && Object.${propOf<ObjectConstructor>("values")}(` +
+        `${ids.params}).${propOf<unknown[]>("some")}((one) => one instanceof Blob || one instanceof ${ids.File});`,
       `  const ${ids.hasBody} = ![${noBodyMethods}].includes(${ids.method});`,
-      `  const ${ids.searchParams} = ${ids.hasBody} ? "" : \`?\${new ${URLSearchParams.name}(${ids.params})}\`;`,
+      `  const ${ids.searchParams} = ${ids.isBlob} || ${ids.hasBody} ? "" : ${searchParams};`,
+      `  const ${ids.headers} = ${headers}`,
+      `  let ${ids.body}: RequestInit["${ids.body}"] = ${ids.undefined};`,
+      `  if (${ids.hasBody}) {`,
+      `    if (${ids.isBlob}) {`,
+      `      ${ids.body} = ${ids.params};`,
+      `    } else if (${ids.hasFiles}) {`,
+      `      ${ids.body} = new ${FormData.name}();`,
+      `      for (const [${ids.key}, ${ids.value}] of Object.${propOf<ObjectConstructor>("entries")}(${ids.params}))`,
+      `        if (${ids.value} !== undefined) ${ids.body}.${propOf<FormData>("append")}(${ids.key}, ${ids.value});`,
+      `    } else {`,
+      `      ${ids.body} = JSON.${propOf<JSON>("stringify")}(${ids.params});`,
+      `    }`,
+      `  }`,
+      `  let init: RequestInit = {`,
+      `    ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
+      `    ${propOf<RequestInit>("credentials")}: ${hasCredentials ? `"include"` : ids.undefined},`,
+      `    ${ids.headers},`,
+      `    ${ids.body},`,
+      `  };`,
+      `  if (${ids.ctx}?.${ids.override}) init = ${ids.ctx}.${ids.override}(init);`,
       `  const ${ids.response} = await ${fetch.name}(`,
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
-      `    {`,
-      `      ${propOf<RequestInit>("method")}: ${ids.method}.${propOf<string>("toUpperCase")}(),`,
-      `      ${propOf<RequestInit>("headers")}: ${headers},`,
-      `      ${propOf<RequestInit>("body")}: ${body},`,
-      `    },`,
+      `    init,`,
       `  );`,
       `  const ${ids.contentType} = ${contentType};`,
       `  if (!${ids.contentType}) return [${ids.response}.status, ${ids.undefined}];`,
-      `  const ${ids.isJSON} = ${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}");`,
-      `  return [${ids.response}.status, await ${ids.response}[${parser}]()];`,
+      `  if (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}")) ` +
+        `return [${ids.response}.status, await ${ids.response}.${propOf<Response>("json")}()];`,
+      `  if (${ids.contentType}.${propOf<string>("startsWith")}("text/")) ` +
+        `return [${ids.response}.status, await ${ids.response}.${propOf<Response>("text")}()];`,
+      `  return [${ids.response}.status, await ${ids.response}.${propOf<Response>("blob")}()];`,
       `};`,
     ].join("\n");
   };
@@ -259,7 +304,7 @@ export abstract class IntegrationBase {
    * @example export class Subscription<K extends Extract<___>, R extends Extract<___>> { ___ }
    * @internal
    * */
-  protected makeSubscriptionClass = (name: string) => {
+  protected makeSubscriptionClass = (name: string, hasCredentials: boolean) => {
     const substitution = `${ids.substitute}(${ids.parseRequest}(${ids.request})[1], ${ids.params})`;
     const dataType = `Extract<R, { ${propOf<SSEShape>("event")}: E }>["${propOf<SSEShape>("data")}"]`;
     const data = `(${ids.msg} as ${MessageEvent.name}).${propOf<SSEShape>("data")}`;
@@ -274,6 +319,7 @@ export abstract class IntegrationBase {
       `    const ${ids.searchParams} = \`?\${new ${URLSearchParams.name}(${ids.rest})}\`;`,
       `    this.${ids.source} = new EventSource(`,
       `      new URL(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
+      `      { ${propOf<EventSourceInit>("withCredentials")}: ${hasCredentials ? "true" : ids.undefined} }`,
       `    );`,
       `  }`,
       `  public ${ids.on}<E extends R["${propOf<SSEShape>("event")}"]>(`,

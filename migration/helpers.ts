@@ -1,20 +1,20 @@
-import type { TSESLint, TSESTree } from "@typescript-eslint/utils";
+import type { ESTree, Context } from "@oxlint/plugins";
 
 export const getRangeWithComma = (
-  ctx: TSESLint.RuleContext<string, unknown[]>,
-  node: TSESTree.Node,
+  ctx: Context,
+  node: ESTree.Node,
 ): [number, number] => {
   const after = ctx.sourceCode.getTokenAfter(node);
   return after?.value === "," ? [node.range[0], after.range[1]] : node.range;
 };
 
 export const hasImport = (
-  ctx: TSESLint.RuleContext<string, unknown[]>,
+  ctx: Context,
   sourceValue: string,
   importName?: string,
 ) =>
   ctx.sourceCode.ast.body.some(
-    (stmt): stmt is TSESTree.ImportDeclaration =>
+    (stmt): stmt is ESTree.ImportDeclaration =>
       stmt.type === "ImportDeclaration" &&
       stmt.source.value === sourceValue &&
       (importName === undefined ||
@@ -26,8 +26,8 @@ export const hasImport = (
         )),
   );
 
-export type NamedProp = TSESTree.PropertyNonComputedName & {
-  key: TSESTree.Identifier | TSESTree.StringLiteral;
+export type NamedProp = ESTree.ObjectProperty & {
+  key: ESTree.IdentifierName | ESTree.StringLiteral;
 };
 
 export const queryNamedProp = (name: string) =>
@@ -42,7 +42,7 @@ export const changeProp = ({
   to,
   assign,
 }: {
-  ctx: TSESLint.RuleContext<"change", unknown[]>;
+  ctx: Context;
   node: NamedProp;
   to: string;
   assign?: (value: typeof node.value) => string | null;
@@ -62,13 +62,7 @@ export const changeProp = ({
     },
   });
 
-export const removeProp = ({
-  ctx,
-  node,
-}: {
-  ctx: TSESLint.RuleContext<"remove", unknown[]>;
-  node: NamedProp;
-}) =>
+export const removeProp = ({ ctx, node }: { ctx: Context; node: NamedProp }) =>
   ctx.report({
     node,
     messageId: "remove",

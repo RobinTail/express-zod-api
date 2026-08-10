@@ -151,7 +151,7 @@ type GetV1AvatarStreamInput = {
 };
 
 /** get /v1/avatar/stream */
-type GetV1AvatarStreamPositiveVariant1 = Buffer;
+type GetV1AvatarStreamPositiveVariant1 = Blob;
 
 /** get /v1/avatar/stream */
 type GetV1AvatarStreamNegativeVariant1 = string;
@@ -168,12 +168,16 @@ type HeadV1AvatarStreamPositiveVariant1 = undefined;
 type HeadV1AvatarStreamNegativeVariant1 = undefined;
 
 /** post /v1/avatar/upload */
-type PostV1AvatarUploadInput = {
-  session: {
-    token: string;
-  };
-  avatar: any;
-};
+type PostV1AvatarUploadInput = Omit<
+  {
+    session: {
+      token: string;
+    };
+    avatar: any;
+  },
+  /** security cookies */
+  "session"
+>;
 
 /** post /v1/avatar/upload */
 type PostV1AvatarUploadPositiveVariant1 = {
@@ -190,7 +194,7 @@ type PostV1AvatarUploadNegativeVariant1 = {
 };
 
 /** post /v1/avatar/raw */
-type PostV1AvatarRawInput = Buffer;
+type PostV1AvatarRawInput = Blob;
 
 /** post /v1/avatar/raw */
 type PostV1AvatarRawPositiveVariant1 = {
@@ -309,8 +313,7 @@ export type Path =
   | "/v1/forms/feedback"
   | "/v2/users/list";
 
-export type Method =
-  "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
 
 export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
@@ -340,8 +343,7 @@ export interface PositiveResponse {
   "head /v1/user/retrieve": HeadV1UserRetrievePositiveVariant1;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveVariant1;
   "patch /v1/user/:id": PatchV1UserIdPositiveVariant1;
-  "post /v1/user/create":
-    PostV1UserCreatePositiveVariant1 | PostV1UserCreatePositiveVariant1;
+  "post /v1/user/create": PostV1UserCreatePositiveVariant1 | PostV1UserCreatePositiveVariant1;
   "query /v1/user/list": QueryV1UserListPositiveVariant1;
   "post /v1/login": PostV1LoginPositiveVariant1;
   /** @deprecated */
@@ -395,8 +397,7 @@ export interface EncodedResponse {
   "delete /v1/user/:id/remove":
     | [204, DeleteV1UserIdRemovePositiveVariant1]
     | [404, DeleteV1UserIdRemoveNegativeVariant1];
-  "patch /v1/user/:id":
-    [200, PatchV1UserIdPositiveVariant1] | [400, PatchV1UserIdNegativeVariant1];
+  "patch /v1/user/:id": [200, PatchV1UserIdPositiveVariant1] | [400, PatchV1UserIdNegativeVariant1];
   "post /v1/user/create":
     | [201, PostV1UserCreatePositiveVariant1]
     | [202, PostV1UserCreatePositiveVariant1]
@@ -406,8 +407,7 @@ export interface EncodedResponse {
   "query /v1/user/list":
     | [200, QueryV1UserListPositiveVariant1]
     | [400, QueryV1UserListNegativeVariant1];
-  "post /v1/login":
-    [200, PostV1LoginPositiveVariant1] | [400, PostV1LoginNegativeVariant1];
+  "post /v1/login": [200, PostV1LoginPositiveVariant1] | [400, PostV1LoginNegativeVariant1];
   /** @deprecated */
   "get /v1/avatar/send":
     | [200, GetV1AvatarSendPositiveVariant1]
@@ -471,10 +471,10 @@ export const endpointTags = {
   "head /v2/users/list": ["users"],
 };
 
-const parseRequest = (request: string) =>
-  request.split(/ (.+)/, 2) as [Method, Path];
+const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
 
-const substitute = (path: string, params: Record<string, any>) => {
+const substitute = (path: string, params: Record<string, any>): [typeof path, typeof params] => {
+  if (params instanceof Blob) return [path, params] as const;
   const rest = { ...params };
   for (const key in params) {
     path = path.replace(`:${key}`, () => {
@@ -485,35 +485,55 @@ const substitute = (path: string, params: Record<string, any>) => {
   return [path, rest] as const;
 };
 
-export type Implementation<T = unknown> = (
+export type Implementation<T extends Record<string, unknown>> = (
   method: Method,
   path: string,
   params: Record<string, any>,
   ctx?: T,
 ) => Promise<[number, any]>;
 
-type Pagination =
-  | { nextCursor: string | null }
-  | { total: number; limit: number; offset: number };
+type Pagination = { nextCursor: string | null } | { total: number; limit: number; offset: number };
 
-const defaultImplementation: Implementation = async (method, path, params) => {
+export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
+
+const defaultImplementation: Implementation<DefaultContext> = async (method, path, params, ctx) => {
+  const isBlob = params instanceof Blob;
+  const hasFiles =
+    !isBlob && Object.values(params).some((one) => one instanceof Blob || one instanceof File);
   const hasBody = !["get", "head", "delete"].includes(method);
-  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-  const response = await fetch(
-    new URL(`${path}${searchParams}`, "http://localhost:8090"),
-    {
-      method: method.toUpperCase(),
-      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-      body: hasBody ? JSON.stringify(params) : undefined,
-    },
-  );
+  const searchParams = isBlob || hasBody ? "" : `?${new URLSearchParams(params)}`;
+  const headers =
+    !hasBody || hasFiles
+      ? undefined
+      : { "Content-Type": isBlob ? "application/octet-stream" : "application/json" };
+  let body: RequestInit["body"] = undefined;
+  if (hasBody) {
+    if (isBlob) {
+      body = params;
+    } else if (hasFiles) {
+      body = new FormData();
+      for (const [key, value] of Object.entries(params))
+        if (value !== undefined) body.append(key, value);
+    } else {
+      body = JSON.stringify(params);
+    }
+  }
+  let init: RequestInit = {
+    method: method.toUpperCase(),
+    credentials: undefined,
+    headers,
+    body,
+  };
+  if (ctx?.override) init = ctx.override(init);
+  const response = await fetch(new URL(`${path}${searchParams}`, "http://localhost:8090"), init);
   const contentType = response.headers.get("content-type");
   if (!contentType) return [response.status, undefined];
-  const isJSON = contentType.startsWith("application/json");
-  return [response.status, await response[isJSON ? "json" : "text"]()];
+  if (contentType.startsWith("application/json")) return [response.status, await response.json()];
+  if (contentType.startsWith("text/")) return [response.status, await response.text()];
+  return [response.status, await response.blob()];
 };
 
-export class Client<T> {
+export class Client<T extends Record<string, unknown> = DefaultContext> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
@@ -523,11 +543,9 @@ export class Client<T> {
     ctx?: T,
   ): Promise<EncodedResponse[K]> {
     const [method, path] = parseRequest(request);
-    return this.implementation(
-      method,
-      ...substitute(path, params),
-      ctx,
-    ) as Promise<EncodedResponse[K]>;
+    return this.implementation(method, ...substitute(path, params), ctx) as Promise<
+      EncodedResponse[K]
+    >;
   }
   public static hasMore(response: Pagination): boolean {
     if ("nextCursor" in response) return response.nextCursor !== null;
@@ -543,17 +561,15 @@ export class Subscription<
   public constructor(request: K, params: Input[K]) {
     const [path, rest] = substitute(parseRequest(request)[1], params);
     const searchParams = `?${new URLSearchParams(rest)}`;
-    this.source = new EventSource(
-      new URL(`${path}${searchParams}`, "http://localhost:8090"),
-    );
+    this.source = new EventSource(new URL(`${path}${searchParams}`, "http://localhost:8090"), {
+      withCredentials: undefined,
+    });
   }
   public on<E extends R["event"]>(
     event: E,
     handler: (data: Extract<R, { event: E }>["data"]) => void | Promise<void>,
   ) {
-    this.source.addEventListener(event, (msg) =>
-      handler(JSON.parse((msg as MessageEvent).data)),
-    );
+    this.source.addEventListener(event, (msg) => handler(JSON.parse((msg as MessageEvent).data)));
     return this;
   }
 }
