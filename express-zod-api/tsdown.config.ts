@@ -18,6 +18,7 @@ export default defineConfig({
   fixedExtension: false,
   minify: true,
   attw: { profile: "esm-only", level: "error" },
+  inputOptions: { experimental: { attachDebugInfo: "none" } },
   deps: {
     dts: {
       neverBundle: ["express-serve-static-core", "qs"],

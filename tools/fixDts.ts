@@ -11,7 +11,6 @@ export const fixDtsPlugin = (): Rolldown.Plugin => ({
         await format(
           name,
           file.code
-            .replaceAll(/^\/\/#(end)?region[^\r\n]*/gm, "") // rm rolldown comments
             .replaceAll(/#private;\s*/g, "") // rm #private markers (TS6 compatibility)
             .replaceAll(/\n\s*\n/g, "\n"), // rm double newlines
           { printWidth: 120 },
