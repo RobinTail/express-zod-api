@@ -284,7 +284,7 @@ importers:
     dependencies:
       '@oxlint/plugins':
         specifier: ^1.76.0
-        version: 1.76.0
+        version: 1.77.0
     devDependencies:
       '@typescript/native-preview':
         specifier: catalog:dev
@@ -618,8 +618,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@oxlint/plugins@1.76.0':
-    resolution: {integrity: sha512-twmbsVrYAjkaOw6I2pDiYSAxVLNOV8kcqMzajJ599SpqXzea+GjDCZVad1VUqNR/4thWjM4PER5n+3/TQtTkZQ==}
+  '@oxlint/plugins@1.77.0':
+    resolution: {integrity: sha512-6KtPXskPgpt+0Kyl2nNSxNnYXt7lbkxW1C7vi2L7xwtq/AisZlsmV+hnzOTEyM5tU1TxPv1GpTqpUBbZfPzBLg==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
   '@quansync/fs@1.0.0':
@@ -2162,7 +2162,7 @@ snapshots:
   '@oxlint/binding-win32-x64-msvc@1.76.0':
     optional: true
 
-  '@oxlint/plugins@1.76.0': {}
+  '@oxlint/plugins@1.77.0': {}
 
   '@quansync/fs@1.0.0':
     dependencies:
@@ -2652,7 +2652,7 @@ snapshots:
 
   eslint-plugin-allowed-dependencies@3.1.0(oxlint@1.76.0):
     dependencies:
-      '@oxlint/plugins': 1.76.0
+      '@oxlint/plugins': 1.77.0
       ramda: 0.32.0
     optionalDependencies:
       oxlint: 1.76.0
