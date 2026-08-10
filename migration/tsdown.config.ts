@@ -15,6 +15,7 @@ export default defineConfig({
   deps: {
     neverBundle: true,
   },
+  inputOptions: { experimental: { attachDebugInfo: "none" } },
   dts: {
     generator: "tsgo",
     tsconfig: "./tsconfig.build.json",
