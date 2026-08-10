@@ -1,8 +1,5 @@
-import {
-  createCacheMiddleware,
-  testMiddleware,
-  type CachePolicy,
-} from "../src";
+import { createCacheMiddleware, testMiddleware } from "../src";
+import type { CachePolicy } from "../src/cache-middleware";
 
 describe("Cache middleware", () => {
   describe("createCacheMiddleware", () => {

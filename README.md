@@ -2,12 +2,11 @@
 
 ![logo](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/logo.svg)
 
-![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
-![OpenAPI](https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fraw.githubusercontent.com%2FRobinTail%2Fexpress-zod-api%2Fmaster%2Fexample%2Fexample.documentation.yaml&label=OpenAPI)
-[![coverage](https://coveralls.io/repos/github/RobinTail/express-zod-api/badge.svg)](https://coveralls.io/github/RobinTail/express-zod-api)
+![CI](https://img.shields.io/github/actions/workflow/status/RobinTail/express-zod-api/node.js.yml?label=CI)
+![OpenAPI](https://img.shields.io/github/actions/workflow/status/RobinTail/express-zod-api/oas.yml?label=OpenAPI)
+[![coverage](https://img.shields.io/coverallsCoverage/github/RobinTail/express-zod-api)](https://coveralls.io/github/RobinTail/express-zod-api)
 
 ![downloads](https://img.shields.io/npm/dw/express-zod-api.svg)
-![npm release](https://img.shields.io/npm/v/express-zod-api.svg?color=green25&label=latest)
 ![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api.svg?style=flat)
 ![License](https://img.shields.io/npm/l/express-zod-api.svg?color=green25)
 
@@ -37,16 +36,17 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Headers as an input source](#headers-as-an-input-source)
    3. [Cookies](#cookies)
    4. [Caching](#caching)
-   5. [Response customization](#response-customization)
-   6. [Empty response](#empty-response)
-   7. [Non-JSON response](#non-json-response) including file downloads
-   8. [Error handling](#error-handling)
-   9. [Production mode](#production-mode)
-   10. [HTML Forms (URL encoded)](#html-forms-url-encoded)
-   11. [File uploads](#file-uploads)
-   12. [Connect to your own express app](#connect-to-your-own-express-app)
-   13. [Testing endpoints](#testing-endpoints)
-   14. [Testing middlewares](#testing-middlewares)
+   5. [Rate limiting](#rate-limiting)
+   6. [Response customization](#response-customization)
+   7. [Empty response](#empty-response)
+   8. [Non-JSON response](#non-json-response) including file downloads
+   9. [Error handling](#error-handling)
+   10. [Production mode](#production-mode)
+   11. [HTML Forms (URL encoded)](#html-forms-url-encoded)
+   12. [File uploads](#file-uploads)
+   13. [Connect to your own express app](#connect-to-your-own-express-app)
+   14. [Testing endpoints](#testing-endpoints)
+   15. [Testing middlewares](#testing-middlewares)
 6. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [End-to-End Type Safety](#end-to-end-type-safety)
@@ -82,12 +82,13 @@ Therefore, many basic tasks can be achieved faster and easier, in particular:
 - All of your endpoints can respond consistently.
 - The expected endpoint input and response types can be exported to the frontend, giving you end-to-end type safety
   so you don't get confused about the field names when you implement the client for your API.
-- You can generate your API documentation in OpenAPI 3.1 and JSON Schema compatible format.
+- You can generate your API documentation in OpenAPI 3.2 and JSON Schema compatible format.
 
 ## Contributors
 
 These people contributed to the improvement of the framework by reporting bugs, making changes, and suggesting ideas:
 
+[<img src="https://github.com/marco-carvalho.png" alt="@marco-carvalho" width="50" />](https://github.com/marco-carvalho)
 [<img src="https://github.com/pycanis.png" alt="@pycanis" width="50" />](https://github.com/pycanis)
 [<img src="https://github.com/arlyon.png" alt="@arlyon" width="50" />](https://github.com/arlyon)
 [<img src="https://github.com/Upsilon-Iridani.png" alt="@Upsilon-Iridani" width="50" />](https://github.com/Upsilon-Iridani)
@@ -170,7 +171,7 @@ Much can be customized to fit your needs.
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
-  - Documentation — [OpenAPI 3.1](https://github.com/metadevpro/openapi3-ts) (former Swagger);
+  - Documentation — [OpenAPI 3.2](https://github.com/metadevpro/openapi3-ts) (former Swagger);
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
@@ -423,9 +424,9 @@ const resultHandlerWithCleanup = new ResultHandler({
 
 There are two ways of connecting the native express middlewares depending on their nature and your objective.
 
-In case it's a middleware establishing and serving its own routes, or somehow globally modifying the behaviour, or
-being an additional request parser (like `cookie-parser`), use the `beforeRouting` option. However, it might be better
-to avoid `cors` here — [the framework handles it on its own](#cross-origin-resource-sharing).
+In case it's middleware establishing and serving its own routes, or somehow globally modifying the behavior, use the
+`beforeRouting` or `beforeParsers` hooks. Note that [CORS](#cross-origin-resource-sharing), cookies, compression, and
+body parsing are already available as separate [config options](#set-up-config).
 
 ```ts
 import { createConfig } from "express-zod-api";
@@ -513,19 +514,27 @@ square brackets. You can choose between those parsers as well as configure a cus
 
 ## Transformations
 
-Since parameters of GET requests come in the form of strings, there is often a need to transform them into numbers.
+Query and path parameters should have acceptable input schema. Those parameters are in general expected to be strings
+or coerced primitives that could accept strings. Query parameters can also be parsed as arrays of strings or objects
+having string properties (depends on `queryParser` config option). Therefore, there is often a need to transform their
+values into numbers. Using the `.transform()` schema method is recommended for this purpose. Alternatively, you can
+also use `z.coerce` or `z.preprocess()` schemas.
 
 ```ts
-import { z } from "zod";
+import { Routing } from "express-zod-api";
 
-const getUserEndpoint = endpointsFactory.buildVoid({
-  input: z.object({
-    id: z.string().transform((id) => parseInt(id, 10)),
+const routing: Routing = {
+  "/v1/users/:groupId": factory.build({
+    input: z.object({
+      // path parameter is originally a string:
+      groupId: z.string().transform((id) => parseInt(id, 10)),
+      // query parser accepts arrays of strings:
+      roleIds: z
+        .array(z.string())
+        .transform((ids) => ids.map((id) => parseInt(id, 10))),
+    }),
   }),
-  handler: async ({ input: { id }, logger }) => {
-    logger.debug("id", typeof id); // number
-  },
-});
+};
 ```
 
 ## Top level transformations and mapping
@@ -646,18 +655,27 @@ const listUsers = defaultEndpointsFactory.build({
 ## Cross-Origin Resource Sharing
 
 You can enable your API for other domains using the corresponding configuration option `cors`. The value is required to
-ensure you explicitly choose the correct setting. In addition to being a boolean, `cors` can also be assigned a
-function that overrides default CORS headers. That function has several parameters and can be asynchronous.
+ensure you explicitly choose the correct setting: `false | true` — disables/enables CORS for any origin, setting
+`Access-Control-Allow-Origin: *` and `Access-Control-Allow-Headers: content-type`. You can also pass standard Express
+middleware for full control, consider using the well-known [cors](https://www.npmjs.com/package/cors) package.
 
 ```ts
+import cors from "cors";
 import { createConfig } from "express-zod-api";
 
-const config = createConfig({
-  /** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS */
-  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
-    ...defaultHeaders,
-    "Access-Control-Max-Age": "5000",
-  }),
+const configWithCorsPackage = createConfig({
+  cors: cors({ origin: "https://example.com" }),
+});
+
+const configWithCustomRequestHandler = createConfig({
+  cors: (req, res, next) => {
+    res.set({
+      "Access-Control-Allow-Origin": "https://example.com",
+      "Access-Control-Allow-Headers": "content-type",
+      "Access-Control-Max-Age": "5000",
+    });
+    next();
+  },
 });
 ```
 
@@ -682,9 +700,7 @@ const config = createConfig({
   }, // ... cors, logger, etc
 });
 
-// 'await' is only needed if you're going to use the returned entities.
-// For top level CJS you can wrap you code with (async () => { ... })()
-const { app, servers, logger } = await createServer(config, routing);
+const { app, servers, logger } = createServer(config, routing);
 ```
 
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
@@ -786,6 +802,7 @@ createConfig({
     put: ["body", "params"],
     patch: ["body", "params"],
     delete: ["query", "params"],
+    query: ["query", "body", "params"],
   }, // ...
 });
 ```
@@ -841,7 +858,7 @@ Consider `createCookieMiddleware()` that makes a Middleware providing `setCookie
 as well as `getCookie()` — alternative to the cookies as an input source:
 
 ```ts
-import { createCookieMiddleware, Middleware } from "express-zod-api";
+import { Middleware } from "express-zod-api";
 
 const cookieDrivenFactory = factory
   .useCookies({ httpOnly: true, sameSite: "lax", path: "/" }) // shorthand, recommended base options
@@ -868,8 +885,6 @@ Consider the `createCacheMiddleware()` that provides helpers for HTTP caching fo
 It covers all standard `Cache-Control` directives, conditional request handling, and the "Not Modified" (304) flow:
 
 ```ts
-import { createCacheMiddleware } from "express-zod-api";
-
 const avatarEndpoint = factory
   .useCache({ maxAge: 3600, scope: "public" }) // shorthand, the policy applies to every response
   .build({
@@ -882,6 +897,21 @@ const avatarEndpoint = factory
       setETag(etag);
       addCachePolicy({ staleWhileRevalidate: 86400 }); // extends the default policy
       return { avatar: "https://example.com/avatar.png" };
+    },
+  });
+```
+
+## Rate limiting
+
+Install `express-rate-limit`. Consider the `createRateLimitMiddleware()` to enable and configure rate limit on a certain
+`EndpointsFactory`. When the limit is exceeded, the Middleware throws a `429` HTTP error, handled by your ResultHandler.
+
+```ts
+const endpoint = factory
+  .useRateLimit({ windowMs: 60000, max: 100 }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
+  .buildVoid({
+    handler: async ({ ctx: { rateLimit, logger } }) => {
+      logger.debug("Features", rateLimit); // { limit, used, remaining, resetTime, getKey, resetKey }
     },
   });
 ```
@@ -975,6 +1005,8 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## Error handling
 
+![Error handling](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/error-handling.svg)
+
 All runtime errors are handled by a `ResultHandler`. The default is `defaultResultHandler`. Using `ensureHttpError()`
 it normalizes errors into consistent HTTP responses with sensible status codes. Errors can originate from three layers:
 
@@ -991,7 +1023,7 @@ it normalizes errors into consistent HTTP responses with sensible status codes. 
   - Upload issues: thrown only if `upload.limitError` is configured (`HttpError::statusCode` can be used for response);
   - For other errors the default status code is `500`;
 - `ResultHandler` failures:
-  - Handled by `LastResortHandler` with status code `500` and a plain text response.
+  - Handled by `AbstractResultHandler::lastResort()` with status code `500` and a plain text response.
 
 You can customize it by passing a custom `ResultHandler` to `EndpointsFactory` and by configuring `errorHandler`.
 
@@ -1001,8 +1033,8 @@ Consider enabling production mode by setting `NODE_ENV` environment variable to 
 
 - Express activates some [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html);
 - Self-diagnosis for potential problems is disabled to ensure faster startup;
-- The `defaultResultHandler`, `defaultEndpointsFactory` and `LastResortHandler` generalize server-side error messages
-  in negative responses to improve the security of your API by not disclosing the exact causes of errors:
+- The `defaultResultHandler`, `defaultEndpointsFactory` and `AbstractResultHandler::lastResort()` generalize server-side
+  error messages in negative responses to improve the security of your API by not disclosing the exact causes of errors:
   - Throwing errors that have or imply `5XX` status codes become just `Internal Server Error` message in response;
   - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option:
 
@@ -1108,7 +1140,7 @@ errors yourself. In this regard `attachRouting()` provides you with `notFoundHan
 to your custom express app.
 
 Besides that, if you're looking to include additional request parsers, or a middleware that establishes its own routes,
-then consider using the `beforeRouting` [option in config instead](#using-native-express-middlewares).
+install them on your custom `app` before calling `attachRouting()`.
 
 ## Testing endpoints
 
@@ -1186,21 +1218,19 @@ import "@express-zod-api/zod-plugin"; // in your routing.ts file
 ## End-to-End Type Safety
 
 You can generate a TypeScript file containing the IO types of your API and a client for it, giving you end-to-end type
-safety between your API and frontend. Make sure you have `typescript` installed. Consider also installing `prettier`
-and using the async `printFormatted()` method.
+safety between your API and frontend. Make sure you have `typescript` installed. Consider also installing either
+`prettier` or `oxfmt` for using the async `printFormatted()` method.
 
 ```ts
-import typescript from "typescript";
-import { Integration } from "express-zod-api";
+import { Integration } from "express-zod-api/integration";
 
 const client = new Integration({
-  typescript, // or await Integration.create() to delegate importing
   routing,
   config,
   variant: "client", // <— optional, see also "types" for a DIY solution
 });
 
-const prettierFormattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
+const formattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
 ```
 
 Alternatively, you can supply your own `format` function into that method or use a regular `print()` method instead.
@@ -1222,14 +1252,13 @@ new Subscription("get /v1/events/stream", {}).on("time", (time) => {}); // Serve
 You can generate the specification of your API and write it to a `.yaml` file, that can be used as the documentation:
 
 ```ts
-import { Documentation } from "express-zod-api";
+import { Documentation } from "express-zod-api/documentation";
 
 const yamlString = new Documentation({
   routing, // the same routing and config that you use to start the server
   config,
-  version: "1.2.3",
-  title: "Example API",
-  serverUrl: "https://example.com",
+  info: { version: "1.2.3", title: "Example API" },
+  server: "https://example.com",
   composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
   // descriptions: { positiveResponse, negativeResponse, requestParameter, requestBody }, // check out these features
 }).getSpecAsYaml();
@@ -1267,7 +1296,8 @@ endpoints is available for that purpose. In order to establish the constraints o
 should be declared as keys of `TagOverrides` interface. Consider the following example:
 
 ```ts
-import { defaultEndpointsFactory, Documentation } from "express-zod-api";
+import { defaultEndpointsFactory } from "express-zod-api";
+import { Documentation } from "express-zod-api/documentation";
 
 // Add similar declaration once, somewhere in your code, preferably near config
 declare module "express-zod-api" {
@@ -1326,12 +1356,8 @@ handling rule for multiple brands, use the exposed types `Depicter` and `Produce
 ```ts
 import ts from "typescript";
 import { z } from "zod";
-import {
-  Documentation,
-  Integration,
-  Depicter,
-  Producer,
-} from "express-zod-api";
+import { Documentation, type Depicter } from "express-zod-api/documentation";
+import { Integration, type Producer } from "express-zod-api/integration";
 
 const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
 const myBrandedSchema = z.string().xBrand(myBrand); // requires Zod Plugin, or .meta({ "x-brand": myBrand })

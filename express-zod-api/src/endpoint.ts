@@ -11,14 +11,9 @@ import {
   isSchema,
 } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
-import {
-  InputValidationError,
-  OutputValidationError,
-  ResultHandlerError,
-} from "./errors";
+import { InputValidationError, OutputValidationError } from "./errors";
 import { ezFormBrand } from "./form-schema";
 import type { IOSchema } from "./io-schema";
-import { lastResortHandler } from "./last-resort";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
 import { getBrand, getExamples } from "./metadata";
@@ -80,7 +75,7 @@ export abstract class AbstractEndpoint {
   /** @internal */
   public abstract get tags(): ReadonlyArray<string>;
   /** @internal */
-  public abstract get requestType(): ContentType;
+  public abstract getProbableRequestType(method?: ClientMethod): ContentType;
   /** @internal */
   public abstract get isDeprecated(): boolean;
 }
@@ -91,6 +86,7 @@ export class Endpoint<
   CTX extends FlatObject,
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
+  #requestType?: ContentType;
 
   /** considered an expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
@@ -163,15 +159,18 @@ export class Endpoint<
   }
 
   /** @internal */
-  public override get requestType() {
-    const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
-    if (found) {
-      const brand = getBrand(found);
-      if (brand === ezUploadBrand) return "upload";
-      if (brand === ezRawBrand) return "raw";
-      if (brand === ezFormBrand) return "form";
-    }
-    return "json";
+  public override getProbableRequestType(method?: ClientMethod) {
+    if (method === "query") return "form";
+    return (this.#requestType ??= (() => {
+      const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
+      if (found) {
+        const brand = getBrand(found);
+        if (brand === ezUploadBrand) return "upload";
+        if (brand === ezRawBrand) return "raw";
+        if (brand === ezFormBrand) return "form";
+      }
+      return "json";
+    })());
   }
 
   /** @internal */
@@ -233,6 +232,7 @@ export class Endpoint<
         !(mw instanceof ExpressMiddleware)
       )
         continue;
+      // oxlint-disable-next-line eslint/no-await-in-loop -- the order matters for middlewares
       Object.assign(ctx, await mw.execute({ ...rest, ctx, response, logger }));
       if (response.writableEnded) {
         logger.warn(
@@ -270,17 +270,7 @@ export class Endpoint<
       ctx: Partial<CTX>;
     },
   ) {
-    try {
-      await this.#def.resultHandler.execute(params);
-    } catch (e) {
-      lastResortHandler({
-        ...params,
-        error: new ResultHandlerError(
-          ensureError(e),
-          params.error || undefined,
-        ),
-      });
-    }
+    await this.#def.resultHandler.execute(params);
   }
 
   public override async execute({

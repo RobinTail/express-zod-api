@@ -62,7 +62,7 @@ export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
     io: "input",
   });
 
-const unsupported: FirstPartyKind[] = [
+const unsupported = new Set<FirstPartyKind>([
   "nan",
   "symbol",
   "map",
@@ -72,7 +72,7 @@ const unsupported: FirstPartyKind[] = [
   "promise",
   "never",
   "function",
-];
+]);
 
 export const findJsonIncompatible = (
   subject: z.core.$ZodType,
@@ -83,7 +83,7 @@ export const findJsonIncompatible = (
     condition: (zodSchema) => {
       const brand = getBrand(zodSchema);
       const { type } = zodSchema._zod.def;
-      if (unsupported.includes(type)) return true;
+      if (unsupported.has(type)) return true;
       if (brand === ezBufferBrand) return true;
       if (io === "input") {
         if (type === "date") return true;

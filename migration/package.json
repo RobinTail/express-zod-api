@@ -1,6 +1,6 @@
 {
   "name": "@express-zod-api/migration",
-  "version": "28.0.1",
+  "version": "29.1.0",
   "license": "MIT",
   "description": "Migration scripts for express-zod-api",
   "repository": {
@@ -18,7 +18,7 @@
     "pretest": "tsc",
     "test": "vitest run --globals",
     "build": "tsdown",
-    "prepublishOnly": "eslint && pnpm test && pnpm build"
+    "prepublishOnly": "oxlint && pnpm test && pnpm build"
   },
   "type": "module",
   "main": "dist/index.js",
@@ -35,14 +35,28 @@
     "*.md"
   ],
   "engines": {
-    "node": "^22.19.0 || ^24.0.0 || ^26.0.0"
+    "node": "^22.19.0 || ^24.11.0 || ^26.0.0"
   },
   "peerDependencies": {
     "eslint": "^10.0.0",
+    "oxlint": "^1.76.0",
     "typescript-eslint": "^8.58.0"
   },
+  "peerDependenciesMeta": {
+    "eslint": {
+      "optional": true
+    },
+    "typescript-eslint": {
+      "optional": true
+    },
+    "oxlint": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@oxlint/plugins": "^1.76.0"
+  },
   "devDependencies": {
-    "@typescript-eslint/rule-tester": "catalog:dev",
-    "typescript": "catalog:dev"
+    "@typescript/native-preview": "catalog:dev"
   }
 }

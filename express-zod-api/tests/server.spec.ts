@@ -1,9 +1,8 @@
+import { compressionMock, cookieParserMock } from "./peers-mock";
 import { moveRaw } from "../src/server-helpers";
 import { givePort } from "../../tools/ports";
 import {
   appMock,
-  compressionMock,
-  cookieParserMock,
   expressJsonMock,
   expressUrlencodedMock,
   expressMock,
@@ -22,9 +21,8 @@ import {
   createServer,
   defaultResultHandler,
   ez,
-  type AppConfig,
-  type ServerConfig,
 } from "../src";
+import type { AppConfig, ServerConfig } from "../src/config-type";
 import express from "express";
 
 describe("Server", () => {
@@ -41,7 +39,7 @@ describe("Server", () => {
   });
 
   describe("createServer()", () => {
-    test("Should create server with minimal config", async () => {
+    test("Should create server with minimal config", () => {
       const port = givePort();
       const configMock = {
         http: { listen: port },
@@ -53,45 +51,47 @@ describe("Server", () => {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
             method: ["get", "post"],
-            input: z.object({ n: z.number() }),
+            input: z.object({ n: z.string() }),
             output: z.object({ b: z.boolean() }),
             handler: vi.fn(),
           }),
         },
       };
-      const { servers } = await createServer(configMock, routingMock);
+      const { servers } = createServer(configMock, routingMock);
       expect(servers).toHaveLength(1);
       expect(servers[0]).toBeTruthy();
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.set).toHaveBeenCalledWith("query parser", "simple");
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.use).toHaveBeenCalledTimes(6);
+      expect(appMock.use).toHaveBeenNthCalledWith(1, expect.any(Function)); // logging
+      expect(appMock.use).toHaveBeenNthCalledWith(2, expect.any(Function)); // cors
+      expect(appMock.use).toHaveBeenNthCalledWith(3, expressJsonMock);
+      expect(appMock.use).toHaveBeenNthCalledWith(4, expressUrlencodedMock);
+      expect(appMock.use).toHaveBeenNthCalledWith(5, expressRawMock, moveRaw);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        expressJsonMock,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledTimes(1);
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        expressJsonMock,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        expressJsonMock,
         expect.any(Function), // endpoint
       );
       expect(httpListenSpy).toHaveBeenCalledTimes(1);
       expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
-    test("Should create server with custom parsers, logger, error handler and hooks", async () => {
+    test("Should create server with custom parsers, logger, error handler and hooks", () => {
       const customLogger = new BuiltinLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
@@ -103,6 +103,7 @@ describe("Server", () => {
         formParser: vi.fn(),
         beforeRouting: vi.fn(),
         afterRouting: vi.fn(),
+        beforeParsers: vi.fn(),
         cors: true,
         startupLogo: false,
         errorHandler: {
@@ -136,7 +137,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { logger, app } = await createServer(
+      const { logger, app } = createServer(
         configMock as unknown as ServerConfig,
         routingMock,
       );
@@ -147,9 +148,22 @@ describe("Server", () => {
         "query parser",
         configMock.queryParser,
       );
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.use).toHaveBeenCalledTimes(6);
+      expect(appMock.use).toHaveBeenNthCalledWith(1, expect.any(Function)); // logging
+      expect(appMock.use).toHaveBeenNthCalledWith(2, expect.any(Function)); // cors
+      expect(appMock.use).toHaveBeenNthCalledWith(3, configMock.jsonParser);
+      expect(appMock.use).toHaveBeenNthCalledWith(4, configMock.formParser);
+      expect(appMock.use).toHaveBeenNthCalledWith(
+        5,
+        configMock.rawParser,
+        moveRaw,
+      );
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
-      for (const hook of ["beforeRouting", "afterRouting"] as const) {
+      for (const hook of [
+        "beforeRouting",
+        "afterRouting",
+        "beforeParsers",
+      ] as const) {
         expect(configMock[hook]).toHaveBeenCalledWith({
           app: appMock,
           getLogger: expect.any(Function),
@@ -161,48 +175,39 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledTimes(2);
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/form",
         expect.any(Function), // cors
-        configMock.formParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.patch).toHaveBeenCalledTimes(1);
       expect(appMock.patch).toHaveBeenCalledWith(
         "/v1/raw",
         expect.any(Function), // cors
-        configMock.rawParser,
-        moveRaw,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledTimes(3);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/raw",
         expect.any(Function), // cors
-        configMock.rawParser,
-        moveRaw,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/form",
         expect.any(Function), // cors
-        configMock.formParser,
         expect.any(Function), // endpoint
       );
       expect(httpListenSpy).toHaveBeenCalledTimes(1);
@@ -212,7 +217,7 @@ describe("Server", () => {
       );
     });
 
-    test("should create a HTTPS server on request", async () => {
+    test("should create a HTTPS server on request", () => {
       const configMock = {
         https: {
           listen: givePort(),
@@ -231,7 +236,7 @@ describe("Server", () => {
         },
       };
 
-      const { servers } = await createServer(configMock, routingMock);
+      const { servers } = createServer(configMock, routingMock);
       expect(servers).toHaveLength(1);
       expect(servers[0]).toBeTruthy();
       expect(createHttpsServerSpy).toHaveBeenCalledWith(
@@ -245,7 +250,7 @@ describe("Server", () => {
       );
     });
 
-    test("should create both HTTP and HTTPS servers", async () => {
+    test("should create both HTTP and HTTPS servers", () => {
       const configMock = {
         http: { listen: givePort() },
         https: {
@@ -256,23 +261,23 @@ describe("Server", () => {
         startupLogo: false,
         logger: { level: "warn" as const },
       };
-      const { servers } = await createServer(configMock, {});
+      const { servers } = createServer(configMock, {});
       expect(servers).toHaveLength(2);
       expect(servers[0]).toBeTruthy();
       expect(servers[1]).toBeTruthy();
     });
 
-    test("should warn when neigher configured", async () => {
+    test("should warn when neither configured", () => {
       const customLogger = new BuiltinLogger({ level: "silent" });
       const warnMethod = vi.spyOn(customLogger, "warn");
-      await createServer(
+      createServer(
         { cors: false, startupLogo: false, logger: customLogger },
         {},
       );
       expect(warnMethod).toHaveBeenCalledWith("No servers configured.");
     });
 
-    test("should enable compression on request", async () => {
+    test("should enable compression on request", () => {
       const configMock = {
         http: { listen: givePort() },
         compression: true,
@@ -280,15 +285,15 @@ describe("Server", () => {
         startupLogo: false,
         logger: { level: "warn" },
       } satisfies ServerConfig;
-      await createServer(configMock, {});
-      expect(appMock.use).toHaveBeenCalledTimes(3);
+      createServer(configMock, {});
+      expect(appMock.use).toHaveBeenCalledTimes(7);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
 
     test.each([true, { secret: "my-secret" }])(
       "should enable cookie parser on demand %#",
-      async (cookies) => {
+      (cookies) => {
         const configMock = {
           http: { listen: givePort() },
           cookies,
@@ -296,8 +301,8 @@ describe("Server", () => {
           startupLogo: false,
           logger: { level: "warn" },
         } satisfies ServerConfig;
-        await createServer(configMock, {});
-        expect(appMock.use).toHaveBeenCalledTimes(3);
+        createServer(configMock, {});
+        expect(appMock.use).toHaveBeenCalledTimes(7);
         expect(cookieParserMock).toHaveBeenCalledTimes(1);
         expect(cookieParserMock).toHaveBeenCalledWith(
           typeof cookies === "object" ? cookies.secret : undefined,
@@ -306,7 +311,7 @@ describe("Server", () => {
       },
     );
 
-    test("should enable uploads on request", async () => {
+    test("should enable uploads on request", () => {
       const configMock = {
         http: { listen: givePort() },
         upload: {
@@ -329,19 +334,17 @@ describe("Server", () => {
           }),
         },
       };
-      await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      createServer(configMock, routingMock);
+      expect(appMock.use).toHaveBeenCalledTimes(7);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        expect.any(Function), // uploader with logger
-        expect.any(Function), // createUploadFailureHandler()
         expect.any(Function), // endpoint
       );
     });
 
-    test("should enable raw on request", async () => {
+    test("should enable raw on request", () => {
       const configMock = {
         http: { listen: givePort() },
         cors: true,
@@ -357,19 +360,17 @@ describe("Server", () => {
           }),
         },
       };
-      await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      createServer(configMock, routingMock);
+      expect(appMock.use).toHaveBeenCalledTimes(6);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // cors
-        expressRawMock,
-        moveRaw,
         expect.any(Function), // endpoint
       );
     });
 
-    test("should enable urlencoded on request", async () => {
+    test("should enable urlencoded on request", () => {
       const configMock = {
         http: { listen: givePort() },
         cors: false,
@@ -384,12 +385,11 @@ describe("Server", () => {
           }),
         },
       };
-      await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      createServer(configMock, routingMock);
+      expect(appMock.use).toHaveBeenCalledTimes(5);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
-        expressUrlencodedMock,
         expect.any(Function), // endpoint
       );
     });
@@ -426,7 +426,7 @@ describe("Server", () => {
       );
       expect(logger).toEqual(customLogger);
       expect(typeof notFoundHandler).toBe("function");
-      expect(appMock.use).toHaveBeenCalledTimes(1); // createLoggingMiddleware
+      expect(appMock.use).toHaveBeenCalledTimes(2); // createLoggingMiddleware + CORS
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
       expect(infoMethod).toHaveBeenCalledTimes(0);
       expect(appMock.get).toHaveBeenCalledTimes(1);

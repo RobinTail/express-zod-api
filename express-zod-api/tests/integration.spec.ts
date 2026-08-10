@@ -2,11 +2,10 @@ import ts from "typescript";
 import { globalRegistry, z } from "zod";
 import {
   EndpointsFactory,
-  Integration,
   defaultEndpointsFactory,
   ResultHandler,
-  type Producer,
 } from "../src";
+import { Integration, type Producer } from "../src/integration";
 import { brandProperty } from "../src/metadata";
 
 describe("Integration", () => {
@@ -28,14 +27,13 @@ describe("Integration", () => {
     "Should support types variant and handle recursive schemas %#",
     (recursiveSchema) => {
       const client = new Integration({
-        typescript: ts,
         variant: "types",
         config: configMock,
         routing: {
           v1: {
             test: defaultEndpointsFactory
               .build({
-                method: "post",
+                method: "query",
                 input: z.object({
                   features: recursiveSchema,
                 }),
@@ -51,7 +49,7 @@ describe("Integration", () => {
   );
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
-    const client = await Integration.create({
+    const client = new Integration({
       config: configMock,
       routing: {
         v1: {
@@ -74,16 +72,22 @@ describe("Integration", () => {
   test.each([undefined, false])(
     "Should support HEAD method by default %#",
     async (hasHeadMethod) => {
-      const client = await Integration.create({
+      const client = new Integration({
         config: configMock,
         hasHeadMethod,
         variant: "types",
         routing: {
           v1: {
-            "get path": defaultEndpointsFactory.buildVoid({
-              input: z.object({ some: z.string() }),
-              handler: vi.fn(),
-            }),
+            "get path": defaultEndpointsFactory
+              .addMiddleware({
+                security: { type: "cookie", name: "session" },
+                input: z.object({ session: z.object() }),
+                handler: vi.fn(),
+              })
+              .buildVoid({
+                input: z.object({ some: z.string() }),
+                handler: vi.fn(),
+              }),
           },
         },
       });
@@ -111,7 +115,7 @@ describe("Integration", () => {
         handler: vi.fn(),
       }),
     );
-    const client = await Integration.create({
+    const client = new Integration({
       config: configMock,
       variant: "types",
       routing: {
@@ -137,7 +141,7 @@ describe("Integration", () => {
         globalRegistry.remove(schema);
         return next(schema);
       };
-      const client = await Integration.create({
+      const client = new Integration({
         config: configMock,
         variant: "types",
         brandHandling: {
@@ -163,5 +167,44 @@ describe("Integration", () => {
       });
       expect(await client.printFormatted()).toMatchSnapshot();
     });
+  });
+
+  describe("Feature #3604: OxFmt support", () => {
+    test("should throw if it failed to format", async () => {
+      await expect(() =>
+        new Integration({
+          config: configMock,
+          variant: "types",
+          brandHandling: {
+            CUSTOM: () => ts.factory.createTypeReferenceNode("## WRONG ##"),
+          },
+          routing: {
+            v1: {
+              custom: defaultEndpointsFactory.buildVoid({
+                method: "post",
+                input: z.object({
+                  string: z.string().meta({ [brandProperty]: "CUSTOM" }),
+                }),
+                handler: vi.fn(),
+              }),
+            },
+          },
+        }).printFormatted(),
+      ).rejects.toThrow(
+        new Error("OxFmt failed to format the code", {
+          cause: [
+            expect.objectContaining({
+              codeframe: expect.stringContaining("## WRONG ##"),
+            }),
+          ],
+        }),
+      );
+    });
+  });
+
+  test("Producer type should be satisfied", () => {
+    expectTypeOf(() =>
+      ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+    ).toExtend<Producer>();
   });
 });

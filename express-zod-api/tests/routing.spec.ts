@@ -42,18 +42,19 @@ describe("Routing", () => {
           recognizeMethodDependentRoutes: false,
         };
         const factory = new EndpointsFactory(defaultResultHandler);
-        const getEndpoint = factory.build({
-          output: z.object({}),
+        const getEndpoint = factory.buildVoid({
           handler: handlerMock,
         });
-        const postEndpoint = factory.build({
+        const postEndpoint = factory.buildVoid({
           method: "post",
-          output: z.object({}),
           handler: handlerMock,
         });
-        const getAndPostEndpoint = factory.build({
+        const getAndPostEndpoint = factory.buildVoid({
           method: ["get", "post"],
-          output: z.object({}),
+          handler: handlerMock,
+        });
+        const queryEndpoint = factory.buildVoid({
+          method: "query",
           handler: handlerMock,
         });
         const routing: Routing = {
@@ -62,6 +63,7 @@ describe("Routing", () => {
               get: getEndpoint, // should be treated as a path
               set: postEndpoint,
               universal: getAndPostEndpoint,
+              search: queryEndpoint,
             },
           },
         };
@@ -77,16 +79,19 @@ describe("Routing", () => {
         expect(appMock.put).toHaveBeenCalledTimes(0);
         expect(appMock.delete).toHaveBeenCalledTimes(0);
         expect(appMock.patch).toHaveBeenCalledTimes(0);
-        expect(appMock.options).toHaveBeenCalledTimes(3);
+        expect(appMock.query).toHaveBeenCalledTimes(1);
+        expect(appMock.options).toHaveBeenCalledTimes(4);
         expect(appMock.get.mock.calls[0]![0]).toBe("/v1/user/get");
         expect(appMock.get.mock.calls[1]![0]).toBe("/v1/user/universal");
         expect(appMock.post.mock.calls[0]![0]).toBe("/v1/user/set");
         expect(appMock.post.mock.calls[1]![0]).toBe("/v1/user/universal");
+        expect(appMock.query.mock.calls[0]![0]).toBe("/v1/user/search");
         expect(appMock.options.mock.calls[0]![0]).toBe("/v1/user/get");
         expect(appMock.options.mock.calls[1]![0]).toBe("/v1/user/set");
         expect(appMock.options.mock.calls[2]![0]).toBe("/v1/user/universal");
+        expect(appMock.options.mock.calls[3]![0]).toBe("/v1/user/search");
         if (hintAllowedMethods === false) return;
-        expect(appMock.all).toHaveBeenCalledTimes(3);
+        expect(appMock.all).toHaveBeenCalledTimes(4);
         expect(appMock.all.mock.calls[0]![0]).toBe("/v1/user/get");
         expect(appMock.all.mock.calls[1]![0]).toBe("/v1/user/set");
         expect(appMock.all.mock.calls[2]![0]).toBe("/v1/user/universal");
@@ -146,6 +151,7 @@ describe("Routing", () => {
       expect(appMock.put).toHaveBeenCalledTimes(1);
       expect(appMock.patch).toHaveBeenCalledTimes(1);
       expect(appMock.delete).toHaveBeenCalledTimes(0);
+      expect(appMock.query).toHaveBeenCalledTimes(0);
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0]![0]).toBe("/v1/user");
       expect(appMock.post.mock.calls[0]![0]).toBe("/v1/user");
@@ -181,14 +187,8 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
-    test("Issue 705: should set all assigned methods to CORS response header", async () => {
+    test("Issue 705: should set allowed methods to CORS response header", async () => {
       const handler = vi.fn(async () => ({}));
-      const configMock = {
-        cors: (params: { defaultHeaders: Record<string, string> }) => ({
-          ...params.defaultHeaders,
-          "X-Custom-Header": "Testing",
-        }),
-      };
       const factory = new EndpointsFactory(defaultResultHandler);
       const input = z.object({});
       const output = z.object({});
@@ -219,22 +219,19 @@ describe("Routing", () => {
       initRouting({
         app: appMock as unknown as IRouter,
         getLogger: () => logger,
-        config: configMock,
+        config: { cors: true },
         routing,
       });
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0]![0]).toBe("/hello");
       const fn = appMock.options.mock.calls[0]![1];
-      expect(typeof fn).toBe("function"); // async RequestHandler, proprietary CORS middleware
+      expect(typeof fn).toBe("function"); // async RequestHandler, route-level CORS middleware
       const requestMock = makeRequestMock({ method: "PUT" });
       const responseMock = makeResponseMock();
       await fn(requestMock, responseMock, vi.fn());
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
-        "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, PATCH, POST, PUT, HEAD, OPTIONS",
-        "access-control-allow-headers": "content-type",
-        "x-custom-header": "Testing",
       });
     });
 
@@ -361,9 +358,7 @@ describe("Routing", () => {
       await fn(requestMock, responseMock, vi.fn());
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
-        "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, POST, HEAD, OPTIONS",
-        "access-control-allow-headers": "content-type",
       });
     });
 
@@ -584,9 +579,8 @@ describe("Routing", () => {
       z.object({ id: z.string() }),
       z.record(z.literal("id"), z.string()),
     ])("should warn about unused path params %#", (input) => {
-      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
         input,
-        output: z.object({}),
         handler: vi.fn(),
       });
       const logger = makeLoggerMock();
@@ -600,6 +594,170 @@ describe("Routing", () => {
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
         { method: "get", param: "idx", path: "/v1/:idx" },
       ]);
+    });
+
+    test("should warn about optional path params", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+        input: z.object({ idx: z.string().optional() }),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { v1: { ":idx": endpoint } },
+      });
+      expect(logger._getLogs().warn).toContainEqual([
+        'The path parameter "idx" is declared optional in the input schema, but path parameters are always required since Express matches the route only when the segment is present.',
+        { method: "get", name: "idx", path: "/v1/:idx" },
+      ]);
+    });
+
+    test("should NOT warn about required path params", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+        input: z.object({ idx: z.string() }),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { v1: { ":idx": endpoint } },
+      });
+      expect(logger._getLogs().warn).toHaveLength(0);
+    });
+
+    test.each([
+      [z.number(), "number"],
+      [z.int(), "integer"],
+      [z.boolean(), "boolean"],
+      [z.literal(42), "number"],
+      [z.literal([42, 43]), "number"],
+      [z.enum({ a: 42, b: 43 }), "number"],
+      [z.array(z.number()), "array"],
+      [z.tuple([z.string(), z.number()]), "array"],
+      [z.tuple([z.string()]).rest(z.number()), "array"],
+      [z.object({ nested: z.number() }), "object"],
+      [z.looseObject({ nested: z.string() }).catchall(z.number()), "object"],
+      [z.record(z.string(), z.number()), "object"],
+    ])(
+      "should warn about non-coercing string-only query params %#",
+      (schema, type) => {
+        const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+          input: z.object({ v: schema }),
+          handler: vi.fn(),
+        });
+        const logger = makeLoggerMock();
+        initRouting({
+          app: appMock as unknown as IRouter,
+          getLogger: () => logger,
+          config: { cors: false },
+          routing: { path: endpoint },
+        });
+        expect(logger._getLogs().warn).toContainEqual([
+          expect.stringContaining('The query parameter "v"'),
+          {
+            method: "get",
+            path: "/path",
+            name: "v",
+            jsonSchema: expect.objectContaining({ type }),
+          },
+        ]);
+      },
+    );
+
+    test("should warn about query params under a top-level transformation", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+        input: z.object({ v: z.number() }).transform((o) => o),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { path: endpoint },
+      });
+      expect(logger._getLogs().warn).toContainEqual([
+        expect.stringContaining('The query parameter "v"'),
+        {
+          method: "get",
+          path: "/path",
+          name: "v",
+          jsonSchema: { type: "number" },
+        },
+      ]);
+    });
+
+    test.each([
+      [z.number(), "number"],
+      [z.object({ nested: z.string() }), "object"],
+      [z.array(z.string()), "array"],
+    ])("should warn about non-coercing path params %#", (schema, type) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+        input: z.object({ id: schema }),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { "/v1/:id": endpoint },
+      });
+      expect(logger._getLogs().warn).toContainEqual([
+        expect.stringContaining('The path parameter "id"'),
+        {
+          method: "get",
+          path: "/v1/:id",
+          name: "id",
+          jsonSchema: expect.objectContaining({ type }),
+        },
+      ]);
+    });
+
+    test.each([
+      z.coerce.number(),
+      z.preprocess(Number, z.number()),
+      z.string(),
+      z.string().transform(Number),
+      z.array(z.string()),
+      z.object({ nested: z.string() }),
+    ])("should NOT warn about acceptable query params %#", (schema) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+        input: z.object({ v: schema }),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { path: endpoint },
+      });
+      expect(
+        logger._getLogs().warn.map((entry) => String((entry as string[])[0])),
+      ).not.toContain(
+        expect.stringContaining("most likely would not accept the parsed data"),
+      );
+    });
+
+    test("should not warn about body properties", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+        method: "post",
+        input: z.object({ v: z.number() }),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { path: endpoint },
+      });
+      expect(logger._getLogs().warn).toHaveLength(0);
     });
   });
 

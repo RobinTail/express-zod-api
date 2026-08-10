@@ -1,7 +1,7 @@
-import type { TSESLint, TSESTree } from "@typescript-eslint/utils";
+import type { ESTree, Context } from "@oxlint/plugins";
 
-export type NamedProp = TSESTree.PropertyNonComputedName & {
-  key: TSESTree.Identifier | TSESTree.StringLiteral;
+export type NamedProp = ESTree.ObjectProperty & {
+  key: ESTree.IdentifierName | ESTree.StringLiteral;
 };
 
 export const queryNamedProp = (name: string) =>
@@ -16,7 +16,7 @@ export const changeProp = ({
   to,
   assign,
 }: {
-  ctx: TSESLint.RuleContext<"change", unknown[]>;
+  ctx: Context;
   node: NamedProp;
   to: string;
   assign?: (value: typeof node.value) => string | null;
@@ -33,5 +33,19 @@ export const changeProp = ({
         changes.push(fixer.replaceText(node.value, newValue));
       }
       return changes;
+    },
+  });
+
+export const removeProp = ({ ctx, node }: { ctx: Context; node: NamedProp }) =>
+  ctx.report({
+    node,
+    messageId: "remove",
+    data: { subject: `${getPropName(node)} property` },
+    fix: (fixer) => {
+      const next = ctx.sourceCode.getTokenAfter(node);
+      return fixer.removeRange([
+        node.range[0],
+        next?.value === "," ? next.range[1] : node.range[1],
+      ]);
     },
   });

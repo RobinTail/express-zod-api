@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   flattenIO,
   isJsonObjectSchema,
+  isParamAcceptable,
   mergeExamples,
   propsMerger,
   canMerge,
@@ -11,6 +12,7 @@ import {
   processPropertyNames,
   pullRequestExamples,
 } from "../src/json-schema-helpers";
+import * as R from "ramda";
 
 describe("JSON Schema helpers", () => {
   describe("isJsonObjectSchema()", () => {
@@ -281,6 +283,119 @@ describe("JSON Schema helpers", () => {
         { name: "jane", age: 30 },
       ]);
     });
+  });
+
+  describe("isParamAcceptable()", () => {
+    test.each(["query", "path"] as const)(
+      "ALWAYS acceptable in %s: coercion, strings, any",
+      (location) => {
+        expect(
+          isParamAcceptable({ type: "number", "x-coerce": true }, location),
+        ).toBe(true);
+        expect(isParamAcceptable({ type: "string" }, location)).toBe(true);
+        expect(isParamAcceptable({}, location)).toBe(true);
+      },
+    );
+
+    test.each(["query", "path"] as const)(
+      "ALWAYS NOT acceptable in %s: null, number, integer, boolean",
+      (location) => {
+        for (const type of ["null", "number", "integer", "boolean"] as const)
+          expect(isParamAcceptable({ type }, location)).toBe(false);
+      },
+    );
+
+    test.each(["array", "object"] as const)(
+      "empty %s is generally OK in query, but not in path",
+      (type) => {
+        expect(isParamAcceptable({ type }, "query")).toBe(true);
+        expect(isParamAcceptable({ type }, "path")).toBe(false);
+      },
+    );
+
+    test.each(["items", "additionalItems", "prefixItems"] as const)(
+      "array is acceptable in query when its items are %#",
+      (prop) => {
+        for (const variant of [
+          { type: "string" },
+          [{ type: "string" }, { type: "string" }],
+        ]) {
+          expect(
+            isParamAcceptable({ type: "array", [prop]: variant }, "query"),
+          ).toBe(true);
+        }
+        for (const variant of [
+          { type: "number" },
+          [{ type: "string" }, { type: "number" }],
+        ]) {
+          expect(
+            isParamAcceptable({ type: "array", [prop]: variant }, "query"),
+          ).toBe(false);
+        }
+      },
+    );
+
+    test.each(["properties/a", "additionalProperties", "propertyNames"])(
+      "object is acceptable in query when its properties are %#",
+      (path) => {
+        expect(
+          isParamAcceptable(
+            R.assocPath(
+              path.split("/"),
+              { type: "string" },
+              { type: "object" },
+            ),
+            "query",
+          ),
+        ).toBe(true);
+        expect(
+          isParamAcceptable(
+            R.assocPath(
+              path.split("/"),
+              { type: "number" },
+              { type: "object" },
+            ),
+            "query",
+          ),
+        ).toBe(false);
+      },
+    );
+
+    test.each(["query", "path"] as const)(
+      "oneOf is acceptable in %s when some member is",
+      (location) => {
+        expect(
+          isParamAcceptable(
+            { oneOf: [{ type: "string" }, { type: "number" }] },
+            location,
+          ),
+        ).toBe(true);
+        expect(
+          isParamAcceptable(
+            { oneOf: [{ type: "number" }, { type: "boolean" }] },
+            location,
+          ),
+        ).toBe(false);
+      },
+    );
+
+    test.each(["query", "path"] as const)(
+      "allOf is acceptable in %s when all members are",
+      (location) => {
+        expect(
+          isParamAcceptable(
+            { allOf: [{ type: "string" }, { type: "string" }] },
+            location,
+          ),
+        ).toBe(true);
+        expect(
+          isParamAcceptable(
+            { allOf: [{ type: "string" }, { type: "number" }] },
+            location,
+          ),
+        ).toBe(false);
+      },
+    );
   });
 
   describe("flattenIO()", () => {

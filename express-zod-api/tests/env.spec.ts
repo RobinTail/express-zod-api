@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import * as R from "ramda";
 import { z } from "zod";
 import { createRequire } from "node:module";
+import { METHODS } from "node:http";
 
 describe("Environment checks", () => {
   describe("Zod global registry", () => {
@@ -93,6 +94,13 @@ describe("Environment checks", () => {
       /** @since 4.0.9 4e7a3ef180f6a5525d9021638e9df20b3ca50456 */
       expect(() => z.literal([])).toThrow(/no valid values/);
     });
+
+    test.each([z.coerce.number(), z.preprocess(Number, z.number())])(
+      "z.coerce and z.preprocess have no effect on JSON schema depiction %#",
+      (schema) => {
+        expect(schema.toJSONSchema()).toMatchSnapshot();
+      },
+    );
   });
 
   describe("Zod new features", () => {
@@ -211,6 +219,30 @@ describe("Environment checks", () => {
       expect(
         z.toJSONSchema(z.string().meta({ id: "uniq" })),
       ).not.toHaveProperty("id");
+    });
+
+    /**
+     * @link https://github.com/colinhacks/zod/commit/adf65cdef4d8de10b788293808e8d52807adb7c0
+     * @since zod v4.3.0, 29.12.2025
+     * */
+    test("meta id uniqueness is NOT checked", () => {
+      const id = "Shared";
+      const alpha = z.string().meta({ id });
+      let beta: z.ZodType;
+      expect(() => {
+        beta = z.number().meta({ id });
+      }).not.toThrow();
+      const metaAlpha = z.globalRegistry.get(alpha)!;
+      const metaBeta = z.globalRegistry.get(beta!)!;
+      expect(metaAlpha).toBeTruthy();
+      expect(metaBeta).toBeTruthy();
+      expect(metaAlpha.id).toBe(metaBeta.id);
+    });
+  });
+
+  describe("Node.js HTTP method support", () => {
+    test("should include QUERY in http.METHODS", () => {
+      expect(METHODS).toContain("QUERY");
     });
   });
 

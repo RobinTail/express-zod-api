@@ -1,7 +1,7 @@
 import ansis from "ansis";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
-import { isProduction, type FlatObject } from "./common-helpers";
+import { runtime, type FlatObject } from "./common-helpers";
 import {
   formatDuration,
   isHidden,
@@ -50,7 +50,7 @@ export class BuiltinLogger implements AbstractLogger {
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor({
     color = ansis.isSupported(),
-    level = isProduction() ? "warn" : "debug",
+    level = runtime.isProduction ? "warn" : "debug",
     depth = 2,
     ctx = {},
   }: Partial<BuiltinLoggerConfig> = {}) {

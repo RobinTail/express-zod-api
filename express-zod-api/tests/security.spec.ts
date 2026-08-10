@@ -1,6 +1,39 @@
-import { getSecurityNames } from "../src/security";
+import {
+  type BasicSecurity,
+  type BearerSecurity,
+  type CookieSecurity,
+  getSecurityNames,
+  type HeaderSecurity,
+  type InputSecurity,
+  type OAuth2Security,
+  type OpenIdSecurity,
+} from "../src/security";
 
 describe("Security", () => {
+  test("types should satisfy", () => {
+    expectTypeOf<{ type: "basic" }>().toEqualTypeOf<BasicSecurity>();
+    expectTypeOf<{
+      type: "bearer";
+      format?: string;
+    }>().toEqualTypeOf<BearerSecurity>();
+    expectTypeOf<{
+      type: "cookie";
+      name: string;
+    }>().toEqualTypeOf<CookieSecurity>();
+    expectTypeOf<{
+      type: "header";
+      name: string;
+    }>().toEqualTypeOf<HeaderSecurity>();
+    expectTypeOf<{ type: "input"; name: string }>().toEqualTypeOf<
+      InputSecurity<string>
+    >();
+    expectTypeOf<{ type: "oauth2" }>().toExtend<OAuth2Security<string>>();
+    expectTypeOf<{
+      type: "openid";
+      url: string;
+    }>().toEqualTypeOf<OpenIdSecurity>();
+  });
+
   describe("getSecurityNames", () => {
     test("should return empty set for empty containers", () => {
       expect(getSecurityNames([], "header")).toHaveProperty("size", 0);

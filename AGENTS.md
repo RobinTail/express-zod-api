@@ -60,6 +60,7 @@ See `src/index.ts` for the complete public API exports.
 - **`express-zod-api/src/routing.ts`** — Core routing logic
 - **`express-zod-api/src/testing.ts`** — Test utilities: `testEndpoint` and `testMiddleware` are public, others internal
 - **`express-zod-api/tests/express-mock.ts`** — Express mocking for tests
+- **`express-zod-api/tests/peers-mock.ts`** — Mocks for compression, cookie-parser, express-fileupload, express-rate-limit
 - **`migration/index.ts`** — Migration ESLint rules
 - **`CHANGELOG.md`** — Version history and breaking changes
 
@@ -84,16 +85,18 @@ All properties of publicly available entities (exposed via `index.ts`) must have
 - **`@default`**: Default value (required for optional properties)
 - **`@example`**: Example value (required for literal types, one per variant)
 
-Each directive should aim to fit on one line:
+Each directive should aim to fit on one line. Several directives should be placed in a single multi-line comment:
 
 ```typescript
 interface SampleInterface {
   /** @desc Enables certain feature. */
   sampleRequiredProperty: boolean | SampleOptions;
-  /** @desc Controls another feature. */
-  /** @default true */
-  /** @example true — leads to one thing */
-  /** @example false — leads to another thing */
+  /**
+   * @desc Controls another feature.
+   * @default true
+   * @example true — leads to one thing
+   * @example false — leads to another thing
+   * */
   sampleOptionalProperty?: boolean;
 }
 ```
@@ -210,7 +213,7 @@ Markdown files should avoid `---` horizontal rule separators.
 
 ### 13. TypeScript Generators Policy
 
-For generating TypeScript code, prefer using helpers from `TypescriptAPI` class over direct factory methods. Native
+For generating TypeScript code, prefer using helpers from `typescript-api.ts` over direct factory methods. Native
 factory methods have verbose APIs with many redundant arguments.
 
 Files that generate TypeScript code:
@@ -223,16 +226,15 @@ Files that generate TypeScript code:
 **Examples**: Use these helpers instead of verbose factory calls:
 
 ```typescript
-// Use TypescriptAPI methods:
-api.makeId("User");
-api.makeParam("name", { type: "string" });
-api.makeConst("count", api.literally(0));
-api.makeInterface("User", [api.makeInterfaceProp("name", "string")]);
+// Use helpers:
+makeId("User");
+literally(0);
+makeInterfaceProp("name", typeNode);
 
 // Avoid native factory calls:
 ts.factory.createIdentifier("User");
-ts.factory.createParameterDeclaration();
-ts.factory.createVariableStatement();
+ts.factory.createNumericLiteral(0);
+ts.factory.createPropertySignature();
 ```
 
 ### 14. Performance Priority

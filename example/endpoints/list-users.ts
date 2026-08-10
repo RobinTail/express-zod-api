@@ -20,6 +20,7 @@ const users = [
  * */
 export const listUsersEndpoint = arrayRespondingFactory.build({
   tag: "users",
+  method: "query",
   input: z.object({
     roles: z.array(roleSchema).optional(),
   }),

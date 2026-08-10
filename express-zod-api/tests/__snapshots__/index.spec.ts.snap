@@ -2,8 +2,6 @@
 
 exports[`Index Entrypoint > exports > BuiltinLogger should have certain value 1`] = `[Function]`;
 
-exports[`Index Entrypoint > exports > Documentation should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > DocumentationError should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > EndpointsFactory should have certain value 1`] = `[Function]`;
@@ -11,8 +9,6 @@ exports[`Index Entrypoint > exports > EndpointsFactory should have certain value
 exports[`Index Entrypoint > exports > EventStreamFactory should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > InputValidationError should have certain value 1`] = `[Function]`;
-
-exports[`Index Entrypoint > exports > Integration should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > Middleware should have certain value 1`] = `[Function]`;
 
@@ -39,11 +35,15 @@ exports[`Index Entrypoint > exports > arrayResultHandler should have certain val
 
 exports[`Index Entrypoint > exports > attachRouting should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint > exports > createApiResponse should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint > exports > createCacheMiddleware should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createConfig should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createCookieMiddleware should have certain value 1`] = `[Function]`;
+
+exports[`Index Entrypoint > exports > createRateLimitMiddleware should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createServer should have certain value 1`] = `[Function]`;
 
@@ -86,13 +86,14 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "Middleware",
   "createCookieMiddleware",
   "createCacheMiddleware",
+  "createRateLimitMiddleware",
   "ResultHandler",
   "defaultResultHandler",
   "arrayResultHandler",
+  "createApiResponse",
   "ServeStatic",
   "createServer",
   "attachRouting",
-  "Documentation",
   "DocumentationError",
   "RoutingError",
   "OutputValidationError",
@@ -100,7 +101,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "MissingPeerError",
   "testEndpoint",
   "testMiddleware",
-  "Integration",
   "EventStreamFactory",
   "ez",
 ]

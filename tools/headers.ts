@@ -1,5 +1,5 @@
 import { writeFile } from "node:fs/promises";
-import { format } from "prettier";
+import { format } from "oxfmt";
 import {
   getWellKnownHeaders,
   wellKnownHeadersLastUpdated,
@@ -15,14 +15,16 @@ const banner =
 const existingNames = getWellKnownHeaders();
 
 const writeDest = async (at: Date) => {
-  const tsCode = await format(
-    `${banner}\n` +
-      `let cache: Set<string>;\n\n` +
-      `export const wellKnownHeadersLastUpdated = "${at.toISOString()}";\n\n` +
-      `export const getWellKnownHeaders = () =>\n` +
-      `  (cache ??= new Set(${JSON.stringify(Array.from(existingNames).sort(), undefined, 2)}));\n`,
-    { filepath: dest },
-  );
+  const tsCode = (
+    await format(
+      dest,
+      `${banner}\n` +
+        `let cache: Set<string>;\n\n` +
+        `export const wellKnownHeadersLastUpdated = "${at.toISOString()}";\n\n` +
+        `export const getWellKnownHeaders = () =>\n` +
+        `  (cache ??= new Set(${JSON.stringify(Array.from(existingNames).sort(), undefined, 2)}));\n`,
+    )
+  ).code;
   await writeFile(dest, tsCode, "utf-8");
 };
 
@@ -32,14 +34,16 @@ const writeExceptions = async () => {
     (key) =>
       `"${key}": { proof: ${JSON.stringify(responseOnlyHeaders[key]!.proof)}, reason: ${JSON.stringify(responseOnlyHeaders[key]!.reason)} },`,
   );
-  const tsCode = await format(
-    `${banner}\n` +
-      "export const responseOnlyHeaders: " +
-      "Record<string, { proof: string; reason: string }> = {\n" +
-      entries.join("\n") +
-      "\n};\n",
-    { filepath: exceptionsDest },
-  );
+  const tsCode = (
+    await format(
+      exceptionsDest,
+      `${banner}\n` +
+        "export const responseOnlyHeaders: " +
+        "Record<string, { proof: string; reason: string }> = {\n" +
+        entries.join("\n") +
+        "\n};\n",
+    )
+  ).code;
   await writeFile(exceptionsDest, tsCode, "utf-8");
 };
 
@@ -82,8 +86,7 @@ const newHeaders = allHeaders.filter(
 );
 
 if (newHeaders.length === 0) {
-  console.info("No new headers found, updating timestamp");
-  await writeDest(state);
+  console.info("No new headers found.");
   process.exit(0);
 }
 

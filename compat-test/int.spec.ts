@@ -1,12 +1,10 @@
-import { Integration } from "express-zod-api";
+import { Integration } from "express-zod-api/integration";
 import { describe, test, expect } from "vitest";
 
 describe("Integration", () => {
-  test("should work with minimum supported TypeScript", async () => {
+  test("should work with minimum supported TypeScript", () => {
     expect(
-      (
-        await Integration.create({ config: { cors: false }, routing: {} })
-      ).print()
+      new Integration({ config: { cors: false }, routing: {} }).print(),
     ).toContain("export class Client");
   });
 });

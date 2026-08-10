@@ -1,6 +1,219 @@
 # Changelog
 
+## Version 29
+
+### v29.2.1
+
+- Tiny performance tuning for self-diagnostics at startup (development mode only).
+
+### v29.2.0
+
+- Added support for the `oxfmt` formatter in `Integration::printFormatted()`:
+  - The generator also tries `oxfmt` after `prettier` when `oxfmt` is installed.
+
+### v29.1.2
+
+- Fixed the generated Documentation having `composition: "components"`:
+  - For routes sharing same input schema but having differed path parameters;
+  - The generator produced a single body component referenced by both operations;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v29.1.1
+
+- Fixed an issue for path parameters having `.optional()` schema:
+  - Since it's invalid, according to the OpenAPI specification, those would be depicted as required;
+  - The self-diagnostic will now report the issue with a warning message (development mode only);
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v29.1.0
+
+- This version checks that query and path parameters have acceptable input schema:
+  - Those parameters are in general expected to be strings or coerced primitives that could accept strings;
+  - Query parameters can also be parsed as arrays of strings or objects having string properties:
+    - That depends on `queryParser` config option;
+  - It's recommended to use `z.string().transform()` schema to handle numbers and booleans in params;
+  - Alternatively, you can use `z.coerce` and `z.preprocess`;
+  - The check prints a warning message, runs only at startup and only in development mode;
+  - Suggested by [@marco-carvalho](https://github.com/marco-carvalho).
+
+```ts
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  "/v1/users/:groupId": factory.build({
+    input: z.object({
+      // path parameter is originally a string:
+      groupId: z.string().transform((id) => parseInt(id, 10)),
+      // query parser accepts arrays of strings:
+      roleIds: z
+        .array(z.string())
+        .transform((ids) => ids.map((id) => parseInt(id, 10))),
+    }),
+  }),
+};
+```
+
+### v29.0.1
+
+- Minor performance tuning for `Documentation` generator:
+  - Collecting security headers and cookie names only when the corresponding input sources are enabled;
+  - Reduced some calculations required to depict request body and parameters.
+- Deprecating the `DocumentationError` export from `express-zod-api`:
+  - This export will be removed in the next major version;
+  - Import it from `express-zod-api/documentation` subpath instead.
+
+### v29.0.0
+
+- Supported Node.js versions: `^22.19.0 || ^24.11.0 || ^26.0.0`;
+- Major changes to the package distribution:
+  - `Documentation` and `Depicter` type moved to the `express-zod-api/documentation` subpath;
+  - `Integration` and `Producer` type moved to the `express-zod-api/integration` subpath;
+  - Several types and interfaces are no longer exposed:
+    - `CommonConfig`, `AppConfig`, `ServerConfig` — use `createConfig()` instead;
+    - `ApiResponse` — use `createApiResponse()` instead (new);
+    - `CacheControl` and `CachePolicy` — use `createCacheMiddleware()` or `EndpointsFactory::useCacheMiddleware()`;
+    - `FlatObject`, `IOSchema` and every type ending with `Security`;
+    - The public nature of these types was a workaround for user-side type declarations, but it's solved differently.
+- Breaking change to the `cors` config option:
+  - Changed from `boolean | HeadersProvider` to `boolean | RequestHandler`;
+  - You can now use the well-known `cors` package or pass a conventional `RequestHandler` directly.
+- Body parsers are now applied globally rather than per-endpoint (`createServer` experience only):
+  - Endpoints can accept requests in different content types (e.g., either JSON or URL-encoded body);
+  - The `Documentation` generator continues to guess the desired request type from the input schema;
+  - Parsers retain the ability for configuration via `jsonParser`, `formParser`, and `rawParser` config options;
+  - If using `attachRouting()` in a DIY server, parsers have to be installed manually.
+- Potentially breaking changes to the server lifecycle hooks:
+  - The hooks (`beforeRouting` and `afterRouting` config options) are no longer async;
+  - `beforeRouting` now runs after the installation of globally enabled parsers;
+  - Added new `beforeParsers` hook that runs before all parsers are installed.
+- The `createServer()` function is now synchronous — that should simplify the daily routines for beginners;
+- Added HTTP QUERY method support (RFC 10008):
+  - The QUERY method is like GET but with a body — safe, idempotent, and cacheable;
+  - Default input sources for QUERY: `["query", "body", "params"]` (from the lowest priority to highest);
+  - Supported by `Integration` and `Documentation` generators.
+- Changes to `Documentation`:
+  - `serverUrl` constructor option renamed to `server` and now also accepts OpenAPI's ServerObject;
+  - `title` option and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
+  - Now produces OpenAPI 3.2.0 with better SSE support and other features.
+- Changes to `Integration`:
+  - The static async method `create()` removed — use `new Integration()` instead;
+  - Removed `typescript` option from constructor — now imported statically;
+  - Generated type for `ez.buffer()` is now `Blob` instead of `Buffer` (which didn't exist in browser environments);
+  - The generated Client now excludes cookie-based security fields from input types (using `Omit`);
+  - The `Implementation` type requires `ctx` to be an object, the default one has `override` method for customizations;
+  - The default `Client` Implementation got improved response parsing and now supports `Blob` in request and response;
+  - The default `Client` Implementation now also supports uploads from the properties assigned with `File` or `Blob`;
+  - Both `Client` and `Subscription` delegate cookies handling (credentials) to the browser when supported;
+  - Added `hasCredentials` — an explicit declaration that the API supports credentialed CORS.
+- Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
+
+```diff
+- import { Integration, Documentation, type Producer, type Depicter } from "express-zod-api";
++ import { Integration, type Producer } from "express-zod-api/integration";
++ import { Documentation, type Depicter } from "express-zod-api/documentation";
+
+  const config = createConfig({
+-   cors: () => ({ origin: "https://example.com" }),
++   cors: cors({ origin: "https://example.com" }), // import cors from "cors"
+  });
+- await Integration.create({});
++ new Integration({});
+- const {} = await createServer({});
++ const {} = createServer({});
+  new Documentation({
++   info: {
+      title: "Sample API",
+      version: "1.2.3",
++   },
+-   serverUrl: "https://example.com",
++   server: "https://example.com",
+  });
+```
+
 ## Version 28
+
+### v28.7.11
+
+- Added missing path params check to the Documentation generator:
+  - An Endpoint assigned to `get /users/:id` must declare the `id` property on the `input` schema;
+  - Similar check is already implemented in runtime (development mode only);
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.10
+
+- Fixed issue for routes having differently named path params:
+  - In case of same method it will now always throw a RoutingError:
+    - Example: having both `get /items/:id` and `get /items/:slug` routes.
+  - If methods are different, Documentation generator will throw `DocumentationError`:
+    - Example: OpenAPI standard does not allow having both `get /users/:id` and `delete /users/:userId`;
+    - See https://spec.openapis.org/oas/v3.1.0#paths-object for details.
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.9
+
+- Fixes the issue where the same `.meta({ id })` could be used on different schemas:
+  - Zod 4.3 removed the `id` uniqueness constraint, but the `Documentation` generator needs it for making references;
+  - The Documentation generator will now throw a `DocumentationError` if it finds the same `id` on different schemas;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.8
+
+- Fixes component duplication in the generated Documentation:
+  - When a schema with `.meta({ id })` is reused across endpoints with `composition: "components"`;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.7
+
+- Fixes an issue where an empty path could be emitted for the root route by Documentation instead of `/`:
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
+### v28.7.6
+
+- Added well-known header, recognized by Documentation generator: `want-unencoded-digest`.
+
+### v28.7.5
+
+- Small performance improvement for startup and Documentation generator (cache for request type resolution).
+
+### v28.7.4
+
+- Centralized the `ResultHandler` error handling by `AbstractResultHandler::execute()`:
+  - Last Resort Handler is now an internal static method of the abstract class;
+  - When `errorHandler` fails to process a routing error (Not found) it's now also handled by the Last Resort Handler;
+- Added an error handling diagram to the documentation in the Readme file.
+
+### v28.7.3
+
+- Several minor improvements to the `gracefulShutdown` feature:
+  - Ensured a single graceful shutdown event listener per signal on the process;
+  - Handling potential errors thrown from syncronous `beforeExit` hooks and ensured the hooks run only once.
+
+### v28.7.2
+
+- Several minor memory optimizations:
+  - Ensured a single deprecation event listener on the process;
+  - When `gracefulShutdown` is enabled, destroying broken sockets immediately (edge case);
+  - For SSE endpoints, removing the stream ensuring timer when the connection is closed.
+
+### v28.7.1
+
+- Fix: supporting the latest versions of `express-rate-limit` (v8) for the rate limiting feature.
+
+### v28.7.0
+
+- Added rate limiting support:
+  - Requires `express-rate-limit` — new optional peer dependency;
+  - Added the `createRateLimitMiddleware()` method and `EndpointsFactory::useRateLimit()` shorthand;
+  - When the limit is exceeded, the Middleware throws a `429` HTTP error, handled by your ResultHandler;
+  - The middleware provides `rateLimit` property to the context with the current rate limit info (`limit`, `used`,
+    `remaining`, `resetTime`) and the limiter API (`getKey()` and `resetKey()` methods) for programmatic management.
+
+### v28.6.0
+
+- Changes to the `Integration` generator:
+  - The `typescript` option is no longer required for constructor;
+  - `Integration.create()` is now deprecated — use `new Integration()` instead;
+  - This is possible thanks to the `require(ESM)` feature, available on all supported Node.js versions;
 
 ### v28.5.0
 
@@ -4198,9 +4411,7 @@ import { z } from "express-zod-api";
 
 const endpoint = endpointsFactory.build({
   input: z
-    .object({
-      /* ... */
-    })
+    .object({/* ... */})
     .refine(() => true)
     .refine(() => true)
     .refine(() => true),
@@ -4459,9 +4670,7 @@ const myMiddleware = createMiddleware({
     },
   },
   input: z.object({}),
-  middleware: async () => ({
-    /* ... */
-  }),
+  middleware: async () => ({/* ... */}),
 });
 
 // example endpoint
@@ -4470,9 +4679,7 @@ const myEndpoint = defaultEndpointsFactory.addMiddleware(myMiddleware).build({
   method: "post",
   input: z.object({}),
   output: z.object({}),
-  handler: async () => ({
-    /* ... */
-  }),
+  handler: async () => ({/* ... */}),
 });
 ```
 
@@ -5404,15 +5611,11 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
   input: z.object({
     avatar: z.upload(),
   }),
-  output: z.object({
-    /* ... */
-  }),
+  output: z.object({/* ... */}),
   handler: async ({ input: { avatar } }) => {
     // avatar: {name, mv(), mimetype, encoding, data, truncated, size, etc}
     // avatar.truncated is true on failure
-    return {
-      /* ... */
-    };
+    return {/* ... */};
   },
 });
 ```
@@ -5646,15 +5849,11 @@ import { EndpointOutput } from "express-zod-api";
 
 const myEndpointV1 = endpointsFactory.build({
   method: "get",
-  input: z.object({
-    /* ... */
-  }),
+  input: z.object({/* ... */}),
   output: z.object({
     name: z.string(),
   }),
-  handler: async () => ({
-    /* ... */
-  }),
+  handler: async () => ({/* ... */}),
 });
 type MyEndpointOutput = EndpointOutput<typeof myEndpointV1>; // => { name: string }
 
@@ -5663,15 +5862,11 @@ import { defaultEndpointsFactory, EndpointResponse } from "express-zod-api";
 
 const myEndpointV2 = defaultEndpointsFactory.build({
   method: "get",
-  input: z.object({
-    /* ... */
-  }),
+  input: z.object({/* ... */}),
   output: z.object({
     name: z.string(),
   }),
-  handler: async () => ({
-    /* ... */
-  }),
+  handler: async () => ({/* ... */}),
 });
 type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the following type:
 //  {
@@ -5685,13 +5880,9 @@ type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the follo
 
 ```ts
 // before
-new OpenAPI({
-  /* ... */
-}).builder.getSpecAsYaml();
+new OpenAPI({/* ... */}).builder.getSpecAsYaml();
 // after
-new OpenAPI({
-  /* ... */
-}).getSpecAsYaml();
+new OpenAPI({/* ... */}).getSpecAsYaml();
 ```
 
 ```ts
@@ -5716,12 +5907,7 @@ const myResultHandlerV2 = createResultHandler({
       }),
       ["mime/type1", "mime/type2"], // optional, default: application/json
     ),
-  getNegativeResponse: () =>
-    createApiResponse(
-      z.object({
-        /* ... */
-      }),
-    ),
+  getNegativeResponse: () => createApiResponse(z.object({/* ... */})),
   handler: ({ error, input, output, request, response, logger }) => {
     /* ... */
   },

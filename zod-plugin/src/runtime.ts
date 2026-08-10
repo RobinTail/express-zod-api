@@ -8,8 +8,7 @@ import {
 } from "./meta";
 import { getClasses, getPackages } from "./packages";
 
-// eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN
-const pluginFlag = Symbol.for(process.env.TSDOWN_SELF!);
+const pluginFlag = Symbol.for(import.meta.TSDOWN_SELF);
 
 if (!(pluginFlag in globalThis)) {
   (globalThis as Record<symbol, unknown>)[pluginFlag] = true;

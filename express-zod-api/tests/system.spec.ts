@@ -16,10 +16,11 @@ import {
 } from "../src";
 import { givePort } from "../../tools/ports";
 import { setTimeout } from "node:timers/promises";
+import { runtime } from "../src/common-helpers";
 
-describe("App in production mode", async () => {
-  vi.stubEnv("TSDOWN_STATIC", "production");
+describe("App in production mode", () => {
   vi.stubEnv("NODE_ENV", "production");
+  runtime._cache = undefined;
   const port = givePort();
   const logger = new BuiltinLogger({ level: "silent" });
   const infoMethod = vi.spyOn(logger, "info");
@@ -135,7 +136,7 @@ describe("App in production mode", async () => {
     "post /v1/upload": uploadEndpoint,
   };
   vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
-  const beforeExit = vi.fn();
+  const beforeExit = vi.fn().mockThrowOnce("failure resistant");
   const config = createConfig({
     http: { listen: port },
     compression: { threshold: 1 },
@@ -176,13 +177,16 @@ describe("App in production mode", async () => {
   });
   const {
     servers: [server],
-  } = await createServer(config, routing);
+  } = createServer(config, routing);
   expect(server).toBeTruthy();
-  await vi.waitFor(() => assert(server!.listening), { timeout: 1e4 });
-  expect(warnMethod).toHaveBeenCalledWith(
-    "DeprecationError (express): Sample deprecation message",
-    expect.any(Array), // stack
-  );
+
+  beforeAll(async () => {
+    await vi.waitFor(() => assert(server!.listening), { timeout: 1e4 });
+    expect(warnMethod).toHaveBeenCalledWith(
+      "DeprecationError (express): Sample deprecation message",
+      expect.any(Array), // stack
+    );
+  });
 
   afterAll(async () => {
     server!.close();

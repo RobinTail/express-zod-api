@@ -6,8 +6,8 @@ import {
   testMiddleware,
   EventStreamFactory,
   EndpointsFactory,
-  type FlatObject,
 } from "../src";
+import type { FlatObject } from "../src/common-helpers";
 import {
   type Emitter,
   ensureStream,
@@ -22,6 +22,14 @@ import {
   makeResponseMock,
 } from "../src/testing";
 import { AbstractEndpoint } from "../src/endpoint";
+
+const useFakeTimers = () => {
+  vi.useFakeTimers();
+  return {
+    [Symbol.dispose]: () => void vi.useRealTimers(),
+    shift: vi.advanceTimersByTime.bind(vi),
+  };
+};
 
 describe("SSE", () => {
   describe("makeEventSchema()", () => {
@@ -110,6 +118,20 @@ describe("SSE", () => {
       requestMock.emit("close");
       expect(signal?.aborted).toBeTruthy();
     });
+
+    test("should clear the stream timeout when request closes before timeout fires", async () => {
+      using timers = useFakeTimers();
+      const middleware = makeMiddleware({ test: z.string() });
+      const { requestMock, responseMock, output } = await testMiddleware({
+        middleware,
+      });
+      expect(output.signal?.aborted).toBeFalsy();
+      expect(responseMock.headersSent).toBeFalsy();
+      requestMock.emit("close");
+      expect(output.signal?.aborted).toBeTruthy();
+      timers.shift(1e4);
+      expect(responseMock.headersSent).toBeFalsy();
+    });
   });
 
   describe("makeResultHandler()", () => {
@@ -118,7 +140,7 @@ describe("SSE", () => {
       { single: z.string() },
     ])(
       "should create ResultHandler describing possible events and handling generic errors %#",
-      (events) => {
+      async (events) => {
         const resultHandler = makeResultHandler(events);
         expect(resultHandler).toBeInstanceOf(ResultHandler);
         expect(
@@ -132,7 +154,7 @@ describe("SSE", () => {
           request: makeRequestMock(),
           logger: makeLoggerMock(),
         };
-        resultHandler.execute({
+        await resultHandler.execute({
           ...commons,
           output: {},
           response: positiveResponse,
@@ -142,7 +164,7 @@ describe("SSE", () => {
         expect(positiveResponse._getData()).toBe("");
         expect(positiveResponse.writableEnded).toBeTruthy();
         const negativeResponse = makeResponseMock();
-        resultHandler.execute({
+        await resultHandler.execute({
           ...commons,
           output: null,
           response: negativeResponse,

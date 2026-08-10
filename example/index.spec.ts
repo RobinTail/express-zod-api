@@ -64,7 +64,9 @@ describe("Example", async () => {
       });
     });
 
-    test("Should handle valid PATCH request", async ({ signal }) => {
+    test("Should handle valid PATCH request with rate limit headers", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
         signal,
         method: "PATCH",
@@ -79,6 +81,10 @@ describe("Example", async () => {
         }),
       });
       expect(response.status).toBe(200);
+      expect(response.headers.get("X-RateLimit-Limit")).toBe("10");
+      expect(
+        Number(response.headers.get("X-RateLimit-Remaining")),
+      ).toBeGreaterThanOrEqual(5);
       const json = await response.json();
       expect(json).toMatchObject({
         status: "success",
@@ -107,16 +113,32 @@ describe("Example", async () => {
       expect(true).toBeTruthy();
     });
 
-    test("Should respond with array (legacy API ResultHandler)", async ({
-      signal,
-    }) => {
-      const response = await fetch(`http://localhost:${port}/v1/user/list`, {
-        signal,
-      });
-      expect(response.status).toBe(200);
-      const json = await response.json();
-      expect(json).toMatchSnapshot();
-    });
+    test.for([
+      {
+        contentType: "application/json",
+        body: JSON.stringify({ roles: ["manager", "operator"] }),
+      },
+      {
+        contentType: "application/x-www-form-urlencoded",
+        body: new URLSearchParams([
+          ["roles", "manager"],
+          ["roles", "operator"],
+        ]).toString(),
+      },
+    ])(
+      "Should respond with array for $contentType",
+      async ({ contentType, body }, { signal }) => {
+        const response = await fetch(`http://localhost:${port}/v1/user/list`, {
+          method: "QUERY",
+          signal,
+          headers: { "Content-Type": contentType },
+          body,
+        });
+        expect(response.status).toBe(200);
+        const json = await response.json();
+        expect(json).toMatchSnapshot();
+      },
+    );
 
     test("Should respond with paginated list (ez.paginated)", async ({
       signal,
@@ -262,8 +284,7 @@ describe("Example", async () => {
           body: data,
           headers: {
             Cookie:
-              "session=j%3A%7B%22token%22%3A%22553280ce-ab20-4481-a9dc-fd3fc4f6759c%22%7D; " +
-              "Path=/; HttpOnly; SameSite=Lax",
+              "session=j%3A%7B%22token%22%3A%22553280ce-ab20-4481-a9dc-fd3fc4f6759c%22%7D;",
           },
         },
       );
@@ -281,8 +302,6 @@ describe("Example", async () => {
             num: "123",
             obj: { some: "thing" },
             str: "test string value",
-            Path: "/", // from cookie
-            SameSite: "Lax",
             session: { token: "553280ce-ab20-4481-a9dc-fd3fc4f6759c" },
           },
           size: 48687,
@@ -378,8 +397,11 @@ describe("Example", async () => {
         body: '{"name": "Test', // no closing bracket
       });
       expect(response.status).toBe(400); // Issue #907
-      expect(response.headers.get("access-control-allow-methods")).toBe(
-        "POST, OPTIONS", // issue #2706
+      // Issue #2706: Global CORS layer runs before parsers, so these are preserved in error
+      // responses even though the route-level allow-methods never fires
+      expect(response.headers.get("access-control-allow-origin")).toBe("*");
+      expect(response.headers.get("access-control-allow-headers")).toBe(
+        "content-type",
       );
       const json = await response.json();
       expect(json).toMatchSnapshot({
@@ -579,8 +601,11 @@ describe("Example", async () => {
         { signal, method: "POST", body: data },
       );
       expect(response.status).toBe(413);
-      expect(response.headers.get("access-control-allow-methods")).toBe(
-        "POST, OPTIONS", // issue #2706
+      // Issue #2706: Global CORS layer runs before parsers, so these are preserved in error
+      // responses even though the route-level allow-methods never fires
+      expect(response.headers.get("access-control-allow-origin")).toBe("*");
+      expect(response.headers.get("access-control-allow-headers")).toBe(
+        "content-type",
       );
       const json = await response.json();
       expect(json).toMatchSnapshot();
@@ -599,7 +624,8 @@ describe("Example", async () => {
     });
   });
 
-  describe("OpenAPI Documentation", () => {
+  /** @todo temporary replaced with oas.yml workflow, restore when the validator supports 3.2 */
+  describe.skip("OpenAPI Documentation", () => {
     test.extend("response", async ({ signal }) => {
       const data = await readFile("example.documentation.yaml", "utf-8");
       try {
@@ -677,6 +703,78 @@ describe("Example", async () => {
       });
       expect(response).toBeUndefined();
       expectTypeOf(response).toBeUndefined();
+    });
+
+    test("can send Blob body", async () => {
+      const response = await client.provide(
+        "post /v1/avatar/raw",
+        new Blob(["test"], { type: "image/svg+xml" }),
+      );
+      expect(response).toEqual({ status: "success", data: { length: 4 } });
+    });
+
+    test("can parse as Blob", async () => {
+      const response = await client.provide("get /v1/avatar/stream", {
+        userId: "10",
+      });
+      expect(response instanceof Blob).toBe(true);
+    });
+
+    test("can upload a file", async () => {
+      const response = await client.provide(
+        "post /v1/avatar/upload",
+        { avatar: new File(["test"], "test.svg", { type: "image/svg+xml" }) },
+        {
+          override: ({ headers, ...rest }) => ({
+            ...rest,
+            headers: {
+              ...headers,
+              Cookie:
+                "session=j%3A%7B%22token%22%3A%22553280ce-ab20-4481-a9dc-fd3fc4f6759c%22%7D;",
+            },
+          }),
+        },
+      );
+      expect(response.status).toBe("success");
+    });
+  });
+
+  describe("Rate limiting", () => {
+    test("Should rate limit the update endpoint after exceeding max requests", async ({
+      signal,
+    }) => {
+      const makeValidPatchRequest = () =>
+        fetch(`http://localhost:${port}/v1/user/50`, {
+          signal,
+          method: "PATCH",
+          headers: {
+            token: "456",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            key: "123",
+            name: "John Doe",
+            birthday: "1974-10-28",
+          }),
+        });
+      let response: Response;
+      for (let i = 0; i < 10; i++) {
+        response = await makeValidPatchRequest();
+        if (response.status === 429) break;
+      }
+      expect(response!.status).toBe(429);
+      expect(response!.headers.get("X-RateLimit-Limit")).toBe("10");
+      expect(
+        Number(response!.headers.get("X-RateLimit-Remaining")),
+      ).toBeLessThanOrEqual(0);
+      expect(
+        Number(response!.headers.get("X-RateLimit-Reset")),
+      ).toBeGreaterThan(Date.now() / 1000);
+      const json = await response!.json();
+      expect(json).toMatchObject({
+        status: "error",
+        error: { message: "Too many requests, please try again later." },
+      });
     });
   });
 });
