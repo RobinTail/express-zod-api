@@ -66,7 +66,7 @@ const moveTargets = new Map<string, string[]>([
   ["express-zod-api/documentation", ["Documentation", "Depicter"]],
 ]);
 
-const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0]}`;
+const ruleName = `v${import.meta.TSDOWN_VERSION.split(".")[0]}`;
 
 const theRule: Rule = {
   meta: {

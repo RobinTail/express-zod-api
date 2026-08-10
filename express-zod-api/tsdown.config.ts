@@ -2,6 +2,13 @@ import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
 import { fixDtsPlugin } from "../tools/fixDts.ts";
 
+declare global {
+  interface ImportMeta {
+    TSDOWN_SELF: string;
+    TSDOWN_BUILD: string;
+  }
+}
+
 export default defineConfig({
   entry: {
     index: "src/index.ts",
@@ -22,8 +29,7 @@ export default defineConfig({
     tsconfig: "./tsconfig.build.json",
   },
   define: {
-    "process.env.TSDOWN_SELF": `"${manifest.name}"`, // used by localsID
-    "process.env.TSDOWN_BUILD": `"v${manifest.version}"`, // @since v25.0.0 is pure ESM
-    "process.env.TSDOWN_STATIC": `"static"`, // used by isProduction()
+    "import.meta.TSDOWN_SELF": `"${manifest.name}"`, // used by localsID
+    "import.meta.TSDOWN_BUILD": `"v${manifest.version}"`, // @since v25.0.0 is pure ESM
   },
 });

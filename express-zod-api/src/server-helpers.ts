@@ -10,8 +10,7 @@ import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
 import type { Server } from "node:net";
 
-// oxlint-disable-next-line eslint-js/no-restricted-syntax -- substituted by TSDOWN
-export const localsID = Symbol.for(process.env.TSDOWN_SELF!);
+export const localsID = Symbol.for(import.meta.TSDOWN_SELF);
 
 type EquippedRequest = Request<
   unknown,

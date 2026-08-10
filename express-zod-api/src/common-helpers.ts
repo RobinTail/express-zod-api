@@ -142,10 +142,14 @@ export const getTransformedType = R.tryCatch(
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
 
-export const isProduction = R.memoizeWith(
-  () => process.env.TSDOWN_STATIC as string, // oxlint-disable-line eslint-js/no-restricted-syntax -- substituted by TSDOWN
-  () => process.env.NODE_ENV === "production", // oxlint-disable-line eslint-js/no-restricted-syntax -- memoized
-);
+export const runtime = {
+  _cache: undefined as string | undefined,
+  get env() {
+    // oxlint-disable-next-line eslint-js/no-restricted-syntax -- cached
+    return (runtime._cache ??= process.env.NODE_ENV ?? "development");
+  },
+  get isProduction() { return runtime.env === "production"; }, // oxfmt-ignore
+};
 
 export const shouldHaveContent = (
   method: ClientMethod,
