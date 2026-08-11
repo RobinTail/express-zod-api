@@ -27,7 +27,7 @@ export type DiscriminatedResult =
       error: Error;
     };
 
-/** @throws ResultHandlerError when Result is an empty array */
+/** @throws ResultHandlerError when Result is an empty array or contains duplicate status codes */
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,
   {
