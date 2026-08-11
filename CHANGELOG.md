@@ -8,7 +8,7 @@
   - The option accepts a single status code or a list of them, like the ones of `ApiResponse`;
   - When the ResultHandler defines a single response schema, the Endpoint status code overrides the configured one;
   - When it defines distinct response schemas for different status codes, only the declared status codes are documented;
-  - Declaring a status code having no response schema in the multi-schema ResultHandler throws `EndpointResponseError`.
+  - Declaring a status code having no response schema in the multi-schema ResultHandler throws `ResultHandlerError`.
 
 ### v29.2.3
 

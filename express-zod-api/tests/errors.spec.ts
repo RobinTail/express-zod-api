@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  DocumentationError,
-  EndpointResponseError,
-  RoutingError,
-} from "../src";
+import { DocumentationError, RoutingError } from "../src";
 import {
   IOSchemaError,
   InputValidationError,
@@ -162,22 +158,6 @@ describe("Errors", () => {
       });
     },
   );
-
-  describe("EndpointResponseError", () => {
-    const error = new EndpointResponseError("test");
-
-    test("should be an instance of Error", () => {
-      expect(error).toBeInstanceOf(Error);
-    });
-
-    test("should have the name matching its class", () => {
-      expect(error.name).toBe("EndpointResponseError");
-    });
-
-    test("should have the message as assigned", () => {
-      expect(error.message).toBe("test");
-    });
-  });
 
   describe("MissingPeerError", () => {
     const error = new MissingPeerError("compression");

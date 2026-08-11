@@ -16,9 +16,9 @@ import {
 } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import {
-  EndpointResponseError,
   InputValidationError,
   OutputValidationError,
+  ResultHandlerError,
 } from "./errors";
 import { ezFormBrand } from "./form-schema";
 import type { IOSchema } from "./io-schema";
@@ -215,12 +215,14 @@ export class Endpoint<
     const covered = new Set(R.chain(({ statusCodes }) => statusCodes, matched));
     const uncovered = narrowed.filter((statusCode) => !covered.has(statusCode));
     if (uncovered.length) {
-      throw new EndpointResponseError(
-        `Endpoint declares status code${uncovered.length > 1 ? "s" : ""} ` +
-          `${uncovered.join(", ")} for its ${variant} responses, but the ResultHandler ` +
-          `defines response schema${responses.length > 1 ? "s" : ""} only for the status code` +
-          `${responses.length > 1 ? "s" : ""} ` +
-          `${R.chain(({ statusCodes }) => statusCodes, responses).join(", ")}.`,
+      throw new ResultHandlerError(
+        new Error(
+          `Endpoint declares status code${uncovered.length > 1 ? "s" : ""} ` +
+            `${uncovered.join(", ")} for its ${variant} responses, but the ResultHandler ` +
+            `defines response schema${responses.length > 1 ? "s" : ""} only for the status code` +
+            `${responses.length > 1 ? "s" : ""} ` +
+            `${R.chain(({ statusCodes }) => statusCodes, responses).join(", ")}.`,
+        ),
       );
     }
     return Object.freeze(matched);

@@ -1,15 +1,15 @@
 import { z } from "zod";
 import {
   EndpointsFactory,
-  EndpointResponseError,
   Middleware,
+  ResultHandler,
   defaultEndpointsFactory,
   defaultResultHandler,
   ez,
   testEndpoint,
-  ResultHandler,
 } from "../src";
 import { Endpoint } from "../src/endpoint";
+import { ResultHandlerError } from "../src/errors";
 
 describe("Endpoint", () => {
   describe(".methods", () => {
@@ -421,7 +421,7 @@ describe("Endpoint", () => {
         statusCode: [200, 204],
       });
       expect(() => endpoint.getResponses("positive")).toThrow(
-        EndpointResponseError,
+        ResultHandlerError,
       );
       expect(() => endpoint.getResponses("positive")).toThrow(/204/);
     });

@@ -21,7 +21,6 @@ export { ServeStatic } from "./serve-static";
 export { createServer, attachRouting } from "./server";
 export {
   DocumentationError, // @todo remove in v30
-  EndpointResponseError,
   RoutingError,
   OutputValidationError,
   InputValidationError,
