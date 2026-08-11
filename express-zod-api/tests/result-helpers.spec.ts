@@ -86,7 +86,11 @@ describe("Result helpers", () => {
             statusCodes: [200],
             mimeTypes: ["text/plain"],
           }),
-        ).toThrow(ResultHandlerError);
+        ).toThrow(
+          new ResultHandlerError(
+            new Error("The status code 200 is used by multiple response schemas."),
+          ),
+        );
       },
     );
   });

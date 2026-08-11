@@ -68,7 +68,7 @@ export const normalize = <A extends unknown[]>(
     );
     if (duplicated !== undefined) {
       const err = new Error(
-        `The status code ${duplicated} is used by more than one schema.`,
+        `The status code ${duplicated} is used by multiple response schemas.`,
       );
       throw new ResultHandlerError(err);
     }
