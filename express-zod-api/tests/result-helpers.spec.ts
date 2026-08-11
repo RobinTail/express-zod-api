@@ -88,7 +88,9 @@ describe("Result helpers", () => {
           }),
         ).toThrow(
           new ResultHandlerError(
-            new Error("The status code 200 is used by multiple response schemas."),
+            new Error(
+              "The status code 200 is used by multiple response schemas.",
+            ),
           ),
         );
       },
