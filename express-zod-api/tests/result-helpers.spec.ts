@@ -11,7 +11,7 @@ import {
 } from "../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../src/testing";
 import { runtime } from "../src/common-helpers";
-import type { ApiResponse } from "../src/api-response.ts";
+import type { ApiResponse } from "../src/api-response";
 
 describe("Result helpers", () => {
   describe("normalize()", () => {
