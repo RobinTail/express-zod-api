@@ -1,11 +1,7 @@
 import type { Request, Response } from "express";
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
-import {
-  isPositiveStatusCode,
-  type NormalizedResponse,
-  type ResponseVariant,
-} from "./api-response";
+import { type NormalizedResponse, type ResponseVariant } from "./api-response";
 import { findRequestTypeDefiningSchema } from "./deep-checks";
 import {
   type FlatObject,
@@ -15,11 +11,7 @@ import {
   isSchema,
 } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
-import {
-  InputValidationError,
-  OutputValidationError,
-  ResultHandlerError,
-} from "./errors";
+import { InputValidationError, OutputValidationError } from "./errors";
 import { ezFormBrand } from "./form-schema";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
@@ -185,47 +177,14 @@ export class Endpoint<
   /** @internal */
   public override getResponses(variant: ResponseVariant) {
     if (variant === "positive") this.#ensureOutputExamples();
-    const responses =
+    return Object.freeze(
       variant === "negative"
-        ? this.#def.resultHandler.getNegativeResponse()
-        : this.#def.resultHandler.getPositiveResponse(this.#def.outputSchema);
-    const declared = this.#def.statusCodes;
-    if (!declared) return Object.freeze(responses);
-    const narrowed = declared.filter((statusCode) =>
-      variant === "positive"
-        ? isPositiveStatusCode(statusCode)
-        : !isPositiveStatusCode(statusCode),
+        ? this.#def.resultHandler.getNegativeResponse(this.#def.statusCodes)
+        : this.#def.resultHandler.getPositiveResponse(
+            this.#def.outputSchema,
+            this.#def.statusCodes,
+          ),
     );
-    if (!narrowed.length) return Object.freeze(responses);
-    if (responses.length === 1) {
-      const response = responses[0]!; // ensured by the length check
-      return Object.freeze([
-        { ...response, statusCodes: narrowed as [number, ...number[]] },
-      ]);
-    }
-    const matched: NormalizedResponse[] = responses
-      .map(({ schema, mimeTypes, statusCodes }) => ({
-        schema,
-        mimeTypes,
-        statusCodes: statusCodes.filter((statusCode) =>
-          narrowed.includes(statusCode),
-        ) as [number, ...number[]],
-      }))
-      .filter(({ statusCodes }) => statusCodes.length > 0);
-    const covered = new Set(R.chain(({ statusCodes }) => statusCodes, matched));
-    const uncovered = narrowed.filter((statusCode) => !covered.has(statusCode));
-    if (uncovered.length) {
-      throw new ResultHandlerError(
-        new Error(
-          `Endpoint declares status code${uncovered.length > 1 ? "s" : ""} ` +
-            `${uncovered.join(", ")} for its ${variant} responses, but the ResultHandler ` +
-            `defines response schema${responses.length > 1 ? "s" : ""} only for the status code` +
-            `${responses.length > 1 ? "s" : ""} ` +
-            `${R.chain(({ statusCodes }) => statusCodes, responses).join(", ")}.`,
-        ),
-      );
-    }
-    return Object.freeze(matched);
   }
 
   /** @internal */

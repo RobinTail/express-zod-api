@@ -88,6 +88,48 @@ export const normalize = <A extends unknown[]>(
   return normalized;
 };
 
+/** @internal An internal helper applying the Endpoint-declared status codes to the normalized responses. */
+export const applyDeclaredStatusCodes = (
+  responses: NormalizedResponse[],
+  declared: ReadonlyArray<number> | undefined,
+  variant: ResponseVariant,
+): NormalizedResponse[] => {
+  if (!declared) return responses;
+  const narrowed = declared.filter((statusCode) =>
+    variant === "positive"
+      ? isPositiveStatusCode(statusCode)
+      : !isPositiveStatusCode(statusCode),
+  );
+  if (!narrowed.length) return responses;
+  if (responses.length === 1) {
+    const response = responses[0]!; // ensured by the length check
+    return [{ ...response, statusCodes: narrowed as [number, ...number[]] }];
+  }
+  const matched: NormalizedResponse[] = responses
+    .map(({ schema, mimeTypes, statusCodes }) => ({
+      schema,
+      mimeTypes,
+      statusCodes: statusCodes.filter((statusCode) =>
+        narrowed.includes(statusCode),
+      ) as [number, ...number[]],
+    }))
+    .filter(({ statusCodes }) => statusCodes.length > 0);
+  const covered = new Set(R.chain(({ statusCodes }) => statusCodes, matched));
+  const uncovered = narrowed.filter((statusCode) => !covered.has(statusCode));
+  if (uncovered.length) {
+    throw new ResultHandlerError(
+      new Error(
+        `Endpoint declares status code${uncovered.length > 1 ? "s" : ""} ` +
+          `${uncovered.join(", ")} for its ${variant} responses, but the ResultHandler ` +
+          `defines response schema${responses.length > 1 ? "s" : ""} only for the status code` +
+          `${responses.length > 1 ? "s" : ""} ` +
+          `${R.chain(({ statusCodes }) => statusCodes, responses).join(", ")}.`,
+      ),
+    );
+  }
+  return matched;
+};
+
 export const logServerError = (
   error: HttpError,
   logger: ActualLogger,

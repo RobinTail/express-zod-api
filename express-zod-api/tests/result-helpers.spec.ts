@@ -1,8 +1,14 @@
 import createHttpError from "http-errors";
 import { z } from "zod";
 import { InputValidationError, OutputValidationError } from "../src";
+import type {
+  ApiResponse,
+  NormalizedResponse,
+  ResponseVariant,
+} from "../src/api-response";
 import { ResultHandlerError } from "../src/errors";
 import {
+  applyDeclaredStatusCodes,
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
@@ -11,7 +17,6 @@ import {
 } from "../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../src/testing";
 import { runtime } from "../src/common-helpers";
-import type { ApiResponse, ResponseVariant } from "../src/api-response";
 
 describe("Result helpers", () => {
   describe("normalize()", () => {
@@ -90,6 +95,88 @@ describe("Result helpers", () => {
         );
       },
     );
+  });
+
+  describe("applyDeclaredStatusCodes()", () => {
+    const schema = z.string();
+
+    test("should return the responses unchanged when declared is undefined", () => {
+      const responses: NormalizedResponse[] = [
+        { schema, statusCodes: [200], mimeTypes: ["text/plain"] },
+      ];
+      expect(applyDeclaredStatusCodes(responses, undefined, "positive")).toBe(
+        responses,
+      );
+    });
+
+    test("should override the status codes of a single schema with the declared ones", () => {
+      expect(
+        applyDeclaredStatusCodes(
+          [{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }],
+          [201],
+          "positive",
+        ),
+      ).toEqual([{ schema, statusCodes: [201], mimeTypes: ["text/plain"] }]);
+    });
+
+    test("should consider only the status codes relevant to the variant", () => {
+      const responses: NormalizedResponse[] = [
+        { schema, statusCodes: [200], mimeTypes: ["text/plain"] },
+      ];
+      expect(
+        applyDeclaredStatusCodes(responses, [200, 400], "positive"),
+      ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+      expect(
+        applyDeclaredStatusCodes(responses, [200, 400], "negative"),
+      ).toEqual([{ schema, statusCodes: [400], mimeTypes: ["text/plain"] }]);
+    });
+
+    test("should keep the responses when the declared codes do not match the variant", () => {
+      const responses: NormalizedResponse[] = [
+        { schema, statusCodes: [400], mimeTypes: ["text/plain"] },
+      ];
+      expect(applyDeclaredStatusCodes(responses, [201], "negative")).toEqual(
+        responses,
+      );
+    });
+
+    test("should intersect multi-schema responses with the declared codes", () => {
+      const first = z.string();
+      const second = z.number();
+      expect(
+        applyDeclaredStatusCodes(
+          [
+            { schema: first, statusCodes: [200], mimeTypes: ["text/plain"] },
+            { schema: second, statusCodes: [400], mimeTypes: ["text/plain"] },
+          ],
+          [200],
+          "positive",
+        ),
+      ).toEqual([
+        { schema: first, statusCodes: [200], mimeTypes: ["text/plain"] },
+      ]);
+    });
+
+    test("should throw when the declared codes are not covered by the multi-schema responses", () => {
+      expect(() =>
+        applyDeclaredStatusCodes(
+          [
+            {
+              schema: z.string(),
+              statusCodes: [200],
+              mimeTypes: ["text/plain"],
+            },
+            {
+              schema: z.number(),
+              statusCodes: [400],
+              mimeTypes: ["text/plain"],
+            },
+          ],
+          [201],
+          "positive",
+        ),
+      ).toThrow(ResultHandlerError);
+    });
   });
 
   describe("logServerError()", () => {

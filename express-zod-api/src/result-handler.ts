@@ -11,6 +11,7 @@ import { ResultHandlerError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import {
+  applyDeclaredStatusCodes,
   type DiscriminatedResult,
   type ResultSchema,
   ensureHttpError,
@@ -49,9 +50,14 @@ export type LazyResult<R extends Result, A extends unknown[] = []> = (
 export abstract class AbstractResultHandler {
   readonly #handler: Handler;
   /** @internal */
-  public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
+  public abstract getPositiveResponse(
+    output: IOSchema,
+    declared?: ReadonlyArray<number>,
+  ): NormalizedResponse[];
   /** @internal */
-  public abstract getNegativeResponse(): NormalizedResponse[];
+  public abstract getNegativeResponse(
+    declared?: ReadonlyArray<number>,
+  ): NormalizedResponse[];
   protected constructor(handler: Handler) {
     this.#handler = handler;
   }
@@ -117,13 +123,24 @@ export class ResultHandler<
   }
 
   /** @internal */
-  public override getPositiveResponse(output: IOSchema) {
-    return normalize(this.#positive, { variant: "positive", args: [output] });
+  public override getPositiveResponse(
+    output: IOSchema,
+    declared?: ReadonlyArray<number>,
+  ) {
+    return applyDeclaredStatusCodes(
+      normalize(this.#positive, { variant: "positive", args: [output] }),
+      declared,
+      "positive",
+    );
   }
 
   /** @internal */
-  public override getNegativeResponse() {
-    return normalize(this.#negative, { variant: "negative", args: [] });
+  public override getNegativeResponse(declared?: ReadonlyArray<number>) {
+    return applyDeclaredStatusCodes(
+      normalize(this.#negative, { variant: "negative", args: [] }),
+      declared,
+      "negative",
+    );
   }
 }
 
