@@ -45,21 +45,35 @@ export const normalize = <A extends unknown[]>(
     const err = new Error(`At least one ${variant} response schema required.`);
     throw new ResultHandlerError(err);
   }
-  return (Array.isArray(subject) ? subject : [subject]).map(
-    ({ schema, statusCode, mimeType }) => ({
-      schema,
-      statusCodes:
-        typeof statusCode === "number"
-          ? [statusCode]
-          : statusCode || fallback.statusCodes,
-      mimeTypes:
-        typeof mimeType === "string"
-          ? [mimeType]
-          : mimeType === undefined
-            ? fallback.mimeTypes
-            : mimeType,
-    }),
-  );
+  const normalized = (
+    Array.isArray(subject) ? subject : [subject]
+  ).map<NormalizedResponse>(({ schema, statusCode, mimeType }) => ({
+    schema,
+    statusCodes:
+      typeof statusCode === "number"
+        ? [statusCode]
+        : statusCode || fallback.statusCodes,
+    mimeTypes:
+      typeof mimeType === "string"
+        ? [mimeType]
+        : mimeType === undefined
+          ? fallback.mimeTypes
+          : mimeType,
+  }));
+  if (normalized.length > 1) {
+    const statusCodes = R.chain(R.prop("statusCodes"), normalized);
+    const duplicated = R.find(
+      (code) => statusCodes.indexOf(code) !== statusCodes.lastIndexOf(code),
+      statusCodes,
+    );
+    if (duplicated !== undefined) {
+      const err = new Error(
+        `The status code ${duplicated} is used by more than one schema.`,
+      );
+      throw new ResultHandlerError(err);
+    }
+  }
+  return normalized;
 };
 
 export const logServerError = (

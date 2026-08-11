@@ -1,6 +1,7 @@
 import createHttpError from "http-errors";
 import { z } from "zod";
 import { InputValidationError, OutputValidationError } from "../src";
+import { ResultHandlerError } from "../src/errors";
 import {
   ensureHttpError,
   getPublicErrorMessage,
@@ -10,6 +11,7 @@ import {
 } from "../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../src/testing";
 import { runtime } from "../src/common-helpers";
+import type { ApiResponse } from "../src/api-response.ts";
 
 describe("Result helpers", () => {
   describe("normalize()", () => {
@@ -67,6 +69,26 @@ describe("Result helpers", () => {
       });
       expect(typeof subject).toBe("function");
     });
+
+    test.each<ApiResponse<z.ZodType>[]>([
+      [{ schema: z.string() }, { schema: z.number() }], // both fall back to defaults
+      [
+        { schema: z.string(), statusCode: 200 },
+        { schema: z.number(), statusCode: [204, 200] }, // 200 is duplicated explicitly
+      ],
+    ])(
+      "should throw when same status code used by different schemas %#",
+      (...subject) => {
+        expect(() =>
+          normalize(subject, {
+            variant: "positive",
+            args: [],
+            statusCodes: [200],
+            mimeTypes: ["text/plain"],
+          }),
+        ).toThrow(ResultHandlerError);
+      },
+    );
   });
 
   describe("logServerError()", () => {
