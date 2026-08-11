@@ -2,6 +2,13 @@
 
 ## Version 29
 
+### v29.2.2
+
+- Fixed the bug where multiple response schemas could share the same status code in `ResultHandler` definition:
+  - Either when multiple entries omit the `statusCode` and fall back to defaults or when the codes explicitly overlap;
+  - That silently overwrote schemas in the generated `Documentation` and duplicated keys in the generated `Integration`;
+  - Now throws a `ResultHandlerError` when using the mentioned generators and at startup in development mode.
+
 ### v29.2.1
 
 - Tiny performance tuning for self-diagnostics at startup (development mode only).
