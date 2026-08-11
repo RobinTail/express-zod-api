@@ -405,6 +405,31 @@ describe("EndpointsFactory", () => {
       ).toEqualTypeOf<EmptyObject>();
       expect(endpoint.isDeprecated).toBe(true);
     });
+
+    test("should pass the single statusCode to the endpoint", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).build({
+        output: z.object({}),
+        handler: vi.fn(),
+        statusCode: 204,
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[204]]);
+    });
+
+    test("should pass the tuple of statusCodes to the endpoint", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).build({
+        output: z.object({}),
+        handler: vi.fn(),
+        statusCode: [201, 400],
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[201]]);
+      expect(
+        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[400]]);
+    });
   });
 
   describe(".buildVoid()", () => {
@@ -415,6 +440,16 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint.outputSchema).toMatchSnapshot();
       expectTypeOf(endpoint.outputSchema.shape).toExtend<EmptyObject>();
+    });
+
+    test("Should pass the statusCode option", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        handler: async () => {},
+        statusCode: 204,
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[204]]);
     });
   });
 });

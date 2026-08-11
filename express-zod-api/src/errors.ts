@@ -73,6 +73,11 @@ export class InputValidationError extends IOSchemaError {
   }
 }
 
+/** @desc An error related to the Endpoint status code declarations when the ResultHandler defines distinct response schemas */
+export class EndpointResponseError extends Error {
+  public override name = "EndpointResponseError";
+}
+
 /** @desc An error related to the execution or incorrect configuration of ResultHandler */
 export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";

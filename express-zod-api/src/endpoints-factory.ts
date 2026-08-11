@@ -68,6 +68,14 @@ interface BuildProps<
    * @see TagOverrides
    * */
   tag?: Tag | Tag[];
+  /**
+   * @desc The status code(s) specific to the Endpoint, overriding the ones configured by the ResultHandler.
+   * @desc If the ResultHandler defines distinct response schemas for different status codes,
+   *       only the declared status codes are documented.
+   * @example 204 — the Endpoint responds with "no content" instead of the default positive status code
+   * @example [200, 201] — the Endpoint responds with either of these positive status codes
+   * */
+  statusCode?: number | [number, ...number[]];
   /** @desc Marks the operation deprecated in the generated Documentation */
   deprecated?: boolean;
 }
@@ -186,6 +194,7 @@ export class EndpointsFactory<
     scope,
     tag,
     method,
+    statusCode,
     ...rest
   }: BuildProps<BIN, BOUT, IN, CTX, SCO>) {
     const { middlewares, resultHandler } = this;
@@ -207,6 +216,7 @@ export class EndpointsFactory<
       methods,
       getOperationId,
       inputSchema: makeFinalInputSchema(this.schema, input),
+      statusCodes: typeof statusCode === "number" ? [statusCode] : statusCode,
     });
   }
 

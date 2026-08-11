@@ -2,6 +2,14 @@
 
 ## Version 29
 
+### v29.3.0
+
+- Feature: New `statusCode` option in `BuildProps` for overriding the status codes configured by the ResultHandler:
+  - The option accepts a single status code or a list of them, like the ones of `ApiResponse`;
+  - When the ResultHandler defines a single response schema, the Endpoint status code overrides the configured one;
+  - When it defines distinct response schemas for different status codes, only the declared status codes are documented;
+  - Declaring a status code having no response schema in the multi-schema ResultHandler throws `EndpointResponseError`.
+
 ### v29.2.3
 
 - This version prevents the HTTP status code misuse within `ResultHandler` API response definition:

@@ -1039,6 +1039,44 @@ describe("Documentation", () => {
         }).getSpecAsYaml(),
       ).toMatchSnapshot();
     });
+
+    test("should depict only the status codes declared by the Endpoint", () => {
+      const factory = new EndpointsFactory(
+        new ResultHandler({
+          positive: (data) => [
+            {
+              statusCode: 200,
+              schema: z.object({ status: z.literal("ok"), data }),
+            },
+            {
+              statusCode: 201,
+              schema: z.object({ status: z.literal("kinda"), data }),
+            },
+          ],
+          negative: [
+            { statusCode: 400, schema: z.literal("error") },
+            { statusCode: 500, schema: z.literal("failure") },
+          ],
+          handler: vi.fn(),
+        }),
+      );
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            mtpl: factory.build({
+              method: "post",
+              input: z.object({ test: z.number() }),
+              output: z.object({ payload: z.string() }),
+              handler: async () => ({ payload: "test" }),
+              statusCode: [201, 500],
+            }),
+          },
+        },
+      }).getSpec();
+      const responses = spec.paths?.["/v1/mtpl"]?.post?.responses ?? {};
+      expect(Object.keys(responses).sort()).toEqual(["201", "500"]);
+    });
   });
 
   describe("Metadata", () => {

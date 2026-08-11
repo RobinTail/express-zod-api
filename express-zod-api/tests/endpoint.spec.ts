@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   EndpointsFactory,
+  EndpointResponseError,
   Middleware,
   defaultEndpointsFactory,
   defaultResultHandler,
@@ -311,6 +312,119 @@ describe("Endpoint", () => {
         expect(() => (responses as any[]).push()).toThrowError(/read only/);
       },
     );
+
+    test("should override the positive status code when the ResultHandler defines a single schema", () => {
+      const endpoint = defaultEndpointsFactory.build({
+        output: z.object({}),
+        handler: vi.fn(),
+        statusCode: 204,
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[204]]);
+      expect(
+        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[400]]);
+    });
+
+    test("should override the negative status code when the ResultHandler defines a single schema", () => {
+      const endpoint = defaultEndpointsFactory.build({
+        output: z.object({}),
+        handler: vi.fn(),
+        statusCode: 404,
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[200]]);
+      expect(
+        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[404]]);
+    });
+
+    test("should serve multiple status codes with the single schema of the ResultHandler", () => {
+      const endpoint = defaultEndpointsFactory.build({
+        output: z.object({}),
+        handler: vi.fn(),
+        statusCode: [200, 204],
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[200, 204]]);
+    });
+
+    test("should override both variants when declared as a tuple", () => {
+      const endpoint = defaultEndpointsFactory.build({
+        output: z.object({}),
+        handler: vi.fn(),
+        statusCode: [201, 400],
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[201]]);
+      expect(
+        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[400]]);
+    });
+
+    const multiSchemaFactory = new EndpointsFactory(
+      new ResultHandler({
+        positive: (data) => [
+          {
+            statusCode: 200,
+            schema: z.object({ status: z.literal("ok"), data }),
+          },
+          {
+            statusCode: 201,
+            schema: z.object({ status: z.literal("kinda"), data }),
+          },
+        ],
+        negative: [
+          { statusCode: 400, schema: z.literal("error") },
+          { statusCode: 500, schema: z.literal("failure") },
+        ],
+        handler: vi.fn(),
+      }),
+    );
+
+    test("should narrow the multi-schema responses to the declared status codes", () => {
+      const endpoint = multiSchemaFactory.build({
+        output: z.object({ payload: z.string() }),
+        handler: async () => ({ payload: "test" }),
+        statusCode: [201, 500],
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[201]]);
+      expect(
+        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[500]]);
+    });
+
+    test("should keep the responses of the variant with no declared status codes", () => {
+      const endpoint = multiSchemaFactory.build({
+        output: z.object({ payload: z.string() }),
+        handler: async () => ({ payload: "test" }),
+        statusCode: 400,
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[200], [201]]);
+      expect(
+        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[400]]);
+    });
+
+    test("should throw when the Endpoint declares a status code uncovered by the multi-schema ResultHandler", () => {
+      const endpoint = multiSchemaFactory.build({
+        output: z.object({ payload: z.string() }),
+        handler: async () => ({ payload: "test" }),
+        statusCode: [200, 204],
+      });
+      expect(() => endpoint.getResponses("positive")).toThrow(
+        EndpointResponseError,
+      );
+      expect(() => endpoint.getResponses("positive")).toThrow(/204/);
+    });
   });
 
   describe(".scopes", () => {
