@@ -32,7 +32,12 @@ describe("Middleware", () => {
         expect(mw.statusCodes).toEqual(
           new Set(typeof statusCode === "number" ? [statusCode] : statusCode),
         );
-        expect(Object.isFrozen(mw.statusCodes)).toBe(true);
+        mw.statusCodes.delete(
+          typeof statusCode === "number" ? statusCode : statusCode[0],
+        );
+        expect(mw.statusCodes).toEqual(
+          new Set(typeof statusCode === "number" ? [statusCode] : statusCode),
+        );
       },
     );
 

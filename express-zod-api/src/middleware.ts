@@ -55,7 +55,7 @@ export class Middleware<
   readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
-  readonly #statusCode: ReadonlySet<number>;
+  readonly #statusCode: number[];
   readonly #handler: Handler<z.output<IN>, CTX, RET>;
 
   constructor({
@@ -85,13 +85,10 @@ export class Middleware<
     super();
     this.#schema = input as IN;
     this.#security = security;
-    this.#statusCode = Object.freeze(
-      new Set(
-        typeof statusCode === "number"
-          ? [statusCode]
-          : (statusCode?.slice() ?? []),
-      ),
-    );
+    this.#statusCode =
+      typeof statusCode === "number"
+        ? [statusCode]
+        : (statusCode?.slice() ?? []);
     this.#handler = handler;
   }
 
@@ -107,7 +104,7 @@ export class Middleware<
 
   /** @internal */
   public override get statusCodes() {
-    return this.#statusCode;
+    return Object.freeze(new Set(this.#statusCode));
   }
 
   /** @throws InputValidationError */
