@@ -18,7 +18,7 @@ import { InputValidationError, ResultHandlerError } from "./errors";
 import type { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
 import { getExamples } from "./metadata";
-import { contentTypes } from "./content-type.ts";
+import { contentTypes } from "./content-type";
 
 export type ResultSchema<R extends Result> =
   R extends Result<infer S> ? S : never;
