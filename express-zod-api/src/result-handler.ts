@@ -4,6 +4,7 @@ import {
   defaultStatusCodes,
   type ApiResponse,
   type NormalizedResponse,
+  type ResponseVariant,
 } from "./api-response";
 import { ensureError, isObject, type FlatObject } from "./common-helpers";
 import createHttpError, { isHttpError } from "http-errors";
@@ -127,20 +128,16 @@ export class ResultHandler<
     output: IOSchema,
     declared?: ReadonlyArray<number>,
   ) {
-    return applyDeclaredStatusCodes(
-      normalize(this.#positive, { variant: "positive", args: [output] }),
-      declared,
-      "positive",
-    );
+    const variant: ResponseVariant = "positive";
+    const normalized = normalize(this.#positive, { variant, args: [output] });
+    return applyDeclaredStatusCodes(normalized, declared, variant);
   }
 
   /** @internal */
   public override getNegativeResponse(declared?: ReadonlyArray<number>) {
-    return applyDeclaredStatusCodes(
-      normalize(this.#negative, { variant: "negative", args: [] }),
-      declared,
-      "negative",
-    );
+    const variant: ResponseVariant = "negative";
+    const normalized = normalize(this.#negative, { variant, args: [] });
+    return applyDeclaredStatusCodes(normalized, declared, variant);
   }
 }
 
