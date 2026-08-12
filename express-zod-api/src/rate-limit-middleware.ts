@@ -23,7 +23,7 @@ export const createRateLimitMiddleware = (
     /**
      * @desc The HTTP status code to send back when a client is rate-limited.
      * @default 429
-     * @modifies ResultHandler.negative.statusCode — overrides when specified explicitly (opt-in for no breaking changes).
+     * @modifies ResultHandler.negative.statusCode — overrides when specified explicitly (opt-in, no breaking changes).
      */
     statusCode?: number;
   },
