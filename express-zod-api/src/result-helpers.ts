@@ -64,11 +64,8 @@ export const normalize = <A extends unknown[]>(
           : mimeType,
   }));
   const statusCodes = R.chain(R.prop("statusCodes"), normalized);
-  const invalid = R.find(
-    variant === "positive"
-      ? R.complement(isPositiveStatusCode)
-      : isPositiveStatusCode,
-    statusCodes,
+  const invalid = statusCodes.find(
+    (one) => isPositiveStatusCode(one) === (variant === "negative"),
   );
   if (invalid !== undefined) {
     const err = new Error(
