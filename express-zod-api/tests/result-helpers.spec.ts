@@ -100,15 +100,6 @@ describe("Result helpers", () => {
   describe("applyDeclaredStatusCodes()", () => {
     const schema = z.string();
 
-    test("should return the responses unchanged when declared is undefined", () => {
-      const responses: NormalizedResponse[] = [
-        { schema, statusCodes: [200], mimeTypes: ["text/plain"] },
-      ];
-      expect(applyDeclaredStatusCodes(responses, undefined, "positive")).toBe(
-        responses,
-      );
-    });
-
     test("should override the status codes of a single schema with the declared ones", () => {
       expect(
         applyDeclaredStatusCodes(

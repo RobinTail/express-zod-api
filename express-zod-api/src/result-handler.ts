@@ -130,6 +130,7 @@ export class ResultHandler<
   ) {
     const variant: ResponseVariant = "positive";
     const normalized = normalize(this.#positive, { variant, args: [output] });
+    if (!declared) return normalized;
     return applyDeclaredStatusCodes(normalized, declared, variant);
   }
 
@@ -137,6 +138,7 @@ export class ResultHandler<
   public override getNegativeResponse(declared?: ReadonlyArray<number>) {
     const variant: ResponseVariant = "negative";
     const normalized = normalize(this.#negative, { variant, args: [] });
+    if (!declared) return normalized;
     return applyDeclaredStatusCodes(normalized, declared, variant);
   }
 }

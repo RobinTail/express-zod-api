@@ -91,10 +91,9 @@ export const normalize = <A extends unknown[]>(
 /** @internal An internal helper applying the Endpoint-declared status codes to the normalized responses. */
 export const applyDeclaredStatusCodes = (
   responses: NormalizedResponse[],
-  declared: ReadonlyArray<number> | undefined,
+  declared: ReadonlyArray<number>,
   variant: ResponseVariant,
 ): NormalizedResponse[] => {
-  if (!declared) return responses;
   const narrowed = declared.filter(
     (one) => isPositiveStatusCode(one) === (variant === "positive"),
   );
