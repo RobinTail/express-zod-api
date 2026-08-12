@@ -235,7 +235,7 @@ paths:
                     data:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
-        "429":
+        "400":
           description: PATCH /v1/user/:id Negative response
           content:
             application/json:

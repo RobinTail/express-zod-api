@@ -13,9 +13,11 @@ describe("Rate limit middleware", () => {
       expect(constructor.name).toBe("ExpressMiddleware");
     });
 
-    test("should declare the 429 status code it may throw", () => {
-      const middleware = createRateLimitMiddleware();
-      expect(middleware.statusCodes).toEqual(new Set([429]));
+    test("should declare the status code it may throw when set explicitly", () => {
+      expect(createRateLimitMiddleware().statusCodes.size).toBe(0);
+      expect(
+        createRateLimitMiddleware({ statusCode: 429 }).statusCodes,
+      ).toEqual(new Set([429]));
     });
 
     test("should forward config to rateLimit function", () => {
@@ -39,17 +41,23 @@ describe("Rate limit middleware", () => {
       expect(output).toEqual({ rateLimit: limiterApiMock });
     });
 
-    test("should reject with 429 when limit exceeded", async () => {
-      rateLimitMock.mockImplementation((options: any) =>
-        Object.assign((req: any, res: any, next: any) => {
-          options.handler(req, res, next, options);
-        }, limiterApiMock),
-      );
-      const { responseMock } = await testMiddleware({
-        middleware: createRateLimitMiddleware({ message: "too fast" }),
-      });
-      expect(responseMock._getStatusCode()).toBe(429);
-    });
+    test.each([{}, { statusCode: 444 }])(
+      "should reject when the limit exceeded %#",
+      async (cfg) => {
+        rateLimitMock.mockImplementationOnce((options: any) =>
+          Object.assign((req: any, res: any, next: any) => {
+            options.handler(req, res, next, options);
+          }, limiterApiMock),
+        );
+        const { responseMock } = await testMiddleware({
+          middleware: createRateLimitMiddleware({
+            ...cfg,
+            message: "too fast",
+          }),
+        });
+        expect(responseMock._getStatusCode()).toBe(cfg.statusCode ?? 429);
+      },
+    );
 
     test("should populate ctx.rateLimit from request", async () => {
       const rateLimitInfo = {

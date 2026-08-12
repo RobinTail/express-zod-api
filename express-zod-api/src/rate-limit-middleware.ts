@@ -18,12 +18,22 @@ const errorCode = 429;
  * @param options — Partial options passed to the express-rate-limit constructor.
  * @example createRateLimitMiddleware({ windowMs: 60000, max: 100 })
  */
-export const createRateLimitMiddleware = (options?: Partial<Options>) => {
+export const createRateLimitMiddleware = (
+  options?: Partial<Options> & {
+    /**
+     * @desc The HTTP status code to send back when a client is rate-limited.
+     * @default 429
+     * @modifies ResultHandler.negative.statusCode — overrides when specified explicitly (opt-in for no breaking changes).
+     */
+    statusCode?: number;
+  },
+) => {
   const rateLimit = loadPeer<typeof RateLimitFn>("express-rate-limit");
   const limiter = rateLimit({
+    statusCode: errorCode,
     ...options,
     handler: (_req, _res, next, optionsUsed) => {
-      next(createHttpError(errorCode, optionsUsed.message));
+      next(createHttpError(optionsUsed.statusCode, optionsUsed.message));
     },
   });
   const { getKey, resetKey } = limiter;
@@ -32,7 +42,8 @@ export const createRateLimitMiddleware = (options?: Partial<Options>) => {
     resetKey,
   };
   return new ExpressMiddleware(limiter, {
-    statusCode: errorCode, // see the limiter
+    /** @todo add ?? errorCode in next major */
+    statusCode: options?.statusCode, // only when specified explicitly to avoid breaking changes
     provider: (req: AugmentedRequest) => ({
       rateLimit: {
         ...limiterApi,
