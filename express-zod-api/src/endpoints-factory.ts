@@ -92,6 +92,7 @@ export class EndpointsFactory<
   SCO extends string = string,
 > {
   protected schema = undefined as IN;
+  protected statusCodes = new Set<number>();
   protected middlewares: AbstractMiddleware[] = [];
 
   /**
@@ -112,6 +113,7 @@ export class EndpointsFactory<
     >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
     factory.schema = ensureExtension(this.schema, middleware.schema);
+    factory.statusCodes = this.statusCodes.union(middleware.statusCodes);
     return factory;
   }
 
@@ -216,7 +218,11 @@ export class EndpointsFactory<
       methods,
       getOperationId,
       inputSchema: makeFinalInputSchema(this.schema, input),
-      statusCodes: typeof statusCode === "number" ? [statusCode] : statusCode,
+      statusCodes: this.statusCodes.union(
+        new Set(
+          typeof statusCode === "number" ? [statusCode] : statusCode || [],
+        ),
+      ),
     });
   }
 

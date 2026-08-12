@@ -104,7 +104,7 @@ describe("Result helpers", () => {
       expect(
         overrideStatusCodes(
           [{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }],
-          [201],
+          new Set([201]),
           "positive",
         ),
       ).toEqual([{ schema, statusCodes: [201], mimeTypes: ["text/plain"] }]);
@@ -114,21 +114,21 @@ describe("Result helpers", () => {
       const responses: NormalizedResponse[] = [
         { schema, statusCodes: [200], mimeTypes: ["text/plain"] },
       ];
-      expect(overrideStatusCodes(responses, [200, 400], "positive")).toEqual([
-        { schema, statusCodes: [200], mimeTypes: ["text/plain"] },
-      ]);
-      expect(overrideStatusCodes(responses, [200, 400], "negative")).toEqual([
-        { schema, statusCodes: [400], mimeTypes: ["text/plain"] },
-      ]);
+      expect(
+        overrideStatusCodes(responses, new Set([200, 400]), "positive"),
+      ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+      expect(
+        overrideStatusCodes(responses, new Set([200, 400]), "negative"),
+      ).toEqual([{ schema, statusCodes: [400], mimeTypes: ["text/plain"] }]);
     });
 
     test("should keep the responses when the declared codes do not match the variant", () => {
       const responses: NormalizedResponse[] = [
         { schema, statusCodes: [400], mimeTypes: ["text/plain"] },
       ];
-      expect(overrideStatusCodes(responses, [201], "negative")).toEqual(
-        responses,
-      );
+      expect(
+        overrideStatusCodes(responses, new Set([201]), "negative"),
+      ).toEqual(responses);
     });
 
     test("should intersect multi-schema responses with the declared codes", () => {
@@ -140,7 +140,7 @@ describe("Result helpers", () => {
             { schema: first, statusCodes: [200], mimeTypes: ["text/plain"] },
             { schema: second, statusCodes: [400], mimeTypes: ["text/plain"] },
           ],
-          [200],
+          new Set([200]),
           "positive",
         ),
       ).toEqual([
@@ -163,7 +163,7 @@ describe("Result helpers", () => {
               mimeTypes: ["text/plain"],
             },
           ],
-          [201],
+          new Set([201]),
           "positive",
         ),
       ).toThrow(ResultHandlerError);

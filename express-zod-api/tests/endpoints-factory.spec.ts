@@ -430,6 +430,39 @@ describe("EndpointsFactory", () => {
         endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
       ).toEqual([[400]]);
     });
+
+    test("should combine the status codes declared by the middlewares", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock)
+        .addMiddleware(new Middleware({ statusCode: 429, handler: vi.fn() }))
+        .build({
+          output: z.object({}),
+          handler: vi.fn(),
+        });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[200]]);
+      expect(
+        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[429]]);
+    });
+
+    test("should deduplicate the status codes declared by the endpoint and middlewares", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock)
+        .addMiddleware(
+          new Middleware({ statusCode: [400, 429], handler: vi.fn() }),
+        )
+        .build({
+          output: z.object({}),
+          handler: vi.fn(),
+          statusCode: [200, 400],
+        });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[200]]);
+      expect(
+        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[400, 429]]);
+    });
   });
 
   describe(".buildVoid()", () => {

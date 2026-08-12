@@ -53,11 +53,11 @@ export abstract class AbstractResultHandler {
   /** @internal */
   public abstract getPositiveResponse(
     output: IOSchema,
-    declared?: ReadonlyArray<number>,
+    declared?: ReadonlySet<number>,
   ): NormalizedResponse[];
   /** @internal */
   public abstract getNegativeResponse(
-    declared?: ReadonlyArray<number>,
+    declared?: ReadonlySet<number>,
   ): NormalizedResponse[];
   protected constructor(handler: Handler) {
     this.#handler = handler;
@@ -126,7 +126,7 @@ export class ResultHandler<
   /** @internal */
   public override getPositiveResponse(
     output: IOSchema,
-    declared?: ReadonlyArray<number>,
+    declared?: ReadonlySet<number>,
   ) {
     const variant: ResponseVariant = "positive";
     const normalized = normalize(this.#positive, { variant, args: [output] });
@@ -135,7 +135,7 @@ export class ResultHandler<
   }
 
   /** @internal */
-  public override getNegativeResponse(declared?: ReadonlyArray<number>) {
+  public override getNegativeResponse(declared?: ReadonlySet<number>) {
     const variant: ResponseVariant = "negative";
     const normalized = normalize(this.#negative, { variant, args: [] });
     if (!declared) return normalized;

@@ -116,7 +116,7 @@ type PatchV1UserIdNegativeVariant1 = {
 
 /** patch /v1/user/:id */
 interface PatchV1UserIdNegativeResponseVariants {
-  400: PatchV1UserIdNegativeVariant1;
+  429: PatchV1UserIdNegativeVariant1;
 }
 
 /** post /v1/user/create */

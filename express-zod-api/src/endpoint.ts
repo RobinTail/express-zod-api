@@ -113,7 +113,7 @@ export class Endpoint<
     methods?: Method[];
     scopes?: string[];
     tags?: string[];
-    statusCodes?: ReadonlyArray<number>;
+    statusCodes?: ReadonlySet<number>;
   }) {
     super();
     this.#def = def;

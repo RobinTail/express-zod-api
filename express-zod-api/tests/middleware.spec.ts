@@ -25,6 +25,30 @@ describe("Middleware", () => {
       expectTypeOf(mw.schema).toBeUndefined();
     });
 
+    test.each<number | [number, ...number[]]>([429, [429, 503]])(
+      "should expose the declared statusCodes %#",
+      (statusCode) => {
+        const mw = new Middleware({ statusCode, handler: vi.fn() });
+        expect(mw.statusCodes).toEqual(
+          new Set(typeof statusCode === "number" ? [statusCode] : statusCode),
+        );
+        expect(Object.isFrozen(mw.statusCodes)).toBe(true);
+      },
+    );
+
+    test("should not mutate the supplied tuple when freezing the status codes", () => {
+      const statusCode = [429, 503] as [number, ...number[]];
+      const mw = new Middleware({ statusCode, handler: vi.fn() });
+      expect(Object.isFrozen(statusCode)).toBe(false);
+      statusCode.push(500);
+      expect(mw.statusCodes).toEqual(new Set([429, 503]));
+    });
+
+    test("should allow to omit statusCode", () => {
+      const mw = new Middleware({ handler: vi.fn() });
+      expect(mw.statusCodes.size).toBe(0);
+    });
+
     describe("#600: Top level refinements", () => {
       test("should allow refinement", () => {
         const mw = new Middleware({
@@ -87,5 +111,10 @@ describe("ExpressMiddleware", () => {
     const mw = new ExpressMiddleware(vi.fn());
     expect(mw).toBeInstanceOf(Middleware);
     expectTypeOf(mw.schema).toBeUndefined();
+  });
+
+  test("should expose the declared statusCodes", () => {
+    const mw = new ExpressMiddleware(vi.fn(), { statusCode: 429 });
+    expect(mw.statusCodes).toEqual(new Set([429]));
   });
 });
