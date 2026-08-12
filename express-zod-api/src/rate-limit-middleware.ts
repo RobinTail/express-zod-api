@@ -18,9 +18,10 @@ import { loadPeer } from "./peer-helpers";
 export const createRateLimitMiddleware = (options?: Partial<Options>) => {
   const rateLimit = loadPeer<typeof RateLimitFn>("express-rate-limit");
   const limiter = rateLimit({
+    statusCode: 429,
     ...options,
     handler: (_req, _res, next, optionsUsed) => {
-      next(createHttpError(429, optionsUsed.message));
+      next(createHttpError(optionsUsed.statusCode, optionsUsed.message));
     },
   });
   const { getKey, resetKey } = limiter;
