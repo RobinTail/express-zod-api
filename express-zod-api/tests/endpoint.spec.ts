@@ -313,54 +313,34 @@ describe("Endpoint", () => {
       },
     );
 
-    test("should override the positive status code when the ResultHandler defines a single schema", () => {
-      const endpoint = defaultEndpointsFactory.buildVoid({
-        handler: vi.fn(),
-        statusCode: 204,
-      });
-      expect(
-        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[204]]);
-      expect(
-        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[400]]);
-    });
-
-    test("should override the negative status code when the ResultHandler defines a single schema", () => {
-      const endpoint = defaultEndpointsFactory.buildVoid({
-        handler: vi.fn(),
-        statusCode: 404,
-      });
-      expect(
-        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[200]]);
-      expect(
-        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[404]]);
-    });
-
-    test("should serve multiple status codes with the single schema of the ResultHandler", () => {
-      const endpoint = defaultEndpointsFactory.buildVoid({
-        handler: vi.fn(),
-        statusCode: [200, 204],
-      });
-      expect(
-        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[200, 204]]);
-    });
-
-    test("should override both variants when declared as a tuple", () => {
-      const endpoint = defaultEndpointsFactory.buildVoid({
-        handler: vi.fn(),
-        statusCode: [201, 400],
-      });
-      expect(
-        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[201]]);
-      expect(
-        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[400]]);
-    });
+    test.each<{
+      statusCode: number | [number, ...number[]];
+      positive: number[][];
+      negative: number[][];
+    }>([
+      { statusCode: 204, positive: [[204]], negative: [[400]] },
+      { statusCode: 404, positive: [[200]], negative: [[404]] },
+      { statusCode: [200, 204], positive: [[200, 204]], negative: [[400]] },
+      { statusCode: [201, 500], positive: [[201]], negative: [[500]] },
+    ])(
+      "should override default status codes (single schema) %#",
+      ({ statusCode, positive, negative }) => {
+        const endpoint = defaultEndpointsFactory.buildVoid({
+          handler: vi.fn(),
+          statusCode,
+        });
+        expect(
+          endpoint
+            .getResponses("positive")
+            .map(({ statusCodes }) => statusCodes),
+        ).toEqual(positive);
+        expect(
+          endpoint
+            .getResponses("negative")
+            .map(({ statusCodes }) => statusCodes),
+        ).toEqual(negative);
+      },
+    );
 
     const multiSchemaFactory = new EndpointsFactory(
       new ResultHandler({
@@ -382,31 +362,32 @@ describe("Endpoint", () => {
       }),
     );
 
-    test("should narrow the multi-schema responses to the declared status codes", () => {
-      const endpoint = multiSchemaFactory.buildVoid({
-        handler: vi.fn(),
-        statusCode: [201, 500],
-      });
-      expect(
-        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[201]]);
-      expect(
-        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[500]]);
-    });
-
-    test("should keep the responses of the variant with no declared status codes", () => {
-      const endpoint = multiSchemaFactory.buildVoid({
-        handler: vi.fn(),
-        statusCode: 400,
-      });
-      expect(
-        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[200], [201]]);
-      expect(
-        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[400]]);
-    });
+    test.each<{
+      statusCode: number | [number, ...number[]];
+      positive: number[][];
+      negative: number[][];
+    }>([
+      { statusCode: [201, 500], positive: [[201]], negative: [[500]] },
+      { statusCode: 400, positive: [[200], [201]], negative: [[400]] },
+    ])(
+      "should narrow the multi-schema responses to the declared status codes %#",
+      ({ statusCode, positive, negative }) => {
+        const endpoint = multiSchemaFactory.buildVoid({
+          handler: vi.fn(),
+          statusCode,
+        });
+        expect(
+          endpoint
+            .getResponses("positive")
+            .map(({ statusCodes }) => statusCodes),
+        ).toEqual(positive);
+        expect(
+          endpoint
+            .getResponses("negative")
+            .map(({ statusCodes }) => statusCodes),
+        ).toEqual(negative);
+      },
+    );
 
     test("should throw when the Endpoint declares a status code uncovered by the multi-schema ResultHandler", () => {
       const endpoint = multiSchemaFactory.buildVoid({
