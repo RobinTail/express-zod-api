@@ -1,11 +1,6 @@
 import createHttpError from "http-errors";
 import { z } from "zod";
 import { InputValidationError, OutputValidationError } from "../src";
-import type {
-  ApiResponse,
-  NormalizedResponse,
-  ResponseVariant,
-} from "../src/api-response";
 import { ResultHandlerError } from "../src/errors";
 import {
   applyDeclaredStatusCodes,
@@ -17,6 +12,11 @@ import {
 } from "../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../src/testing";
 import { runtime } from "../src/common-helpers";
+import type {
+  ApiResponse,
+  NormalizedResponse,
+  ResponseVariant,
+} from "../src/api-response";
 
 describe("Result helpers", () => {
   describe("normalize()", () => {
