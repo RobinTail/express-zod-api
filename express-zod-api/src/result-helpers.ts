@@ -89,7 +89,7 @@ export const normalize = <A extends unknown[]>(
 };
 
 /** @internal An internal helper applying the Endpoint-declared status codes to the normalized responses. */
-export const applyDeclaredStatusCodes = (
+export const overrideStatusCodes = (
   responses: NormalizedResponse[],
   declared: ReadonlyArray<number>,
   variant: ResponseVariant,

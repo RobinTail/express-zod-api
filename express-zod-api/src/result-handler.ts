@@ -12,7 +12,7 @@ import { ResultHandlerError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import {
-  applyDeclaredStatusCodes,
+  overrideStatusCodes,
   type DiscriminatedResult,
   type ResultSchema,
   ensureHttpError,
@@ -131,7 +131,7 @@ export class ResultHandler<
     const variant: ResponseVariant = "positive";
     const normalized = normalize(this.#positive, { variant, args: [output] });
     if (!declared) return normalized;
-    return applyDeclaredStatusCodes(normalized, declared, variant);
+    return overrideStatusCodes(normalized, declared, variant);
   }
 
   /** @internal */
@@ -139,7 +139,7 @@ export class ResultHandler<
     const variant: ResponseVariant = "negative";
     const normalized = normalize(this.#negative, { variant, args: [] });
     if (!declared) return normalized;
-    return applyDeclaredStatusCodes(normalized, declared, variant);
+    return overrideStatusCodes(normalized, declared, variant);
   }
 }
 

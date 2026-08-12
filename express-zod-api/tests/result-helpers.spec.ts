@@ -3,7 +3,7 @@ import { z } from "zod";
 import { InputValidationError, OutputValidationError } from "../src";
 import { ResultHandlerError } from "../src/errors";
 import {
-  applyDeclaredStatusCodes,
+  overrideStatusCodes,
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
@@ -97,12 +97,12 @@ describe("Result helpers", () => {
     );
   });
 
-  describe("applyDeclaredStatusCodes()", () => {
+  describe("overrideStatusCodes()", () => {
     const schema = z.string();
 
     test("should override the status codes of a single schema with the declared ones", () => {
       expect(
-        applyDeclaredStatusCodes(
+        overrideStatusCodes(
           [{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }],
           [201],
           "positive",
@@ -114,19 +114,19 @@ describe("Result helpers", () => {
       const responses: NormalizedResponse[] = [
         { schema, statusCodes: [200], mimeTypes: ["text/plain"] },
       ];
-      expect(
-        applyDeclaredStatusCodes(responses, [200, 400], "positive"),
-      ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
-      expect(
-        applyDeclaredStatusCodes(responses, [200, 400], "negative"),
-      ).toEqual([{ schema, statusCodes: [400], mimeTypes: ["text/plain"] }]);
+      expect(overrideStatusCodes(responses, [200, 400], "positive")).toEqual([
+        { schema, statusCodes: [200], mimeTypes: ["text/plain"] },
+      ]);
+      expect(overrideStatusCodes(responses, [200, 400], "negative")).toEqual([
+        { schema, statusCodes: [400], mimeTypes: ["text/plain"] },
+      ]);
     });
 
     test("should keep the responses when the declared codes do not match the variant", () => {
       const responses: NormalizedResponse[] = [
         { schema, statusCodes: [400], mimeTypes: ["text/plain"] },
       ];
-      expect(applyDeclaredStatusCodes(responses, [201], "negative")).toEqual(
+      expect(overrideStatusCodes(responses, [201], "negative")).toEqual(
         responses,
       );
     });
@@ -135,7 +135,7 @@ describe("Result helpers", () => {
       const first = z.string();
       const second = z.number();
       expect(
-        applyDeclaredStatusCodes(
+        overrideStatusCodes(
           [
             { schema: first, statusCodes: [200], mimeTypes: ["text/plain"] },
             { schema: second, statusCodes: [400], mimeTypes: ["text/plain"] },
@@ -150,7 +150,7 @@ describe("Result helpers", () => {
 
     test("should throw when the declared codes are not covered by the multi-schema responses", () => {
       expect(() =>
-        applyDeclaredStatusCodes(
+        overrideStatusCodes(
           [
             {
               schema: z.string(),
