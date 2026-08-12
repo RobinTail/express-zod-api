@@ -2,6 +2,11 @@
 
 ## Version 29
 
+### v29.2.4
+
+- Fixed: `createRateLimitMiddleware` and `EndpointsFactory::useRateLimit` respect the custom `statusCode`:
+  - The feature introduced in v28.7.0 and the default code remains `429`.
+
 ### v29.2.3
 
 - This version prevents the HTTP status code misuse within `ResultHandler` API response definition:
