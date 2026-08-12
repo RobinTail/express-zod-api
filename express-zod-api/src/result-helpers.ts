@@ -36,13 +36,7 @@ export type DiscriminatedResult =
 /** @throws ResultHandlerError when Result is an empty array or contains duplicate status codes */
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,
-  {
-    variant,
-    args,
-  }: {
-    variant: ResponseVariant;
-    args: A;
-  },
+  { variant, args }: { variant: ResponseVariant; args: A },
 ): NormalizedResponse[] => {
   if (typeof subject === "function") subject = subject(...args);
   const fallback: Pick<NormalizedResponse, "statusCodes" | "mimeTypes"> = {
