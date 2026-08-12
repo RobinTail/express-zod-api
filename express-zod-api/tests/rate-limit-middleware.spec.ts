@@ -35,7 +35,7 @@ describe("Rate limit middleware", () => {
     });
 
     test.each([{}, { statusCode: 444 }])(
-      "should reject when the limit exceeded",
+      "should reject when the limit exceeded %#",
       async (cfg) => {
         rateLimitMock.mockImplementationOnce((options: any) =>
           Object.assign((req: any, res: any, next: any) => {
