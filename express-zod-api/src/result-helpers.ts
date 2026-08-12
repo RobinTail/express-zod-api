@@ -2,7 +2,11 @@ import type { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import * as R from "ramda";
 import { z } from "zod";
-import type { NormalizedResponse, ResponseVariant } from "./api-response";
+import {
+  isPositiveStatusCode,
+  type NormalizedResponse,
+  type ResponseVariant,
+} from "./api-response";
 import {
   combinations,
   getMessageFromError,
@@ -60,8 +64,20 @@ export const normalize = <A extends unknown[]>(
           ? fallback.mimeTypes
           : mimeType,
   }));
+  const statusCodes = R.chain(R.prop("statusCodes"), normalized);
+  const invalid = R.find(
+    variant === "positive"
+      ? R.complement(isPositiveStatusCode)
+      : isPositiveStatusCode,
+    statusCodes,
+  );
+  if (invalid !== undefined) {
+    const err = new Error(
+      `The status code ${invalid} is not valid for a ${variant} API response.`,
+    );
+    throw new ResultHandlerError(err);
+  }
   if (normalized.length > 1) {
-    const statusCodes = R.chain(R.prop("statusCodes"), normalized);
     const duplicated = R.find(
       (code) => statusCodes.indexOf(code) !== statusCodes.lastIndexOf(code),
       statusCodes,

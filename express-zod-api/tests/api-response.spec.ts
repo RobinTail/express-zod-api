@@ -2,9 +2,11 @@ import {
   type ApiResponse,
   createApiResponse,
   defaultStatusCodes,
+  isPositiveStatusCode,
   responseVariants,
 } from "../src/api-response";
 import { z } from "zod";
+import * as R from "ramda";
 
 describe("ApiResponse", () => {
   test("type should satisfy", () => {
@@ -38,5 +40,20 @@ describe("ApiResponse", () => {
         ApiResponse<z.ZodString>
       >();
     });
+  });
+
+  describe("isPositiveStatusCode", () => {
+    test.each(R.range(100, 400))(
+      "should consider %s as positive",
+      (statusCode) => {
+        expect(isPositiveStatusCode(statusCode)).toBe(true);
+      },
+    );
+    test.each(R.range(400, 600))(
+      "should consider %s as negative",
+      (statusCode) => {
+        expect(isPositiveStatusCode(statusCode)).toBe(false);
+      },
+    );
   });
 });

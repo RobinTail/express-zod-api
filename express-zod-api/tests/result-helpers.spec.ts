@@ -11,7 +11,7 @@ import {
 } from "../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../src/testing";
 import { runtime } from "../src/common-helpers";
-import type { ApiResponse } from "../src/api-response";
+import type { ApiResponse, ResponseVariant } from "../src/api-response";
 
 describe("Result helpers", () => {
   describe("normalize()", () => {
@@ -90,6 +90,34 @@ describe("Result helpers", () => {
           new ResultHandlerError(
             new Error(
               "The status code 200 is used by multiple response schemas.",
+            ),
+          ),
+        );
+      },
+    );
+
+    test.each<[number, ResponseVariant]>([
+      [200, "negative"],
+      [399, "negative"],
+      [400, "positive"],
+      [599, "positive"],
+    ])(
+      "should throw when status code %s does not match the %s response variant",
+      (statusCode, variant) => {
+        expect(() =>
+          normalize(
+            { schema: z.string(), statusCode },
+            {
+              variant,
+              args: [],
+              statusCodes: [200],
+              mimeTypes: ["text/plain"],
+            },
+          ),
+        ).toThrow(
+          new ResultHandlerError(
+            new Error(
+              `The status code ${statusCode} is not valid for a ${variant} API response.`,
             ),
           ),
         );
