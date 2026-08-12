@@ -314,8 +314,7 @@ describe("Endpoint", () => {
     );
 
     test("should override the positive status code when the ResultHandler defines a single schema", () => {
-      const endpoint = defaultEndpointsFactory.build({
-        output: z.object({}),
+      const endpoint = defaultEndpointsFactory.buildVoid({
         handler: vi.fn(),
         statusCode: 204,
       });
@@ -328,8 +327,7 @@ describe("Endpoint", () => {
     });
 
     test("should override the negative status code when the ResultHandler defines a single schema", () => {
-      const endpoint = defaultEndpointsFactory.build({
-        output: z.object({}),
+      const endpoint = defaultEndpointsFactory.buildVoid({
         handler: vi.fn(),
         statusCode: 404,
       });
@@ -342,8 +340,7 @@ describe("Endpoint", () => {
     });
 
     test("should serve multiple status codes with the single schema of the ResultHandler", () => {
-      const endpoint = defaultEndpointsFactory.build({
-        output: z.object({}),
+      const endpoint = defaultEndpointsFactory.buildVoid({
         handler: vi.fn(),
         statusCode: [200, 204],
       });
@@ -353,8 +350,7 @@ describe("Endpoint", () => {
     });
 
     test("should override both variants when declared as a tuple", () => {
-      const endpoint = defaultEndpointsFactory.build({
-        output: z.object({}),
+      const endpoint = defaultEndpointsFactory.buildVoid({
         handler: vi.fn(),
         statusCode: [201, 400],
       });
@@ -387,9 +383,8 @@ describe("Endpoint", () => {
     );
 
     test("should narrow the multi-schema responses to the declared status codes", () => {
-      const endpoint = multiSchemaFactory.build({
-        output: z.object({ payload: z.string() }),
-        handler: async () => ({ payload: "test" }),
+      const endpoint = multiSchemaFactory.buildVoid({
+        handler: vi.fn(),
         statusCode: [201, 500],
       });
       expect(
@@ -401,9 +396,8 @@ describe("Endpoint", () => {
     });
 
     test("should keep the responses of the variant with no declared status codes", () => {
-      const endpoint = multiSchemaFactory.build({
-        output: z.object({ payload: z.string() }),
-        handler: async () => ({ payload: "test" }),
+      const endpoint = multiSchemaFactory.buildVoid({
+        handler: vi.fn(),
         statusCode: 400,
       });
       expect(
@@ -415,9 +409,8 @@ describe("Endpoint", () => {
     });
 
     test("should throw when the Endpoint declares a status code uncovered by the multi-schema ResultHandler", () => {
-      const endpoint = multiSchemaFactory.build({
-        output: z.object({ payload: z.string() }),
-        handler: async () => ({ payload: "test" }),
+      const endpoint = multiSchemaFactory.buildVoid({
+        handler: vi.fn(),
         statusCode: [200, 204],
       });
       expect(() => endpoint.getResponses("positive")).toThrow(

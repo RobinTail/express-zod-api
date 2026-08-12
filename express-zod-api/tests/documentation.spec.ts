@@ -1064,11 +1064,10 @@ describe("Documentation", () => {
         config: sampleConfig,
         routing: {
           v1: {
-            mtpl: factory.build({
+            mtpl: factory.buildVoid({
               method: "post",
               input: z.object({ test: z.number() }),
-              output: z.object({ payload: z.string() }),
-              handler: async () => ({ payload: "test" }),
+              handler: vi.fn(),
               statusCode: [201, 500],
             }),
           },

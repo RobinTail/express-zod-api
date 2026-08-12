@@ -13,7 +13,7 @@ describe("Rate limit middleware", () => {
       expect(constructor.name).toBe("ExpressMiddleware");
     });
 
-    test("should declare the 429 status code it may respond with", () => {
+    test("should declare the 429 status code it may throw", () => {
       const middleware = createRateLimitMiddleware();
       expect(middleware.statusCodes).toEqual(new Set([429]));
     });

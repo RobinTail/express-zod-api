@@ -407,8 +407,7 @@ describe("EndpointsFactory", () => {
     });
 
     test("should pass the single statusCode to the endpoint", () => {
-      const endpoint = new EndpointsFactory(resultHandlerMock).build({
-        output: z.object({}),
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
         handler: vi.fn(),
         statusCode: 204,
       });
@@ -418,8 +417,7 @@ describe("EndpointsFactory", () => {
     });
 
     test("should pass the tuple of statusCodes to the endpoint", () => {
-      const endpoint = new EndpointsFactory(resultHandlerMock).build({
-        output: z.object({}),
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
         handler: vi.fn(),
         statusCode: [201, 400],
       });
@@ -434,10 +432,7 @@ describe("EndpointsFactory", () => {
     test("should combine the status codes declared by the middlewares", () => {
       const endpoint = new EndpointsFactory(resultHandlerMock)
         .addMiddleware(new Middleware({ statusCode: 429, handler: vi.fn() }))
-        .build({
-          output: z.object({}),
-          handler: vi.fn(),
-        });
+        .buildVoid({ handler: vi.fn() });
       expect(
         endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
       ).toEqual([[200]]);
@@ -451,8 +446,7 @@ describe("EndpointsFactory", () => {
         .addMiddleware(
           new Middleware({ statusCode: [400, 429], handler: vi.fn() }),
         )
-        .build({
-          output: z.object({}),
+        .buildVoid({
           handler: vi.fn(),
           statusCode: [200, 400],
         });
@@ -477,7 +471,7 @@ describe("EndpointsFactory", () => {
 
     test("Should pass the statusCode option", () => {
       const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
-        handler: async () => {},
+        handler: vi.fn(),
         statusCode: 204,
       });
       expect(
