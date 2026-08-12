@@ -2,6 +2,13 @@
 
 ## Version 29
 
+### v29.2.3
+
+- This version prevents the HTTP status code misuse within `ResultHandler` API response definition:
+  - The `ResultHandler::positive` expects status codes less than `400`;
+  - The `ResultHandler::negative` expects status codes greater than or equal to `400`;
+  - Otherwise, throws a `ResultHandlerError` when using `Documentation` or `Integration` or at startup (dev. mode).
+
 ### v29.2.2
 
 - Fixed the bug where multiple response schemas could share the same status code in `ResultHandler` definition:

@@ -10,6 +10,9 @@ export const responseVariants = Object.keys(
   defaultStatusCodes,
 ) as ResponseVariant[];
 
+/** @internal An internal helper to distinguish positive (success) status codes from the negative ones. */
+export const isPositiveStatusCode = (statusCode: number) => statusCode < 400;
+
 /**
  * @desc A container for describing an API response: its schema, status code(s) and MIME type(s).
  * @see ResultHandler

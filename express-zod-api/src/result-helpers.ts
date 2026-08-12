@@ -2,7 +2,12 @@ import type { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import * as R from "ramda";
 import { z } from "zod";
-import type { NormalizedResponse, ResponseVariant } from "./api-response";
+import {
+  defaultStatusCodes,
+  isPositiveStatusCode,
+  type NormalizedResponse,
+  type ResponseVariant,
+} from "./api-response";
 import {
   combinations,
   getMessageFromError,
@@ -13,6 +18,7 @@ import { InputValidationError, ResultHandlerError } from "./errors";
 import type { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
 import { getExamples } from "./metadata";
+import { contentTypes } from "./content-type";
 
 export type ResultSchema<R extends Result> =
   R extends Result<infer S> ? S : never;
@@ -30,16 +36,13 @@ export type DiscriminatedResult =
 /** @throws ResultHandlerError when Result is an empty array or contains duplicate status codes */
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,
-  {
-    variant,
-    args,
-    ...fallback
-  }: Omit<NormalizedResponse, "schema"> & {
-    variant: ResponseVariant;
-    args: A;
-  },
+  { variant, args }: { variant: ResponseVariant; args: A },
 ): NormalizedResponse[] => {
   if (typeof subject === "function") subject = subject(...args);
+  const fallback: Pick<NormalizedResponse, "statusCodes" | "mimeTypes"> = {
+    statusCodes: [defaultStatusCodes[variant]],
+    mimeTypes: [contentTypes.json],
+  };
   if (subject instanceof z.ZodType) return [{ schema: subject, ...fallback }];
   if (Array.isArray(subject) && !subject.length) {
     const err = new Error(`At least one ${variant} response schema required.`);
@@ -60,8 +63,17 @@ export const normalize = <A extends unknown[]>(
           ? fallback.mimeTypes
           : mimeType,
   }));
+  const statusCodes = R.chain(R.prop("statusCodes"), normalized);
+  const invalid = statusCodes.find(
+    (one) => isPositiveStatusCode(one) === (variant === "negative"),
+  );
+  if (invalid !== undefined) {
+    const err = new Error(
+      `The status code ${invalid} is not valid for a ${variant} API response.`,
+    );
+    throw new ResultHandlerError(err);
+  }
   if (normalized.length > 1) {
-    const statusCodes = R.chain(R.prop("statusCodes"), normalized);
     const duplicated = R.find(
       (code) => statusCodes.indexOf(code) !== statusCodes.lastIndexOf(code),
       statusCodes,
