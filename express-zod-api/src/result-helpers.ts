@@ -95,10 +95,8 @@ export const applyDeclaredStatusCodes = (
   variant: ResponseVariant,
 ): NormalizedResponse[] => {
   if (!declared) return responses;
-  const narrowed = declared.filter((statusCode) =>
-    variant === "positive"
-      ? isPositiveStatusCode(statusCode)
-      : !isPositiveStatusCode(statusCode),
+  const narrowed = declared.filter(
+    (one) => isPositiveStatusCode(one) === (variant === "positive"),
   );
   if (!narrowed.length) return responses;
   if (responses.length === 1) {
