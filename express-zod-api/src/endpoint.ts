@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
-import { type NormalizedResponse, type ResponseVariant } from "./api-response";
+import type { NormalizedResponse, ResponseVariant } from "./api-response";
 import { findRequestTypeDefiningSchema } from "./deep-checks";
 import {
   type FlatObject,
