@@ -16,6 +16,8 @@ describe("ApiResponse", () => {
   describe("defaultStatusCodes", () => {
     test("should be 200 and 400", () => {
       expect(defaultStatusCodes).toMatchSnapshot();
+      expect(isPositiveStatusCode(defaultStatusCodes.positive)).toBe(true);
+      expect(isPositiveStatusCode(defaultStatusCodes.negative)).toBe(false);
     });
   });
 

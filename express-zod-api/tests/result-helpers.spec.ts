@@ -20,53 +20,33 @@ describe("Result helpers", () => {
     test.each([schema, () => schema])(
       "should handle a plain schema %#",
       (subject) => {
-        expect(
-          normalize(subject, {
-            variant: "positive",
-            args: [],
-            statusCodes: [200],
-            mimeTypes: ["text/plain"],
-          }),
-        ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+        expect(normalize(subject, { variant: "positive", args: [] })).toEqual([
+          { schema, statusCodes: [200], mimeTypes: ["application/json"] },
+        ]);
       },
     );
 
     test.each([{ schema }, () => ({ schema })])(
       "should handle an object %#",
       (subject) => {
-        expect(
-          normalize(subject, {
-            variant: "positive",
-            args: [],
-            statusCodes: [200],
-            mimeTypes: ["text/plain"],
-          }),
-        ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+        expect(normalize(subject, { variant: "positive", args: [] })).toEqual([
+          { schema, statusCodes: [200], mimeTypes: ["application/json"] },
+        ]);
       },
     );
 
     test.each([[{ schema }], () => [{ schema }]])(
       "should handle an array of objects %#",
       (subject) => {
-        expect(
-          normalize(subject, {
-            variant: "positive",
-            args: [],
-            statusCodes: [200],
-            mimeTypes: ["text/plain"],
-          }),
-        ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+        expect(normalize(subject, { variant: "positive", args: [] })).toEqual([
+          { schema, statusCodes: [200], mimeTypes: ["application/json"] },
+        ]);
       },
     );
 
     test("should not mutate the subject when it's a function", () => {
       const subject = () => schema;
-      normalize(subject, {
-        variant: "positive",
-        args: [],
-        statusCodes: [200],
-        mimeTypes: ["text/plain"],
-      });
+      normalize(subject, { variant: "positive", args: [] });
       expect(typeof subject).toBe("function");
     });
 
@@ -80,12 +60,7 @@ describe("Result helpers", () => {
       "should throw when same status code used by different schemas %#",
       (...subject) => {
         expect(() =>
-          normalize(subject, {
-            variant: "positive",
-            args: [],
-            statusCodes: [200],
-            mimeTypes: ["text/plain"],
-          }),
+          normalize(subject, { variant: "positive", args: [] }),
         ).toThrow(
           new ResultHandlerError(
             new Error(
@@ -105,15 +80,7 @@ describe("Result helpers", () => {
       "should throw when status code %s does not match the %s response variant",
       (statusCode, variant) => {
         expect(() =>
-          normalize(
-            { schema: z.string(), statusCode },
-            {
-              variant,
-              args: [],
-              statusCodes: [200],
-              mimeTypes: ["text/plain"],
-            },
-          ),
+          normalize({ schema: z.string(), statusCode }, { variant, args: [] }),
         ).toThrow(
           new ResultHandlerError(
             new Error(
