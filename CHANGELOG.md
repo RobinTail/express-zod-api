@@ -11,7 +11,7 @@
   - Declaring a status code having no response schema in the multi-schema ResultHandler throws `ResultHandlerError`.
 - Fixed: `createRateLimitMiddleware` and `EndpointsFactory::useRateLimit` respect the custom `statusCode`:
   - When the status code is specified explicitly, it will override the one configured by the ResultHandler;
-  - The feature introduced in v28.7.0 and the default code remains `429`.
+  - Rate-limit middleware was introduced in v28.7.0; its default status code remains `429`.
 
 ### v29.2.3
 
