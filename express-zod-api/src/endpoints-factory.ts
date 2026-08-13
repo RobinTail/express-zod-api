@@ -72,6 +72,7 @@ interface BuildProps<
    * @desc The status code(s) specific to the Endpoint, overriding the ones configured by the ResultHandler.
    *       Narrows the response schemas of ResultHandler by status codes in the generated Documentation.
    * @example [201, 403] — the Endpoint narrows the ResultHandler responses to either "Created" or "Forbidden".
+   * @see ApiResponse#statusCode - the status codes used by ResultHandler
    * */
   statusCode?: number | [number, ...number[]];
   /** @desc Marks the operation deprecated in the generated Documentation */
