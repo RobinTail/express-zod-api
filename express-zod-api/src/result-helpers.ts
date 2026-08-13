@@ -104,16 +104,15 @@ export const overrideStatusCodes = (
       statusCodes: Array.from(overrides) as [number, ...number[]], // ensured by size check
     }));
   }
-  const matched: NormalizedResponse[] = subject
-    .map(({ schema, mimeTypes, statusCodes }) => ({
-      schema,
-      mimeTypes,
+  const overlap: NormalizedResponse[] = subject
+    .map(({ statusCodes, ...rest }) => ({
+      ...rest,
       statusCodes: statusCodes.filter((statusCode) =>
         overrides.has(statusCode),
       ) as [number, ...number[]],
     }))
     .filter(({ statusCodes }) => statusCodes.length > 0);
-  const covered = new Set(R.chain(({ statusCodes }) => statusCodes, matched));
+  const covered = new Set(R.chain(({ statusCodes }) => statusCodes, overlap));
   const uncovered = Array.from(overrides).filter(
     (statusCode) => !covered.has(statusCode),
   );
@@ -128,7 +127,7 @@ export const overrideStatusCodes = (
       ),
     );
   }
-  return matched;
+  return overlap;
 };
 
 export const logServerError = (
