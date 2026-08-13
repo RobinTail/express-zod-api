@@ -90,35 +90,35 @@ export const normalize = <A extends unknown[]>(
 
 /** @internal An internal helper applying the Endpoint-declared status codes to the normalized responses. */
 export const overrideStatusCodes = (
-  responses: NormalizedResponse[],
-  declared: ReadonlySet<number>,
+  subject: NormalizedResponse[],
+  specific: ReadonlySet<number>, // can contain codes for both positive and negative status codes
   variant: ResponseVariant,
 ): NormalizedResponse[] => {
-  const narrowed = new Set(
-    Array.from(declared).filter(
+  const overrides = new Set(
+    Array.from(specific).filter(
       (one) => isPositiveStatusCode(one) === (variant === "positive"),
     ),
   );
-  if (!narrowed.size) return responses;
-  if (responses.length === 1) {
+  if (!overrides.size) return subject;
+  if (subject.length === 1) {
     return [
       {
-        ...responses[0]!, // ensured by the length check
-        statusCodes: Array.from(narrowed) as [number, ...number[]], // ensured by size check
+        ...subject[0]!, // ensured by the length check
+        statusCodes: Array.from(overrides) as [number, ...number[]], // ensured by size check
       },
     ];
   }
-  const matched: NormalizedResponse[] = responses
+  const matched: NormalizedResponse[] = subject
     .map(({ schema, mimeTypes, statusCodes }) => ({
       schema,
       mimeTypes,
       statusCodes: statusCodes.filter((statusCode) =>
-        narrowed.has(statusCode),
+        overrides.has(statusCode),
       ) as [number, ...number[]],
     }))
     .filter(({ statusCodes }) => statusCodes.length > 0);
   const covered = new Set(R.chain(({ statusCodes }) => statusCodes, matched));
-  const uncovered = Array.from(narrowed).filter(
+  const uncovered = Array.from(overrides).filter(
     (statusCode) => !covered.has(statusCode),
   );
   if (uncovered.length) {
@@ -126,9 +126,9 @@ export const overrideStatusCodes = (
       new Error(
         `Endpoint declares status code${uncovered.length > 1 ? "s" : ""} ` +
           `${uncovered.join(", ")} for its ${variant} responses, but the ResultHandler ` +
-          `defines response schema${responses.length > 1 ? "s" : ""} only for the status code` +
-          `${responses.length > 1 ? "s" : ""} ` +
-          `${R.chain(({ statusCodes }) => statusCodes, responses).join(", ")}.`,
+          `defines response schema${subject.length > 1 ? "s" : ""} only for the status code` +
+          `${subject.length > 1 ? "s" : ""} ` +
+          `${R.chain(({ statusCodes }) => statusCodes, subject).join(", ")}.`,
       ),
     );
   }
