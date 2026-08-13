@@ -8,14 +8,23 @@ import {
   ez,
   testEndpoint,
   ResultHandler,
+  type Method,
 } from "../src";
 import { Endpoint } from "../src/endpoint";
 
 describe("Endpoint", () => {
   describe(".methods", () => {
-    test("Should return the correct set of methods (readonly)", () => {
+    test("Should return the correct set of methods", () => {
+      const methods: Method[] = [
+        "get",
+        "post",
+        "put",
+        "delete",
+        "patch",
+        "query",
+      ];
       const endpointMock = new Endpoint({
-        methods: ["get", "post", "put", "delete", "patch", "query"],
+        methods,
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         statusCodes: new Set(),
@@ -26,16 +35,10 @@ describe("Endpoint", () => {
           handler: vi.fn(),
         }),
       });
-      const { methods } = endpointMock;
-      expect(methods).toEqual([
-        "get",
-        "post",
-        "put",
-        "delete",
-        "patch",
-        "query",
-      ]);
-      expect(() => (methods as any[]).push()).toThrowError(/read only/);
+      const { methods: actual } = endpointMock;
+      expect(actual).toEqual(new Set(methods));
+      actual.delete("get");
+      expect(endpointMock.methods).toEqual(new Set(methods));
     });
   });
 

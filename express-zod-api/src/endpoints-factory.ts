@@ -199,7 +199,7 @@ export class EndpointsFactory<
     ...rest
   }: BuildProps<BIN, BOUT, IN, CTX, SCO>) {
     const { middlewares, resultHandler } = this;
-    const methods = typeof method === "string" ? [method] : method;
+    const methods = typeof method === "string" ? [method] : method?.slice();
     const getOperationId =
       typeof operationId === "function"
         ? operationId

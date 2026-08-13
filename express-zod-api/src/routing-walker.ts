@@ -67,9 +67,9 @@ const prohibit = (method: Method, path: string) => {
 const checkMethodSupported = (
   method: Method,
   path: string,
-  methods?: ReadonlyArray<Method>,
+  methods: ReadonlySet<Method>,
 ) => {
-  if (!methods || methods.includes(method)) return;
+  if (!methods.size || methods.has(method)) return;
   throw new RoutingError(
     `Method ${method} is not supported by the assigned Endpoint.`,
     method,
@@ -106,8 +106,9 @@ export const walkRouting = ({
         checkMethodSupported(explicitMethod, path, element.methods);
         onEndpoint(explicitMethod, path, element);
       } else {
-        const { methods = ["get"] } = element;
-        for (const method of methods) {
+        const { methods } = element;
+        const effective = methods.size ? methods : new Set<Method>(["get"]);
+        for (const method of effective) {
           checkDuplicate(method, path, visited);
           onEndpoint(method, path, element);
         }
