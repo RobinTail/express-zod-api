@@ -138,7 +138,7 @@ describe("Result helpers", () => {
         overrideStatusCodes(
           [
             { schema: first, statusCodes: [200], mimeTypes: ["text/plain"] },
-            { schema: second, statusCodes: [400], mimeTypes: ["text/plain"] },
+            { schema: second, statusCodes: [201], mimeTypes: ["text/plain"] },
           ],
           new Set([200]),
           "positive",
