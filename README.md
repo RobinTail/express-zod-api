@@ -4,7 +4,9 @@
 
 ![CI](https://img.shields.io/github/actions/workflow/status/RobinTail/express-zod-api/node.js.yml?label=CI)
 ![OpenAPI](https://img.shields.io/github/actions/workflow/status/RobinTail/express-zod-api/oas.yml?label=OpenAPI)
-[![coverage](https://img.shields.io/coverallsCoverage/github/RobinTail/express-zod-api)](https://coveralls.io/github/RobinTail/express-zod-api)
+[![coverage](https://coveralls.io/repos/github/RobinTail/express-zod-api/badge.svg?branch=master)](https://coveralls.io/github/RobinTail/express-zod-api)
+
+
 
 ![downloads](https://img.shields.io/npm/dw/express-zod-api.svg)
 ![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api.svg?style=flat)
