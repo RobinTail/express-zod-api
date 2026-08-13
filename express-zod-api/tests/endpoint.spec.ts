@@ -2,11 +2,11 @@ import { z } from "zod";
 import {
   EndpointsFactory,
   Middleware,
-  ResultHandler,
   defaultEndpointsFactory,
   defaultResultHandler,
   ez,
   testEndpoint,
+  ResultHandler,
 } from "../src";
 import { Endpoint } from "../src/endpoint";
 import { ResultHandlerError } from "../src/errors";
