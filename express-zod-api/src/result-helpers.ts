@@ -99,12 +99,10 @@ export const overrideStatusCodes = (
   const overrides = new Set(Array.from(specific).filter(variantFilter));
   if (!overrides.size) return subject;
   if (subject.length === 1) {
-    return [
-      {
-        ...subject[0]!, // ensured by the length check
-        statusCodes: Array.from(overrides) as [number, ...number[]], // ensured by size check
-      },
-    ];
+    return subject.map((response) => ({
+      ...response, // single schema case — replacing the codes:
+      statusCodes: Array.from(overrides) as [number, ...number[]], // ensured by size check
+    }));
   }
   const matched: NormalizedResponse[] = subject
     .map(({ schema, mimeTypes, statusCodes }) => ({
