@@ -70,10 +70,8 @@ interface BuildProps<
   tag?: Tag | Tag[];
   /**
    * @desc The status code(s) specific to the Endpoint, overriding the ones configured by the ResultHandler.
-   * @desc If the ResultHandler defines distinct response schemas for different status codes,
-   *       only the declared status codes are documented.
-   * @example 204 — the Endpoint responds with "no content" instead of the default positive status code
-   * @example [200, 201] — the Endpoint responds with either of these positive status codes
+   *       Narrows the response schemas of ResultHandler by status codes in the generated Documentation.
+   * @example [201, 403] — the Endpoint narrows the ResultHandler responses to either "Created" or "Forbidden".
    * */
   statusCode?: number | [number, ...number[]];
   /** @desc Marks the operation deprecated in the generated Documentation */
