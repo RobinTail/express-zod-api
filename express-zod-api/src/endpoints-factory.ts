@@ -68,6 +68,13 @@ interface BuildProps<
    * @see TagOverrides
    * */
   tag?: Tag | Tag[];
+  /**
+   * @desc The status code(s) specific to the Endpoint, overriding the ones configured by the ResultHandler.
+   *       Narrows the response schemas of ResultHandler by status codes in the generated Documentation.
+   * @example [201, 403] — the Endpoint narrows the ResultHandler responses to either "Created" or "Forbidden".
+   * @see ApiResponse#statusCode - the status codes used by ResultHandler
+   * */
+  statusCode?: number | [number, ...number[]];
   /** @desc Marks the operation deprecated in the generated Documentation */
   deprecated?: boolean;
 }
@@ -84,6 +91,7 @@ export class EndpointsFactory<
   SCO extends string = string,
 > {
   protected schema = undefined as IN;
+  protected statusCodes = new Set<number>();
   protected middlewares: AbstractMiddleware[] = [];
 
   /**
@@ -104,6 +112,7 @@ export class EndpointsFactory<
     >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
     factory.schema = ensureExtension(this.schema, middleware.schema);
+    factory.statusCodes = this.statusCodes.union(middleware.statusCodes);
     return factory;
   }
 
@@ -186,6 +195,7 @@ export class EndpointsFactory<
     scope,
     tag,
     method,
+    statusCode,
     ...rest
   }: BuildProps<BIN, BOUT, IN, CTX, SCO>) {
     const { middlewares, resultHandler } = this;
@@ -207,6 +217,11 @@ export class EndpointsFactory<
       methods,
       getOperationId,
       inputSchema: makeFinalInputSchema(this.schema, input),
+      statusCodes: this.statusCodes.union(
+        new Set(
+          typeof statusCode === "number" ? [statusCode] : statusCode || [],
+        ),
+      ),
     });
   }
 

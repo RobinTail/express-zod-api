@@ -88,6 +88,47 @@ export const normalize = <A extends unknown[]>(
   return normalized;
 };
 
+/** @internal Overrides the normalized responses with Endpoint-specific status codes. */
+export const overrideStatusCodes = (
+  subject: NormalizedResponse[],
+  specific: ReadonlySet<number>, // can contain codes for both positive and negative status codes
+  variant: ResponseVariant,
+): NormalizedResponse[] => {
+  const variantFilter = (code: number) =>
+    isPositiveStatusCode(code) === (variant === "positive");
+  const overrides = new Set(Array.from(specific).filter(variantFilter));
+  if (!overrides.size) return subject;
+  if (subject.length === 1) {
+    return subject.map((response) => ({
+      ...response, // single schema case — replacing the codes:
+      statusCodes: Array.from(overrides) as [number, ...number[]], // ensured by size check
+    }));
+  }
+  const overlap: NormalizedResponse[] = [];
+  const missing = subject.reduce((acc, { statusCodes, ...rest }) => {
+    const reduced = new Set(statusCodes).intersection(overrides);
+    if (!reduced.size) return acc;
+    overlap.push({
+      ...rest,
+      statusCodes: Array.from(reduced) as [number, ...number[]], // ensured by the size check
+    });
+    return acc.difference(reduced);
+  }, new Set(overrides));
+  if (missing.size) {
+    const missingCodes = Array.from(missing).join(", ");
+    const isPlural = missing.size > 1;
+    throw new ResultHandlerError(
+      new Error(
+        `The ResultHandler defines multiple ${variant} response schemas, but the overriding status ` +
+          `code${isPlural ? "s" : ""} ${missingCodes} of the Endpoint ${isPlural ? "are" : "is"} not listed for any ` +
+          `of them, therefore it is unclear how such override${isPlural ? "s" : ""} would be handled. ` +
+          `Consider adding ${isPlural ? "them" : "it"} to ResultHandler.`,
+      ),
+    );
+  }
+  return overlap; // not empty, ensured by missing.size
+};
+
 export const logServerError = (
   error: HttpError,
   logger: ActualLogger,

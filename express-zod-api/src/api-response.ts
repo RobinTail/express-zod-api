@@ -23,6 +23,7 @@ export interface ApiResponse<S extends z.ZodType> {
   /**
    * @desc The status code(s) for this response.
    * @default 200 for a positive response, 400 for a negative one
+   * @see BuildProps#statusCode - for Endpoint-specific overrides
    * */
   statusCode?: number | [number, ...number[]];
   /**

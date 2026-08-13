@@ -111,6 +111,24 @@ exports[`Endpoint > .getResponses() > should return the positive responses (read
 ]
 `;
 
+exports[`Endpoint > .getResponses() > should throw when the Endpoint declares a status code uncovered by the multi-schema ResultHandler 1`] = `
+ResultHandlerError({
+  "cause": Error({
+    "message": "The ResultHandler defines multiple positive response schemas, but the overriding status code 204 of the Endpoint is not listed for any of them, therefore it is unclear how such override would be handled. Consider adding it to ResultHandler.",
+  }),
+  "message": "The ResultHandler defines multiple positive response schemas, but the overriding status code 204 of the Endpoint is not listed for any of them, therefore it is unclear how such override would be handled. Consider adding it to ResultHandler.",
+})
+`;
+
+exports[`Endpoint > .getResponses() > should throw when the Endpoint declares a status code uncovered by the multi-schema ResultHandler 2`] = `
+ResultHandlerError({
+  "cause": Error({
+    "message": "The ResultHandler defines multiple negative response schemas, but the overriding status codes 404, 502 of the Endpoint are not listed for any of them, therefore it is unclear how such overrides would be handled. Consider adding them to ResultHandler.",
+  }),
+  "message": "The ResultHandler defines multiple negative response schemas, but the overriding status codes 404, 502 of the Endpoint are not listed for any of them, therefore it is unclear how such overrides would be handled. Consider adding them to ResultHandler.",
+})
+`;
+
 exports[`Endpoint > Issue #585: Handling non-Error exceptions > thrown in #handleResult() 1`] = `
 [
   [

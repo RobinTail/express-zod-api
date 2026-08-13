@@ -23,6 +23,7 @@ import type { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
 import {
   type DiscriminatedResult,
+  overrideStatusCodes,
   pullResponseExamples,
 } from "./result-helpers";
 import type { AbstractResultHandler } from "./result-handler";
@@ -113,6 +114,7 @@ export class Endpoint<
     methods?: Method[];
     scopes?: string[];
     tags?: string[];
+    statusCodes: ReadonlySet<number>;
   }) {
     super();
     this.#def = def;
@@ -176,10 +178,14 @@ export class Endpoint<
   /** @internal */
   public override getResponses(variant: ResponseVariant) {
     if (variant === "positive") this.#ensureOutputExamples();
-    return Object.freeze(
+    const responses =
       variant === "negative"
         ? this.#def.resultHandler.getNegativeResponse()
-        : this.#def.resultHandler.getPositiveResponse(this.#def.outputSchema),
+        : this.#def.resultHandler.getPositiveResponse(this.#def.outputSchema);
+    return Object.freeze(
+      this.#def.statusCodes.size
+        ? overrideStatusCodes(responses, this.#def.statusCodes, variant)
+        : responses,
     );
   }
 

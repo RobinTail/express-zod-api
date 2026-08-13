@@ -2,10 +2,21 @@
 
 ## Version 29
 
-### v29.2.4
+### v29.3.0
 
+- Featuring Endpoint-specific status codes:
+  - Added `statusCode` option to `EndpointsFactory::build()` and `Middleware::constructor()` arguments;
+  - It can be assigned with a number or an array of numbers having at least one element;
+  - You can specify how exactly an Endpoint can respond or a Middleware can terminate the request handling;
+  - Those codes affect the generated Documentation along with the `ResultHandler` (`positive` and `negative`):
+    - If `ResultHandler` has a single response schema, those codes replace the configured ones (override);
+    - When it has different response schemas, status codes would be narrowed down (intersection):
+      - Failure to intersect (uncertain response schema for unlisted code) leads to `ResultHandlerError`.
 - Fixed: `createRateLimitMiddleware` and `EndpointsFactory::useRateLimit` respect the custom `statusCode`:
-  - The feature introduced in v28.7.0 and the default code remains `429`.
+  - Rate-limit middleware was introduced in v28.7.0; its default status code remains `429`.
+- Rate-limit middleware, in this regard, is supposed to declare its status code:
+  - But it could be a breaking change for some APIs and therefore, it's postponed until v30;
+  - If that behavior is desired now, you can specify the `{ statusCode: 429 }` explicitly in its configuration.
 
 ### v29.2.3
 

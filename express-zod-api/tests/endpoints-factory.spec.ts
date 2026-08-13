@@ -15,6 +15,7 @@ import * as rateLimitMw from "../src/rate-limit-middleware";
 import type { EmptyObject } from "../src/common-helpers";
 import { Endpoint } from "../src/endpoint";
 import { z } from "zod";
+import * as R from "ramda";
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({
@@ -405,6 +406,53 @@ describe("EndpointsFactory", () => {
       ).toEqualTypeOf<EmptyObject>();
       expect(endpoint.isDeprecated).toBe(true);
     });
+
+    test("should pass the single statusCode to the endpoint", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        handler: vi.fn(),
+        statusCode: 204,
+      });
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[204]],
+      );
+    });
+
+    test("should pass the tuple of statusCodes to the endpoint", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        handler: vi.fn(),
+        statusCode: [201, 400],
+      });
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[201]],
+      );
+      expect(R.pluck("statusCodes", endpoint.getResponses("negative"))).toEqual(
+        [[400]],
+      );
+    });
+
+    test("should combine the status codes declared by the middlewares", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock)
+        .addMiddleware({ statusCode: 429, handler: vi.fn() })
+        .buildVoid({ handler: vi.fn() });
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[200]],
+      );
+      expect(R.pluck("statusCodes", endpoint.getResponses("negative"))).toEqual(
+        [[429]],
+      );
+    });
+
+    test("should deduplicate the status codes declared by the endpoint and middlewares", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock)
+        .addMiddleware({ statusCode: [400, 429], handler: vi.fn() })
+        .buildVoid({ handler: vi.fn(), statusCode: [200, 400] });
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[200]],
+      );
+      expect(R.pluck("statusCodes", endpoint.getResponses("negative"))).toEqual(
+        [[400, 429]],
+      );
+    });
   });
 
   describe(".buildVoid()", () => {
@@ -415,6 +463,16 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint.outputSchema).toMatchSnapshot();
       expectTypeOf(endpoint.outputSchema.shape).toExtend<EmptyObject>();
+    });
+
+    test("Should pass the statusCode option", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        handler: vi.fn(),
+        statusCode: 204,
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[204]]);
     });
   });
 });
