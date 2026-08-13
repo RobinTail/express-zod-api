@@ -432,7 +432,7 @@ describe("EndpointsFactory", () => {
 
     test("should combine the status codes declared by the middlewares", () => {
       const endpoint = new EndpointsFactory(resultHandlerMock)
-        .addMiddleware(new Middleware({ statusCode: 429, handler: vi.fn() }))
+        .addMiddleware({ statusCode: 429, handler: vi.fn() })
         .buildVoid({ handler: vi.fn() });
       expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
         [[200]],
@@ -444,9 +444,7 @@ describe("EndpointsFactory", () => {
 
     test("should deduplicate the status codes declared by the endpoint and middlewares", () => {
       const endpoint = new EndpointsFactory(resultHandlerMock)
-        .addMiddleware(
-          new Middleware({ statusCode: [400, 429], handler: vi.fn() }),
-        )
+        .addMiddleware({ statusCode: [400, 429], handler: vi.fn() })
         .buildVoid({ handler: vi.fn(), statusCode: [200, 400] });
       expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
         [[200]],
