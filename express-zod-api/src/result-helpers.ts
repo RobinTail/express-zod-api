@@ -119,10 +119,10 @@ export const overrideStatusCodes = (
     const isPlural = missing.size > 1;
     throw new ResultHandlerError(
       new Error(
-        `The ResultHandler defines multiple ${variant} response schemas, but the overriding ` +
-          `status code${isPlural ? "s" : ""} ${missingCodes} of the Endpoint ` +
-          `${isPlural ? "are" : "is"} not listed for any of them, therefore it is unclear ` +
-          `how such overrides would be handled. Consider adding them to ResultHandler.`,
+        `The ResultHandler defines multiple ${variant} response schemas, but the overriding status ` +
+          `code${isPlural ? "s" : ""} ${missingCodes} of the Endpoint ${isPlural ? "are" : "is"} not listed for any ` +
+          `of them, therefore it is unclear how such override${isPlural ? "s" : ""} would be handled. ` +
+          `Consider adding ${isPlural ? "them" : "it"} to ResultHandler.`,
       ),
     );
   }

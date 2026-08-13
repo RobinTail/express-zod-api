@@ -10,7 +10,6 @@ import {
   ResultHandler,
 } from "../src";
 import { Endpoint } from "../src/endpoint";
-import { ResultHandlerError } from "../src/errors";
 
 describe("Endpoint", () => {
   describe(".methods", () => {
@@ -380,12 +379,14 @@ describe("Endpoint", () => {
     test("should throw when the Endpoint declares a status code uncovered by the multi-schema ResultHandler", () => {
       const endpoint = multiSchemaFactory.buildVoid({
         handler: vi.fn(),
-        statusCode: [200, 204],
+        statusCode: [200, 204, 400, 404, 502],
       });
-      expect(() => endpoint.getResponses("positive")).toThrow(
-        ResultHandlerError,
-      );
-      expect(() => endpoint.getResponses("positive")).toThrow(/204/);
+      expect(() =>
+        endpoint.getResponses("positive"),
+      ).toThrowErrorMatchingSnapshot();
+      expect(() =>
+        endpoint.getResponses("negative"),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
