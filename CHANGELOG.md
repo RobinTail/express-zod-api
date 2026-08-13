@@ -4,11 +4,14 @@
 
 ### v29.3.0
 
-- Feature: New `statusCode` option in `BuildProps` for overriding the status codes configured by the ResultHandler:
-  - The option accepts a single status code or a list of them, like the ones of `ApiResponse`;
-  - When the ResultHandler defines a single response schema, the Endpoint status code overrides the configured one;
-  - When it defines distinct response schemas for different status codes, only the declared status codes are documented;
-  - Declaring a status code having no response schema in the multi-schema ResultHandler throws `ResultHandlerError`.
+- Featuring Endpoint-specific status codes:
+  - Added `statusCode` option to `EndpointsFactory::build()` and `Middleware::constructor()` arguments;
+  - It can be assigned with a number or an array of numbers having at least one element;
+  - You can specify how exactly this Endpoint or a Middleware can respond or terminate the request handling;
+  - Those codes affect the generated Documentation along with the `ResultHandler` (`positive` and `negative`):
+    - If `ResultHandler` has a single response schema, those codes replace the configured ones (override);
+    - When it has different response schemas, status codes would be narrowed down (intersection):
+      - Failure to intersect (uncertain response schema for unlisted code), it throws `ResultHandlerError`.
 - Fixed: `createRateLimitMiddleware` and `EndpointsFactory::useRateLimit` respect the custom `statusCode`:
   - When the status code is specified explicitly, it will override the one configured by the ResultHandler;
   - Rate-limit middleware was introduced in v28.7.0; its default status code remains `429`.
