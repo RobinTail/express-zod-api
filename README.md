@@ -456,7 +456,7 @@ import { auth } from "express-oauth2-jwt-bearer";
 const factory = defaultEndpointsFactory.use(auth(), {
   provider: (req) => ({ auth: req.auth }), // optional, can be async
   transformer: (err) => createHttpError(401, err.message), // optional
-  statusCode: 401, // for Documentation: middleware may interrupt handling this way
+  statusCode: 401, // for Documentation: Middleware may interrupt handling this way
 });
 ```
 
