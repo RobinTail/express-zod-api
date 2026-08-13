@@ -7,7 +7,7 @@
 - Featuring Endpoint-specific status codes:
   - Added `statusCode` option to `EndpointsFactory::build()` and `Middleware::constructor()` arguments;
   - It can be assigned with a number or an array of numbers having at least one element;
-  - You can specify how exactly this Endpoint or a Middleware can respond or terminate the request handling;
+  - You can specify how exactly an Endpoint can respond or a Middleware can terminate the request handling;
   - Those codes affect the generated Documentation along with the `ResultHandler` (`positive` and `negative`):
     - If `ResultHandler` has a single response schema, those codes replace the configured ones (override);
     - When it has different response schemas, status codes would be narrowed down (intersection):
