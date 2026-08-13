@@ -116,12 +116,13 @@ export const overrideStatusCodes = (
   }, new Set(overrides));
   if (missing.size) {
     const missingCodes = Array.from(missing).join(", ");
+    const isPlural = missing.size > 1;
     throw new ResultHandlerError(
       new Error(
         `The ResultHandler defines multiple ${variant} response schemas, but the overriding ` +
-          `status code${missing.size > 1 ? "s" : ""} ${missingCodes} of the Endpoint ` +
-          `${missing.size > 1 ? "are" : "is"} not listed for any of them, so it is ` +
-          `unclear how such overrides would be handled.`,
+          `status code${isPlural ? "s" : ""} ${missingCodes} of the Endpoint ` +
+          `${isPlural ? "are" : "is"} not listed for any of them, therefore it is unclear ` +
+          `how such overrides would be handled. Consider adding them to ResultHandler.`,
       ),
     );
   }
