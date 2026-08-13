@@ -1,4 +1,5 @@
 import { z } from "zod";
+import * as R from "ramda";
 import {
   EndpointsFactory,
   Middleware,
@@ -331,29 +332,19 @@ describe("Endpoint", () => {
           statusCode,
         });
         expect(
-          endpoint
-            .getResponses("positive")
-            .map(({ statusCodes }) => statusCodes),
+          R.pluck("statusCodes", endpoint.getResponses("positive")),
         ).toEqual(positive);
         expect(
-          endpoint
-            .getResponses("negative")
-            .map(({ statusCodes }) => statusCodes),
+          R.pluck("statusCodes", endpoint.getResponses("negative")),
         ).toEqual(negative);
       },
     );
 
     const multiSchemaFactory = new EndpointsFactory(
       new ResultHandler({
-        positive: (data) => [
-          {
-            statusCode: 200,
-            schema: z.object({ status: z.literal("ok"), data }),
-          },
-          {
-            statusCode: 201,
-            schema: z.object({ status: z.literal("kinda"), data }),
-          },
+        positive: [
+          { statusCode: 200, schema: z.literal("ok") },
+          { statusCode: 201, schema: z.literal("kinda") },
         ],
         negative: [
           { statusCode: 400, schema: z.literal("error") },
@@ -378,14 +369,10 @@ describe("Endpoint", () => {
           statusCode,
         });
         expect(
-          endpoint
-            .getResponses("positive")
-            .map(({ statusCodes }) => statusCodes),
+          R.pluck("statusCodes", endpoint.getResponses("positive")),
         ).toEqual(positive);
         expect(
-          endpoint
-            .getResponses("negative")
-            .map(({ statusCodes }) => statusCodes),
+          R.pluck("statusCodes", endpoint.getResponses("negative")),
         ).toEqual(negative);
       },
     );
