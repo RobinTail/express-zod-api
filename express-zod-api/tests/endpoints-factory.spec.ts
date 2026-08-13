@@ -15,6 +15,7 @@ import * as rateLimitMw from "../src/rate-limit-middleware";
 import type { EmptyObject } from "../src/common-helpers";
 import { Endpoint } from "../src/endpoint";
 import { z } from "zod";
+import * as R from "ramda";
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({
@@ -411,9 +412,9 @@ describe("EndpointsFactory", () => {
         handler: vi.fn(),
         statusCode: 204,
       });
-      expect(
-        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[204]]);
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[204]],
+      );
     });
 
     test("should pass the tuple of statusCodes to the endpoint", () => {
@@ -421,24 +422,24 @@ describe("EndpointsFactory", () => {
         handler: vi.fn(),
         statusCode: [201, 400],
       });
-      expect(
-        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[201]]);
-      expect(
-        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[400]]);
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[201]],
+      );
+      expect(R.pluck("statusCodes", endpoint.getResponses("negative"))).toEqual(
+        [[400]],
+      );
     });
 
     test("should combine the status codes declared by the middlewares", () => {
       const endpoint = new EndpointsFactory(resultHandlerMock)
         .addMiddleware(new Middleware({ statusCode: 429, handler: vi.fn() }))
         .buildVoid({ handler: vi.fn() });
-      expect(
-        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[200]]);
-      expect(
-        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[429]]);
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[200]],
+      );
+      expect(R.pluck("statusCodes", endpoint.getResponses("negative"))).toEqual(
+        [[429]],
+      );
     });
 
     test("should deduplicate the status codes declared by the endpoint and middlewares", () => {
@@ -446,16 +447,13 @@ describe("EndpointsFactory", () => {
         .addMiddleware(
           new Middleware({ statusCode: [400, 429], handler: vi.fn() }),
         )
-        .buildVoid({
-          handler: vi.fn(),
-          statusCode: [200, 400],
-        });
-      expect(
-        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[200]]);
-      expect(
-        endpoint.getResponses("negative").map(({ statusCodes }) => statusCodes),
-      ).toEqual([[400, 429]]);
+        .buildVoid({ handler: vi.fn(), statusCode: [200, 400] });
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[200]],
+      );
+      expect(R.pluck("statusCodes", endpoint.getResponses("negative"))).toEqual(
+        [[400, 429]],
+      );
     });
   });
 
