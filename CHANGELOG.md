@@ -5,10 +5,8 @@
 ### v29.3.1
 
 - Fixed the `Endpoint` methods duplication issue:
-  - `Endpoint::methods()` now returns a `ReadonlySet` instead of a `ReadonlyArray`;
-  - `EndpointsFactory::build()` copies the array of declared methods to prevent its further mutation;
-  - Declared methods are now deduplicated, so assigning the same method multiple times no longer causes
-    a misleading "Route has a duplicate" error and duplicate entries in the generated `Integration` and `Documentation`.
+  - The methods given to `EndpointsFactory::build()` are now deduplicated;
+  - No more confusing "Route has a duplicate" error in that case and duplicate entries in the generated `Integration`.
 
 ### v29.3.0
 
