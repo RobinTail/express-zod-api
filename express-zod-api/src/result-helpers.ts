@@ -118,11 +118,10 @@ export const overrideStatusCodes = (
     const missingCodes = Array.from(missing).join(", ");
     throw new ResultHandlerError(
       new Error(
-        `Endpoint declares status code${missing.size > 1 ? "s" : ""} ` +
-          `${missingCodes} for its ${variant} responses, but the ResultHandler ` +
-          `defines response schema${subject.length > 1 ? "s" : ""} only for the status code` +
-          `${subject.length > 1 ? "s" : ""} ` +
-          `${R.chain(({ statusCodes }) => statusCodes, subject).join(", ")}.`,
+        `The ResultHandler defines multiple ${variant} response schemas, but the overriding ` +
+          `status code${missing.size > 1 ? "s" : ""} ${missingCodes} of the Endpoint ` +
+          `${missing.size > 1 ? "are" : "is"} not listed for any of them, so it is ` +
+          `unclear how such overrides would be handled.`,
       ),
     );
   }
