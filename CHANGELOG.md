@@ -11,7 +11,7 @@
   - Those codes affect the generated Documentation along with the `ResultHandler` (`positive` and `negative`):
     - If `ResultHandler` has a single response schema, those codes replace the configured ones (override);
     - When it has different response schemas, status codes would be narrowed down (intersection):
-      - Failure to intersect (uncertain response schema for unlisted code), it throws `ResultHandlerError`.
+      - Failure to intersect (uncertain response schema for unlisted code) leads to `ResultHandlerError`.
 - Fixed: `createRateLimitMiddleware` and `EndpointsFactory::useRateLimit` respect the custom `statusCode`:
   - Rate-limit middleware was introduced in v28.7.0; its default status code remains `429`.
 - Rate-limit middleware, in this regard, is supposed to declare its status code:
