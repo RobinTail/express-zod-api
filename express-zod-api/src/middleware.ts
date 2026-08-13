@@ -55,7 +55,7 @@ export class Middleware<
   readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
-  readonly #statusCode: number[];
+  readonly #statusCode?: number[];
   readonly #handler: Handler<z.output<IN>, CTX, RET>;
 
   constructor({
@@ -86,9 +86,7 @@ export class Middleware<
     this.#schema = input as IN;
     this.#security = security;
     this.#statusCode =
-      typeof statusCode === "number"
-        ? [statusCode]
-        : (statusCode?.slice() ?? []);
+      typeof statusCode === "number" ? [statusCode] : statusCode?.slice();
     this.#handler = handler;
   }
 
