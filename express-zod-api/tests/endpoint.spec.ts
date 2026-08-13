@@ -18,6 +18,7 @@ describe("Endpoint", () => {
         methods: ["get", "post", "put", "delete", "patch", "query"],
         inputSchema: z.object({}),
         outputSchema: z.object({}),
+        statusCodes: new Set(),
         handler: vi.fn(),
         resultHandler: new ResultHandler({
           positive: z.string(),
@@ -492,6 +493,7 @@ describe("Endpoint", () => {
         new Endpoint({
           inputSchema: z.object({}),
           outputSchema: z.object({}),
+          statusCodes: new Set(),
           handler: async () => ({}),
           resultHandler: defaultResultHandler,
         }).getOperationId("get"),

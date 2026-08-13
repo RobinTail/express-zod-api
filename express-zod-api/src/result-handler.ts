@@ -4,7 +4,6 @@ import {
   defaultStatusCodes,
   type ApiResponse,
   type NormalizedResponse,
-  type ResponseVariant,
 } from "./api-response";
 import { ensureError, isObject, type FlatObject } from "./common-helpers";
 import createHttpError, { isHttpError } from "http-errors";
@@ -12,7 +11,6 @@ import { ResultHandlerError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import {
-  overrideStatusCodes,
   type DiscriminatedResult,
   type ResultSchema,
   ensureHttpError,
@@ -51,14 +49,9 @@ export type LazyResult<R extends Result, A extends unknown[] = []> = (
 export abstract class AbstractResultHandler {
   readonly #handler: Handler;
   /** @internal */
-  public abstract getPositiveResponse(
-    output: IOSchema,
-    declared?: ReadonlySet<number>,
-  ): NormalizedResponse[];
+  public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
   /** @internal */
-  public abstract getNegativeResponse(
-    declared?: ReadonlySet<number>,
-  ): NormalizedResponse[];
+  public abstract getNegativeResponse(): NormalizedResponse[];
   protected constructor(handler: Handler) {
     this.#handler = handler;
   }
@@ -124,22 +117,13 @@ export class ResultHandler<
   }
 
   /** @internal */
-  public override getPositiveResponse(
-    output: IOSchema,
-    declared?: ReadonlySet<number>,
-  ) {
-    const variant: ResponseVariant = "positive";
-    const normalized = normalize(this.#positive, { variant, args: [output] });
-    if (!declared) return normalized;
-    return overrideStatusCodes(normalized, declared, variant);
+  public override getPositiveResponse(output: IOSchema) {
+    return normalize(this.#positive, { variant: "positive", args: [output] });
   }
 
   /** @internal */
-  public override getNegativeResponse(declared?: ReadonlySet<number>) {
-    const variant: ResponseVariant = "negative";
-    const normalized = normalize(this.#negative, { variant, args: [] });
-    if (!declared) return normalized;
-    return overrideStatusCodes(normalized, declared, variant);
+  public override getNegativeResponse() {
+    return normalize(this.#negative, { variant: "negative", args: [] });
   }
 }
 
