@@ -104,14 +104,15 @@ export const overrideStatusCodes = (
       statusCodes: Array.from(overrides) as [number, ...number[]], // ensured by size check
     }));
   }
-  const overlap: NormalizedResponse[] = subject
-    .map(({ statusCodes, ...rest }) => ({
-      ...rest,
-      statusCodes: statusCodes.filter((statusCode) =>
-        overrides.has(statusCode),
-      ) as [number, ...number[]],
-    }))
-    .filter(({ statusCodes }) => statusCodes.length > 0);
+  const overlap = subject.reduce<NormalizedResponse[]>(
+    (acc, { statusCodes, ...rest }) => {
+      const reduced = statusCodes.filter((one) => overrides.has(one));
+      if (!reduced.length) return acc;
+      acc.push({ ...rest, statusCodes: reduced as [number, ...number[]] }); // ensured by the length check
+      return acc;
+    },
+    [],
+  );
   const covered = new Set(R.chain(({ statusCodes }) => statusCodes, overlap));
   const uncovered = Array.from(overrides).filter(
     (statusCode) => !covered.has(statusCode),
