@@ -105,21 +105,20 @@ export const overrideStatusCodes = (
     }));
   }
   const overlap: NormalizedResponse[] = [];
-  const covered = subject.reduce((acc, { statusCodes, ...rest }) => {
+  const uncovered = subject.reduce((acc, { statusCodes, ...rest }) => {
     const reduced = new Set(statusCodes).intersection(overrides);
     if (!reduced.size) return acc;
     overlap.push({
       ...rest,
       statusCodes: Array.from(reduced) as [number, ...number[]], // ensured by the size check
     });
-    return acc.union(reduced);
-  }, new Set<number>());
-  const uncovered = Array.from(overrides.difference(covered));
-  if (uncovered.length) {
+    return acc.difference(reduced);
+  }, new Set(overrides));
+  if (uncovered.size) {
     throw new ResultHandlerError(
       new Error(
-        `Endpoint declares status code${uncovered.length > 1 ? "s" : ""} ` +
-          `${uncovered.join(", ")} for its ${variant} responses, but the ResultHandler ` +
+        `Endpoint declares status code${uncovered.size > 1 ? "s" : ""} ` +
+          `${[...uncovered].join(", ")} for its ${variant} responses, but the ResultHandler ` +
           `defines response schema${subject.length > 1 ? "s" : ""} only for the status code` +
           `${subject.length > 1 ? "s" : ""} ` +
           `${R.chain(({ statusCodes }) => statusCodes, subject).join(", ")}.`,
