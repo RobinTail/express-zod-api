@@ -94,25 +94,33 @@ export const overrideStatusCodes = (
   declared: ReadonlySet<number>,
   variant: ResponseVariant,
 ): NormalizedResponse[] => {
-  const narrowed = Array.from(declared).filter(
-    (one) => isPositiveStatusCode(one) === (variant === "positive"),
+  const narrowed = new Set(
+    Array.from(declared).filter(
+      (one) => isPositiveStatusCode(one) === (variant === "positive"),
+    ),
   );
-  if (!narrowed.length) return responses;
+  if (!narrowed.size) return responses;
   if (responses.length === 1) {
-    const response = responses[0]!; // ensured by the length check
-    return [{ ...response, statusCodes: narrowed as [number, ...number[]] }];
+    return [
+      {
+        ...responses[0]!, // ensured by the length check
+        statusCodes: Array.from(narrowed) as [number, ...number[]], // ensured by size check
+      },
+    ];
   }
   const matched: NormalizedResponse[] = responses
     .map(({ schema, mimeTypes, statusCodes }) => ({
       schema,
       mimeTypes,
       statusCodes: statusCodes.filter((statusCode) =>
-        narrowed.includes(statusCode),
+        narrowed.has(statusCode),
       ) as [number, ...number[]],
     }))
     .filter(({ statusCodes }) => statusCodes.length > 0);
   const covered = new Set(R.chain(({ statusCodes }) => statusCodes, matched));
-  const uncovered = narrowed.filter((statusCode) => !covered.has(statusCode));
+  const uncovered = Array.from(narrowed).filter(
+    (statusCode) => !covered.has(statusCode),
+  );
   if (uncovered.length) {
     throw new ResultHandlerError(
       new Error(
