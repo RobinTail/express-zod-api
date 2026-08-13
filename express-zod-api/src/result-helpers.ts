@@ -88,7 +88,7 @@ export const normalize = <A extends unknown[]>(
   return normalized;
 };
 
-/** @internal An internal helper applying the Endpoint-declared status codes to the normalized responses. */
+/** @internal Overrides the normalized responses with Endpoint-specific status codes. */
 export const overrideStatusCodes = (
   subject: NormalizedResponse[],
   specific: ReadonlySet<number>, // can contain codes for both positive and negative status codes
@@ -126,7 +126,7 @@ export const overrideStatusCodes = (
       ),
     );
   }
-  return overlap;
+  return overlap; // not empty, ensured by missing.size
 };
 
 export const logServerError = (
