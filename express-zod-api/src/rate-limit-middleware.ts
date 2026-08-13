@@ -10,7 +10,7 @@ import { ExpressMiddleware } from "./middleware";
 import { loadPeer } from "./peer-helpers";
 
 /** @desc The HTTP status code returned by the rate limiter. */
-const errorCode = 429;
+const defaultStatusCode = 429;
 
 /**
  * @desc Creates an ExpressMiddleware that enforces rate limits using express-rate-limit.
@@ -30,7 +30,7 @@ export const createRateLimitMiddleware = (
 ) => {
   const rateLimit = loadPeer<typeof RateLimitFn>("express-rate-limit");
   const limiter = rateLimit({
-    statusCode: errorCode,
+    statusCode: defaultStatusCode,
     ...options,
     handler: (_req, _res, next, optionsUsed) => {
       next(createHttpError(optionsUsed.statusCode, optionsUsed.message));
@@ -42,7 +42,7 @@ export const createRateLimitMiddleware = (
     resetKey,
   };
   return new ExpressMiddleware(limiter, {
-    /** @todo add ?? errorCode in next major */
+    /** @todo add ?? defaultStatusCode in next major */
     statusCode: options?.statusCode, // only when specified explicitly to avoid breaking changes
     provider: (req: AugmentedRequest) => ({
       rateLimit: {
