@@ -341,12 +341,12 @@ import { Middleware } from "express-zod-api";
 
 const authMiddleware = new Middleware({
   security: {
-    // this information is optional and used for generating documentation
     and: [
       { type: "input", name: "key" },
       { type: "header", name: "token" },
     ],
-  },
+  }, // this information is optional and used for generating Documentation
+  statusCode: 401, // for Documentation: Middleware may interrupt handling this way
   input: z.object({
     key: z.string().min(1),
   }),
@@ -456,6 +456,7 @@ import { auth } from "express-oauth2-jwt-bearer";
 const factory = defaultEndpointsFactory.use(auth(), {
   provider: (req) => ({ auth: req.auth }), // optional, can be async
   transformer: (err) => createHttpError(401, err.message), // optional
+  statusCode: 401, // for Documentation: middleware may interrupt handling this way
 });
 ```
 
@@ -908,7 +909,11 @@ Install `express-rate-limit`. Consider the `createRateLimitMiddleware()` to enab
 
 ```ts
 const endpoint = factory
-  .useRateLimit({ windowMs: 60000, max: 100 }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
+  .useRateLimit({
+    windowMs: 60000,
+    max: 100,
+    statusCode: 429, // when set explicitly, it will be reflected in the Documentation
+  }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
   .buildVoid({
     handler: async ({ ctx: { rateLimit, logger } }) => {
       logger.debug("Features", rateLimit); // { limit, used, remaining, resetTime, getKey, resetKey }
@@ -1396,7 +1401,7 @@ response schemas and their corresponding status codes.
 ```ts
 import { ResultHandler } from "express-zod-api";
 
-new ResultHandler({
+const resultHandler = new ResultHandler({
   positive: (data) => ({
     statusCode: [201, 202], // created or will be created
     schema: z.object({ status: z.literal("created"), data }),
@@ -1411,9 +1416,15 @@ new ResultHandler({
       schema: z.object({ status: z.literal("error"), reason: z.string() }),
     },
   ],
-  handler: ({ error, response, output }) => {
-    // your implementation here
-  },
+});
+```
+
+Moreover, when building an Endpoint, you can narrow the codes the Endpoint actually responds by using the local
+`statusCode` option, overriding the ones defined by the ResultHandler. That simplifies the generated Documentation:
+
+```ts
+const endpoint = new EndpointsFactory(resultHandler).build({
+  statusCode: [201, 409], // narrows the responses down to "created" (201) or "conflict" (409)
 });
 ```
 

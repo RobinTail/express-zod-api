@@ -8,9 +8,9 @@ export const updateUserEndpoint =
   keyAndTokenAuthenticatedEndpointsFactory.build({
     tag: "users",
     description: "Changes the user record. Example user update endpoint.",
+    statusCode: [400, 404], // augments 401 and 429 ones from the middlewares, according to the handle implementation
     input: z.object({
-      // id is the route path param of /v1/user/:id
-      id: z
+      id: z // id is the route path param of /v1/user/:id
         .string()
         .example("12") // before transformation
         .transform((value) => parseInt(value, 10))
