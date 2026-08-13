@@ -94,11 +94,9 @@ export const overrideStatusCodes = (
   specific: ReadonlySet<number>, // can contain codes for both positive and negative status codes
   variant: ResponseVariant,
 ): NormalizedResponse[] => {
-  const overrides = new Set(
-    Array.from(specific).filter(
-      (one) => isPositiveStatusCode(one) === (variant === "positive"),
-    ),
-  );
+  const variantFilter = (code: number) =>
+    isPositiveStatusCode(code) === (variant === "positive");
+  const overrides = new Set(Array.from(specific).filter(variantFilter));
   if (!overrides.size) return subject;
   if (subject.length === 1) {
     return [
