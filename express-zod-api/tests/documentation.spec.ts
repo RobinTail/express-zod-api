@@ -1043,15 +1043,9 @@ describe("Documentation", () => {
     test("should depict only the status codes declared by the Endpoint", () => {
       const factory = new EndpointsFactory(
         new ResultHandler({
-          positive: (data) => [
-            {
-              statusCode: 200,
-              schema: z.object({ status: z.literal("ok"), data }),
-            },
-            {
-              statusCode: 201,
-              schema: z.object({ status: z.literal("kinda"), data }),
-            },
+          positive: [
+            { statusCode: 200, schema: z.literal("ok") },
+            { statusCode: 201, schema: z.literal("created") },
           ],
           negative: [
             { statusCode: 400, schema: z.literal("error") },
@@ -1064,16 +1058,14 @@ describe("Documentation", () => {
         config: sampleConfig,
         routing: {
           v1: {
-            mtpl: factory.buildVoid({
-              method: "post",
-              input: z.object({ test: z.number() }),
-              handler: vi.fn(),
+            "post overrides": factory.buildVoid({
               statusCode: [201, 500],
+              handler: vi.fn(),
             }),
           },
         },
       }).getSpec();
-      const responses = spec.paths?.["/v1/mtpl"]?.post?.responses ?? {};
+      const responses = spec.paths?.["/v1/overrides"]?.post?.responses ?? {};
       expect(Object.keys(responses).sort()).toEqual(["201", "500"]);
     });
   });
