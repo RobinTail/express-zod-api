@@ -112,7 +112,7 @@ export class Endpoint<
     description?: string;
     summary?: string;
     getOperationId?: (method: ClientMethod) => string | undefined;
-    methods?: Method[];
+    methods: FrozenSet<Method>;
     scopes?: string[];
     tags?: string[];
     statusCodes: ReadonlySet<number>;
@@ -148,7 +148,7 @@ export class Endpoint<
 
   /** @internal */
   public override get methods() {
-    return new FrozenSet(this.#def.methods);
+    return this.#def.methods;
   }
 
   /** @internal */
