@@ -2,9 +2,11 @@ import { FrozenSet } from "../src/frozen-set";
 
 describe("FrozenSet", () => {
   test("types", () => {
-    expectTypeOf(Set).toExtend<typeof FrozenSet>();
-    expectTypeOf(FrozenSet).not.toExtend<typeof Set>();
-    expectTypeOf<Set<string>>().toExtend<FrozenSet<string>>();
+    expectTypeOf(Set).not.toExtend<typeof FrozenSet>();
+    expectTypeOf(FrozenSet).toExtend<typeof Set>();
+    expectTypeOf<FrozenSet<string>>().toExtend<Set<string>>();
+    expectTypeOf<FrozenSet<string>>().toExtend<ReadonlySet<string>>();
+    expectTypeOf<Set<string>>().not.toExtend<FrozenSet<string>>();
   });
 
   test("should construct an empty Set", () => {
