@@ -69,7 +69,7 @@ export abstract class IntegrationBase {
   /** @internal */
   protected paths = new Set<string>();
   /** @internal */
-  protected tags = new Map<string, ReadonlyArray<string>>();
+  protected tags = new Map<string, ReadonlySet<string>>();
   /** @internal */
   protected registry = new Map<
     string,

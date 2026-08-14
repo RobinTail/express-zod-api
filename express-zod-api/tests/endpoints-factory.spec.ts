@@ -427,6 +427,44 @@ describe("EndpointsFactory", () => {
       expect(Array.from(endpoint.methods)).toEqual(["get", "post"]);
     });
 
+    test("should deduplicate the tags declared in the tuple", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        tag: ["users", "users", "files"],
+        handler: vi.fn(),
+      });
+      expect(Array.from(endpoint.tags)).toEqual(["users", "files"]);
+    });
+
+    test("should not mutate the supplied array of tags when building", () => {
+      const tags = ["users", "files"];
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        tag: tags,
+        handler: vi.fn(),
+      });
+      expect(Object.isFrozen(tags)).toBe(false);
+      tags.push("extra");
+      expect(Array.from(endpoint.tags)).toEqual(["users", "files"]);
+    });
+
+    test("should deduplicate the scopes declared in the tuple", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        scope: ["admin", "admin", "read"],
+        handler: vi.fn(),
+      });
+      expect(Array.from(endpoint.scopes)).toEqual(["admin", "read"]);
+    });
+
+    test("should not mutate the supplied array of scopes when building", () => {
+      const scopes = ["admin", "read"];
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        scope: scopes,
+        handler: vi.fn(),
+      });
+      expect(Object.isFrozen(scopes)).toBe(false);
+      scopes.push("write");
+      expect(Array.from(endpoint.scopes)).toEqual(["admin", "read"]);
+    });
+
     test("should pass the single statusCode to the endpoint", () => {
       const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
         handler: vi.fn(),

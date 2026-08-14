@@ -2,6 +2,11 @@
 
 ## Version 29
 
+### v29.3.2
+
+- The tags and scopes given to `EndpointsFactory::build()` are now deduplicated and immutable:
+  - The generated `Documentation` and `Integration` no longer contain duplicate entries in such cases.
+
 ### v29.3.1
 
 - Fixed the `Endpoint` methods duplication issue:

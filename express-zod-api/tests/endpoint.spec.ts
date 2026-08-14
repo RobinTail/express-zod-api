@@ -26,6 +26,8 @@ describe("Endpoint", () => {
       ];
       const endpointMock = new Endpoint({
         methods: new FrozenSet(methods),
+        scopes: new FrozenSet(),
+        tags: new FrozenSet(),
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         statusCodes: new Set(),
@@ -405,8 +407,10 @@ describe("Endpoint", () => {
           scope,
         });
         const { scopes } = endpoint;
-        expect(scopes).toEqual(typeof scope === "string" ? [scope] : scope);
-        expect(() => (scopes as any[]).push()).toThrowError(/read only/);
+        expect(Array.from(scopes)).toEqual(
+          typeof scope === "string" ? [scope] : scope,
+        );
+        expect(() => scopes.add("something")).toThrow(/read only/);
       },
     );
   });
@@ -422,8 +426,8 @@ describe("Endpoint", () => {
           tag,
         });
         const { tags } = endpoint;
-        expect(tags).toEqual(typeof tag === "string" ? [tag] : tag);
-        expect(() => (tags as any[]).push()).toThrowError(/read only/);
+        expect(Array.from(tags)).toEqual(typeof tag === "string" ? [tag] : tag);
+        expect(() => tags.add("something")).toThrow(/read only/);
       },
     );
   });
@@ -484,6 +488,8 @@ describe("Endpoint", () => {
       expect(
         new Endpoint({
           methods: new FrozenSet(),
+          scopes: new FrozenSet(),
+          tags: new FrozenSet(),
           inputSchema: z.object({}),
           outputSchema: z.object({}),
           statusCodes: new Set(),
