@@ -2,6 +2,12 @@
 
 ## Version 29
 
+### v29.3.1
+
+- Fixed the `Endpoint` methods duplication issue:
+  - The methods given to `EndpointsFactory::build()` are now deduplicated;
+  - No more confusing "Route has a duplicate" error in that case and duplicate entries in the generated `Integration`.
+
 ### v29.3.0
 
 - Featuring Endpoint-specific status codes:

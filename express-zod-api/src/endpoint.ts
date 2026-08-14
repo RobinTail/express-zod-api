@@ -64,7 +64,7 @@ export abstract class AbstractEndpoint {
   /** @internal */
   public abstract get summary(): string | undefined;
   /** @internal */
-  public abstract get methods(): ReadonlyArray<Method> | undefined;
+  public abstract get methods(): ReadonlySet<Method>;
   /** @internal */
   public abstract get inputSchema(): IOSchema;
   /** @internal */
@@ -147,7 +147,7 @@ export class Endpoint<
 
   /** @internal */
   public override get methods() {
-    return Object.freeze(this.#def.methods);
+    return Object.freeze(new Set(this.#def.methods));
   }
 
   /** @internal */

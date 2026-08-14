@@ -8,6 +8,7 @@ import {
   defaultEndpointsFactory,
   ResultHandler,
   testMiddleware,
+  type Method,
 } from "../src";
 import * as cookieMw from "../src/cookie-middleware";
 import * as cacheMw from "../src/cache-middleware";
@@ -309,7 +310,7 @@ describe("EndpointsFactory", () => {
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.methods).toBeUndefined();
+      expect(endpoint.methods.size).toBe(0);
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
       expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<
@@ -359,7 +360,7 @@ describe("EndpointsFactory", () => {
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.methods).toBeUndefined();
+      expect(endpoint.methods.size).toBe(0);
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
       expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<
@@ -385,7 +386,7 @@ describe("EndpointsFactory", () => {
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.methods).toBeUndefined();
+      expect(endpoint.methods.size).toBe(0);
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
       expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<
@@ -405,6 +406,25 @@ describe("EndpointsFactory", () => {
         endpoint.inputSchema._zod.output,
       ).toEqualTypeOf<EmptyObject>();
       expect(endpoint.isDeprecated).toBe(true);
+    });
+
+    test("should deduplicate the methods declared in the tuple", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        method: ["get", "post", "get"],
+        handler: vi.fn(),
+      });
+      expect(endpoint.methods).toEqual(new Set(["get", "post"]));
+    });
+
+    test("should not mutate the supplied array of methods when building", () => {
+      const methods = ["get", "post"] as [Method, ...Method[]];
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        method: methods,
+        handler: vi.fn(),
+      });
+      expect(Object.isFrozen(methods)).toBe(false);
+      methods.push("put");
+      expect(endpoint.methods).toEqual(new Set(["get", "post"]));
     });
 
     test("should pass the single statusCode to the endpoint", () => {
