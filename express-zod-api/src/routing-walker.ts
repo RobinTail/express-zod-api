@@ -107,8 +107,7 @@ export const walkRouting = ({
         onEndpoint(explicitMethod, path, element);
       } else {
         const { methods } = element;
-        const effective = methods.size ? methods : new Set<Method>(["get"]);
-        for (const method of effective) {
+        for (const method of methods.size ? methods : ["get" as const]) {
           checkDuplicate(method, path, visited);
           onEndpoint(method, path, element);
         }
