@@ -1,5 +1,5 @@
 /** @class The Set that cannot be modified. */
-export class FrozenSet<T> extends Set<T> {
+export class FrozenSet<T> extends Set<T> implements ReadonlySet<T> {
   public constructor(values?: Iterable<T>) {
     super(); // because super(values) populates using this.add(value)
     if (values) for (const value of values) Set.prototype.add.call(this, value);
