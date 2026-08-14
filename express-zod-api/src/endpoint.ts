@@ -13,6 +13,7 @@ import {
 import type { CommonConfig } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { ezFormBrand } from "./form-schema";
+import type { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
@@ -111,7 +112,7 @@ export class Endpoint<
     description?: string;
     summary?: string;
     getOperationId?: (method: ClientMethod) => string | undefined;
-    methods?: Method[];
+    methods: FrozenSet<Method>;
     scopes?: string[];
     tags?: string[];
     statusCodes: ReadonlySet<number>;
@@ -147,7 +148,7 @@ export class Endpoint<
 
   /** @internal */
   public override get methods() {
-    return Object.freeze(new Set(this.#def.methods));
+    return this.#def.methods;
   }
 
   /** @internal */

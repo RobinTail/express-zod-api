@@ -29,15 +29,15 @@ describe("Middleware", () => {
       "should expose the declared statusCodes %#",
       (statusCode) => {
         const mw = new Middleware({ statusCode, handler: vi.fn() });
-        expect(mw.statusCodes).toEqual(
-          new Set(typeof statusCode === "number" ? [statusCode] : statusCode),
-        );
-        mw.statusCodes.delete(
-          typeof statusCode === "number" ? statusCode : statusCode[0],
-        );
-        expect(mw.statusCodes).toEqual(
-          new Set(typeof statusCode === "number" ? [statusCode] : statusCode),
-        );
+        const expected =
+          typeof statusCode === "number" ? [statusCode] : statusCode;
+        expect(Array.from(mw.statusCodes)).toEqual(expected);
+        expect(() =>
+          mw.statusCodes.delete(
+            typeof statusCode === "number" ? statusCode : statusCode[0],
+          ),
+        ).toThrow(/read only/);
+        expect(Array.from(mw.statusCodes)).toEqual(expected);
       },
     );
 
@@ -46,7 +46,7 @@ describe("Middleware", () => {
       const mw = new Middleware({ statusCode, handler: vi.fn() });
       expect(Object.isFrozen(statusCode)).toBe(false);
       statusCode.push(500);
-      expect(mw.statusCodes).toEqual(new Set([429, 503]));
+      expect([...mw.statusCodes]).toEqual([429, 503]);
     });
 
     test("should allow to omit statusCode", () => {
@@ -120,6 +120,6 @@ describe("ExpressMiddleware", () => {
 
   test("should expose the declared statusCodes", () => {
     const mw = new ExpressMiddleware(vi.fn(), { statusCode: 429 });
-    expect(mw.statusCodes).toEqual(new Set([429]));
+    expect([...mw.statusCodes]).toEqual([429]);
   });
 });

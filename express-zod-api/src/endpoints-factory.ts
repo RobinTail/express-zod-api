@@ -26,6 +26,7 @@ import {
   arrayResultHandler,
   defaultResultHandler,
 } from "./result-handler";
+import { FrozenSet } from "./frozen-set";
 import { createCacheMiddleware } from "./cache-middleware";
 import { createCookieMiddleware } from "./cookie-middleware";
 import { createRateLimitMiddleware } from "./rate-limit-middleware";
@@ -199,7 +200,9 @@ export class EndpointsFactory<
     ...rest
   }: BuildProps<BIN, BOUT, IN, CTX, SCO>) {
     const { middlewares, resultHandler } = this;
-    const methods = typeof method === "string" ? [method] : method?.slice();
+    const methods = new FrozenSet(
+      typeof method === "string" ? [method] : method,
+    );
     const getOperationId =
       typeof operationId === "function"
         ? operationId

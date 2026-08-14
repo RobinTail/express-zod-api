@@ -11,6 +11,7 @@ import {
   type Method,
 } from "../src";
 import { Endpoint } from "../src/endpoint";
+import { FrozenSet } from "../src/frozen-set";
 
 describe("Endpoint", () => {
   describe(".methods", () => {
@@ -24,7 +25,7 @@ describe("Endpoint", () => {
         "query",
       ];
       const endpointMock = new Endpoint({
-        methods,
+        methods: new FrozenSet(methods),
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         statusCodes: new Set(),
@@ -36,9 +37,9 @@ describe("Endpoint", () => {
         }),
       });
       const { methods: actual } = endpointMock;
-      expect(actual).toEqual(new Set(methods));
-      actual.delete("get");
-      expect(endpointMock.methods).toEqual(new Set(methods));
+      expect(Array.from(actual)).toEqual(methods);
+      expect(() => actual.delete("get")).toThrow(/read only/);
+      expect(Array.from(endpointMock.methods)).toEqual(methods);
     });
   });
 
@@ -482,6 +483,7 @@ describe("Endpoint", () => {
     test("should return undefined if its not defined upon creation", () => {
       expect(
         new Endpoint({
+          methods: new FrozenSet(),
           inputSchema: z.object({}),
           outputSchema: z.object({}),
           statusCodes: new Set(),
