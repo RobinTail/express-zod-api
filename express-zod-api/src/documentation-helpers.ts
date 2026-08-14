@@ -595,10 +595,9 @@ export const depictSecurity = (
   );
 };
 
-const scopedSecurities = new Set<SecuritySchemeType>([
-  "oauth2",
-  "openIdConnect",
-]);
+const hasScopes = Set.prototype.has.bind(
+  new Set<SecuritySchemeType>(["oauth2", "openIdConnect"]),
+);
 export const depictSecurityRefs = (
   alternatives: Alternatives<SecuritySchemeObject>,
   scopes: ReadonlySet<string>,
@@ -609,7 +608,7 @@ export const depictSecurityRefs = (
     alternative.reduce<SecurityRequirementObject>((refs, securitySchema) => {
       const name = entitle(securitySchema);
       return Object.assign(refs, {
-        [name]: scopedSecurities.has(securitySchema.type) ? list : [],
+        [name]: hasScopes(securitySchema.type) ? list : [],
       });
     }, {}),
   );
