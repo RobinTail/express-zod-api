@@ -36,9 +36,11 @@ describe("Endpoint", () => {
         }),
       });
       const { methods: actual } = endpointMock;
-      expect(actual).toEqual(new Set(methods));
-      actual.delete("get");
-      expect(endpointMock.methods).toEqual(new Set(methods));
+      expect(Array.from(actual)).toEqual(methods);
+      expect(() => (actual as Set<Method>).delete("get")).toThrow(
+        /read only/,
+      );
+      expect(Array.from(endpointMock.methods)).toEqual(methods);
     });
   });
 

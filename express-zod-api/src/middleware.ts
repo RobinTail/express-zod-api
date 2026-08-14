@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import { emptySchema, type FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
+import { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { LogicalContainer } from "./logical-container";
 import type { Security } from "./security";
@@ -102,7 +103,7 @@ export class Middleware<
 
   /** @internal */
   public override get statusCodes() {
-    return Object.freeze(new Set(this.#statusCode));
+    return new FrozenSet(this.#statusCode);
   }
 
   /** @throws InputValidationError */

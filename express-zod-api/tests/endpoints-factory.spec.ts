@@ -413,7 +413,7 @@ describe("EndpointsFactory", () => {
         method: ["get", "post", "get"],
         handler: vi.fn(),
       });
-      expect(endpoint.methods).toEqual(new Set(["get", "post"]));
+      expect(Array.from(endpoint.methods)).toEqual(["get", "post"]);
     });
 
     test("should not mutate the supplied array of methods when building", () => {
@@ -424,7 +424,7 @@ describe("EndpointsFactory", () => {
       });
       expect(Object.isFrozen(methods)).toBe(false);
       methods.push("put");
-      expect(endpoint.methods).toEqual(new Set(["get", "post"]));
+      expect(Array.from(endpoint.methods)).toEqual(["get", "post"]);
     });
 
     test("should pass the single statusCode to the endpoint", () => {
