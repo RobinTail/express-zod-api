@@ -13,7 +13,7 @@ import {
 import type { CommonConfig } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { ezFormBrand } from "./form-schema";
-import { FrozenSet } from "./frozen-set";
+import type { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
