@@ -33,7 +33,7 @@ describe("Middleware", () => {
           typeof statusCode === "number" ? [statusCode] : statusCode;
         expect(Array.from(mw.statusCodes)).toEqual(expected);
         expect(() =>
-          (mw.statusCodes as Set<number>).delete(
+          mw.statusCodes.delete(
             typeof statusCode === "number" ? statusCode : statusCode[0],
           ),
         ).toThrow(/read only/);
