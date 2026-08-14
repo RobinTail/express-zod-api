@@ -74,6 +74,24 @@ const performanceConcerns = [
   },
 ];
 
+const setTypeConcerns = [
+  {
+    selector:
+      "CallExpression[callee.object.name='Object'][callee.property.name='freeze'] " +
+      "> NewExpression[callee.name='Set']",
+    message: "Object.freeze() does not protect Set instances, use FrozenSet",
+  },
+  {
+    selector: "MethodDefinition[kind='get'] NewExpression[callee.name='Set']",
+    message: "getters must expose FrozenSet instead of the mutable Set",
+  },
+  {
+    selector:
+      "MethodDefinition[kind='get'] TSTypeReference[typeName.name='Set']",
+    message: "type the getters returning sets as ReadonlySet",
+  },
+];
+
 const tsFactoryConcerns = [
   {
     selector: "Identifier[name='createPropertySignature']",
@@ -233,6 +251,7 @@ export default defineConfig({
           "warn",
           ...importConcerns,
           ...performanceConcerns,
+          ...setTypeConcerns,
         ],
       },
     },
