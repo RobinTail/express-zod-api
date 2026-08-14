@@ -604,14 +604,14 @@ export const depictSecurityRefs = (
   entitle: (subject: SecuritySchemeObject) => string,
 ): SecurityRequirementObject[] => {
   const list = Array.from(scopes);
-  return alternatives.map((alternative) =>
-    alternative.reduce<SecurityRequirementObject>((refs, securitySchema) => {
+  return alternatives.map((alternative) => {
+    const refs: SecurityRequirementObject = {};
+    for (const securitySchema of alternative) {
       const name = entitle(securitySchema);
-      return Object.assign(refs, {
-        [name]: hasScopes(securitySchema.type) ? list : [],
-      });
-    }, {}),
-  );
+      refs[name] = hasScopes(securitySchema.type) ? list : [];
+    }
+    return refs;
+  });
 };
 
 export const depictRequest = ({
