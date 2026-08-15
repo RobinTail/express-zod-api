@@ -50,14 +50,12 @@ export const hasCycle = (
   return false;
 };
 
+const requestDefiningBrands = new Set([ezUploadBrand, ezRawBrand, ezFormBrand]);
 export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
   findNestedSchema(subject, {
     condition: (schema) => {
       const brand = getBrand(schema);
-      return (
-        typeof brand === "symbol" &&
-        [ezUploadBrand, ezRawBrand, ezFormBrand].includes(brand)
-      );
+      return typeof brand === "symbol" && requestDefiningBrands.has(brand);
     },
     io: "input",
   });
