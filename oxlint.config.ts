@@ -68,9 +68,14 @@ const performanceConcerns = [
     message: "shifting is 2-20x slower than index-based iteration",
   },
   {
-    selector:
+    selector: // set-iter.bench.ts
       "CallExpression > MemberExpression[property.name='map'] > ArrayExpression > SpreadElement",
     message: "Set::values().map() would be 5% faster and more memory efficient",
+  },
+  {
+    selector: // array-from-map.bench.ts
+      "CallExpression[callee.object.name='Array'][callee.property.name='from'][arguments.length>1]",
+    message: "Array.from().map() would be 3.5x faster",
   },
 ];
 
