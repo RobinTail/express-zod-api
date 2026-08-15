@@ -72,6 +72,13 @@ const performanceConcerns = [
       "CallExpression > MemberExpression[property.name='map'] > ArrayExpression > SpreadElement",
     message: "Set::values().map() would be 5% faster and more memory efficient",
   },
+  {
+    selector:
+      "MemberExpression[property.name='map'] > CallExpression > " +
+      "MemberExpression[object.name='Array'][property.name='from']," +
+      "MemberExpression[property.name='map'] > ArrayExpression > SpreadElement",
+    message: "Array.from() accepts mapper as the second argument",
+  },
 ];
 
 const setTypeConcerns = [

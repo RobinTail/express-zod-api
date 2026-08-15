@@ -124,12 +124,11 @@ export abstract class IntegrationBase {
    * */
   protected makePublicInterfaces = () =>
     (Object.keys(interfaces) as IOKind[]).map((kind) => {
-      const props = Array.from(this.registry)
-        .map(
-          ([request, { store, isDeprecated }]) =>
-            `  ${isDeprecated ? "/** @deprecated */\n  " : ""}"${request}": ${store[kind]};`,
-        )
-        .join("\n");
+      const props = Array.from(
+        this.registry,
+        ([request, { store, isDeprecated }]) =>
+          `  ${isDeprecated ? "/** @deprecated */\n  " : ""}"${request}": ${store[kind]};`,
+      ).join("\n");
       return `export interface ${interfaces[kind]} {\n${props}\n}`;
     });
 
@@ -138,9 +137,10 @@ export abstract class IntegrationBase {
    * @internal
    * */
   protected makeEndpointTags = () => {
-    const props = Array.from(this.tags)
-      .map(([request, tags]) => `  "${request}": [${quot(tags).join(", ")}]`)
-      .join(",\n");
+    const props = Array.from(
+      this.tags,
+      ([request, tags]) => `  "${request}": [${quot(tags).join(", ")}]`,
+    ).join(",\n");
     return `export const endpointTags = {\n${props}\n}`;
   };
 
