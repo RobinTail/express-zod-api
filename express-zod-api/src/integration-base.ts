@@ -61,7 +61,8 @@ export const interfaces: Record<IOKind, string> = {
   response: "Response",
 };
 
-const quot = (items: Iterable<string>) => Array.from(items, (s) => `"${s}"`);
+const quot = (items: Iterable<string>) =>
+  Array.from(items).map((s) => `"${s}"`);
 
 const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
