@@ -5,7 +5,7 @@
 ### v29.3.2
 
 - The tags and scopes given to `EndpointsFactory::build()` are now deduplicated and immutable:
-  - The generated `Documentation` and `Integration` no longer contain duplicate entries in such cases.
+  - The generated `Documentation` and `Integration` would no longer contain duplicate entries of that kind.
 
 ### v29.3.1
 
