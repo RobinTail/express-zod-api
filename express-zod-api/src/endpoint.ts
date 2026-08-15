@@ -73,9 +73,9 @@ export abstract class AbstractEndpoint {
   /** @internal */
   public abstract get security(): LogicalContainer<Security>[];
   /** @internal */
-  public abstract get scopes(): ReadonlyArray<string>;
+  public abstract get scopes(): ReadonlySet<string>;
   /** @internal */
-  public abstract get tags(): ReadonlyArray<string>;
+  public abstract get tags(): ReadonlySet<string>;
   /** @internal */
   public abstract getProbableRequestType(method?: ClientMethod): ContentType;
   /** @internal */
@@ -113,8 +113,8 @@ export class Endpoint<
     summary?: string;
     getOperationId?: (method: ClientMethod) => string | undefined;
     methods: FrozenSet<Method>;
-    scopes?: string[];
-    tags?: string[];
+    scopes: FrozenSet<string>;
+    tags: FrozenSet<string>;
     statusCodes: ReadonlySet<number>;
   }) {
     super();
@@ -198,12 +198,12 @@ export class Endpoint<
 
   /** @internal */
   public override get scopes() {
-    return Object.freeze(this.#def.scopes || []);
+    return this.#def.scopes;
   }
 
   /** @internal */
   public override get tags() {
-    return Object.freeze(this.#def.tags || []);
+    return this.#def.tags;
   }
 
   /** @internal */

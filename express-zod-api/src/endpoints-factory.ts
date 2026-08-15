@@ -208,8 +208,8 @@ export class EndpointsFactory<
         ? operationId
         : (mtd: ClientMethod) =>
             operationId && `${operationId}${mtd === "head" ? "__HEAD" : ""}`; // ensure non-breaking change
-    const scopes = typeof scope === "string" ? [scope] : scope || [];
-    const tags = typeof tag === "string" ? [tag] : tag || [];
+    const scopes = new FrozenSet(typeof scope === "string" ? [scope] : scope);
+    const tags = new FrozenSet(typeof tag === "string" ? [tag] : tag);
     return new Endpoint({
       ...rest,
       middlewares,
