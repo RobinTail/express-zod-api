@@ -1,4 +1,4 @@
-import { FrozenSet } from "../src/frozen-set";
+import { FrozenSet } from "../src/sets";
 
 describe("FrozenSet", () => {
   test("types", () => {

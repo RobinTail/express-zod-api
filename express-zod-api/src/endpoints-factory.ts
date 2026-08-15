@@ -26,7 +26,7 @@ import {
   arrayResultHandler,
   defaultResultHandler,
 } from "./result-handler";
-import { FrozenSet } from "./frozen-set";
+import { FrozenSet } from "./sets";
 import { createCacheMiddleware } from "./cache-middleware";
 import { createCookieMiddleware } from "./cookie-middleware";
 import { createRateLimitMiddleware } from "./rate-limit-middleware";

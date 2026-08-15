@@ -19,28 +19,17 @@ describe("Method", () => {
 
   describe("methods array", () => {
     test("should be the list of selected keys of express router", () => {
-      expect(methods).toEqual([
-        "get",
-        "post",
-        "put",
-        "delete",
-        "patch",
-        "query",
-      ]);
+      expect(methods).toEqual(
+        new Set(["get", "post", "put", "delete", "patch", "query"]),
+      );
     });
   });
 
   describe("clientMethods array", () => {
     test("should be same methods and the head", () => {
-      expect(clientMethods).toEqual([
-        "get",
-        "post",
-        "put",
-        "delete",
-        "patch",
-        "query",
-        "head",
-      ]);
+      expect(clientMethods).toEqual(
+        new Set(["get", "post", "put", "delete", "patch", "query", "head"]),
+      );
     });
   });
 
@@ -87,10 +76,10 @@ describe("Method", () => {
   });
 
   describe("isMethod", () => {
-    test.each(methods)("should validate %s", (one) => {
+    test.each(Array.from(methods))("should validate %s", (one) => {
       expect(isMethod(one)).toBe(true);
     });
-    test.each([...R.map(R.toUpper, methods), "", " ", "wrong"])(
+    test.each([...Array.from(methods, R.toUpper), "", " ", "wrong"])(
       "should invalidate others %#",
       (one) => {
         expect(isMethod(one)).toBe(false);

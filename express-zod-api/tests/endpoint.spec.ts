@@ -11,7 +11,7 @@ import {
   type Method,
 } from "../src";
 import { Endpoint } from "../src/endpoint";
-import { FrozenSet } from "../src/frozen-set";
+import { FrozenSet } from "../src/sets";
 
 describe("Endpoint", () => {
   describe(".methods", () => {

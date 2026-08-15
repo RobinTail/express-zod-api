@@ -99,17 +99,22 @@ describe("Common Helpers", () => {
       },
     );
 
-    test.each(methods)("should return user defined ones for %s", (method) => {
-      const userDefined: InputSources = {
-        get: ["headers"],
-        put: ["files"],
-        post: ["query"],
-        delete: ["params"],
-        patch: ["body"],
-        query: ["body"],
-      };
-      expect(getInputSources(method, userDefined)).toEqual(userDefined[method]);
-    });
+    test.each(Array.from(methods))(
+      "should return user defined ones for %s",
+      (method) => {
+        const userDefined: InputSources = {
+          get: ["headers"],
+          put: ["files"],
+          post: ["query"],
+          delete: ["params"],
+          patch: ["body"],
+          query: ["body"],
+        };
+        expect(getInputSources(method, userDefined)).toEqual(
+          userDefined[method],
+        );
+      },
+    );
 
     test.each([undefined, {}])(
       "should return default ones when missing user defined for %s",
@@ -419,7 +424,7 @@ describe("Common Helpers", () => {
   });
 
   describe("doesImplyContent()", () => {
-    test.each(methods)("should return true for %s", (method) => {
+    test.each(Array.from(methods))("should return true for %s", (method) => {
       expect(shouldHaveContent(method, ["some"])).toBe(true);
     });
 

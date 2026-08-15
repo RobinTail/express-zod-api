@@ -1,3 +1,6 @@
+export type SetValue<S extends Set<unknown>> =
+  S extends Set<infer V> ? V : never;
+
 const frozenSetBrand: unique symbol = Symbol("FrozenSet");
 
 /**
