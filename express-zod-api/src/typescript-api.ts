@@ -7,7 +7,7 @@ export const f = ts.factory;
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
-const primitives: ts.KeywordTypeSyntaxKind[] = [
+const primitives = new Set<ts.SyntaxKind>([
   ts.SyntaxKind.AnyKeyword,
   ts.SyntaxKind.BigIntKeyword,
   ts.SyntaxKind.BooleanKeyword,
@@ -19,7 +19,7 @@ const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.UndefinedKeyword,
   ts.SyntaxKind.UnknownKeyword,
   ts.SyntaxKind.VoidKeyword,
-];
+] satisfies ts.KeywordTypeSyntaxKind[]);
 
 export type Typeable =
   | ts.TypeNode
@@ -65,7 +65,7 @@ export const makeUnion = (entries: ts.TypeNode[]) => {
 };
 
 const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
-  (primitives as ts.SyntaxKind[]).includes(node.kind);
+  primitives.has(node.kind);
 
 const addJsDoc = <T extends ts.Node>(node: T, text: string) =>
   ts.addSyntheticLeadingComment(
