@@ -1,5 +1,5 @@
 import type { IRouter } from "express";
-import type { SetValue } from "./sets.ts";
+import type { SetValue } from "./sets";
 
 export type SomeMethod = Lowercase<string>;
 
