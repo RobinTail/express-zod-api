@@ -492,6 +492,8 @@ describe("Server", () => {
     });
 
     test("Should NOT warn in non-production mode", () => {
+      vi.stubEnv("NODE_ENV", "development");
+      runtime._cache = undefined;
       const warnSpy = vi.spyOn(BuiltinLogger.prototype, "warn");
       createServer(
         { http: { listen: givePort() }, startupLogo: false, cors: false },
