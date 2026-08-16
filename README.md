@@ -729,7 +729,7 @@ To receive a compressed response, the client should include the following header
 
 ## Customizing logger
 
-The built-in logger is used by default (for development only) with the following options that you can configure:
+The built-in logger is used by default with the following options that you can configure:
 
 ```ts
 import { createConfig } from "express-zod-api";
@@ -742,10 +742,10 @@ const config = createConfig({
 });
 ```
 
-However, it prints messages to the console synchronously, which may degrade the performance of your API in
-[production mode](#production-mode). Consider installing a professional logging solution instead, such as
-[Pino](https://github.com/pinojs/pino) or [Winston](https://github.com/winstonjs/winston). You can use any logger
-having at least the following methods: `info()`, `debug()`, `error()` and `warn()`. Here is how to use `pino`:
+However, it's for development purposes only: it prints messages to the console synchronously, which may degrade the
+performance of your API in [production mode](#production-mode). Consider installing a professional logging solution
+instead, such as [Pino](https://github.com/pinojs/pino) or [Winston](https://github.com/winstonjs/winston). You can use
+any logger having at least these methods: `info()`, `debug()`, `error()` and `warn()`. Here is how to use `pino`:
 
 ```ts
 import pino, { Logger } from "pino";
