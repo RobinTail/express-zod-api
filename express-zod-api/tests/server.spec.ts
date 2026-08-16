@@ -440,9 +440,17 @@ describe("Server", () => {
   });
 
   describe("Production mode", () => {
+    beforeAll(() => {
+      vi.spyOn(console, "log").mockImplementation(() => {});
+    });
+
     afterEach(() => {
       vi.unstubAllEnvs();
       runtime._cache = undefined;
+    });
+
+    afterAll(() => {
+      vi.restoreAllMocks();
     });
 
     test.each([
