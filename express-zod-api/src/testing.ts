@@ -44,6 +44,10 @@ export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
           return (...args: unknown[]) => logs[prop].push(args);
         return Reflect.get(target, prop, recv);
       },
+      has(target, prop) {
+        if (isSeverity(prop) || prop === "_getLogs") return true;
+        return Reflect.has(target, prop);
+      },
     },
   );
 };

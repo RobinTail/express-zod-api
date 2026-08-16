@@ -2,6 +2,12 @@
 
 ## Version 29
 
+### v29.3.3
+
+- Added a warning about using the built-in logger in production:
+  - The `BuiltinLogger` is intended for development purposes only because it prints messages synchronously;
+  - That may degrade the performance of your API in production mode (`NODE_ENV=production`).
+
 ### v29.3.2
 
 - The tags and scopes given to `EndpointsFactory::build()` are now deduplicated and immutable:
