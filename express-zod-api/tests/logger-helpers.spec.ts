@@ -8,7 +8,7 @@ import {
   formatDuration,
   type AbstractLogger,
 } from "../src/logger-helpers";
-import { makeLoggerMock } from "../src/testing.ts";
+import { makeLoggerMock } from "../src/testing";
 
 describe("Logger helpers", () => {
   describe("isSeverity()", () => {
