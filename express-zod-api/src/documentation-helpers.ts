@@ -192,6 +192,11 @@ const makeNullableType = (
   );
 };
 
+const typeofCompatible = new Set<ReturnType<typeof getTransformedType>>([
+  "number",
+  "string",
+  "boolean",
+] satisfies SchemaObjectType[]);
 export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
   const target = (zodSchema as z.core.$ZodPipe)._zod.def[
     ctx.isResponse ? "out" : "in"
@@ -213,12 +218,8 @@ export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
         target,
         makeSample(opposingDepiction),
       );
-      if (targetType && ["number", "string", "boolean"].includes(targetType)) {
-        return {
-          ...jsonSchema,
-          type: targetType as "number" | "string" | "boolean",
-        };
-      }
+      if (targetType && typeofCompatible.has(targetType))
+        return { ...jsonSchema, type: targetType as SchemaObjectType };
     }
   }
   return jsonSchema;
