@@ -731,6 +731,11 @@ To receive a compressed response, the client should include the following header
 
 A simple built-in console logger is used by default with the following options that you can configure:
 
+The built-in logger is intended for development purposes only: it prints messages synchronously, which may degrade the
+performance of your API in production mode. When running in production, the framework warns you about this and
+recommends installing a professional logging solution instead, such as [Pino](https://github.com/pinojs/pino) or
+[Winston](https://github.com/winstonjs/winston). Installing one will also suppress the warning.
+
 ```ts
 import { createConfig } from "express-zod-api";
 const config = createConfig({
@@ -1459,9 +1464,9 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
 
 ## Profiling
 
-For debugging and performance testing purposes the framework offers a simple `.profile()` method on the built-in logger.
-It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
-invoke the returned callback. The default severity of those measurements is `debug`.
+During development, for debugging and performance testing purposes, the framework offers a simple `.profile()` method
+on the built-in logger. It starts a timer when you call it and measures the duration in adaptive units (from
+picoseconds to minutes) until you invoke the returned callback. The default severity of those measurements is `debug`.
 
 ```ts
 import { createConfig, BuiltinLogger } from "express-zod-api";
