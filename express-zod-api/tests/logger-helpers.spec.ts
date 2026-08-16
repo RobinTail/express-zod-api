@@ -8,6 +8,7 @@ import {
   formatDuration,
   type AbstractLogger,
 } from "../src/logger-helpers";
+import { makeLoggerMock } from "../src/testing.ts";
 
 describe("Logger helpers", () => {
   describe("isSeverity()", () => {
@@ -74,6 +75,7 @@ describe("Logger helpers", () => {
       })(),
       Object.setPrototypeOf({ level: "debug" }, { debug: () => {} }),
       new BuiltinLogger({ level: "debug" }),
+      makeLoggerMock(),
     ])("should validate logger instances %#", (sample) => {
       expect(isLoggerInstance(sample)).toBeTruthy();
     });
