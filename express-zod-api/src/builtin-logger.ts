@@ -43,7 +43,7 @@ interface ProfilerOptions {
   formatter?: (ms: number) => string | number;
 }
 
-/** @desc Built-in console logger with optional colorful inspections */
+/** @desc Built-in console logger for development with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
   protected readonly config: BuiltinLoggerConfig;
 

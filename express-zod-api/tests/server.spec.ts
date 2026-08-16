@@ -23,6 +23,7 @@ import {
   ez,
 } from "../src";
 import type { AppConfig, ServerConfig } from "../src/config-type";
+import { runtime } from "../src/common-helpers";
 import express from "express";
 
 describe("Server", () => {
@@ -435,6 +436,70 @@ describe("Server", () => {
       expect(appMock.post.mock.calls[0]![0]).toBe("/v1/test");
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0]![0]).toBe("/v1/test");
+    });
+  });
+
+  describe("Production mode", () => {
+    afterEach(() => {
+      vi.unstubAllEnvs();
+      runtime._cache = undefined;
+    });
+
+    test.each([
+      undefined,
+      { level: "info" as const },
+      new BuiltinLogger({ level: "silent" }),
+    ])(
+      "Should warn when using the built-in logger in production %#",
+      (logger) => {
+        vi.stubEnv("NODE_ENV", "production");
+        runtime._cache = undefined;
+        const warnSpy = vi.spyOn(BuiltinLogger.prototype, "warn");
+        createServer(
+          {
+            http: { listen: givePort() },
+            startupLogo: false,
+            logger,
+            cors: false,
+          },
+          {},
+        );
+        expect(warnSpy).toHaveBeenCalledWith(
+          expect.stringContaining("Using the built-in logger in production"),
+        );
+      },
+    );
+
+    test("Should NOT warn when a custom logger is used in production", () => {
+      vi.stubEnv("NODE_ENV", "production");
+      runtime._cache = undefined;
+      const customLogger = {
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+      };
+      createServer(
+        {
+          http: { listen: givePort() },
+          startupLogo: false,
+          logger: customLogger,
+          cors: false,
+        },
+        {},
+      );
+      expect(customLogger.warn).not.toHaveBeenCalled();
+    });
+
+    test("Should NOT warn in non-production mode", () => {
+      vi.stubEnv("NODE_ENV", "development");
+      runtime._cache = undefined;
+      const warnSpy = vi.spyOn(BuiltinLogger.prototype, "warn");
+      createServer(
+        { http: { listen: givePort() }, startupLogo: false, cors: false },
+        {},
+      );
+      expect(warnSpy).not.toHaveBeenCalled();
     });
   });
 });

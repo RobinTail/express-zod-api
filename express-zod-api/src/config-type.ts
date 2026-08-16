@@ -61,7 +61,7 @@ export interface CommonConfig {
    */
   errorHandler?: AbstractResultHandler;
   /**
-   * @desc Built-in logger configuration or an instance of any compatible logger.
+   * @desc Built-in logger configuration (for development only) or any compatible logger instance.
    * @example { level: "debug", color: true }
    * @default { level: NODE_ENV === "production" ? "warn" : "debug", color: isSupported(), depth: 2 }
    * */
