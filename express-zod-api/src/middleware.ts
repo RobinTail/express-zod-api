@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import { emptySchema, type FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
-import { FrozenSet } from "./sets";
+import { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { LogicalContainer } from "./logical-container";
 import type { Security } from "./security";
