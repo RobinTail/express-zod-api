@@ -50,13 +50,12 @@ export const hasCycle = (
   return false;
 };
 
-const requestDefiningBrands = new Set([ezUploadBrand, ezRawBrand, ezFormBrand]);
+const isRequestDefiningBrand = Set.prototype.has.bind(
+  new Set([ezUploadBrand, ezRawBrand, ezFormBrand]),
+);
 export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
   findNestedSchema(subject, {
-    condition: (schema) => {
-      const brand = getBrand(schema);
-      return typeof brand === "symbol" && requestDefiningBrands.has(brand);
-    },
+    condition: (schema) => isRequestDefiningBrand(getBrand(schema)),
     io: "input",
   });
 
