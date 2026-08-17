@@ -42,6 +42,6 @@ export type ClientMethod = (typeof clientMethods)[number];
  * */
 export type CORSMethod = ClientMethod | Extract<FamiliarMethod, "options">;
 
-const methodSet = new Set(methods);
-export const isMethod = (subject: string): subject is Method =>
-  (methodSet as Set<string>).has(subject);
+export const isMethod = Set.prototype.has.bind(new Set(methods)) as (
+  subject: string,
+) => subject is Method;
