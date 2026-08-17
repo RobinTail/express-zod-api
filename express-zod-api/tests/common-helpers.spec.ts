@@ -419,7 +419,7 @@ describe("Common Helpers", () => {
   });
 
   describe("doesImplyContent()", () => {
-    test.each(Array.from(methods))("should return true for %s", (method) => {
+    test.each(methods)("should return true for %s", (method) => {
       expect(shouldHaveContent(method, ["some"])).toBe(true);
     });
 
