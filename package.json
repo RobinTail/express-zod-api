@@ -21,7 +21,7 @@
     "eslint-plugin-allowed-dependencies": "^3.1.0",
     "husky": "^9.1.7",
     "openai": "^7.0.0",
-    "oxfmt": "0.62.0",
+    "oxfmt": "0.63.0",
     "oxlint": "^1.76.0",
     "oxlint-plugin-eslint": "^1.76.0",
     "tsdown": "^0.22.4",
