@@ -2,8 +2,6 @@
 
 exports[`Index Entrypoint > exports > BuiltinLogger should have certain value 1`] = `[Function]`;
 
-exports[`Index Entrypoint > exports > DocumentationError should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > EndpointsFactory should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > EventStreamFactory should have certain value 1`] = `[Function]`;
@@ -96,7 +94,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "ServeStatic",
   "createServer",
   "attachRouting",
-  "DocumentationError",
   "RoutingError",
   "OutputValidationError",
   "InputValidationError",
