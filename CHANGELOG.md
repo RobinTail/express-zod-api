@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 30
+
+### v30.0.0
+
+- Supported TypeScript versions (optional peer): `^6.0.3`:
+  - Entirely `#private` props are now restored in the classes of the distributed `.d.ts` files.
+
 ## Version 29
 
 ### v29.3.3

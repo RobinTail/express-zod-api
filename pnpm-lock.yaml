@@ -123,8 +123,8 @@ importers:
         specifier: npm:http-errors@2.0.1
         version: 2.0.1
       typescript:
-        specifier: npm:typescript@5.1.3
-        version: 5.1.3
+        specifier: npm:typescript@6.0.3
+        version: 6.0.3
       zod:
         specifier: npm:zod@4.3.4
         version: 4.3.4
@@ -1821,11 +1821,6 @@ packages:
   types-ramda@0.32.0:
     resolution: {integrity: sha512-iZtriSUdsDqOlip/wUaDNcoiskbVf5RdcqLNpQdUcOM1JKFClochCvPZCDjn/cc9HzoBzi4DEB4iPr1PbrhN1w==}
 
-  typescript@5.1.3:
-    resolution: {integrity: sha512-XH627E9vkeqhlZFQuL+UsyAXEnibT0kWR2FWONlr4sTjvxyJYnyefgrkyECLzM5NenmKzRAy2rR/OlYLA1HkZw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   typescript@5.6.1-rc:
     resolution: {integrity: sha512-E3b2+1zEFu84jB0YQi9BORDjz9+jGbwwy1Zi3G0LUNw7a7cePUrHMRNy8aPh53nXpkFGVHSxIZo5vKTfYaFiBQ==}
     engines: {node: '>=14.17'}
@@ -3226,8 +3221,6 @@ snapshots:
   types-ramda@0.32.0:
     dependencies:
       ts-toolbelt: 9.6.0
-
-  typescript@5.1.3: {}
 
   typescript@5.6.1-rc: {}
 
