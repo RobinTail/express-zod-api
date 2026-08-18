@@ -11,6 +11,7 @@ import {
   type SchemaObjectValue,
   type SecurityRequirementObject,
   type SecuritySchemeObject,
+  type SecuritySchemeType,
   type TagObject,
   isReferenceObject,
   isSchemaObject,
@@ -191,6 +192,11 @@ const makeNullableType = (
   );
 };
 
+const typeofCompatible = new Set<ReturnType<typeof getTransformedType>>([
+  "number",
+  "string",
+  "boolean",
+] satisfies SchemaObjectType[]);
 export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
   const target = (zodSchema as z.core.$ZodPipe)._zod.def[
     ctx.isResponse ? "out" : "in"
@@ -212,12 +218,8 @@ export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
         target,
         makeSample(opposingDepiction),
       );
-      if (targetType && ["number", "string", "boolean"].includes(targetType)) {
-        return {
-          ...jsonSchema,
-          type: targetType as "number" | "string" | "boolean",
-        };
-      }
+      if (targetType && typeofCompatible.has(targetType))
+        return { ...jsonSchema, type: targetType as SchemaObjectType };
     }
   }
   return jsonSchema;
@@ -594,20 +596,24 @@ export const depictSecurity = (
   );
 };
 
+const hasScopes = Set.prototype.has.bind(
+  new Set<SecuritySchemeType>(["oauth2", "openIdConnect"]),
+);
 export const depictSecurityRefs = (
   alternatives: Alternatives<SecuritySchemeObject>,
-  scopes: string[] | ReadonlyArray<string>,
+  scopes: ReadonlySet<string>,
   entitle: (subject: SecuritySchemeObject) => string,
-): SecurityRequirementObject[] =>
-  alternatives.map((alternative) =>
-    alternative.reduce<SecurityRequirementObject>((refs, securitySchema) => {
+): SecurityRequirementObject[] => {
+  const list = Array.from(scopes);
+  return alternatives.map((alternative) => {
+    const refs: SecurityRequirementObject = {};
+    for (const securitySchema of alternative) {
       const name = entitle(securitySchema);
-      const hasScopes = ["oauth2", "openIdConnect"].includes(
-        securitySchema.type,
-      );
-      return Object.assign(refs, { [name]: hasScopes ? scopes : [] });
-    }, {}),
-  );
+      refs[name] = hasScopes(securitySchema.type) ? list : [];
+    }
+    return refs;
+  });
+};
 
 export const depictRequest = ({
   schema,
@@ -700,5 +706,7 @@ export const trimSummary = (summary?: string, limit = 50) =>
     ? summary
     : summary.slice(0, Math.max(1, limit || 0) - 1) + "…";
 
-export const nonEmpty = <T>(subject: T[] | ReadonlyArray<T>) =>
-  subject.length ? subject.slice() : undefined;
+export const nonEmpty = <T>(subject: Iterable<T>) => {
+  const copy = Array.from(subject);
+  return copy.length ? copy : undefined;
+};

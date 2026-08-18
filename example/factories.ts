@@ -18,7 +18,11 @@ import { stat } from "node:fs/promises";
 
 /** @desc This factory extends the default one by enforcing rate limiting and authentication */
 export const keyAndTokenAuthenticatedEndpointsFactory = defaultEndpointsFactory
-  .useRateLimit({ windowMs: 60000, max: 10 })
+  .useRateLimit({
+    windowMs: 60000,
+    max: 10,
+    statusCode: 429, // forces this response code in Documentation, @todo remove in v30
+  })
   .addMiddleware(authMiddleware);
 
 /** @desc This factory adds session read from cookie into context */

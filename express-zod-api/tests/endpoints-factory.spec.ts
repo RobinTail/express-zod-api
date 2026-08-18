@@ -8,6 +8,7 @@ import {
   defaultEndpointsFactory,
   ResultHandler,
   testMiddleware,
+  type Method,
 } from "../src";
 import * as cookieMw from "../src/cookie-middleware";
 import * as cacheMw from "../src/cache-middleware";
@@ -15,6 +16,7 @@ import * as rateLimitMw from "../src/rate-limit-middleware";
 import type { EmptyObject } from "../src/common-helpers";
 import { Endpoint } from "../src/endpoint";
 import { z } from "zod";
+import * as R from "ramda";
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({
@@ -305,7 +307,7 @@ describe("EndpointsFactory", () => {
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.methods).toBeUndefined();
+      expect(endpoint.methods.size).toBe(0);
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
       expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<
@@ -355,7 +357,7 @@ describe("EndpointsFactory", () => {
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.methods).toBeUndefined();
+      expect(endpoint.methods.size).toBe(0);
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
       expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<
@@ -381,7 +383,7 @@ describe("EndpointsFactory", () => {
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.methods).toBeUndefined();
+      expect(endpoint.methods.size).toBe(0);
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
       expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<
@@ -402,6 +404,110 @@ describe("EndpointsFactory", () => {
       ).toEqualTypeOf<EmptyObject>();
       expect(endpoint.isDeprecated).toBe(true);
     });
+
+    test("should deduplicate the methods declared in the tuple", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        method: ["get", "post", "get"],
+        handler: vi.fn(),
+      });
+      expect(Array.from(endpoint.methods)).toEqual(["get", "post"]);
+    });
+
+    test("should not mutate the supplied array of methods when building", () => {
+      const methods = ["get", "post"] as [Method, ...Method[]];
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        method: methods,
+        handler: vi.fn(),
+      });
+      expect(Object.isFrozen(methods)).toBe(false);
+      methods.push("put");
+      expect(Array.from(endpoint.methods)).toEqual(["get", "post"]);
+    });
+
+    test("should deduplicate the tags declared in the tuple", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        tag: ["users", "users", "files"],
+        handler: vi.fn(),
+      });
+      expect(Array.from(endpoint.tags)).toEqual(["users", "files"]);
+    });
+
+    test("should not mutate the supplied array of tags when building", () => {
+      const tags = ["users", "files"];
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        tag: tags,
+        handler: vi.fn(),
+      });
+      expect(Object.isFrozen(tags)).toBe(false);
+      tags.push("extra");
+      expect(Array.from(endpoint.tags)).toEqual(["users", "files"]);
+    });
+
+    test("should deduplicate the scopes declared in the tuple", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        scope: ["admin", "admin", "read"],
+        handler: vi.fn(),
+      });
+      expect(Array.from(endpoint.scopes)).toEqual(["admin", "read"]);
+    });
+
+    test("should not mutate the supplied array of scopes when building", () => {
+      const scopes = ["admin", "read"];
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        scope: scopes,
+        handler: vi.fn(),
+      });
+      expect(Object.isFrozen(scopes)).toBe(false);
+      scopes.push("write");
+      expect(Array.from(endpoint.scopes)).toEqual(["admin", "read"]);
+    });
+
+    test("should pass the single statusCode to the endpoint", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        handler: vi.fn(),
+        statusCode: 204,
+      });
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[204]],
+      );
+    });
+
+    test("should pass the tuple of statusCodes to the endpoint", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        handler: vi.fn(),
+        statusCode: [201, 400],
+      });
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[201]],
+      );
+      expect(R.pluck("statusCodes", endpoint.getResponses("negative"))).toEqual(
+        [[400]],
+      );
+    });
+
+    test("should combine the status codes declared by the middlewares", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock)
+        .addMiddleware({ statusCode: 429, handler: vi.fn() })
+        .buildVoid({ handler: vi.fn() });
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[200]],
+      );
+      expect(R.pluck("statusCodes", endpoint.getResponses("negative"))).toEqual(
+        [[429]],
+      );
+    });
+
+    test("should deduplicate the status codes declared by the endpoint and middlewares", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock)
+        .addMiddleware({ statusCode: [400, 429], handler: vi.fn() })
+        .buildVoid({ handler: vi.fn(), statusCode: [200, 400] });
+      expect(R.pluck("statusCodes", endpoint.getResponses("positive"))).toEqual(
+        [[200]],
+      );
+      expect(R.pluck("statusCodes", endpoint.getResponses("negative"))).toEqual(
+        [[400, 429]],
+      );
+    });
   });
 
   describe(".buildVoid()", () => {
@@ -412,6 +518,16 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint.outputSchema).toMatchSnapshot();
       expectTypeOf(endpoint.outputSchema.shape).toExtend<EmptyObject>();
+    });
+
+    test("Should pass the statusCode option", () => {
+      const endpoint = new EndpointsFactory(resultHandlerMock).buildVoid({
+        handler: vi.fn(),
+        statusCode: 204,
+      });
+      expect(
+        endpoint.getResponses("positive").map(({ statusCodes }) => statusCodes),
+      ).toEqual([[204]]);
     });
   });
 });

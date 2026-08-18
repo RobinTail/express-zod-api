@@ -740,7 +740,7 @@ describe("Documentation helpers", () => {
       expect(
         depictSecurityRefs(
           [[{ type: "apiKey" }, { type: "oauth2" }, { type: "openIdConnect" }]],
-          [],
+          new Set(),
           R.prop("type"),
         ),
       ).toMatchSnapshot();
@@ -750,7 +750,7 @@ describe("Documentation helpers", () => {
             [{ type: "apiKey" }, { type: "oauth2" }],
             [{ type: "apiKey" }, { type: "openIdConnect" }],
           ],
-          [],
+          new Set(),
           R.prop("type"),
         ),
       ).toMatchSnapshot();
@@ -761,7 +761,7 @@ describe("Documentation helpers", () => {
             [{ type: "oauth2" }],
             [{ type: "openIdConnect" }],
           ],
-          [],
+          new Set(),
           R.prop("type"),
         ),
       ).toMatchSnapshot();
@@ -775,7 +775,7 @@ describe("Documentation helpers", () => {
             [{ type: "oauth2" }],
             [{ type: "openIdConnect" }],
           ],
-          ["read", "write"],
+          new Set(["read", "write"]),
           R.prop("type"),
         ),
       ).toMatchSnapshot();

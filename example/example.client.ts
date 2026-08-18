@@ -343,7 +343,7 @@ export interface PositiveResponse {
   "head /v1/user/retrieve": HeadV1UserRetrievePositiveVariant1;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveVariant1;
   "patch /v1/user/:id": PatchV1UserIdPositiveVariant1;
-  "post /v1/user/create": PostV1UserCreatePositiveVariant1 | PostV1UserCreatePositiveVariant1;
+  "post /v1/user/create": PostV1UserCreatePositiveVariant1;
   "query /v1/user/list": QueryV1UserListPositiveVariant1;
   "post /v1/login": PostV1LoginPositiveVariant1;
   /** @deprecated */
@@ -365,7 +365,11 @@ export interface NegativeResponse {
   "get /v1/user/retrieve": GetV1UserRetrieveNegativeVariant1;
   "head /v1/user/retrieve": HeadV1UserRetrieveNegativeVariant1;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveNegativeVariant1;
-  "patch /v1/user/:id": PatchV1UserIdNegativeVariant1;
+  "patch /v1/user/:id":
+    | PatchV1UserIdNegativeVariant1
+    | PatchV1UserIdNegativeVariant1
+    | PatchV1UserIdNegativeVariant1
+    | PatchV1UserIdNegativeVariant1;
   "post /v1/user/create":
     | PostV1UserCreateNegativeVariant1
     | PostV1UserCreateNegativeVariant2
@@ -397,10 +401,14 @@ export interface EncodedResponse {
   "delete /v1/user/:id/remove":
     | [204, DeleteV1UserIdRemovePositiveVariant1]
     | [404, DeleteV1UserIdRemoveNegativeVariant1];
-  "patch /v1/user/:id": [200, PatchV1UserIdPositiveVariant1] | [400, PatchV1UserIdNegativeVariant1];
+  "patch /v1/user/:id":
+    | [200, PatchV1UserIdPositiveVariant1]
+    | [429, PatchV1UserIdNegativeVariant1]
+    | [401, PatchV1UserIdNegativeVariant1]
+    | [400, PatchV1UserIdNegativeVariant1]
+    | [404, PatchV1UserIdNegativeVariant1];
   "post /v1/user/create":
     | [201, PostV1UserCreatePositiveVariant1]
-    | [202, PostV1UserCreatePositiveVariant1]
     | [409, PostV1UserCreateNegativeVariant1]
     | [400, PostV1UserCreateNegativeVariant2]
     | [500, PostV1UserCreateNegativeVariant2];

@@ -67,4 +67,20 @@ describe("walkRouting()", () => {
       walkRouting({ routing, config: { cors: false }, onEndpoint }),
     ).not.toThrow();
   });
+
+  test("Should deduplicate the methods declared by the endpoint", () => {
+    const dupEndpoint = defaultEndpointsFactory.buildVoid({
+      method: ["get", "get"],
+      handler: vi.fn(),
+    });
+    expect(() =>
+      walkRouting({
+        routing: { "/x": dupEndpoint },
+        config: { cors: false },
+        onEndpoint,
+      }),
+    ).not.toThrow();
+    expect(onEndpoint).toHaveBeenCalledTimes(1);
+    expect(onEndpoint).toHaveBeenCalledWith("get", "/x", dupEndpoint);
+  });
 });

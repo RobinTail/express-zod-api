@@ -186,6 +186,9 @@ describe("App in production mode", () => {
       "DeprecationError (express): Sample deprecation message",
       expect.any(Array), // stack
     );
+    expect(warnMethod).toHaveBeenCalledWith(
+      expect.stringContaining("Using the built-in logger in production"),
+    );
   });
 
   afterAll(async () => {

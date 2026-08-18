@@ -4,7 +4,7 @@
 
 ![CI](https://img.shields.io/github/actions/workflow/status/RobinTail/express-zod-api/node.js.yml?label=CI)
 ![OpenAPI](https://img.shields.io/github/actions/workflow/status/RobinTail/express-zod-api/oas.yml?label=OpenAPI)
-[![coverage](https://img.shields.io/coverallsCoverage/github/RobinTail/express-zod-api)](https://coveralls.io/github/RobinTail/express-zod-api)
+[![coverage](https://coveralls.io/repos/github/RobinTail/express-zod-api/badge.svg?branch=master)](https://coveralls.io/github/RobinTail/express-zod-api)
 
 ![downloads](https://img.shields.io/npm/dw/express-zod-api.svg)
 ![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api.svg?style=flat)
@@ -341,12 +341,12 @@ import { Middleware } from "express-zod-api";
 
 const authMiddleware = new Middleware({
   security: {
-    // this information is optional and used for generating documentation
     and: [
       { type: "input", name: "key" },
       { type: "header", name: "token" },
     ],
-  },
+  }, // this information is optional and used for generating Documentation
+  statusCode: 401, // for Documentation: Middleware may interrupt handling this way
   input: z.object({
     key: z.string().min(1),
   }),
@@ -456,6 +456,7 @@ import { auth } from "express-oauth2-jwt-bearer";
 const factory = defaultEndpointsFactory.use(auth(), {
   provider: (req) => ({ auth: req.auth }), // optional, can be async
   transformer: (err) => createHttpError(401, err.message), // optional
+  statusCode: 401, // for Documentation: Middleware may interrupt handling this way
 });
 ```
 
@@ -728,7 +729,7 @@ To receive a compressed response, the client should include the following header
 
 ## Customizing logger
 
-A simple built-in console logger is used by default with the following options that you can configure:
+The built-in logger is used by default with the following options that you can configure:
 
 ```ts
 import { createConfig } from "express-zod-api";
@@ -741,8 +742,10 @@ const config = createConfig({
 });
 ```
 
-You can also replace it with a one having at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
-Winston and Pino support is well-known. Here is an example configuring `pino` logger with `pino-pretty` extension:
+However, it's for development purposes only: it prints messages to the console synchronously, which may degrade the
+performance of your API in [production mode](#production-mode). Consider installing a professional logging solution
+instead, such as [Pino](https://github.com/pinojs/pino) or [Winston](https://github.com/winstonjs/winston). You can use
+any logger having at least these methods: `info()`, `debug()`, `error()` and `warn()`. Here is how to use `pino`:
 
 ```ts
 import pino, { Logger } from "pino";
@@ -908,7 +911,11 @@ Install `express-rate-limit`. Consider the `createRateLimitMiddleware()` to enab
 
 ```ts
 const endpoint = factory
-  .useRateLimit({ windowMs: 60000, max: 100 }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
+  .useRateLimit({
+    windowMs: 60000,
+    max: 100,
+    statusCode: 429, // when set explicitly, it will be reflected in the Documentation
+  }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
   .buildVoid({
     handler: async ({ ctx: { rateLimit, logger } }) => {
       logger.debug("Features", rateLimit); // { limit, used, remaining, resetTime, getKey, resetKey }
@@ -1396,7 +1403,7 @@ response schemas and their corresponding status codes.
 ```ts
 import { ResultHandler } from "express-zod-api";
 
-new ResultHandler({
+const resultHandler = new ResultHandler({
   positive: (data) => ({
     statusCode: [201, 202], // created or will be created
     schema: z.object({ status: z.literal("created"), data }),
@@ -1411,9 +1418,15 @@ new ResultHandler({
       schema: z.object({ status: z.literal("error"), reason: z.string() }),
     },
   ],
-  handler: ({ error, response, output }) => {
-    // your implementation here
-  },
+});
+```
+
+Moreover, when building an Endpoint, you can narrow the codes the Endpoint actually responds by using the local
+`statusCode` option, overriding the ones defined by the ResultHandler. That simplifies the generated Documentation:
+
+```ts
+const endpoint = new EndpointsFactory(resultHandler).build({
+  statusCode: [201, 409], // narrows the responses down to "created" (201) or "conflict" (409)
 });
 ```
 
@@ -1448,9 +1461,9 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
 
 ## Profiling
 
-For debugging and performance testing purposes the framework offers a simple `.profile()` method on the built-in logger.
-It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
-invoke the returned callback. The default severity of those measurements is `debug`.
+During development, for debugging and performance testing purposes, the framework offers a simple `.profile()` method
+on the built-in logger. It starts a timer when you call it and measures the duration in adaptive units (from
+picoseconds to minutes) until you invoke the returned callback. The default severity of those measurements is `debug`.
 
 ```ts
 import { createConfig, BuiltinLogger } from "express-zod-api";

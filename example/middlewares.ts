@@ -14,6 +14,7 @@ export const authMiddleware = new Middleware({
       { type: "header", name: "token" },
     ],
   },
+  statusCode: 401, // the middleware can interrupt request handling with this code
   input: z.object({
     key: z.string().nonempty().example("1234-5678-90"),
     token: z.string().nonempty().example("1234567890"),

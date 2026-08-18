@@ -658,7 +658,11 @@ describe("Example", async () => {
       expect(typeof response).toBe("object");
       expect(response).toMatchSnapshot();
       expectTypeOf(response).toEqualTypeOf<
-        [200, { name: string; createdAt: string }] | [400, { message: string }]
+        | [200, { name: string; createdAt: string }]
+        | [400, { message: string }]
+        | [401, { message: string }]
+        | [404, { message: string }]
+        | [429, { message: string }]
       >();
     });
 

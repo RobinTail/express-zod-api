@@ -1,4 +1,5 @@
 import { z } from "zod";
+import * as R from "ramda";
 import {
   EndpointsFactory,
   Middleware,
@@ -7,16 +8,29 @@ import {
   ez,
   testEndpoint,
   ResultHandler,
+  type Method,
 } from "../src";
 import { Endpoint } from "../src/endpoint";
+import { FrozenSet } from "../src/frozen-set";
 
 describe("Endpoint", () => {
   describe(".methods", () => {
-    test("Should return the correct set of methods (readonly)", () => {
+    test("Should return the correct set of methods", () => {
+      const methods: Method[] = [
+        "get",
+        "post",
+        "put",
+        "delete",
+        "patch",
+        "query",
+      ];
       const endpointMock = new Endpoint({
-        methods: ["get", "post", "put", "delete", "patch", "query"],
+        methods: new FrozenSet(methods),
+        scopes: new FrozenSet(),
+        tags: new FrozenSet(),
         inputSchema: z.object({}),
         outputSchema: z.object({}),
+        statusCodes: new Set(),
         handler: vi.fn(),
         resultHandler: new ResultHandler({
           positive: z.string(),
@@ -24,16 +38,10 @@ describe("Endpoint", () => {
           handler: vi.fn(),
         }),
       });
-      const { methods } = endpointMock;
-      expect(methods).toEqual([
-        "get",
-        "post",
-        "put",
-        "delete",
-        "patch",
-        "query",
-      ]);
-      expect(() => (methods as any[]).push()).toThrowError(/read only/);
+      const { methods: actual } = endpointMock;
+      expect(Array.from(actual)).toEqual(methods);
+      expect(() => actual.delete("get")).toThrow(/read only/);
+      expect(Array.from(endpointMock.methods)).toEqual(methods);
     });
   });
 
@@ -311,6 +319,81 @@ describe("Endpoint", () => {
         expect(() => (responses as any[]).push()).toThrowError(/read only/);
       },
     );
+
+    test.each<{
+      statusCode: number | [number, ...number[]];
+      positive: number[][];
+      negative: number[][];
+    }>([
+      { statusCode: 204, positive: [[204]], negative: [[400]] },
+      { statusCode: 404, positive: [[200]], negative: [[404]] },
+      { statusCode: [200, 204], positive: [[200, 204]], negative: [[400]] },
+      { statusCode: [201, 500], positive: [[201]], negative: [[500]] },
+    ])(
+      "should override default status codes (single schema) %#",
+      ({ statusCode, positive, negative }) => {
+        const endpoint = defaultEndpointsFactory.buildVoid({
+          handler: vi.fn(),
+          statusCode,
+        });
+        expect(
+          R.pluck("statusCodes", endpoint.getResponses("positive")),
+        ).toEqual(positive);
+        expect(
+          R.pluck("statusCodes", endpoint.getResponses("negative")),
+        ).toEqual(negative);
+      },
+    );
+
+    const multiSchemaFactory = new EndpointsFactory(
+      new ResultHandler({
+        positive: [
+          { statusCode: 200, schema: z.literal("ok") },
+          { statusCode: 201, schema: z.literal("kinda") },
+        ],
+        negative: [
+          { statusCode: 400, schema: z.literal("error") },
+          { statusCode: 500, schema: z.literal("failure") },
+        ],
+        handler: vi.fn(),
+      }),
+    );
+
+    test.each<{
+      statusCode: number | [number, ...number[]];
+      positive: number[][];
+      negative: number[][];
+    }>([
+      { statusCode: [201, 500], positive: [[201]], negative: [[500]] },
+      { statusCode: 400, positive: [[200], [201]], negative: [[400]] },
+    ])(
+      "should narrow the multi-schema responses to the declared status codes %#",
+      ({ statusCode, positive, negative }) => {
+        const endpoint = multiSchemaFactory.buildVoid({
+          handler: vi.fn(),
+          statusCode,
+        });
+        expect(
+          R.pluck("statusCodes", endpoint.getResponses("positive")),
+        ).toEqual(positive);
+        expect(
+          R.pluck("statusCodes", endpoint.getResponses("negative")),
+        ).toEqual(negative);
+      },
+    );
+
+    test("should throw when the Endpoint declares a status code uncovered by the multi-schema ResultHandler", () => {
+      const endpoint = multiSchemaFactory.buildVoid({
+        handler: vi.fn(),
+        statusCode: [200, 204, 400, 404, 502],
+      });
+      expect(() =>
+        endpoint.getResponses("positive"),
+      ).toThrowErrorMatchingSnapshot();
+      expect(() =>
+        endpoint.getResponses("negative"),
+      ).toThrowErrorMatchingSnapshot();
+    });
   });
 
   describe(".scopes", () => {
@@ -324,8 +407,10 @@ describe("Endpoint", () => {
           scope,
         });
         const { scopes } = endpoint;
-        expect(scopes).toEqual(typeof scope === "string" ? [scope] : scope);
-        expect(() => (scopes as any[]).push()).toThrowError(/read only/);
+        expect(Array.from(scopes)).toEqual(
+          typeof scope === "string" ? [scope] : scope,
+        );
+        expect(() => scopes.add("something")).toThrow(/read only/);
       },
     );
   });
@@ -341,8 +426,8 @@ describe("Endpoint", () => {
           tag,
         });
         const { tags } = endpoint;
-        expect(tags).toEqual(typeof tag === "string" ? [tag] : tag);
-        expect(() => (tags as any[]).push()).toThrowError(/read only/);
+        expect(Array.from(tags)).toEqual(typeof tag === "string" ? [tag] : tag);
+        expect(() => tags.add("something")).toThrow(/read only/);
       },
     );
   });
@@ -402,8 +487,12 @@ describe("Endpoint", () => {
     test("should return undefined if its not defined upon creation", () => {
       expect(
         new Endpoint({
+          methods: new FrozenSet(),
+          scopes: new FrozenSet(),
+          tags: new FrozenSet(),
           inputSchema: z.object({}),
           outputSchema: z.object({}),
+          statusCodes: new Set(),
           handler: async () => ({}),
           resultHandler: defaultResultHandler,
         }).getOperationId("get"),

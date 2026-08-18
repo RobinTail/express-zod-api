@@ -1039,6 +1039,35 @@ describe("Documentation", () => {
         }).getSpecAsYaml(),
       ).toMatchSnapshot();
     });
+
+    test("should depict only the status codes declared by the Endpoint", () => {
+      const factory = new EndpointsFactory(
+        new ResultHandler({
+          positive: [
+            { statusCode: 200, schema: z.literal("ok") },
+            { statusCode: 201, schema: z.literal("created") },
+          ],
+          negative: [
+            { statusCode: 400, schema: z.literal("error") },
+            { statusCode: 500, schema: z.literal("failure") },
+          ],
+          handler: vi.fn(),
+        }),
+      );
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            "post overrides": factory.buildVoid({
+              statusCode: [201, 500],
+              handler: vi.fn(),
+            }),
+          },
+        },
+      }).getSpec();
+      const responses = spec.paths?.["/v1/overrides"]?.post?.responses ?? {};
+      expect(Object.keys(responses).sort()).toEqual(["201", "500"]);
+    });
   });
 
   describe("Metadata", () => {

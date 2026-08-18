@@ -59,7 +59,8 @@ const interfaces: Record<IOKind, string> = {
   encoded: "EncodedResponse",
 };
 
-const quot = (items: Iterable<string>) => Array.from(items, (s) => `"${s}"`);
+const quot = (items: Iterable<string>) =>
+  Array.from(items).map((s) => `"${s}"`);
 
 const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
@@ -67,7 +68,7 @@ export abstract class IntegrationBase {
   /** @internal */
   protected paths = new Set<string>();
   /** @internal */
-  protected tags = new Map<string, ReadonlyArray<string>>();
+  protected tags = new Map<string, ReadonlySet<string>>();
   /** @internal */
   protected registry = new Map<
     string,

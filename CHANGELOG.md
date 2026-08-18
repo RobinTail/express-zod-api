@@ -43,6 +43,53 @@ if (status === 200) {
 
 ## Version 29
 
+### v29.3.3
+
+- Added a warning about using the built-in logger in production:
+  - The `BuiltinLogger` is intended for development purposes only because it prints messages synchronously;
+  - That may degrade the performance of your API in production mode (`NODE_ENV=production`).
+
+### v29.3.2
+
+- The tags and scopes given to `EndpointsFactory::build()` are now deduplicated and immutable:
+  - The generated `Documentation` and `Integration` would no longer contain duplicate entries of that kind.
+
+### v29.3.1
+
+- Fixed the `Endpoint` methods duplication issue:
+  - The methods given to `EndpointsFactory::build()` are now deduplicated;
+  - No more confusing "Route has a duplicate" error in that case and duplicate entries in the generated `Integration`.
+
+### v29.3.0
+
+- Featuring Endpoint-specific status codes:
+  - Added `statusCode` option to `EndpointsFactory::build()` and `Middleware::constructor()` arguments;
+  - It can be assigned with a number or an array of numbers having at least one element;
+  - You can specify how exactly an Endpoint can respond or a Middleware can terminate the request handling;
+  - Those codes affect the generated Documentation along with the `ResultHandler` (`positive` and `negative`):
+    - If `ResultHandler` has a single response schema, those codes replace the configured ones (override);
+    - When it has different response schemas, status codes would be narrowed down (intersection):
+      - Failure to intersect (uncertain response schema for unlisted code) leads to `ResultHandlerError`.
+- Fixed: `createRateLimitMiddleware` and `EndpointsFactory::useRateLimit` respect the custom `statusCode`:
+  - Rate-limit middleware was introduced in v28.7.0; its default status code remains `429`.
+- Rate-limit middleware, in this regard, is supposed to declare its status code:
+  - But it could be a breaking change for some APIs and therefore, it's postponed until v30;
+  - If that behavior is desired now, you can specify the `{ statusCode: 429 }` explicitly in its configuration.
+
+### v29.2.3
+
+- This version prevents the HTTP status code misuse within `ResultHandler` API response definition:
+  - The `ResultHandler::positive` expects status codes less than `400`;
+  - The `ResultHandler::negative` expects status codes greater than or equal to `400`;
+  - Otherwise, throws a `ResultHandlerError` when using `Documentation` or `Integration` or at startup (dev. mode).
+
+### v29.2.2
+
+- Fixed the bug where multiple response schemas could share the same status code in `ResultHandler` definition:
+  - Either when multiple entries omit the `statusCode` and fall back to defaults or when the codes explicitly overlap;
+  - That silently overwrote schemas in the generated `Documentation` and duplicated keys in the generated `Integration`;
+  - Now throws a `ResultHandlerError` when using the mentioned generators and at startup in development mode.
+
 ### v29.2.1
 
 - Tiny performance tuning for self-diagnostics at startup (development mode only).

@@ -27,6 +27,7 @@ EndpointsFactory {
   "middlewares": [],
   "resultHandler": ResultHandler {},
   "schema": undefined,
+  "statusCodes": Set {},
   "use": [Function],
 }
 `;
@@ -52,6 +53,7 @@ EndpointsFactory {
   "middlewares": [],
   "resultHandler": ResultHandler {},
   "schema": undefined,
+  "statusCodes": Set {},
   "use": [Function],
 }
 `;

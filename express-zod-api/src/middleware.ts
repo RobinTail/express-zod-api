@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import { emptySchema, type FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
+import { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { LogicalContainer } from "./logical-container";
 import type { Security } from "./security";
@@ -29,6 +30,8 @@ export abstract class AbstractMiddleware {
   public abstract get security(): LogicalContainer<Security> | undefined;
   /** @internal */
   public abstract get schema(): IOSchema | undefined;
+  /** @internal */
+  public abstract get statusCodes(): ReadonlySet<number>;
   public abstract execute(params: {
     input: unknown;
     ctx: FlatObject;
@@ -53,11 +56,13 @@ export class Middleware<
   readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
+  readonly #statusCode: FrozenSet<number>;
   readonly #handler: Handler<z.output<IN>, CTX, RET>;
 
   constructor({
     input,
     security,
+    statusCode,
     handler,
   }: {
     /**
@@ -73,12 +78,17 @@ export class Middleware<
     security?: LogicalContainer<
       Security<Extract<keyof z.input<IN>, string>, SCO>
     >;
+    /** @desc The status code(s) the Middleware may interrupt the request handling (used by Documentation). */
+    statusCode?: number | [number, ...number[]];
     /** @desc The handler returning a context available to Endpoints. */
     handler: Handler<z.output<IN>, CTX, RET>;
   }) {
     super();
     this.#schema = input as IN;
     this.#security = security;
+    this.#statusCode = new FrozenSet(
+      typeof statusCode === "number" ? [statusCode] : statusCode,
+    );
     this.#handler = handler;
   }
 
@@ -90,6 +100,11 @@ export class Middleware<
   /** @internal */
   public override get schema() {
     return this.#schema;
+  }
+
+  /** @internal */
+  public override get statusCodes() {
+    return this.#statusCode;
   }
 
   /** @throws InputValidationError */
@@ -130,14 +145,18 @@ export class ExpressMiddleware<
     {
       provider = () => ({}) as RET,
       transformer = (err: Error) => err,
+      statusCode,
     }: {
       /** @desc Extracts context properties from request and response after the native middleware execution. */
       provider?: (request: R, response: S) => RET | Promise<RET>;
       /** @desc Transforms errors caught from the native middleware before they propagate further. */
       transformer?: (err: Error) => Error;
+      /** @desc The status code(s) the Middleware may interrupt the request handling (used by Documentation). */
+      statusCode?: number | [number, ...number[]];
     } = {},
   ) {
     super({
+      statusCode,
       handler: async ({ request, response }) => {
         const { promise, resolve, reject } = Promise.withResolvers<RET>();
         const next = (err?: unknown) => {

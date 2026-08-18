@@ -6,7 +6,6 @@ import {
   type NormalizedResponse,
 } from "./api-response";
 import { ensureError, isObject, type FlatObject } from "./common-helpers";
-import { contentTypes } from "./content-type";
 import createHttpError, { isHttpError } from "http-errors";
 import { ResultHandlerError } from "./errors";
 import type { IOSchema } from "./io-schema";
@@ -119,22 +118,12 @@ export class ResultHandler<
 
   /** @internal */
   public override getPositiveResponse(output: IOSchema) {
-    return normalize(this.#positive, {
-      variant: "positive",
-      args: [output],
-      statusCodes: [defaultStatusCodes.positive],
-      mimeTypes: [contentTypes.json],
-    });
+    return normalize(this.#positive, { variant: "positive", args: [output] });
   }
 
   /** @internal */
   public override getNegativeResponse() {
-    return normalize(this.#negative, {
-      variant: "negative",
-      args: [],
-      statusCodes: [defaultStatusCodes.negative],
-      mimeTypes: [contentTypes.json],
-    });
+    return normalize(this.#negative, { variant: "negative", args: [] });
   }
 }
 

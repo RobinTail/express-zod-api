@@ -9,6 +9,7 @@ const namePart = z.string().regex(/^\w+$/);
 export const createUserEndpoint = statusDependingFactory.build({
   method: "post",
   tag: "users",
+  statusCode: [201, 400, 409, 500], // narrows the ones configured in ResultHandler down to the actual implementation
   input: z.object({
     name: z
       .templateLiteral([namePart, " ", namePart])

@@ -68,9 +68,35 @@ const performanceConcerns = [
     message: "shifting is 2-20x slower than index-based iteration",
   },
   {
-    selector:
+    selector: // set-iter.bench.ts
       "CallExpression > MemberExpression[property.name='map'] > ArrayExpression > SpreadElement",
     message: "Set::values().map() would be 5% faster and more memory efficient",
+  },
+  {
+    selector: // array-from-map.bench.ts
+      "CallExpression[callee.object.name='Array'][callee.property.name='from'][arguments.length>1]",
+    message: "Array.from().map() would be 3.5x faster",
+  },
+];
+
+const setTypeConcerns = [
+  {
+    selector:
+      "CallExpression[callee.object.name='Object'][callee.property.name='freeze'] " +
+      "> NewExpression[callee.name='Set']",
+    message: "Object.freeze() does not protect Set instances, use FrozenSet",
+  },
+  {
+    selector:
+      "MethodDefinition:matches([kind='get'], [key.name=/^get/]) " +
+      "NewExpression[callee.name='Set']",
+    message: "getters must expose FrozenSet instead of the mutable Set",
+  },
+  {
+    selector:
+      "MethodDefinition:matches([kind='get'], [key.name=/^get/]) " +
+      "TSTypeReference[typeName.name='Set']",
+    message: "type the getters returning sets as ReadonlySet",
   },
 ];
 
@@ -233,6 +259,7 @@ export default defineConfig({
           "warn",
           ...importConcerns,
           ...performanceConcerns,
+          ...setTypeConcerns,
         ],
       },
     },

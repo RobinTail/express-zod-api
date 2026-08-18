@@ -13,6 +13,7 @@ import {
 import type { CommonConfig } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { ezFormBrand } from "./form-schema";
+import type { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
@@ -23,6 +24,7 @@ import type { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
 import {
   type DiscriminatedResult,
+  overrideStatusCodes,
   pullResponseExamples,
 } from "./result-helpers";
 import type { AbstractResultHandler } from "./result-handler";
@@ -63,7 +65,7 @@ export abstract class AbstractEndpoint {
   /** @internal */
   public abstract get summary(): string | undefined;
   /** @internal */
-  public abstract get methods(): ReadonlyArray<Method> | undefined;
+  public abstract get methods(): ReadonlySet<Method>;
   /** @internal */
   public abstract get inputSchema(): IOSchema;
   /** @internal */
@@ -71,9 +73,9 @@ export abstract class AbstractEndpoint {
   /** @internal */
   public abstract get security(): LogicalContainer<Security>[];
   /** @internal */
-  public abstract get scopes(): ReadonlyArray<string>;
+  public abstract get scopes(): ReadonlySet<string>;
   /** @internal */
-  public abstract get tags(): ReadonlyArray<string>;
+  public abstract get tags(): ReadonlySet<string>;
   /** @internal */
   public abstract getProbableRequestType(method?: ClientMethod): ContentType;
   /** @internal */
@@ -110,9 +112,10 @@ export class Endpoint<
     description?: string;
     summary?: string;
     getOperationId?: (method: ClientMethod) => string | undefined;
-    methods?: Method[];
-    scopes?: string[];
-    tags?: string[];
+    methods: FrozenSet<Method>;
+    scopes: FrozenSet<string>;
+    tags: FrozenSet<string>;
+    statusCodes: ReadonlySet<number>;
   }) {
     super();
     this.#def = def;
@@ -145,7 +148,7 @@ export class Endpoint<
 
   /** @internal */
   public override get methods() {
-    return Object.freeze(this.#def.methods);
+    return this.#def.methods;
   }
 
   /** @internal */
@@ -176,10 +179,14 @@ export class Endpoint<
   /** @internal */
   public override getResponses(variant: ResponseVariant) {
     if (variant === "positive") this.#ensureOutputExamples();
-    return Object.freeze(
+    const responses =
       variant === "negative"
         ? this.#def.resultHandler.getNegativeResponse()
-        : this.#def.resultHandler.getPositiveResponse(this.#def.outputSchema),
+        : this.#def.resultHandler.getPositiveResponse(this.#def.outputSchema);
+    return Object.freeze(
+      this.#def.statusCodes.size
+        ? overrideStatusCodes(responses, this.#def.statusCodes, variant)
+        : responses,
     );
   }
 
@@ -191,12 +198,12 @@ export class Endpoint<
 
   /** @internal */
   public override get scopes() {
-    return Object.freeze(this.#def.scopes || []);
+    return this.#def.scopes;
   }
 
   /** @internal */
   public override get tags() {
-    return Object.freeze(this.#def.tags || []);
+    return this.#def.tags;
   }
 
   /** @internal */

@@ -2,7 +2,12 @@ import type { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import * as R from "ramda";
 import { z } from "zod";
-import type { NormalizedResponse, ResponseVariant } from "./api-response";
+import {
+  defaultStatusCodes,
+  isPositiveStatusCode,
+  type NormalizedResponse,
+  type ResponseVariant,
+} from "./api-response";
 import {
   combinations,
   getMessageFromError,
@@ -13,6 +18,7 @@ import { InputValidationError, ResultHandlerError } from "./errors";
 import type { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
 import { getExamples } from "./metadata";
+import { contentTypes } from "./content-type";
 
 export type ResultSchema<R extends Result> =
   R extends Result<infer S> ? S : never;
@@ -27,39 +33,100 @@ export type DiscriminatedResult =
       error: Error;
     };
 
-/** @throws ResultHandlerError when Result is an empty array */
+/** @throws ResultHandlerError when Result is an empty array or contains duplicate status codes */
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,
-  {
-    variant,
-    args,
-    ...fallback
-  }: Omit<NormalizedResponse, "schema"> & {
-    variant: ResponseVariant;
-    args: A;
-  },
+  { variant, args }: { variant: ResponseVariant; args: A },
 ): NormalizedResponse[] => {
   if (typeof subject === "function") subject = subject(...args);
+  const fallback: Pick<NormalizedResponse, "statusCodes" | "mimeTypes"> = {
+    statusCodes: [defaultStatusCodes[variant]],
+    mimeTypes: [contentTypes.json],
+  };
   if (subject instanceof z.ZodType) return [{ schema: subject, ...fallback }];
   if (Array.isArray(subject) && !subject.length) {
     const err = new Error(`At least one ${variant} response schema required.`);
     throw new ResultHandlerError(err);
   }
-  return (Array.isArray(subject) ? subject : [subject]).map(
-    ({ schema, statusCode, mimeType }) => ({
-      schema,
-      statusCodes:
-        typeof statusCode === "number"
-          ? [statusCode]
-          : statusCode || fallback.statusCodes,
-      mimeTypes:
-        typeof mimeType === "string"
-          ? [mimeType]
-          : mimeType === undefined
-            ? fallback.mimeTypes
-            : mimeType,
-    }),
+  const normalized = (
+    Array.isArray(subject) ? subject : [subject]
+  ).map<NormalizedResponse>(({ schema, statusCode, mimeType }) => ({
+    schema,
+    statusCodes:
+      typeof statusCode === "number"
+        ? [statusCode]
+        : statusCode || fallback.statusCodes,
+    mimeTypes:
+      typeof mimeType === "string"
+        ? [mimeType]
+        : mimeType === undefined
+          ? fallback.mimeTypes
+          : mimeType,
+  }));
+  const statusCodes = R.chain(R.prop("statusCodes"), normalized);
+  const invalid = statusCodes.find(
+    (one) => isPositiveStatusCode(one) === (variant === "negative"),
   );
+  if (invalid !== undefined) {
+    const err = new Error(
+      `The status code ${invalid} is not valid for a ${variant} API response.`,
+    );
+    throw new ResultHandlerError(err);
+  }
+  if (normalized.length > 1) {
+    const duplicated = R.find(
+      (code) => statusCodes.indexOf(code) !== statusCodes.lastIndexOf(code),
+      statusCodes,
+    );
+    if (duplicated !== undefined) {
+      const err = new Error(
+        `The status code ${duplicated} is used by multiple response schemas.`,
+      );
+      throw new ResultHandlerError(err);
+    }
+  }
+  return normalized;
+};
+
+/** @internal Overrides the normalized responses with Endpoint-specific status codes. */
+export const overrideStatusCodes = (
+  subject: NormalizedResponse[],
+  specific: ReadonlySet<number>, // can contain codes for both positive and negative status codes
+  variant: ResponseVariant,
+): NormalizedResponse[] => {
+  const variantFilter = (code: number) =>
+    isPositiveStatusCode(code) === (variant === "positive");
+  const overrides = new Set(Array.from(specific).filter(variantFilter));
+  if (!overrides.size) return subject;
+  if (subject.length === 1) {
+    return subject.map((response) => ({
+      ...response, // single schema case — replacing the codes:
+      statusCodes: Array.from(overrides) as [number, ...number[]], // ensured by size check
+    }));
+  }
+  const overlap: NormalizedResponse[] = [];
+  const missing = subject.reduce((acc, { statusCodes, ...rest }) => {
+    const reduced = new Set(statusCodes).intersection(overrides);
+    if (!reduced.size) return acc;
+    overlap.push({
+      ...rest,
+      statusCodes: Array.from(reduced) as [number, ...number[]], // ensured by the size check
+    });
+    return acc.difference(reduced);
+  }, new Set(overrides));
+  if (missing.size) {
+    const missingCodes = Array.from(missing).join(", ");
+    const isPlural = missing.size > 1;
+    throw new ResultHandlerError(
+      new Error(
+        `The ResultHandler defines multiple ${variant} response schemas, but the overriding status ` +
+          `code${isPlural ? "s" : ""} ${missingCodes} of the Endpoint ${isPlural ? "are" : "is"} not listed for any ` +
+          `of them, therefore it is unclear how such override${isPlural ? "s" : ""} would be handled. ` +
+          `Consider adding ${isPlural ? "them" : "it"} to ResultHandler.`,
+      ),
+    );
+  }
+  return overlap; // not empty, ensured by missing.size
 };
 
 export const logServerError = (

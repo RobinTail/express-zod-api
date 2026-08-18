@@ -38,6 +38,12 @@ const makeCommonEntities = (config: CommonConfig) => {
     build: import.meta.TSDOWN_BUILD || "from sources",
     env: runtime.env,
   });
+  if (runtime.isProduction && logger instanceof BuiltinLogger) {
+    logger.warn(
+      "Using the built-in logger in production may degrade performance due to synchronous printing. " +
+        "Consider installing a professional logging solution, such as Pino or Winston.",
+    );
+  }
   installDeprecationListener(logger);
   const loggingMiddleware = createLoggingMiddleware({ logger, config });
   const getLogger = makeGetLogger(logger);
