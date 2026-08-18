@@ -7,6 +7,10 @@
 - Supported TypeScript versions (optional peer): `^6.0.3`:
   - Entirely `#private` props are now restored in the classes of the distributed `.d.ts` files.
 - `DocumentationError` removed from main entrypoint: import from `express-zod-api/documentation` instead.
+- The rate-limiting Middleware now explicitly declares the `statusCode` that it may interrupt the request handling:
+  - Uses the `statusCode` option given to `EndpointsFactory::useRateLimit()` and `createRateLimitMiddleware()` or 429;
+  - This will override or narrow the negative status codes declared in ResultHandler when generating Documentation;
+  - The Endpoints using this Middleware should declare its other negative status codes explicitly to preserve them.
 
 ## Version 29
 
