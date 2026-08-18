@@ -911,11 +911,7 @@ Install `express-rate-limit`. Consider the `createRateLimitMiddleware()` to enab
 
 ```ts
 const endpoint = factory
-  .useRateLimit({
-    windowMs: 60000,
-    max: 100,
-    statusCode: 429, // when set explicitly, it will be reflected in the Documentation
-  }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
+  .useRateLimit({ windowMs: 60000, max: 100 }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
   .buildVoid({
     handler: async ({ ctx: { rateLimit, logger } }) => {
       logger.debug("Features", rateLimit); // { limit, used, remaining, resetTime, getKey, resetKey }
