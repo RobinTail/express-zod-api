@@ -96,7 +96,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "ServeStatic",
   "createServer",
   "attachRouting",
-  "DocumentationError",
   "RoutingError",
   "OutputValidationError",
   "InputValidationError",

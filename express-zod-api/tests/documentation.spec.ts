@@ -1,7 +1,6 @@
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
 import {
-  DocumentationError,
   EndpointsFactory,
   createConfig,
   Middleware,
@@ -11,7 +10,11 @@ import {
   type Method,
   type Routing,
 } from "../src";
-import { Documentation, type Depicter } from "../src/documentation";
+import {
+  Documentation,
+  DocumentationError,
+  type Depicter,
+} from "../src/documentation";
 import { contentTypes } from "../src/content-type";
 import type { IOSchema } from "../src/io-schema";
 import { z } from "zod";
