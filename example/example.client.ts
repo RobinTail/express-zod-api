@@ -571,6 +571,9 @@ export class Client<T extends Record<string, unknown> = DefaultContext> {
     if ("nextCursor" in response) return response.nextCursor !== null;
     return response.offset + response.limit < response.total;
   }
+  public static discriminate(statusCode: number): "success" | "error" {
+    return statusCode < 400 ? "success" : "error";
+  }
 }
 
 export class Subscription<
