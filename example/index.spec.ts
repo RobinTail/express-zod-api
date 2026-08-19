@@ -629,9 +629,7 @@ describe("Example", async () => {
     test("Should perform the request with a positive response", async () => {
       const { discriminator, data } = await client.provide(
         "get /v1/user/retrieve",
-        {
-          id: "10",
-        },
+        { id: "10" },
       );
       expect(data).toMatchSnapshot();
       if (discriminator === "success")
