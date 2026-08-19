@@ -712,6 +712,18 @@ describe("Example", async () => {
       );
       expect(response.discriminator).toBe("success");
     });
+
+    test.each([
+      { nextCursor: "123", expected: true },
+      { nextCursor: null, expected: false },
+      { offset: 15, limit: 20, total: 60, expected: true },
+      { offset: 15, limit: 20, total: 30, expected: false },
+    ])(
+      "::hasMore() should return true if there are more responses %#",
+      ({ expected, ...response }) => {
+        expect(Client.hasMore(response)).toBe(expected);
+      },
+    );
   });
 
   describe("Rate limiting", () => {
