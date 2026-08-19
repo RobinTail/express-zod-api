@@ -127,39 +127,20 @@ export class ResultHandler<
   }
 }
 
-const defaultNegativeSchema = z.object({
-  status: z.literal("error"),
-  error: z.object({ message: z.string() }),
-});
+const defaultNegativeSchema = z.object({ message: z.string() });
 globalRegistry.add(defaultNegativeSchema, {
-  examples: [
-    { status: "error", error: { message: "Sample error message" } },
-  ] satisfies z.output<typeof defaultNegativeSchema>[],
+  examples: [{ message: "Sample error message" }] satisfies z.output<
+    typeof defaultNegativeSchema
+  >[],
 });
 
 /**
- * @desc The default ResultHandler wrapping Endpoint output in `{ status: "success", data: output }`
- *       and errors in `{ status: "error", error: { message } }`. Responds with JSON Content-Type.
+ * @desc The default ResultHandler relaying Endpoint output errors messages. Responds with JSON Content-Type.
  *       Respects the status of errors from createHttpError(), others become InternalServerError (500).
  * @see ensureHttpError
  * */
 export const defaultResultHandler = new ResultHandler({
-  positive: (output) => {
-    const responseSchema = z.object({
-      status: z.literal("success"),
-      data: output,
-    });
-    const examples = getExamples(output); // pulling down:
-    if (examples.length) {
-      globalRegistry.add(responseSchema, {
-        examples: examples.map((data) => ({
-          status: "success" as const,
-          data,
-        })),
-      });
-    }
-    return responseSchema;
-  },
+  positive: (output) => output,
   negative: defaultNegativeSchema,
   handler: ({ error, input, output, request, response, logger }) => {
     if (error) {
@@ -168,14 +149,9 @@ export const defaultResultHandler = new ResultHandler({
       return void response
         .status(httpError.statusCode)
         .set(httpError.headers)
-        .json({
-          status: "error",
-          error: { message: getPublicErrorMessage(httpError) },
-        });
+        .json({ message: getPublicErrorMessage(httpError) });
     }
-    response
-      .status(defaultStatusCodes.positive)
-      .json({ status: "success", data: output });
+    response.status(defaultStatusCodes.positive).json(output);
   },
 });
 

@@ -9,10 +9,7 @@ type PostV1CustomInput = {
 
 /** post /v1/custom */
 type PostV1CustomPositiveVariant1 = {
-  status: "success";
-  data: {
-    number: boolean;
-  };
+  number: boolean;
 };
 
 /** post /v1/custom */
@@ -22,10 +19,7 @@ interface PostV1CustomPositiveResponseVariants {
 
 /** post /v1/custom */
 type PostV1CustomNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** post /v1/custom */
@@ -75,10 +69,7 @@ type GetV1PathInput = Omit<
 >;
 
 /** get /v1/path */
-type GetV1PathPositiveVariant1 = {
-  status: "success";
-  data: {};
-};
+type GetV1PathPositiveVariant1 = {};
 
 /** get /v1/path */
 interface GetV1PathPositiveResponseVariants {
@@ -87,10 +78,7 @@ interface GetV1PathPositiveResponseVariants {
 
 /** get /v1/path */
 type GetV1PathNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** get /v1/path */
@@ -171,10 +159,7 @@ type GetV1PathInput = Omit<
 >;
 
 /** get /v1/path */
-type GetV1PathPositiveVariant1 = {
-  status: "success";
-  data: {};
-};
+type GetV1PathPositiveVariant1 = {};
 
 /** get /v1/path */
 interface GetV1PathPositiveResponseVariants {
@@ -183,10 +168,7 @@ interface GetV1PathPositiveResponseVariants {
 
 /** get /v1/path */
 type GetV1PathNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** get /v1/path */
@@ -306,10 +288,7 @@ type QueryV1TestInput = {
 };
 
 /** query /v1/test */
-type QueryV1TestPositiveVariant1 = {
-    status: "success";
-    data: {};
-};
+type QueryV1TestPositiveVariant1 = {};
 
 /** query /v1/test */
 interface QueryV1TestPositiveResponseVariants {
@@ -318,10 +297,7 @@ interface QueryV1TestPositiveResponseVariants {
 
 /** query /v1/test */
 type QueryV1TestNegativeVariant1 = {
-    status: "error";
-    error: {
-        message: string;
-    };
+    message: string;
 };
 
 /** query /v1/test */
@@ -375,10 +351,7 @@ type QueryV1TestInput = {
 };
 
 /** query /v1/test */
-type QueryV1TestPositiveVariant1 = {
-    status: "success";
-    data: {};
-};
+type QueryV1TestPositiveVariant1 = {};
 
 /** query /v1/test */
 interface QueryV1TestPositiveResponseVariants {
@@ -387,10 +360,7 @@ interface QueryV1TestPositiveResponseVariants {
 
 /** query /v1/test */
 type QueryV1TestNegativeVariant1 = {
-    status: "error";
-    error: {
-        message: string;
-    };
+    message: string;
 };
 
 /** query /v1/test */
@@ -440,10 +410,7 @@ type PostV1TestWithDashesInput = {
 
 /** post /v1/test-with-dashes */
 type PostV1TestWithDashesPositiveVariant1 = {
-  status: "success";
-  data: {
-    similar?: number | undefined;
-  };
+  similar?: number | undefined;
 };
 
 /** post /v1/test-with-dashes */
@@ -453,10 +420,7 @@ interface PostV1TestWithDashesPositiveResponseVariants {
 
 /** post /v1/test-with-dashes */
 type PostV1TestWithDashesNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** post /v1/test-with-dashes */

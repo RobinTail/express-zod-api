@@ -87,11 +87,8 @@ describe("Example", async () => {
       ).toBeGreaterThanOrEqual(5);
       const json = await response.json();
       expect(json).toMatchObject({
-        status: "success",
-        data: {
-          name: "John Doe",
-          createdAt: "2022-01-22T00:00:00.000Z",
-        },
+        name: "John Doe",
+        createdAt: "2022-01-22T00:00:00.000Z",
       });
       await vi.waitFor(() =>
         assert([/v1\/user\/50/, /123, 456/, /Jane Doe/, /#50/].every(matchOut)),
@@ -162,9 +159,9 @@ describe("Example", async () => {
       );
       expect(response.status).toBe(200);
       const json = (await response.json()) as {
-        data?: { users?: Array<{ role: string }> };
+        users?: Array<{ role: string }>;
       };
-      const users = json.data?.users;
+      const users = json?.users;
       if (!Array.isArray(users)) fail("response.data.users should be an array");
       expect(
         users.every((one: { role: string }) =>
@@ -293,20 +290,17 @@ describe("Example", async () => {
       );
       const json = await response.json();
       expect(json).toEqual({
-        data: {
-          hash: "f39beeff92379dc935586d726211c2620be6f879",
-          mime: "image/svg+xml",
-          name: "logo.svg",
-          otherInputs: {
-            arr: ["456", "789"],
-            num: "123",
-            obj: { some: "thing" },
-            str: "test string value",
-            session: { token: "553280ce-ab20-4481-a9dc-fd3fc4f6759c" },
-          },
-          size: 48687,
+        hash: "f39beeff92379dc935586d726211c2620be6f879",
+        mime: "image/svg+xml",
+        name: "logo.svg",
+        otherInputs: {
+          arr: ["456", "789"],
+          num: "123",
+          obj: { some: "thing" },
+          str: "test string value",
+          session: { token: "553280ce-ab20-4481-a9dc-fd3fc4f6759c" },
         },
-        status: "success",
+        size: 48687,
       });
     });
 
@@ -340,10 +334,7 @@ describe("Example", async () => {
         },
       );
       expect(response.status).toBe(200);
-      expect(await response.json()).toEqual({
-        status: "success",
-        data: { crc: 32 },
-      });
+      expect(await response.json()).toEqual({ crc: 32 });
     });
 
     test("Should handle no content", async ({ signal }) => {
@@ -378,10 +369,7 @@ describe("Example", async () => {
         body: JSON.stringify({ username: "admin", password: "test" }),
       });
       expect(response.status).toBe(200);
-      expect(await response.json()).toEqual({
-        data: { message: "Logged in" },
-        status: "success",
-      });
+      expect(await response.json()).toEqual({ message: "Logged in" });
       expect(response.headers.get("set-cookie")).toMatch(/^session=j/);
     });
   });
@@ -405,11 +393,9 @@ describe("Example", async () => {
       );
       const json = await response.json();
       expect(json).toMatchSnapshot({
-        error: {
-          message: expect.stringMatching(
-            /Unterminated string in JSON at position 14/,
-          ),
-        },
+        message: expect.stringMatching(
+          /Unterminated string in JSON at position 14/,
+        ),
       });
     });
   });
@@ -436,12 +422,7 @@ describe("Example", async () => {
       );
       expect(response.status).toBe(404);
       const json = await response.json();
-      expect(json).toEqual({
-        status: "error",
-        error: {
-          message: "User not found",
-        },
-      });
+      expect(json).toEqual({ message: "User not found" });
       await vi.waitFor(() => assert(matchOut(/101, method get/)));
       expect(true).toBeTruthy();
     });
@@ -490,12 +471,7 @@ describe("Example", async () => {
       });
       expect(response.status).toBe(401);
       const json = await response.json();
-      expect(json).toEqual({
-        status: "error",
-        error: {
-          message: "Invalid key",
-        },
-      });
+      expect(json).toEqual({ message: "Invalid key" });
     });
 
     test("PATCH request should fail on auth middleware token check", async ({
@@ -516,12 +492,7 @@ describe("Example", async () => {
       });
       expect(response.status).toBe(401);
       const json = await response.json();
-      expect(json).toEqual({
-        status: "error",
-        error: {
-          message: "Invalid token",
-        },
-      });
+      expect(json).toEqual({ message: "Invalid token" });
     });
 
     test("PATCH request should fail on schema validation", async ({
@@ -563,12 +534,7 @@ describe("Example", async () => {
       });
       expect(response.status).toBe(404);
       const json = await response.json();
-      expect(json).toEqual({
-        status: "error",
-        error: {
-          message: "User not found",
-        },
-      });
+      expect(json).toEqual({ message: "User not found" });
     });
 
     test("Should respond with error to the missing static file request", async ({
@@ -666,9 +632,8 @@ describe("Example", async () => {
       });
       expect(response).toMatchSnapshot();
       expectTypeOf(response).toExtend<
-        | { status: "success"; data: { id: number; name: string } }
-        | { status: "error"; error: { message: string } }
-      >();
+        { id: number; name: string } | { message: string }
+      >(); // @todo add discriminator
     });
 
     test("Issue #2177: should handle path params correctly", async () => {
@@ -680,15 +645,11 @@ describe("Example", async () => {
         birthday: "1912-06-23",
       });
       expect(typeof response).toBe("object");
-      expect(response).toMatchSnapshot();
-      expectTypeOf<{
-        status: "success";
-        data: { name: string; createdAt: string };
-      }>().toExtend<typeof response>();
-      expectTypeOf<{
-        status: "error";
-        error: { message: string };
-      }>().toExtend<typeof response>();
+      expect(response).toMatchSnapshot(); // @todo add discriminator
+      expectTypeOf<{ name: string; createdAt: string }>().toExtend<
+        typeof response
+      >();
+      expectTypeOf<{ message: string }>().toExtend<typeof response>();
     });
 
     test("Issue #2182: should deny unlisted combination of path and method", async () => {
@@ -710,7 +671,7 @@ describe("Example", async () => {
         "post /v1/avatar/raw",
         new Blob(["test"], { type: "image/svg+xml" }),
       );
-      expect(response).toEqual({ status: "success", data: { length: 4 } });
+      expect(response).toEqual({ length: 4 });
     });
 
     test("can parse as Blob", async () => {
@@ -735,7 +696,7 @@ describe("Example", async () => {
           }),
         },
       );
-      expect(response.status).toBe("success");
+      expect(response).toHaveProperty("name"); // @todo add discriminator
     });
   });
 
@@ -772,8 +733,7 @@ describe("Example", async () => {
       ).toBeGreaterThan(Date.now() / 1000);
       const json = await response!.json();
       expect(json).toMatchObject({
-        status: "error",
-        error: { message: "Too many requests, please try again later." },
+        message: "Too many requests, please try again later.",
       });
     });
   });
