@@ -125,13 +125,14 @@ export class Integration extends IntegrationBase {
           `type ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies, "security cookies") : printed};`,
         ].join("\n");
       });
-      const names: Record<ResponseVariant, Set<string>> = {
+      const names: Record<ResponseVariant | "encoded", Set<string>> = {
         positive: new Set(),
         negative: new Set(),
+        encoded: new Set(),
       };
       for (const responseVariant of responseVariants) {
         const responses = endpoint.getResponses(responseVariant);
-        for (const [idx, { schema, mimeTypes }] of responses.entries()) {
+        for (const [idx, { schema, mimeTypes, statusCodes }] of responses.entries()) {
           const hasBody = shouldHaveContent(method, mimeTypes);
           const variantName = entitle(responseVariant, "variant", `${idx + 1}`);
           const variantTypeNode = zodToTs(
@@ -143,6 +144,7 @@ export class Integration extends IntegrationBase {
               `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
           );
           names[responseVariant].add(variantName);
+          names.encoded.add(`{ statusCode: ${statusCodes.join(" | ")}, status: "${responseVariant === "positive" ? "success" : "error"}", data: ${variantName} }`);
         }
       }
       this.paths.add(path);
@@ -150,9 +152,8 @@ export class Integration extends IntegrationBase {
         input: inputTypeName,
         positive: Array.from(names.positive).join(" | "),
         negative: Array.from(names.negative).join(" | "),
-        response: `${interfaces.positive}["${request}"] | ${interfaces.negative}["${request}"]`,
-        /** @todo restore encoding */
-        encoded: Array.from(names.positive.union(names.negative)).join(" | "),
+        response: Array.from(names.positive.union(names.negative)).join(" | "),
+        encoded: Array.from(names.encoded).join(" | "),
       };
       this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, tags);

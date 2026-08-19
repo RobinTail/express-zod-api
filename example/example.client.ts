@@ -385,6 +385,66 @@ export interface NegativeResponse {
 }
 
 export interface EncodedResponse {
+  "get /v1/user/retrieve":
+    | { statusCode: 200; status: "success"; data: GetV1UserRetrievePositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: GetV1UserRetrieveNegativeVariant1 };
+  "head /v1/user/retrieve":
+    | { statusCode: 200; status: "success"; data: HeadV1UserRetrievePositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: HeadV1UserRetrieveNegativeVariant1 };
+  "delete /v1/user/:id/remove":
+    | { statusCode: 204; status: "success"; data: DeleteV1UserIdRemovePositiveVariant1 }
+    | { statusCode: 404; status: "error"; data: DeleteV1UserIdRemoveNegativeVariant1 };
+  "patch /v1/user/:id":
+    | { statusCode: 200; status: "success"; data: PatchV1UserIdPositiveVariant1 }
+    | { statusCode: 429 | 401 | 400 | 404; status: "error"; data: PatchV1UserIdNegativeVariant1 };
+  "post /v1/user/create":
+    | { statusCode: 201; status: "success"; data: PostV1UserCreatePositiveVariant1 }
+    | { statusCode: 409; status: "error"; data: PostV1UserCreateNegativeVariant1 }
+    | { statusCode: 400 | 500; status: "error"; data: PostV1UserCreateNegativeVariant2 };
+  "query /v1/user/list":
+    | { statusCode: 200; status: "success"; data: QueryV1UserListPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: QueryV1UserListNegativeVariant1 };
+  "post /v1/login":
+    | { statusCode: 200; status: "success"; data: PostV1LoginPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: PostV1LoginNegativeVariant1 };
+  /** @deprecated */
+  "get /v1/avatar/send":
+    | { statusCode: 200; status: "success"; data: GetV1AvatarSendPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: GetV1AvatarSendNegativeVariant1 };
+  /** @deprecated */
+  "head /v1/avatar/send":
+    | { statusCode: 200; status: "success"; data: HeadV1AvatarSendPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: HeadV1AvatarSendNegativeVariant1 };
+  "get /v1/avatar/stream":
+    | { statusCode: 200; status: "success"; data: GetV1AvatarStreamPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: GetV1AvatarStreamNegativeVariant1 };
+  "head /v1/avatar/stream":
+    | { statusCode: 200; status: "success"; data: HeadV1AvatarStreamPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: HeadV1AvatarStreamNegativeVariant1 };
+  "post /v1/avatar/upload":
+    | { statusCode: 200; status: "success"; data: PostV1AvatarUploadPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: PostV1AvatarUploadNegativeVariant1 };
+  "post /v1/avatar/raw":
+    | { statusCode: 200; status: "success"; data: PostV1AvatarRawPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: PostV1AvatarRawNegativeVariant1 };
+  "get /v1/events/stream":
+    | { statusCode: 200; status: "success"; data: GetV1EventsStreamPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: GetV1EventsStreamNegativeVariant1 };
+  "head /v1/events/stream":
+    | { statusCode: 200; status: "success"; data: HeadV1EventsStreamPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: HeadV1EventsStreamNegativeVariant1 };
+  "post /v1/forms/feedback":
+    | { statusCode: 200; status: "success"; data: PostV1FormsFeedbackPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: PostV1FormsFeedbackNegativeVariant1 };
+  "get /v2/users/list":
+    | { statusCode: 200; status: "success"; data: GetV2UsersListPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: GetV2UsersListNegativeVariant1 };
+  "head /v2/users/list":
+    | { statusCode: 200; status: "success"; data: HeadV2UsersListPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: HeadV2UsersListNegativeVariant1 };
+}
+
+export interface Response {
   "get /v1/user/retrieve": GetV1UserRetrievePositiveVariant1 | GetV1UserRetrieveNegativeVariant1;
   "head /v1/user/retrieve": HeadV1UserRetrievePositiveVariant1 | HeadV1UserRetrieveNegativeVariant1;
   "delete /v1/user/:id/remove":
@@ -412,63 +472,6 @@ export interface EncodedResponse {
     | PostV1FormsFeedbackNegativeVariant1;
   "get /v2/users/list": GetV2UsersListPositiveVariant1 | GetV2UsersListNegativeVariant1;
   "head /v2/users/list": HeadV2UsersListPositiveVariant1 | HeadV2UsersListNegativeVariant1;
-}
-
-export interface Response {
-  "get /v1/user/retrieve":
-    | PositiveResponse["get /v1/user/retrieve"]
-    | NegativeResponse["get /v1/user/retrieve"];
-  "head /v1/user/retrieve":
-    | PositiveResponse["head /v1/user/retrieve"]
-    | NegativeResponse["head /v1/user/retrieve"];
-  "delete /v1/user/:id/remove":
-    | PositiveResponse["delete /v1/user/:id/remove"]
-    | NegativeResponse["delete /v1/user/:id/remove"];
-  "patch /v1/user/:id":
-    | PositiveResponse["patch /v1/user/:id"]
-    | NegativeResponse["patch /v1/user/:id"];
-  "post /v1/user/create":
-    | PositiveResponse["post /v1/user/create"]
-    | NegativeResponse["post /v1/user/create"];
-  "query /v1/user/list":
-    | PositiveResponse["query /v1/user/list"]
-    | NegativeResponse["query /v1/user/list"];
-  "post /v1/login": PositiveResponse["post /v1/login"] | NegativeResponse["post /v1/login"];
-  /** @deprecated */
-  "get /v1/avatar/send":
-    | PositiveResponse["get /v1/avatar/send"]
-    | NegativeResponse["get /v1/avatar/send"];
-  /** @deprecated */
-  "head /v1/avatar/send":
-    | PositiveResponse["head /v1/avatar/send"]
-    | NegativeResponse["head /v1/avatar/send"];
-  "get /v1/avatar/stream":
-    | PositiveResponse["get /v1/avatar/stream"]
-    | NegativeResponse["get /v1/avatar/stream"];
-  "head /v1/avatar/stream":
-    | PositiveResponse["head /v1/avatar/stream"]
-    | NegativeResponse["head /v1/avatar/stream"];
-  "post /v1/avatar/upload":
-    | PositiveResponse["post /v1/avatar/upload"]
-    | NegativeResponse["post /v1/avatar/upload"];
-  "post /v1/avatar/raw":
-    | PositiveResponse["post /v1/avatar/raw"]
-    | NegativeResponse["post /v1/avatar/raw"];
-  "get /v1/events/stream":
-    | PositiveResponse["get /v1/events/stream"]
-    | NegativeResponse["get /v1/events/stream"];
-  "head /v1/events/stream":
-    | PositiveResponse["head /v1/events/stream"]
-    | NegativeResponse["head /v1/events/stream"];
-  "post /v1/forms/feedback":
-    | PositiveResponse["post /v1/forms/feedback"]
-    | NegativeResponse["post /v1/forms/feedback"];
-  "get /v2/users/list":
-    | PositiveResponse["get /v2/users/list"]
-    | NegativeResponse["get /v2/users/list"];
-  "head /v2/users/list":
-    | PositiveResponse["head /v2/users/list"]
-    | NegativeResponse["head /v2/users/list"];
 }
 
 export type Request = keyof Input;

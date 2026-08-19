@@ -34,11 +34,13 @@ export interface NegativeResponse {
 }
 
 export interface EncodedResponse {
-  "post /v1/custom": PostV1CustomPositiveVariant1 | PostV1CustomNegativeVariant1;
+  "post /v1/custom":
+    | { statusCode: 200; status: "success"; data: PostV1CustomPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: PostV1CustomNegativeVariant1 };
 }
 
 export interface Response {
-  "post /v1/custom": PositiveResponse["post /v1/custom"] | NegativeResponse["post /v1/custom"];
+  "post /v1/custom": PostV1CustomPositiveVariant1 | PostV1CustomNegativeVariant1;
 }
 
 export type Request = keyof Input;
@@ -100,13 +102,17 @@ export interface NegativeResponse {
 }
 
 export interface EncodedResponse {
-  "get /v1/path": GetV1PathPositiveVariant1 | GetV1PathNegativeVariant1;
-  "head /v1/path": HeadV1PathPositiveVariant1 | HeadV1PathNegativeVariant1;
+  "get /v1/path":
+    | { statusCode: 200; status: "success"; data: GetV1PathPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: GetV1PathNegativeVariant1 };
+  "head /v1/path":
+    | { statusCode: 200; status: "success"; data: HeadV1PathPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: HeadV1PathNegativeVariant1 };
 }
 
 export interface Response {
-  "get /v1/path": PositiveResponse["get /v1/path"] | NegativeResponse["get /v1/path"];
-  "head /v1/path": PositiveResponse["head /v1/path"] | NegativeResponse["head /v1/path"];
+  "get /v1/path": GetV1PathPositiveVariant1 | GetV1PathNegativeVariant1;
+  "head /v1/path": HeadV1PathPositiveVariant1 | HeadV1PathNegativeVariant1;
 }
 
 export type Request = keyof Input;
@@ -149,11 +155,13 @@ export interface NegativeResponse {
 }
 
 export interface EncodedResponse {
-  "get /v1/path": GetV1PathPositiveVariant1 | GetV1PathNegativeVariant1;
+  "get /v1/path":
+    | { statusCode: 200; status: "success"; data: GetV1PathPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: GetV1PathNegativeVariant1 };
 }
 
 export interface Response {
-  "get /v1/path": PositiveResponse["get /v1/path"] | NegativeResponse["get /v1/path"];
+  "get /v1/path": GetV1PathPositiveVariant1 | GetV1PathNegativeVariant1;
 }
 
 export type Request = keyof Input;
@@ -206,14 +214,18 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   "post /v1/mtpl":
+    | { statusCode: 200; status: "success"; data: PostV1MtplPositiveVariant1 }
+    | { statusCode: 201; status: "success"; data: PostV1MtplPositiveVariant2 }
+    | { statusCode: 400; status: "error"; data: PostV1MtplNegativeVariant1 }
+    | { statusCode: 500; status: "error"; data: PostV1MtplNegativeVariant2 };
+}
+
+export interface Response {
+  "post /v1/mtpl":
     | PostV1MtplPositiveVariant1
     | PostV1MtplPositiveVariant2
     | PostV1MtplNegativeVariant1
     | PostV1MtplNegativeVariant2;
-}
-
-export interface Response {
-  "post /v1/mtpl": PositiveResponse["post /v1/mtpl"] | NegativeResponse["post /v1/mtpl"];
 }
 
 export type Request = keyof Input;
@@ -260,12 +272,12 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   /** @deprecated */
-  "query /v1/test": QueryV1TestPositiveVariant1 | QueryV1TestNegativeVariant1;
+  "query /v1/test": { statusCode: 200, status: "success", data: QueryV1TestPositiveVariant1 } | { statusCode: 400, status: "error", data: QueryV1TestNegativeVariant1 };
 }
 
 export interface Response {
   /** @deprecated */
-  "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
+  "query /v1/test": QueryV1TestPositiveVariant1 | QueryV1TestNegativeVariant1;
 }
 
 export type Request = keyof Input;"
@@ -311,12 +323,12 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   /** @deprecated */
-  "query /v1/test": QueryV1TestPositiveVariant1 | QueryV1TestNegativeVariant1;
+  "query /v1/test": { statusCode: 200, status: "success", data: QueryV1TestPositiveVariant1 } | { statusCode: 400, status: "error", data: QueryV1TestNegativeVariant1 };
 }
 
 export interface Response {
   /** @deprecated */
-  "query /v1/test": PositiveResponse["query /v1/test"] | NegativeResponse["query /v1/test"];
+  "query /v1/test": QueryV1TestPositiveVariant1 | QueryV1TestNegativeVariant1;
 }
 
 export type Request = keyof Input;"
@@ -356,14 +368,14 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   "post /v1/test-with-dashes":
-    | PostV1TestWithDashesPositiveVariant1
-    | PostV1TestWithDashesNegativeVariant1;
+    | { statusCode: 200; status: "success"; data: PostV1TestWithDashesPositiveVariant1 }
+    | { statusCode: 400; status: "error"; data: PostV1TestWithDashesNegativeVariant1 };
 }
 
 export interface Response {
   "post /v1/test-with-dashes":
-    | PositiveResponse["post /v1/test-with-dashes"]
-    | NegativeResponse["post /v1/test-with-dashes"];
+    | PostV1TestWithDashesPositiveVariant1
+    | PostV1TestWithDashesNegativeVariant1;
 }
 
 export type Request = keyof Input;
