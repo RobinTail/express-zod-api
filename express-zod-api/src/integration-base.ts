@@ -241,8 +241,8 @@ export abstract class IntegrationBase {
       `    if ("${nextCursorProp}" in ${ids.response}) return ${ids.response}.${nextCursorProp} !== null;`,
       `    return ${ids.response}.${offsetProp} + ${ids.response}.${limitProp} < ${ids.response}.${totalProp};`,
       `  }`,
-      `  public static discriminate(statusCode: number): "success" | "error" {`,
-      `    return statusCode < 400 ? "success" : "error";`,
+      `  public static discriminate(${propOf<Response>("status")}: number): "success" | "error" {`,
+      `    return ${propOf<Response>("status")} < 400 ? "success" : "error";`,
       `  }`,
       `}`,
     ].join("\n");
