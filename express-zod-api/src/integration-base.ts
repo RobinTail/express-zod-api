@@ -251,7 +251,7 @@ export abstract class IntegrationBase {
       `  ): Promise<${interfaces.encoded}[K]> {`,
       `    const [${ids.method}, ${ids.path}] = ${ids.parseRequest}(${ids.request});`,
       `    const { ${propOf<Response>("status")}, ${ids.data} } = await this.${ids.implementation}(${callArgs});`,
-      `    const discriminator = ${name}.${ids.discriminate}(${propOf<Response>("status")});`,
+      `    const ${ids.discriminator} = ${name}.${ids.discriminate}(${propOf<Response>("status")});`,
       `    return { ${propOf<Response>("status")}, ${ids.data}, ${ids.discriminator} } as ${interfaces.encoded}[K];`,
       `  }`,
       `  public static hasMore(${ids.response}: ${ids.Pagination}): boolean {`,
