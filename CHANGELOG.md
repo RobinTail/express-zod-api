@@ -17,7 +17,7 @@
 - The `Integration` generator changed to discriminate responses by HTTP status code or legacy `success|error` fallback:
   - New `EncodedReponse` interface holding payloads along with `status: number, discriminator: "success" | "error"`;
   - New public static method `Client::discriminate(status: number): "success" | "error"`;
-  - If using a custom `Implementation`, it now has to return `Promise<{ status: number, data: unknown }>`;
+  - If using a custom `Implementation`, it now has to return `Promise<{ status: number, data: any }>`;
   - The `Client::provide()` method now returns `Promise<{ status, discriminator, data }>` for further discrimination;
   - The basic approach is to discriminate by `status` (the actual `Response.status`);
   - In case of receiving an unlisted status, use the `discriminator` ("success" or "error" fallback);
