@@ -18,7 +18,20 @@
   - New `EncodedReponse` interface holding payloads along with `status: number, discriminator: "success" | "error"`;
   - New public static method `Client::discriminate(status: number): "success" | "error"`;
   - The `Implementation` type now has to return `Promise<{ status: number, data: unknown }>`;
-  - The `Client::provide()` method now <!-- @todo -->
+  - The `Client::provide()` method now returns `Promise<{ status, discriminator, data }>` for further discrimination
+  - The basic approach is to discriminate by `status` (the actual `Response.status`);
+  - In case of receiving an unlisted status, use the `discriminator` ("success" or "error" fallback).
+
+```ts
+const client = new Client();
+const { status, discriminator, data } = await client.provide(
+  "get /v1/user/retrieve",
+  { id: "10" },
+);
+if (status === 200) assert(data, successfulResponse);
+else if (status === 400) assert(data, errorResponse);
+else if (discriminator === "error") assert(data, errorResponse);
+```
 
 ## Version 29
 
