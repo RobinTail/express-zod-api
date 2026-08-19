@@ -135,7 +135,7 @@ globalRegistry.add(defaultNegativeSchema, {
 });
 
 /**
- * @desc The default ResultHandler relaying Endpoint output errors messages. Responds with JSON Content-Type.
+ * @desc The default ResultHandler relaying Endpoint output and error messages. Responds with JSON Content-Type.
  *       Respects the status of errors from createHttpError(), others become InternalServerError (500).
  * @see ensureHttpError
  * */
