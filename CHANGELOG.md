@@ -11,6 +11,14 @@
   - Uses the `statusCode` option given to `EndpointsFactory::useRateLimit()` and `createRateLimitMiddleware()` or 429;
   - This will override or narrow the negative status codes declared in ResultHandler when generating Documentation;
   - The Endpoints using this Middleware should declare its other negative status codes explicitly to preserve them.
+- The `defaultResultHandler` changed both positive and negative schemas:
+  - The positive response is now the Endpoint output as is: the `{ status: "success", data: {...} }` wrapper removed;
+  - The negative response is now the `{ message }`: the `{ status: "error", error: {...} }` wrapper removed.
+- The `Integration` generator changed to discriminate responses by HTTP status code or legacy `success|error` fallback:
+  - New `EncodedReponse` interface holding payloads along with `status: number, discriminator: "success" | "error"`;
+  - New public static method `Client::discriminate(status: number): "success" | "error"`;
+  - The `Implementation` type now has to return `Promise<{ status: number, data: unknown }>`;
+  - The `Client::provide()` method now <!-- @todo -->
 
 ## Version 29
 
