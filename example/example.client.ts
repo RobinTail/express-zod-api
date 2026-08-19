@@ -578,7 +578,8 @@ export class Client<T extends Record<string, unknown> = DefaultContext> {
   ): Promise<EncodedResponse[K]> {
     const [method, path] = parseRequest(request);
     const { status, data } = await this.implementation(method, ...substitute(path, params), ctx);
-    return { status, data, discriminator: Client.discriminate(status) } as EncodedResponse[K];
+    const discriminator = Client.discriminate(status);
+    return { status, data, discriminator } as EncodedResponse[K];
   }
   public static hasMore(response: Pagination): boolean {
     if ("nextCursor" in response) return response.nextCursor !== null;
