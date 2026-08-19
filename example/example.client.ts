@@ -386,62 +386,66 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   "get /v1/user/retrieve":
-    | { statusCode: 200; status: "success"; data: GetV1UserRetrievePositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: GetV1UserRetrieveNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: GetV1UserRetrievePositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: GetV1UserRetrieveNegativeVariant1 };
   "head /v1/user/retrieve":
-    | { statusCode: 200; status: "success"; data: HeadV1UserRetrievePositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: HeadV1UserRetrieveNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: HeadV1UserRetrievePositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: HeadV1UserRetrieveNegativeVariant1 };
   "delete /v1/user/:id/remove":
-    | { statusCode: 204; status: "success"; data: DeleteV1UserIdRemovePositiveVariant1 }
-    | { statusCode: 404; status: "error"; data: DeleteV1UserIdRemoveNegativeVariant1 };
+    | { status: 204; discriminator: "success"; data: DeleteV1UserIdRemovePositiveVariant1 }
+    | { status: 404; discriminator: "error"; data: DeleteV1UserIdRemoveNegativeVariant1 };
   "patch /v1/user/:id":
-    | { statusCode: 200; status: "success"; data: PatchV1UserIdPositiveVariant1 }
-    | { statusCode: 429 | 401 | 400 | 404; status: "error"; data: PatchV1UserIdNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: PatchV1UserIdPositiveVariant1 }
+    | {
+        status: 429 | 401 | 400 | 404;
+        discriminator: "error";
+        data: PatchV1UserIdNegativeVariant1;
+      };
   "post /v1/user/create":
-    | { statusCode: 201; status: "success"; data: PostV1UserCreatePositiveVariant1 }
-    | { statusCode: 409; status: "error"; data: PostV1UserCreateNegativeVariant1 }
-    | { statusCode: 400 | 500; status: "error"; data: PostV1UserCreateNegativeVariant2 };
+    | { status: 201; discriminator: "success"; data: PostV1UserCreatePositiveVariant1 }
+    | { status: 409; discriminator: "error"; data: PostV1UserCreateNegativeVariant1 }
+    | { status: 400 | 500; discriminator: "error"; data: PostV1UserCreateNegativeVariant2 };
   "query /v1/user/list":
-    | { statusCode: 200; status: "success"; data: QueryV1UserListPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: QueryV1UserListNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: QueryV1UserListPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: QueryV1UserListNegativeVariant1 };
   "post /v1/login":
-    | { statusCode: 200; status: "success"; data: PostV1LoginPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: PostV1LoginNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: PostV1LoginPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: PostV1LoginNegativeVariant1 };
   /** @deprecated */
   "get /v1/avatar/send":
-    | { statusCode: 200; status: "success"; data: GetV1AvatarSendPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: GetV1AvatarSendNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: GetV1AvatarSendPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: GetV1AvatarSendNegativeVariant1 };
   /** @deprecated */
   "head /v1/avatar/send":
-    | { statusCode: 200; status: "success"; data: HeadV1AvatarSendPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: HeadV1AvatarSendNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: HeadV1AvatarSendPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: HeadV1AvatarSendNegativeVariant1 };
   "get /v1/avatar/stream":
-    | { statusCode: 200; status: "success"; data: GetV1AvatarStreamPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: GetV1AvatarStreamNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: GetV1AvatarStreamPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: GetV1AvatarStreamNegativeVariant1 };
   "head /v1/avatar/stream":
-    | { statusCode: 200; status: "success"; data: HeadV1AvatarStreamPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: HeadV1AvatarStreamNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: HeadV1AvatarStreamPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: HeadV1AvatarStreamNegativeVariant1 };
   "post /v1/avatar/upload":
-    | { statusCode: 200; status: "success"; data: PostV1AvatarUploadPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: PostV1AvatarUploadNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: PostV1AvatarUploadPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: PostV1AvatarUploadNegativeVariant1 };
   "post /v1/avatar/raw":
-    | { statusCode: 200; status: "success"; data: PostV1AvatarRawPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: PostV1AvatarRawNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: PostV1AvatarRawPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: PostV1AvatarRawNegativeVariant1 };
   "get /v1/events/stream":
-    | { statusCode: 200; status: "success"; data: GetV1EventsStreamPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: GetV1EventsStreamNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: GetV1EventsStreamPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: GetV1EventsStreamNegativeVariant1 };
   "head /v1/events/stream":
-    | { statusCode: 200; status: "success"; data: HeadV1EventsStreamPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: HeadV1EventsStreamNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: HeadV1EventsStreamPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: HeadV1EventsStreamNegativeVariant1 };
   "post /v1/forms/feedback":
-    | { statusCode: 200; status: "success"; data: PostV1FormsFeedbackPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: PostV1FormsFeedbackNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: PostV1FormsFeedbackPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: PostV1FormsFeedbackNegativeVariant1 };
   "get /v2/users/list":
-    | { statusCode: 200; status: "success"; data: GetV2UsersListPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: GetV2UsersListNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: GetV2UsersListPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: GetV2UsersListNegativeVariant1 };
   "head /v2/users/list":
-    | { statusCode: 200; status: "success"; data: HeadV2UsersListPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: HeadV2UsersListNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: HeadV2UsersListPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: HeadV2UsersListNegativeVariant1 };
 }
 
 export interface Response {
@@ -573,12 +577,8 @@ export class Client<T extends Record<string, unknown> = DefaultContext> {
     ctx?: T,
   ): Promise<EncodedResponse[K]> {
     const [method, path] = parseRequest(request);
-    const { status: statusCode, data } = await this.implementation(
-      method,
-      ...substitute(path, params),
-      ctx,
-    );
-    return { statusCode, data, status: Client.discriminate(statusCode) } as EncodedResponse[K];
+    const { status, data } = await this.implementation(method, ...substitute(path, params), ctx);
+    return { status, data, discriminator: Client.discriminate(status) } as EncodedResponse[K];
   }
   public static hasMore(response: Pagination): boolean {
     if ("nextCursor" in response) return response.nextCursor !== null;

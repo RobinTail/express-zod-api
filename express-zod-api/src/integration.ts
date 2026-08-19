@@ -147,8 +147,9 @@ export class Integration extends IntegrationBase {
               `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
           );
           names[responseVariant].add(variantName);
+          // @todo move to the base, add naming constraints
           names.encoded.add(
-            `{ statusCode: ${statusCodes.join(" | ")}, status: "${responseVariant === "positive" ? "success" : "error"}", data: ${variantName} }`,
+            `{ status: ${statusCodes.join(" | ")}, discriminator: "${responseVariant === "positive" ? "success" : "error"}", data: ${variantName} }`,
           );
         }
       }

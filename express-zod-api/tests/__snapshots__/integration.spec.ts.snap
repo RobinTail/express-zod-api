@@ -35,8 +35,8 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   "post /v1/custom":
-    | { statusCode: 200; status: "success"; data: PostV1CustomPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: PostV1CustomNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: PostV1CustomPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: PostV1CustomNegativeVariant1 };
 }
 
 export interface Response {
@@ -103,11 +103,11 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   "get /v1/path":
-    | { statusCode: 200; status: "success"; data: GetV1PathPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: GetV1PathNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: GetV1PathPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: GetV1PathNegativeVariant1 };
   "head /v1/path":
-    | { statusCode: 200; status: "success"; data: HeadV1PathPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: HeadV1PathNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: HeadV1PathPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: HeadV1PathNegativeVariant1 };
 }
 
 export interface Response {
@@ -156,8 +156,8 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   "get /v1/path":
-    | { statusCode: 200; status: "success"; data: GetV1PathPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: GetV1PathNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: GetV1PathPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: GetV1PathNegativeVariant1 };
 }
 
 export interface Response {
@@ -214,10 +214,10 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   "post /v1/mtpl":
-    | { statusCode: 200; status: "success"; data: PostV1MtplPositiveVariant1 }
-    | { statusCode: 201; status: "success"; data: PostV1MtplPositiveVariant2 }
-    | { statusCode: 400; status: "error"; data: PostV1MtplNegativeVariant1 }
-    | { statusCode: 500; status: "error"; data: PostV1MtplNegativeVariant2 };
+    | { status: 200; discriminator: "success"; data: PostV1MtplPositiveVariant1 }
+    | { status: 201; discriminator: "success"; data: PostV1MtplPositiveVariant2 }
+    | { status: 400; discriminator: "error"; data: PostV1MtplNegativeVariant1 }
+    | { status: 500; discriminator: "error"; data: PostV1MtplNegativeVariant2 };
 }
 
 export interface Response {
@@ -272,7 +272,7 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   /** @deprecated */
-  "query /v1/test": { statusCode: 200, status: "success", data: QueryV1TestPositiveVariant1 } | { statusCode: 400, status: "error", data: QueryV1TestNegativeVariant1 };
+  "query /v1/test": { status: 200, discriminator: "success", data: QueryV1TestPositiveVariant1 } | { status: 400, discriminator: "error", data: QueryV1TestNegativeVariant1 };
 }
 
 export interface Response {
@@ -323,7 +323,7 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   /** @deprecated */
-  "query /v1/test": { statusCode: 200, status: "success", data: QueryV1TestPositiveVariant1 } | { statusCode: 400, status: "error", data: QueryV1TestNegativeVariant1 };
+  "query /v1/test": { status: 200, discriminator: "success", data: QueryV1TestPositiveVariant1 } | { status: 400, discriminator: "error", data: QueryV1TestNegativeVariant1 };
 }
 
 export interface Response {
@@ -368,8 +368,8 @@ export interface NegativeResponse {
 
 export interface EncodedResponse {
   "post /v1/test-with-dashes":
-    | { statusCode: 200; status: "success"; data: PostV1TestWithDashesPositiveVariant1 }
-    | { statusCode: 400; status: "error"; data: PostV1TestWithDashesNegativeVariant1 };
+    | { status: 200; discriminator: "success"; data: PostV1TestWithDashesPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: PostV1TestWithDashesNegativeVariant1 };
 }
 
 export interface Response {
@@ -460,12 +460,8 @@ export class Client<T extends Record<string, unknown> = DefaultContext> {
     ctx?: T,
   ): Promise<EncodedResponse[K]> {
     const [method, path] = parseRequest(request);
-    const { status: statusCode, data } = await this.implementation(
-      method,
-      ...substitute(path, params),
-      ctx,
-    );
-    return { statusCode, data, status: Client.discriminate(statusCode) } as EncodedResponse[K];
+    const { status, data } = await this.implementation(method, ...substitute(path, params), ctx);
+    return { status, data, discriminator: Client.discriminate(status) } as EncodedResponse[K];
   }
   public static hasMore(response: Pagination): boolean {
     if ("nextCursor" in response) return response.nextCursor !== null;

@@ -627,17 +627,20 @@ describe("Example", async () => {
     const client = new Client();
 
     test("Should perform the request with a positive response", async () => {
-      const { status, data } = await client.provide("get /v1/user/retrieve", {
-        id: "10",
-      });
+      const { discriminator, data } = await client.provide(
+        "get /v1/user/retrieve",
+        {
+          id: "10",
+        },
+      );
       expect(data).toMatchSnapshot();
-      if (status === "success")
+      if (discriminator === "success")
         expectTypeOf(data).toExtend<{ id: number; name: string }>();
       else expectTypeOf(data).toEqualTypeOf<{ message: string }>();
     });
 
     test("Issue #2177: should handle path params correctly", async () => {
-      const { status, statusCode, data } = await client.provide(
+      const { status, discriminator, data } = await client.provide(
         "patch /v1/user/:id",
         {
           key: "123",
@@ -649,12 +652,12 @@ describe("Example", async () => {
       );
       expect(typeof data).toBe("object");
       expect(data).toMatchSnapshot();
-      if (statusCode === 200) {
+      if (status === 200) {
         expectTypeOf(data).toEqualTypeOf<{ name: string; createdAt: string }>();
-      } else if (statusCode === 400) {
+      } else if (status === 400) {
         expectTypeOf(data).toEqualTypeOf<{ message: string }>();
       } else {
-        expectTypeOf(status).toEqualTypeOf<"error">();
+        expectTypeOf(discriminator).toEqualTypeOf<"error">();
         expectTypeOf(data).toEqualTypeOf<{ message: string }>();
       }
     });
@@ -679,8 +682,8 @@ describe("Example", async () => {
         new Blob(["test"], { type: "image/svg+xml" }),
       );
       expect(response).toEqual({
-        status: "success",
-        statusCode: 200,
+        discriminator: "success",
+        status: 200,
         data: { length: 4 },
       });
     });
@@ -707,7 +710,7 @@ describe("Example", async () => {
           }),
         },
       );
-      expect(response.status).toBe("success");
+      expect(response.discriminator).toBe("success");
     });
   });
 

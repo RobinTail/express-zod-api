@@ -233,10 +233,9 @@ export abstract class IntegrationBase {
       `    ${ids.ctx}?: T,`,
       `  ): Promise<${interfaces.encoded}[K]> {`,
       `    const [${ids.method}, ${ids.path}] = ${ids.parseRequest}(${ids.request});`,
-      // @todo reconsider naming, maybe { status, discriminator } would be ok
-      `    const { ${propOf<Response>("status")}: statusCode, ${ids.data} } = await this.${ids.implementation}(${callArgs});`,
-      // @todo why needs 'as'?
-      `    return { statusCode, data, status: ${name}.discriminate(statusCode) } as ${interfaces.encoded}[K];`,
+      `    const { ${propOf<Response>("status")}, ${ids.data} } = await this.${ids.implementation}(${callArgs});`,
+      // @todo why needs 'as'?, add disc. naming constraint
+      `    return { ${propOf<Response>("status")}, ${ids.data}, discriminator: ${name}.discriminate(${propOf<Response>("status")}) } as ${interfaces.encoded}[K];`,
       `  }`,
       `  public static hasMore(${ids.response}: ${ids.Pagination}): boolean {`,
       `    if ("${nextCursorProp}" in ${ids.response}) return ${ids.response}.${nextCursorProp} !== null;`,
