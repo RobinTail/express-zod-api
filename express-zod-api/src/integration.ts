@@ -5,7 +5,7 @@
 export type { Producer } from "./zts-helpers";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
-import { IntegrationBase } from "./integration-base";
+import { IntegrationBase, interfaces } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
@@ -157,7 +157,7 @@ export class Integration extends IntegrationBase {
         input: inputTypeName,
         positive: Array.from(names.positive).join(" | "),
         negative: Array.from(names.negative).join(" | "),
-        response: Array.from(names.positive.union(names.negative)).join(" | "),
+        response: `${interfaces.encoded}["${request}"]["data"]`,
         encoded: Array.from(names.encoded).join(" | "),
       };
       this.registry.set(request, { isDeprecated, store });

@@ -40,7 +40,7 @@ export interface EncodedResponse {
 }
 
 export interface Response {
-  "post /v1/custom": PostV1CustomPositiveVariant1 | PostV1CustomNegativeVariant1;
+  "post /v1/custom": EncodedResponse["post /v1/custom"]["data"];
 }
 
 export type Request = keyof Input;
@@ -111,8 +111,8 @@ export interface EncodedResponse {
 }
 
 export interface Response {
-  "get /v1/path": GetV1PathPositiveVariant1 | GetV1PathNegativeVariant1;
-  "head /v1/path": HeadV1PathPositiveVariant1 | HeadV1PathNegativeVariant1;
+  "get /v1/path": EncodedResponse["get /v1/path"]["data"];
+  "head /v1/path": EncodedResponse["head /v1/path"]["data"];
 }
 
 export type Request = keyof Input;
@@ -161,7 +161,7 @@ export interface EncodedResponse {
 }
 
 export interface Response {
-  "get /v1/path": GetV1PathPositiveVariant1 | GetV1PathNegativeVariant1;
+  "get /v1/path": EncodedResponse["get /v1/path"]["data"];
 }
 
 export type Request = keyof Input;
@@ -221,11 +221,7 @@ export interface EncodedResponse {
 }
 
 export interface Response {
-  "post /v1/mtpl":
-    | PostV1MtplPositiveVariant1
-    | PostV1MtplPositiveVariant2
-    | PostV1MtplNegativeVariant1
-    | PostV1MtplNegativeVariant2;
+  "post /v1/mtpl": EncodedResponse["post /v1/mtpl"]["data"];
 }
 
 export type Request = keyof Input;
@@ -277,7 +273,7 @@ export interface EncodedResponse {
 
 export interface Response {
   /** @deprecated */
-  "query /v1/test": QueryV1TestPositiveVariant1 | QueryV1TestNegativeVariant1;
+  "query /v1/test": EncodedResponse["query /v1/test"]["data"];
 }
 
 export type Request = keyof Input;"
@@ -328,7 +324,7 @@ export interface EncodedResponse {
 
 export interface Response {
   /** @deprecated */
-  "query /v1/test": QueryV1TestPositiveVariant1 | QueryV1TestNegativeVariant1;
+  "query /v1/test": EncodedResponse["query /v1/test"]["data"];
 }
 
 export type Request = keyof Input;"
@@ -373,9 +369,7 @@ export interface EncodedResponse {
 }
 
 export interface Response {
-  "post /v1/test-with-dashes":
-    | PostV1TestWithDashesPositiveVariant1
-    | PostV1TestWithDashesNegativeVariant1;
+  "post /v1/test-with-dashes": EncodedResponse["post /v1/test-with-dashes"]["data"];
 }
 
 export type Request = keyof Input;

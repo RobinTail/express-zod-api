@@ -54,7 +54,7 @@ const ids = {
   discriminator: "discriminator",
 } satisfies Record<string, string>;
 
-const interfaces: Record<IOKind, string> = {
+export const interfaces: Record<IOKind, string> = {
   input: "Input",
   positive: "PositiveResponse",
   negative: "NegativeResponse",
