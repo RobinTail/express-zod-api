@@ -649,11 +649,11 @@ describe("Example", async () => {
       );
       expect(typeof data).toBe("object");
       expect(data).toMatchSnapshot();
-      if (statusCode === 200)
+      if (statusCode === 200) {
         expectTypeOf(data).toEqualTypeOf<{ name: string; createdAt: string }>();
-      else if (statusCode === 400)
+      } else if (statusCode === 400) {
         expectTypeOf(data).toEqualTypeOf<{ message: string }>();
-      else {
+      } else {
         expectTypeOf(status).toEqualTypeOf<"error">();
         expectTypeOf(data).toEqualTypeOf<{ message: string }>();
       }
