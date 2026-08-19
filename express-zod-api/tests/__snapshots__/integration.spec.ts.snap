@@ -13,21 +13,9 @@ type PostV1CustomPositiveVariant1 = {
 };
 
 /** post /v1/custom */
-interface PostV1CustomPositiveResponseVariants {
-  200: PostV1CustomPositiveVariant1;
-}
-
-/** post /v1/custom */
 type PostV1CustomNegativeVariant1 = {
   message: string;
 };
-
-/** post /v1/custom */
-interface PostV1CustomNegativeResponseVariants {
-  400: PostV1CustomNegativeVariant1;
-}
-
-type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/custom";
 
@@ -38,15 +26,15 @@ export interface Input {
 }
 
 export interface PositiveResponse {
-  "post /v1/custom": SomeOf<PostV1CustomPositiveResponseVariants>;
+  "post /v1/custom": PostV1CustomPositiveVariant1;
 }
 
 export interface NegativeResponse {
-  "post /v1/custom": SomeOf<PostV1CustomNegativeResponseVariants>;
+  "post /v1/custom": PostV1CustomNegativeVariant1;
 }
 
 export interface EncodedResponse {
-  "post /v1/custom": PostV1CustomPositiveResponseVariants & PostV1CustomNegativeResponseVariants;
+  "post /v1/custom": PostV1CustomPositiveVariant1 | PostV1CustomNegativeVariant1;
 }
 
 export interface Response {
@@ -72,19 +60,9 @@ type GetV1PathInput = Omit<
 type GetV1PathPositiveVariant1 = {};
 
 /** get /v1/path */
-interface GetV1PathPositiveResponseVariants {
-  200: GetV1PathPositiveVariant1;
-}
-
-/** get /v1/path */
 type GetV1PathNegativeVariant1 = {
   message: string;
 };
-
-/** get /v1/path */
-interface GetV1PathNegativeResponseVariants {
-  400: GetV1PathNegativeVariant1;
-}
 
 /** head /v1/path */
 type HeadV1PathInput = Omit<
@@ -100,19 +78,7 @@ type HeadV1PathInput = Omit<
 type HeadV1PathPositiveVariant1 = undefined;
 
 /** head /v1/path */
-interface HeadV1PathPositiveResponseVariants {
-  200: HeadV1PathPositiveVariant1;
-}
-
-/** head /v1/path */
 type HeadV1PathNegativeVariant1 = undefined;
-
-/** head /v1/path */
-interface HeadV1PathNegativeResponseVariants {
-  400: HeadV1PathNegativeVariant1;
-}
-
-type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/path";
 
@@ -124,18 +90,18 @@ export interface Input {
 }
 
 export interface PositiveResponse {
-  "get /v1/path": SomeOf<GetV1PathPositiveResponseVariants>;
-  "head /v1/path": SomeOf<HeadV1PathPositiveResponseVariants>;
+  "get /v1/path": GetV1PathPositiveVariant1;
+  "head /v1/path": HeadV1PathPositiveVariant1;
 }
 
 export interface NegativeResponse {
-  "get /v1/path": SomeOf<GetV1PathNegativeResponseVariants>;
-  "head /v1/path": SomeOf<HeadV1PathNegativeResponseVariants>;
+  "get /v1/path": GetV1PathNegativeVariant1;
+  "head /v1/path": HeadV1PathNegativeVariant1;
 }
 
 export interface EncodedResponse {
-  "get /v1/path": GetV1PathPositiveResponseVariants & GetV1PathNegativeResponseVariants;
-  "head /v1/path": HeadV1PathPositiveResponseVariants & HeadV1PathNegativeResponseVariants;
+  "get /v1/path": GetV1PathPositiveVariant1 | GetV1PathNegativeVariant1;
+  "head /v1/path": HeadV1PathPositiveVariant1 | HeadV1PathNegativeVariant1;
 }
 
 export interface Response {
@@ -162,21 +128,9 @@ type GetV1PathInput = Omit<
 type GetV1PathPositiveVariant1 = {};
 
 /** get /v1/path */
-interface GetV1PathPositiveResponseVariants {
-  200: GetV1PathPositiveVariant1;
-}
-
-/** get /v1/path */
 type GetV1PathNegativeVariant1 = {
   message: string;
 };
-
-/** get /v1/path */
-interface GetV1PathNegativeResponseVariants {
-  400: GetV1PathNegativeVariant1;
-}
-
-type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/path";
 
@@ -187,15 +141,15 @@ export interface Input {
 }
 
 export interface PositiveResponse {
-  "get /v1/path": SomeOf<GetV1PathPositiveResponseVariants>;
+  "get /v1/path": GetV1PathPositiveVariant1;
 }
 
 export interface NegativeResponse {
-  "get /v1/path": SomeOf<GetV1PathNegativeResponseVariants>;
+  "get /v1/path": GetV1PathNegativeVariant1;
 }
 
 export interface EncodedResponse {
-  "get /v1/path": GetV1PathPositiveResponseVariants & GetV1PathNegativeResponseVariants;
+  "get /v1/path": GetV1PathPositiveVariant1 | GetV1PathNegativeVariant1;
 }
 
 export interface Response {
@@ -229,24 +183,10 @@ type PostV1MtplPositiveVariant2 = {
 };
 
 /** post /v1/mtpl */
-interface PostV1MtplPositiveResponseVariants {
-  200: PostV1MtplPositiveVariant1;
-  201: PostV1MtplPositiveVariant2;
-}
-
-/** post /v1/mtpl */
 type PostV1MtplNegativeVariant1 = "error";
 
 /** post /v1/mtpl */
 type PostV1MtplNegativeVariant2 = "failure";
-
-/** post /v1/mtpl */
-interface PostV1MtplNegativeResponseVariants {
-  400: PostV1MtplNegativeVariant1;
-  500: PostV1MtplNegativeVariant2;
-}
-
-type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/mtpl";
 
@@ -257,15 +197,19 @@ export interface Input {
 }
 
 export interface PositiveResponse {
-  "post /v1/mtpl": SomeOf<PostV1MtplPositiveResponseVariants>;
+  "post /v1/mtpl": PostV1MtplPositiveVariant1 | PostV1MtplPositiveVariant2;
 }
 
 export interface NegativeResponse {
-  "post /v1/mtpl": SomeOf<PostV1MtplNegativeResponseVariants>;
+  "post /v1/mtpl": PostV1MtplNegativeVariant1 | PostV1MtplNegativeVariant2;
 }
 
 export interface EncodedResponse {
-  "post /v1/mtpl": PostV1MtplPositiveResponseVariants & PostV1MtplNegativeResponseVariants;
+  "post /v1/mtpl":
+    | PostV1MtplPositiveVariant1
+    | PostV1MtplPositiveVariant2
+    | PostV1MtplNegativeVariant1
+    | PostV1MtplNegativeVariant2;
 }
 
 export interface Response {
@@ -291,21 +235,9 @@ type QueryV1TestInput = {
 type QueryV1TestPositiveVariant1 = {};
 
 /** query /v1/test */
-interface QueryV1TestPositiveResponseVariants {
-  200: QueryV1TestPositiveVariant1;
-}
-
-/** query /v1/test */
 type QueryV1TestNegativeVariant1 = {
     message: string;
 };
-
-/** query /v1/test */
-interface QueryV1TestNegativeResponseVariants {
-  400: QueryV1TestNegativeVariant1;
-}
-
-type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/test";
 
@@ -318,17 +250,17 @@ export interface Input {
 
 export interface PositiveResponse {
   /** @deprecated */
-  "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
+  "query /v1/test": QueryV1TestPositiveVariant1;
 }
 
 export interface NegativeResponse {
   /** @deprecated */
-  "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
+  "query /v1/test": QueryV1TestNegativeVariant1;
 }
 
 export interface EncodedResponse {
   /** @deprecated */
-  "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
+  "query /v1/test": QueryV1TestPositiveVariant1 | QueryV1TestNegativeVariant1;
 }
 
 export interface Response {
@@ -354,21 +286,9 @@ type QueryV1TestInput = {
 type QueryV1TestPositiveVariant1 = {};
 
 /** query /v1/test */
-interface QueryV1TestPositiveResponseVariants {
-  200: QueryV1TestPositiveVariant1;
-}
-
-/** query /v1/test */
 type QueryV1TestNegativeVariant1 = {
     message: string;
 };
-
-/** query /v1/test */
-interface QueryV1TestNegativeResponseVariants {
-  400: QueryV1TestNegativeVariant1;
-}
-
-type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/test";
 
@@ -381,17 +301,17 @@ export interface Input {
 
 export interface PositiveResponse {
   /** @deprecated */
-  "query /v1/test": SomeOf<QueryV1TestPositiveResponseVariants>;
+  "query /v1/test": QueryV1TestPositiveVariant1;
 }
 
 export interface NegativeResponse {
   /** @deprecated */
-  "query /v1/test": SomeOf<QueryV1TestNegativeResponseVariants>;
+  "query /v1/test": QueryV1TestNegativeVariant1;
 }
 
 export interface EncodedResponse {
   /** @deprecated */
-  "query /v1/test": QueryV1TestPositiveResponseVariants & QueryV1TestNegativeResponseVariants;
+  "query /v1/test": QueryV1TestPositiveVariant1 | QueryV1TestNegativeVariant1;
 }
 
 export interface Response {
@@ -414,21 +334,9 @@ type PostV1TestWithDashesPositiveVariant1 = {
 };
 
 /** post /v1/test-with-dashes */
-interface PostV1TestWithDashesPositiveResponseVariants {
-  200: PostV1TestWithDashesPositiveVariant1;
-}
-
-/** post /v1/test-with-dashes */
 type PostV1TestWithDashesNegativeVariant1 = {
   message: string;
 };
-
-/** post /v1/test-with-dashes */
-interface PostV1TestWithDashesNegativeResponseVariants {
-  400: PostV1TestWithDashesNegativeVariant1;
-}
-
-type SomeOf<T> = T[keyof T];
 
 export type Path = "/v1/test-with-dashes";
 
@@ -439,16 +347,17 @@ export interface Input {
 }
 
 export interface PositiveResponse {
-  "post /v1/test-with-dashes": SomeOf<PostV1TestWithDashesPositiveResponseVariants>;
+  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveVariant1;
 }
 
 export interface NegativeResponse {
-  "post /v1/test-with-dashes": SomeOf<PostV1TestWithDashesNegativeResponseVariants>;
+  "post /v1/test-with-dashes": PostV1TestWithDashesNegativeVariant1;
 }
 
 export interface EncodedResponse {
-  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponseVariants &
-    PostV1TestWithDashesNegativeResponseVariants;
+  "post /v1/test-with-dashes":
+    | PostV1TestWithDashesPositiveVariant1
+    | PostV1TestWithDashesNegativeVariant1;
 }
 
 export interface Response {

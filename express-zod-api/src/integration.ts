@@ -125,46 +125,34 @@ export class Integration extends IntegrationBase {
           `type ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies, "security cookies") : printed};`,
         ].join("\n");
       });
-      const dictionaries = responseVariants.reduce(
-        (agg, responseVariant) => {
-          const responses = endpoint.getResponses(responseVariant);
-          const props: string[] = [];
-          for (const [
-            idx,
-            { schema, mimeTypes, statusCodes },
-          ] of responses.entries()) {
-            const hasBody = shouldHaveContent(method, mimeTypes);
-            const variantName = entitle(
-              responseVariant,
-              "variant",
-              `${idx + 1}`,
-            );
-            const variantTypeNode = zodToTs(
-              hasBody ? schema : noBodySchema,
-              ctxOut,
-            );
-            this.#program.push(
-              (opts) =>
-                `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
-            );
-            for (const code of statusCodes)
-              props.push(`  ${code}: ${variantName};`);
-          }
-          const dictName = entitle(responseVariant, "response", "variants");
-          this.#program.push(
-            `/** ${request} */\ninterface ${dictName} {\n${props.join("\n")}\n}`,
+      const names: Record<ResponseVariant, Set<string>> = {
+        positive: new Set(),
+        negative: new Set(),
+      };
+      for (const responseVariant of responseVariants) {
+        const responses = endpoint.getResponses(responseVariant);
+        for (const [idx, { schema, mimeTypes }] of responses.entries()) {
+          const hasBody = shouldHaveContent(method, mimeTypes);
+          const variantName = entitle(responseVariant, "variant", `${idx + 1}`);
+          const variantTypeNode = zodToTs(
+            hasBody ? schema : noBodySchema,
+            ctxOut,
           );
-          return Object.assign(agg, { [responseVariant]: dictName });
-        },
-        {} as Record<ResponseVariant, string>,
-      );
+          this.#program.push(
+            (opts) =>
+              `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
+          );
+          names[responseVariant].add(variantName);
+        }
+      }
       this.paths.add(path);
       const store = {
         input: inputTypeName,
-        positive: this.someOf(dictionaries.positive),
-        negative: this.someOf(dictionaries.negative),
+        positive: Array.from(names.positive).join(" | "),
+        negative: Array.from(names.negative).join(" | "),
         response: `${interfaces.positive}["${request}"] | ${interfaces.negative}["${request}"]`,
-        encoded: `${dictionaries.positive} & ${dictionaries.negative}`,
+        /** @todo restore encoding */
+        encoded: Array.from(names.positive.union(names.negative)).join(" | "),
       };
       this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, tags);
@@ -175,7 +163,6 @@ export class Integration extends IntegrationBase {
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
     this.#program.push(
-      this.makeSomeOfType(),
       this.makePathType(),
       this.makeMethodType(),
       ...this.makePublicInterfaces(),

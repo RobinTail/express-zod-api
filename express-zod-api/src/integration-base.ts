@@ -47,7 +47,6 @@ const ids = {
   isBlob: "isBlob",
   source: "source",
   Method: "Method",
-  SomeOf: "SomeOf",
   Request: "Request",
   Pagination: "Pagination",
   override: "override",
@@ -92,23 +91,11 @@ export abstract class IntegrationBase {
     `Omit<${base}, ${reason && `\n/** ${reason} */\n`}${quot(props).join(" | ")}>`;
 
   /**
-   * @example type SomeOf<T> = T[keyof T];
-   * @internal
-   * */
-  protected makeSomeOfType = () => `type ${ids.SomeOf}<T> = T[keyof T];`;
-
-  /**
    * @example export type Request = keyof Input;
    * @internal
    * */
   protected makeRequestType = () =>
     `export type ${ids.Request} = keyof ${interfaces.input};`;
-
-  /**
-   * @example SomeOf<_>
-   * @internal
-   **/
-  protected someOf = (name: string) => `${ids.SomeOf}<${name}>`;
 
   /**
    * @example export type Path = "/v1/user/retrieve" | ___;
