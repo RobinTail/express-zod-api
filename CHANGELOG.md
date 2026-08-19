@@ -15,7 +15,7 @@
   - The positive response is now the Endpoint output as is: the `{ status: "success", data: {...} }` wrapper removed;
   - The negative response is now the `{ message }`: the `{ status: "error", error: {...} }` wrapper removed.
 - The `Integration` generator changed to discriminate responses by HTTP status code or legacy `success|error` fallback:
-  - New `EncodedReponse` interface holding payloads along with `status: number, discriminator: "success" | "error"`;
+  - New `EncodedResponse` interface holding payloads along with `status: number, discriminator: "success" | "error"`;
   - New public static method `Client::discriminate(status: number): "success" | "error"`;
   - If using a custom `Implementation`, it now has to return `Promise<{ status: number, data: any }>`;
   - The `Client::provide()` method now returns `Promise<{ status, discriminator, data }>` for further discrimination;
