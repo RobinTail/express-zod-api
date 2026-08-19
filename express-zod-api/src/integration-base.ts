@@ -102,10 +102,10 @@ export abstract class IntegrationBase {
     const props = [
       `${propOf<Response>("status")}: ${statusCodes.join(" | ")}`,
       `${ids.discriminator}: "${responseVariant === "positive" ? discriminators.success : discriminators.error}"`,
-      `${ids.data}: ${dataRef}`
+      `${ids.data}: ${dataRef}`,
     ];
     return `{ ${props.join(", ")} }`;
-  }
+  };
 
   /**
    * @example export type Request = keyof Input;
