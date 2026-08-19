@@ -50,6 +50,8 @@ const ids = {
   Request: "Request",
   Pagination: "Pagination",
   override: "override",
+  discriminate: "discriminate",
+  discriminator: "discriminator",
 } satisfies Record<string, string>;
 
 const interfaces: Record<IOKind, string> = {
@@ -64,6 +66,8 @@ const quot = (items: Iterable<string>) =>
   Array.from(items).map((s) => `"${s}"`);
 
 const propOf = <T>(name: keyof NoInfer<T>) => name as string;
+
+const discriminators = { success: "success", error: "error" };
 
 export abstract class IntegrationBase {
   /** @internal */
@@ -89,6 +93,19 @@ export abstract class IntegrationBase {
 
   protected makeOmit = (base: string, props: Iterable<string>, reason = "") =>
     `Omit<${base}, ${reason && `\n/** ${reason} */\n`}${quot(props).join(" | ")}>`;
+
+  protected makeDiscriminator = (
+    statusCodes: number[],
+    responseVariant: ResponseVariant,
+    dataRef: string,
+  ) => {
+    const props = [
+      `${propOf<Response>("status")}: ${statusCodes.join(" | ")}`,
+      `${ids.discriminator}: "${responseVariant === "positive" ? discriminators.success : discriminators.error}"`,
+      `${ids.data}: ${dataRef}`
+    ];
+    return `{ ${props.join(", ")} }`;
+  }
 
   /**
    * @example export type Request = keyof Input;
@@ -235,14 +252,14 @@ export abstract class IntegrationBase {
       `    const [${ids.method}, ${ids.path}] = ${ids.parseRequest}(${ids.request});`,
       `    const { ${propOf<Response>("status")}, ${ids.data} } = await this.${ids.implementation}(${callArgs});`,
       // @todo why needs 'as'?, add disc. naming constraint
-      `    return { ${propOf<Response>("status")}, ${ids.data}, discriminator: ${name}.discriminate(${propOf<Response>("status")}) } as ${interfaces.encoded}[K];`,
+      `    return { ${propOf<Response>("status")}, ${ids.data}, ${ids.discriminator}: ${name}.${ids.discriminate}(${propOf<Response>("status")}) } as ${interfaces.encoded}[K];`,
       `  }`,
       `  public static hasMore(${ids.response}: ${ids.Pagination}): boolean {`,
       `    if ("${nextCursorProp}" in ${ids.response}) return ${ids.response}.${nextCursorProp} !== null;`,
       `    return ${ids.response}.${offsetProp} + ${ids.response}.${limitProp} < ${ids.response}.${totalProp};`,
       `  }`,
-      `  public static discriminate(${propOf<Response>("status")}: number): "success" | "error" {`,
-      `    return ${propOf<Response>("status")} < 400 ? "success" : "error";`,
+      `  public static ${ids.discriminate}(${propOf<Response>("status")}: number): ${quot(Object.values(discriminators)).join(" | ")} {`,
+      `    return ${propOf<Response>("status")} < 400 ? "${discriminators.success}" : "${discriminators.error}";`,
       `  }`,
       `}`,
     ].join("\n");
