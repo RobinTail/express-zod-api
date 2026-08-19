@@ -367,7 +367,11 @@ export abstract class IntegrationBase {
   ) =>
     [
       `const ${ids.client} = new ${clientClassName}();`,
-      `${ids.client}.${ids.provide}("get /v1/user/retrieve", { id: "10" });`,
+      `const { ${propOf<Response>("status")}, ${ids.discriminator}, ${ids.data} } = ` +
+        `await ${ids.client}.${ids.provide}("get /v1/user/retrieve", { id: "10" });`,
+      `if (${propOf<Response>("status")} === 200) console.log(${ids.data}.name); // success`,
+      `else if (${propOf<Response>("status")} === 400 || ${ids.discriminator} === "${discriminators.error}") ` +
+        `console.error(${ids.data}.message); // error`,
       `new ${subscriptionClassName}("get /v1/events/stream", {}).${ids.on}("time", (time) => {});`,
     ].join("\n");
 }
