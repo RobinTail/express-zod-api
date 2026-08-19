@@ -403,7 +403,7 @@ export type Implementation<T extends Record<string, unknown>> = (
   path: string,
   params: Record<string, any>,
   ctx?: T,
-) => Promise<any>;
+) => Promise<{ status: number; data: any }>;
 
 type Pagination = { nextCursor: string | null } | { total: number; limit: number; offset: number };
 
@@ -439,20 +439,33 @@ const defaultImplementation: Implementation<DefaultContext> = async (method, pat
   };
   if (ctx?.override) init = ctx.override(init);
   const response = await fetch(new URL(\`\${path}\${searchParams}\`, "https://example.com"), init);
+  const { status } = response;
   const contentType = response.headers.get("content-type");
-  if (!contentType) return;
-  if (contentType.startsWith("application/json")) return response.json();
-  if (contentType.startsWith("text/")) return response.text();
-  return response.blob();
+  if (!contentType) return { status, data: undefined };
+  const data = await (contentType.startsWith("application/json")
+    ? response.json()
+    : contentType.startsWith("text/")
+      ? response.text()
+      : response.blob());
+  return { status, data };
 };
 
 export class Client<T extends Record<string, unknown> = DefaultContext> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
-  public provide<K extends Request>(request: K, params: Input[K], ctx?: T): Promise<Response[K]> {
+  public async provide<K extends Request>(
+    request: K,
+    params: Input[K],
+    ctx?: T,
+  ): Promise<EncodedResponse[K]> {
     const [method, path] = parseRequest(request);
-    return this.implementation(method, ...substitute(path, params), ctx);
+    const { status: statusCode, data } = await this.implementation(
+      method,
+      ...substitute(path, params),
+      ctx,
+    );
+    return { statusCode, data, status: Client.discriminate(statusCode) } as EncodedResponse[K];
   }
   public static hasMore(response: Pagination): boolean {
     if ("nextCursor" in response) return response.nextCursor !== null;

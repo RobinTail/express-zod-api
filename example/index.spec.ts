@@ -627,29 +627,36 @@ describe("Example", async () => {
     const client = new Client();
 
     test("Should perform the request with a positive response", async () => {
-      const response = await client.provide("get /v1/user/retrieve", {
+      const { status, data } = await client.provide("get /v1/user/retrieve", {
         id: "10",
       });
-      expect(response).toMatchSnapshot();
-      expectTypeOf(response).toExtend<
-        { id: number; name: string } | { message: string }
-      >(); // @todo add discriminator
+      expect(data).toMatchSnapshot();
+      if (status === "success")
+        expectTypeOf(data).toExtend<{ id: number; name: string }>();
+      else expectTypeOf(data).toEqualTypeOf<{ message: string }>();
     });
 
     test("Issue #2177: should handle path params correctly", async () => {
-      const response = await client.provide("patch /v1/user/:id", {
-        key: "123",
-        token: "456",
-        id: "12",
-        name: "Alan Turing",
-        birthday: "1912-06-23",
-      });
-      expect(typeof response).toBe("object");
-      expect(response).toMatchSnapshot(); // @todo add discriminator
-      expectTypeOf<{ name: string; createdAt: string }>().toExtend<
-        typeof response
-      >();
-      expectTypeOf<{ message: string }>().toExtend<typeof response>();
+      const { status, statusCode, data } = await client.provide(
+        "patch /v1/user/:id",
+        {
+          key: "123",
+          token: "456",
+          id: "12",
+          name: "Alan Turing",
+          birthday: "1912-06-23",
+        },
+      );
+      expect(typeof data).toBe("object");
+      expect(data).toMatchSnapshot();
+      if (statusCode === 200)
+        expectTypeOf(data).toEqualTypeOf<{ name: string; createdAt: string }>();
+      else if (statusCode === 400)
+        expectTypeOf(data).toEqualTypeOf<{ message: string }>();
+      else {
+        expectTypeOf(status).toEqualTypeOf<"error">();
+        expectTypeOf(data).toEqualTypeOf<{ message: string }>();
+      }
     });
 
     test("Issue #2182: should deny unlisted combination of path and method", async () => {
@@ -659,11 +666,11 @@ describe("Example", async () => {
     });
 
     test("should handle no content (no response body)", async () => {
-      const response = await client.provide("delete /v1/user/:id/remove", {
+      const { data } = await client.provide("delete /v1/user/:id/remove", {
         id: "12",
       });
-      expect(response).toBeUndefined();
-      expectTypeOf(response).toBeUndefined();
+      expect(data).toBeUndefined();
+      expectTypeOf(data).toBeUndefined();
     });
 
     test("can send Blob body", async () => {
@@ -671,14 +678,18 @@ describe("Example", async () => {
         "post /v1/avatar/raw",
         new Blob(["test"], { type: "image/svg+xml" }),
       );
-      expect(response).toEqual({ length: 4 });
+      expect(response).toEqual({
+        status: "success",
+        statusCode: 200,
+        data: { length: 4 },
+      });
     });
 
     test("can parse as Blob", async () => {
       const response = await client.provide("get /v1/avatar/stream", {
         userId: "10",
       });
-      expect(response instanceof Blob).toBe(true);
+      expect(response.data instanceof Blob).toBe(true);
     });
 
     test("can upload a file", async () => {
@@ -696,7 +707,7 @@ describe("Example", async () => {
           }),
         },
       );
-      expect(response).toHaveProperty("name"); // @todo add discriminator
+      expect(response.status).toBe("success");
     });
   });
 

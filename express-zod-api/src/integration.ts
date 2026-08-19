@@ -132,7 +132,10 @@ export class Integration extends IntegrationBase {
       };
       for (const responseVariant of responseVariants) {
         const responses = endpoint.getResponses(responseVariant);
-        for (const [idx, { schema, mimeTypes, statusCodes }] of responses.entries()) {
+        for (const [
+          idx,
+          { schema, mimeTypes, statusCodes },
+        ] of responses.entries()) {
           const hasBody = shouldHaveContent(method, mimeTypes);
           const variantName = entitle(responseVariant, "variant", `${idx + 1}`);
           const variantTypeNode = zodToTs(
@@ -144,7 +147,9 @@ export class Integration extends IntegrationBase {
               `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
           );
           names[responseVariant].add(variantName);
-          names.encoded.add(`{ statusCode: ${statusCodes.join(" | ")}, status: "${responseVariant === "positive" ? "success" : "error"}", data: ${variantName} }`);
+          names.encoded.add(
+            `{ statusCode: ${statusCodes.join(" | ")}, status: "${responseVariant === "positive" ? "success" : "error"}", data: ${variantName} }`,
+          );
         }
       }
       this.paths.add(path);

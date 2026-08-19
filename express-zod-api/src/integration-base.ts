@@ -134,7 +134,8 @@ export abstract class IntegrationBase {
 
   /**
    * @example export type Implementation<T extends Record<string, unknown>> =
-   *          (method: Method, path: string, params: Record<string, any>, ctx?: T) => Promise<any>;
+   *          (method: Method, path: string, params: Record<string, any>, ctx?: T) =>
+   *            Promise<{ status: number, data: any }>;
    * @internal
    * */
   protected makeImplementationType = () => {
@@ -144,7 +145,10 @@ export abstract class IntegrationBase {
       `${ids.params}: Record<string, any>`,
       `${ids.ctx}?: T`,
     ].join(",");
-    return `export type ${ids.Implementation}<T extends Record<string, unknown>> = (${args}) => Promise<any>;`;
+    return (
+      `export type ${ids.Implementation}<T extends Record<string, unknown>> = ` +
+      `(${args}) => Promise<{ ${propOf<Response>("status")}: number, ${ids.data}: any }>;`
+    );
   };
 
   /**
@@ -223,13 +227,16 @@ export abstract class IntegrationBase {
       `  public constructor(`,
       `    protected readonly ${ids.implementation}: ${ids.Implementation}<T> = ${ids.defaultImplementation},`,
       `  ) {}`,
-      `  public ${ids.provide}<K extends ${ids.Request}>(`,
+      `  public async ${ids.provide}<K extends ${ids.Request}>(`,
       `    ${ids.request}: K,`,
       `    ${ids.params}: ${interfaces.input}[K],`,
       `    ${ids.ctx}?: T,`,
-      `  ): Promise<${interfaces.response}[K]> {`,
+      `  ): Promise<${interfaces.encoded}[K]> {`,
       `    const [${ids.method}, ${ids.path}] = ${ids.parseRequest}(${ids.request});`,
-      `    return this.${ids.implementation}(${callArgs});`,
+      // @todo reconsider naming, maybe { status, discriminator } would be ok
+      `    const { ${propOf<Response>("status")}: statusCode, ${ids.data} } = await this.${ids.implementation}(${callArgs});`,
+      // @todo why needs 'as'?
+      `    return { statusCode, data, status: ${name}.discriminate(statusCode) } as ${interfaces.encoded}[K];`,
       `  }`,
       `  public static hasMore(${ids.response}: ${ids.Pagination}): boolean {`,
       `    if ("${nextCursorProp}" in ${ids.response}) return ${ids.response}.${nextCursorProp} !== null;`,
@@ -289,13 +296,15 @@ export abstract class IntegrationBase {
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
       `    init,`,
       `  );`,
+      `  const { ${propOf<Response>("status")} } = ${ids.response};`,
       `  const ${ids.contentType} = ${contentType};`,
-      `  if (!${ids.contentType}) return;`,
-      `  if (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}")) ` +
-        `return ${ids.response}.${propOf<Response>("json")}();`,
-      `  if (${ids.contentType}.${propOf<string>("startsWith")}("text/")) ` +
-        `return ${ids.response}.${propOf<Response>("text")}();`,
-      `  return ${ids.response}.${propOf<Response>("blob")}();`,
+      `  if (!${ids.contentType}) return { ${propOf<Response>("status")}, data: undefined };`,
+      `  const ${ids.data} = await (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}") ?`,
+      `    ${ids.response}.${propOf<Response>("json")}() : `,
+      `    ${ids.contentType}.${propOf<string>("startsWith")}("text/") ? `,
+      `    ${ids.response}.${propOf<Response>("text")}() : `,
+      `    ${ids.response}.${propOf<Response>("blob")}());`,
+      `  return { ${propOf<Response>("status")}, ${ids.data} };`,
       `};`,
     ].join("\n");
   };
