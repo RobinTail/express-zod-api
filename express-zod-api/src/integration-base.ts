@@ -52,7 +52,7 @@ const ids = {
   override: "override",
 } satisfies Record<string, string>;
 
-export const interfaces: Record<IOKind, string> = {
+const interfaces: Record<IOKind, string> = {
   input: "Input",
   positive: "PositiveResponse",
   negative: "NegativeResponse",

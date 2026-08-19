@@ -5,7 +5,7 @@
 export type { Producer } from "./zts-helpers";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
-import { IntegrationBase, interfaces } from "./integration-base";
+import { IntegrationBase } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
