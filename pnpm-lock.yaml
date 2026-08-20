@@ -124,7 +124,7 @@ catalogs:
       specifier: ^0.32.0
       version: 0.32.0
     '@typescript/native-preview':
-      specifier: npm:typescript@^7.1.0-dev.20260801.1
+      specifier: npm:typescript@^7.1.0-dev.20260812.1
       version: 7.1.0-dev.20260904.1
     camelize-ts:
       specifier: ^3.0.0
