@@ -155,6 +155,51 @@ export const defaultResultHandler = new ResultHandler({
   },
 });
 
+const legacyNegativeSchema = z.object({
+  status: z.literal("error"),
+  error: z.object({ message: z.string() }),
+});
+globalRegistry.add(legacyNegativeSchema, {
+  examples: [
+    {
+      status: "error",
+      error: { message: "Sample error message" },
+    },
+  ] satisfies z.output<typeof legacyNegativeSchema>[],
+});
+
+/**
+ * @deprecated This handler is designed only to simplify the migration of APIs from v29.
+ * @since v30.0.0
+ * @todo remove in v31
+ * @desc Preserves the v29 response shapes: `{ status: "success", data: {...} }` and `{ status: "error", error: {...} }`.
+ * @desc Use defaultResultHandler for new APIs — the old envelope is removed in v30.
+ * */
+export const legacyResultHandler = new ResultHandler({
+  positive: (output) =>
+    z.object({
+      status: z.literal("success"),
+      data: output,
+    }),
+  negative: legacyNegativeSchema,
+  handler: ({ error, input, output, request, response, logger }) => {
+    if (error) {
+      const httpError = ensureHttpError(error);
+      logServerError(httpError, logger, request, input);
+      return void response
+        .status(httpError.statusCode)
+        .set(httpError.headers)
+        .json({
+          status: "error",
+          error: { message: getPublicErrorMessage(httpError) },
+        });
+    }
+    response
+      .status(defaultStatusCodes.positive)
+      .json({ status: "success", data: output });
+  },
+});
+
 const arrayNegativeSchema = z.string();
 globalRegistry.add(arrayNegativeSchema, {
   examples: ["Sample error message"] satisfies z.output<

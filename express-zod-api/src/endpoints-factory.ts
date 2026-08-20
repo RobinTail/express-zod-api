@@ -25,6 +25,7 @@ import {
   AbstractResultHandler,
   arrayResultHandler,
   defaultResultHandler,
+  legacyResultHandler,
 } from "./result-handler";
 import { FrozenSet } from "./frozen-set";
 import { createCacheMiddleware } from "./cache-middleware";
@@ -254,6 +255,15 @@ export class EndpointsFactory<
 export const defaultEndpointsFactory = new EndpointsFactory(
   defaultResultHandler,
 );
+
+/**
+ * @deprecated This factory is designed only to simplify the migration of APIs from v29.
+ * @since v30.0.0
+ * @todo remove in v31
+ * @desc Preserves the v29 response shapes using legacyResultHandler.
+ * @desc Use defaultEndpointsFactory for new APIs.
+ * */
+export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);
 
 /**
  * @deprecated Resist the urge of using it: this factory is designed only to simplify the migration of legacy APIs.

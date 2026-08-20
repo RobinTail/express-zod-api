@@ -24,6 +24,10 @@ describe("Migration", async () => {
     valid: [
       // expressZodApiImport
       `import { Documentation } from "express-zod-api/documentation"`,
+      // defaultId
+      `import { legacyResultHandler, legacyEndpointsFactory } from "express-zod-api"`,
+      `const foo = new EndpointsFactory(legacyResultHandler)`,
+      `const bar = legacyEndpointsFactory.build({})`,
     ],
     invalid: [
       {
@@ -50,6 +54,153 @@ describe("Migration", async () => {
             data: {
               subject: "DocumentationError",
               to: "express-zod-api/documentation",
+            },
+          },
+        ],
+      },
+      {
+        name: "change defaultResultHandler import",
+        code: `import { defaultResultHandler } from "express-zod-api"`,
+        output: `import { legacyResultHandler } from "express-zod-api"`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+        ],
+      },
+      {
+        name: "change defaultEndpointsFactory import",
+        code: `import { defaultEndpointsFactory } from "express-zod-api"`,
+        output: `import { legacyEndpointsFactory } from "express-zod-api"`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultEndpointsFactory",
+              to: "legacyEndpointsFactory",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultEndpointsFactory",
+              to: "legacyEndpointsFactory",
+            },
+          },
+        ],
+      },
+      {
+        name: "change both in mixed import",
+        code: `import { defaultResultHandler, defaultEndpointsFactory } from "express-zod-api"`,
+        output: `import { legacyResultHandler, legacyEndpointsFactory } from "express-zod-api"`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultEndpointsFactory",
+              to: "legacyEndpointsFactory",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultEndpointsFactory",
+              to: "legacyEndpointsFactory",
+            },
+          },
+        ],
+      },
+      {
+        name: "change defaultResultHandler in code usage",
+        code: `import { defaultResultHandler } from "express-zod-api"; const f = new EndpointsFactory(defaultResultHandler)`,
+        output: `import { legacyResultHandler } from "express-zod-api"; const f = new EndpointsFactory(legacyResultHandler)`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+        ],
+      },
+      {
+        name: "change defaultEndpointsFactory in code usage",
+        code: `import { defaultEndpointsFactory } from "express-zod-api"; const f = defaultEndpointsFactory.build({})`,
+        output: `import { legacyEndpointsFactory } from "express-zod-api"; const f = legacyEndpointsFactory.build({})`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultEndpointsFactory",
+              to: "legacyEndpointsFactory",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultEndpointsFactory",
+              to: "legacyEndpointsFactory",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultEndpointsFactory",
+              to: "legacyEndpointsFactory",
             },
           },
         ],
