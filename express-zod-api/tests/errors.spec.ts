@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { DocumentationError, RoutingError } from "../src";
 import {
   IOSchemaError,
   InputValidationError,
@@ -7,6 +6,8 @@ import {
   OutputValidationError,
   ResultHandlerError,
   DeepCheckError,
+  DocumentationError,
+  RoutingError,
 } from "../src/errors";
 
 describe("Errors", () => {

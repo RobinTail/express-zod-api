@@ -1,5 +1,51 @@
 # Changelog
 
+## Version 30
+
+### v30.0.0
+
+- Supported TypeScript versions (optional peer): `^6.0.3`:
+  - Entirely `#private` props are now restored in the classes of the distributed `.d.ts` files.
+- `DocumentationError` removed from main entrypoint: import from `express-zod-api/documentation` instead.
+- The rate-limiting Middleware now explicitly declares the `statusCode` that it may interrupt the request handling:
+  - Uses the `statusCode` option given to `EndpointsFactory::useRateLimit()` and `createRateLimitMiddleware()` or 429;
+  - This will override or narrow the negative status codes declared in ResultHandler when generating Documentation;
+  - The Endpoints using this Middleware should declare its other negative status codes explicitly to preserve them.
+- The `defaultResultHandler` (and `defaultEndpointsFactory`) changed both positive and negative response schemas:
+  - The positive response is now the Endpoint output as is: the `{ status: "success", data: {...} }` wrapper removed;
+  - The negative response is now the `{ message }`: the `{ status: "error", error: {...} }` wrapper removed;
+  - Existing APIs can migrate to `legacyResultHandler` and `legacyEndpointsFactory` for preserving those wrappers.
+- The `Integration` generator changed to discriminate responses by HTTP status code or legacy `success|error` fallback:
+  - New `EncodedResponse` interface holding payloads along with `status: number, discriminator: "success" | "error"`;
+  - New public static method `Client::discriminate(status: number): "success" | "error"`;
+  - If using a custom `Implementation`, it now has to return `Promise<{ status: number, data: any }>`;
+  - The `Client::provide()` method now returns `Promise<{ status, discriminator, data }>` for further discrimination;
+  - The basic approach is to discriminate by `status` (the actual `Response.status`);
+  - In case of receiving an unlisted status, use the `discriminator` ("success" or "error" fallback);
+  - Unlike previous versions, the `data` property always relays the original payload, including the error `{ message }`.
+
+```ts
+const client = new Client();
+const { status, discriminator, data } = await client.provide(
+  "get /v1/user/retrieve",
+  { id: "10" },
+);
+if (status === 200)
+  console.log(data.name); // success
+else if (status === 400 || discriminator === "error")
+  console.error(data.message); // error
+```
+
+```diff
+@@ Keeping the response wrappers: @@
+- import { defaultEndpointsFactory } from "express-zod-api";
++ import { legacyEndpointsFactory } from "express-zod-api";
+  const factory = new EndpointsFactory(
+-   defaultResultHandler
++   legacyResultHandler
+  );
+```
+
 ## Version 29
 
 ### v29.3.4
