@@ -374,7 +374,7 @@ import { defaultEndpointsFactory } from "express-zod-api";
 
 const authedFactory = defaultEndpointsFactory
   .addMiddleware(authMiddleware)
-  .addMiddleware(anotherMiddleware);
+  .addMiddleware({/* another one, can also define it inline */});
 const endpointA = authedFactory.build({/* ... */});
 const endpointB = authedFactory.build({/* ... */}); // both share middlewares and defaultResultHandler
 
