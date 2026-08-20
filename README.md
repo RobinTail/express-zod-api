@@ -18,19 +18,20 @@ Start your API server with I/O schema validation and custom middlewares in minut
 4. [Basic features](#basic-features)
    1. [Routing](#routing) including static file serving
    2. [Middlewares](#middlewares)
-   3. [Context](#context)
-   4. [Using native express middlewares](#using-native-express-middlewares)
-   5. [Refinements](#refinements)
-   6. [Query string parser](#query-string-parser)
-   7. [Transformations](#transformations)
-   8. [Top level transformations and mapping](#top-level-transformations-and-mapping)
-   9. [Dealing with dates](#dealing-with-dates)
-   10. [Pagination](#pagination)
-   11. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
-   12. [Enabling HTTPS](#enabling-https)
-   13. [Enabling compression](#enabling-compression)
-   14. [Customizing logger](#customizing-logger)
-   15. [Child logger](#child-logger)
+   3. [Endpoints factory](#endpoints-factory)
+   4. [Context](#context)
+   5. [Using native express middlewares](#using-native-express-middlewares)
+   6. [Refinements](#refinements)
+   7. [Query string parser](#query-string-parser)
+   8. [Transformations](#transformations)
+   9. [Top level transformations and mapping](#top-level-transformations-and-mapping)
+   10. [Dealing with dates](#dealing-with-dates)
+   11. [Pagination](#pagination)
+   12. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   13. [Enabling HTTPS](#enabling-https)
+   14. [Enabling compression](#enabling-compression)
+   15. [Customizing logger](#customizing-logger)
+   16. [Child logger](#child-logger)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as an input source](#headers-as-an-input-source)
@@ -79,7 +80,7 @@ Therefore, many basic tasks can be achieved faster and easier, in particular:
   you expect a number.
 - Variables within an endpoint handler have types according to the declared schema, so your IDE and TypeScript will
   provide you with necessary hints to focus on bringing your vision to life.
-- All of your endpoints can respond consistently.
+- All of your endpoints can process requests and respond consistently.
 - The expected endpoint input and response types can be exported to the frontend, giving you end-to-end type safety
   so you don't get confused about the field names when you implement the client for your API.
 - You can generate your API documentation in OpenAPI 3.2 and JSON Schema compatible format.
@@ -219,7 +220,7 @@ const config = createConfig({
 ## Create your first endpoint
 
 Use the default factory to make an endpoint that responds with "Hello, World" or "Hello, {name}" depending on inputs.
-Learn how to make factories for [custom response](#response-customization) and by [adding middlewares](#middlewares).
+Learn how to [add middlewares](#middlewares) or [customize responses](#response-customization).
 
 ```ts
 import { defaultEndpointsFactory } from "express-zod-api";
@@ -329,10 +330,8 @@ If no method is specified, the methods supported by the endpoint are used (or `g
 
 ## Middlewares
 
-Middleware can authenticate using input or `request` headers, and can provide endpoint handlers with `ctx`.
-Inputs of middlewares are also available to endpoint handlers within `input`.
-
-Here is an example of the authentication middleware, that checks a `key` from input and `token` from headers:
+Middlewares preprocess the incoming requests. For example, authenticate using aggregated `input` or headers. Middleware
+returns become a [Context](#context) available for Endpoint as `ctx`, and its input schema augments the Endpoint's one.
 
 ```ts
 import { z } from "zod";
@@ -358,33 +357,30 @@ const authMiddleware = new Middleware({
       throw createHttpError(401, "Invalid token");
     return { user }; // provides endpoints with ctx.user
   },
-});
+}); // connect it using EndpointsFactory::addMiddleware()
 ```
 
-By using `.addMiddleware()` method before `.build()` you can connect it to the endpoint:
+## Endpoints factory
 
-```ts
-const yourEndpoint = defaultEndpointsFactory
-  .addMiddleware(authMiddleware)
-  .build({
-    handler: async ({ ctx: { user } }) => {
-      // user is the one returned by authMiddleware
-    }, // ...
-  });
-```
-
-You can create a new factory by connecting as many middlewares as you want — they will be executed in the specified
-order for all the endpoints produced on that factory. You may also use a shorter inline syntax within the
-`.addMiddleware()` method, and have access to the output of the previously executed middlewares in a chain as `ctx`:
+`EndpointsFactory` accumulates a sequence of `Middlewares` and holds a `ResultHandler` enabling the response
+consistency: formatting outputs and errors. Use the `.build()` (or `.buildVoid()` for no output) methods to create
+`Endpoint` that inherits all the middlewares and the ResultHandler from the factory. Thus, every Endpoint produced by
+the same factory shares the same preprocessing logic, [Context](#context), and response shape. The
+`defaultEndpointsFactory` uses the [`defaultResultHandler`](#response-customization). You can derive specialized
+factories by adding middlewares: each call creates a new factory, retaining the original one unchanged:
 
 ```ts
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const factory = defaultEndpointsFactory
-  .addMiddleware(authMiddleware) // add Middleware instance or use shorter syntax:
-  .addMiddleware({
-    handler: async ({ ctx: { user } }) => ({}), // user from authMiddleware
-  });
+const authedFactory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware)
+  .addMiddleware({/* another one, can also define it inline */});
+const endpointA = authedFactory.build({/* ... */});
+const endpointB = authedFactory.build({/* ... */}); // both share middlewares and defaultResultHandler
+
+const endpointC = defaultEndpointsFactory // or inline in a single chain:
+  .addMiddleware(authMiddleware) // provides ctx.user
+  .buildVoid({ handler: async ({ ctx: { user } }) => {} });
 ```
 
 ## Context
