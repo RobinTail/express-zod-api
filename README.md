@@ -357,7 +357,7 @@ const authMiddleware = new Middleware({
       throw createHttpError(401, "Invalid token");
     return { user }; // provides endpoints with ctx.user
   },
-}); // connect is using EndpointsFactory::addMiddleware()
+}); // connect it using EndpointsFactory::addMiddleware()
 ```
 
 ## Endpoints factory
