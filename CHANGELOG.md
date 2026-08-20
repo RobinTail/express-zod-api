@@ -2,6 +2,12 @@
 
 ## Version 29
 
+### v29.3.4
+
+- Fixed mocked logger compatibility (returned by `testEndpoint()` and `testMiddleware()`);
+- Minor performance tweaks related to HTTP methods recognition in `Routing`;
+- Improved the framework documentation (Readme): explained the purpose and operation of `EndpointsFactory`.
+
 ### v29.3.3
 
 - Added a warning about using the built-in logger in production:
