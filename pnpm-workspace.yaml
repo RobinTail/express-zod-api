@@ -36,7 +36,7 @@ catalogs:
     "express-fileupload": "^1.5.2"
     "http-errors": "^2.0.1"
     "typescript": "npm:@typescript/typescript6@^6.0.2"
-    "@typescript/native-preview": "npm:typescript@^7.1.0-dev.20260801.1" # the name used by tsdown
+    "@typescript/native-preview": "npm:typescript@^7.1.0-dev.20260812.1" # the name used by tsdown
     "zod": "^4.4.3"
 overrides:
   "@scarf/scarf": "-"
