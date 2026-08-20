@@ -175,11 +175,22 @@ globalRegistry.add(legacyNegativeSchema, {
  * @todo remove in v31
  * */
 export const legacyResultHandler = new ResultHandler({
-  positive: (output) =>
-    z.object({
+  positive: (output) => {
+    const responseSchema = z.object({
       status: z.literal("success"),
       data: output,
-    }),
+    });
+    const examples = getExamples(output); // pulling up:
+    if (examples.length) {
+      globalRegistry.add(responseSchema, {
+        examples: examples.map((data) => ({
+          status: "success" as const,
+          data,
+        })),
+      });
+    }
+    return responseSchema;
+  },
   negative: legacyNegativeSchema,
   handler: ({ error, input, output, request, response, logger }) => {
     if (error) {

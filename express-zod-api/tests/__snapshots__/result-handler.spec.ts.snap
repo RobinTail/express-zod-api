@@ -189,7 +189,23 @@ exports[`ResultHandler > 'legacyResultHandler' > Should handle schema error 1`] 
 }
 `;
 
-exports[`ResultHandler > 'legacyResultHandler' > should forward output schema examples 1`] = `undefined`;
+exports[`ResultHandler > 'legacyResultHandler' > should forward output schema examples 1`] = `
+{
+  "examples": [
+    {
+      "data": {
+        "items": [
+          "One",
+          "Two",
+          "Three",
+        ],
+        "str": "test",
+      },
+      "status": "success",
+    },
+  ],
+}
+`;
 
 exports[`ResultHandler > 'legacyResultHandler' > should generate negative response example 1`] = `
 {
