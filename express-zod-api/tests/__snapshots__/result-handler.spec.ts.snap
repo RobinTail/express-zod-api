@@ -128,6 +128,98 @@ exports[`ResultHandler > 'defaultResultHandler' > should generate negative respo
 }
 `;
 
+exports[`ResultHandler > 'legacyResultHandler' > Should handle HTTP error 1`] = `
+{
+  "error": {
+    "message": "Something not found",
+  },
+  "status": "error",
+}
+`;
+
+exports[`ResultHandler > 'legacyResultHandler' > Should handle generic error 1`] = `
+[
+  [
+    "Server side error",
+    {
+      "error": InternalServerError({
+        "cause": Error({
+          "message": "Some error",
+        }),
+        "message": "Some error",
+      }),
+      "payload": {
+        "something": 453,
+      },
+      "url": "http://something/v1/anything",
+    },
+  ],
+]
+`;
+
+exports[`ResultHandler > 'legacyResultHandler' > Should handle generic error 2`] = `
+{
+  "error": {
+    "message": "Some error",
+  },
+  "status": "error",
+}
+`;
+
+exports[`ResultHandler > 'legacyResultHandler' > Should handle regular response 1`] = `
+{
+  "data": {
+    "anything": 118,
+    "items": [
+      "One",
+      "Two",
+      "Three",
+    ],
+  },
+  "status": "success",
+}
+`;
+
+exports[`ResultHandler > 'legacyResultHandler' > Should handle schema error 1`] = `
+{
+  "error": {
+    "message": "something: Expected string, got number",
+  },
+  "status": "error",
+}
+`;
+
+exports[`ResultHandler > 'legacyResultHandler' > should forward output schema examples 1`] = `
+{
+  "examples": [
+    {
+      "data": {
+        "items": [
+          "One",
+          "Two",
+          "Three",
+        ],
+        "str": "test",
+      },
+      "status": "success",
+    },
+  ],
+}
+`;
+
+exports[`ResultHandler > 'legacyResultHandler' > should generate negative response example 1`] = `
+{
+  "examples": [
+    {
+      "error": {
+        "message": "Sample error message",
+      },
+      "status": "error",
+    },
+  ],
+}
+`;
+
 exports[`ResultHandler > arrayResultHandler should attempt to take examples from the items prop 1`] = `
 {
   "examples": [

@@ -25,6 +25,7 @@ import {
   AbstractResultHandler,
   arrayResultHandler,
   defaultResultHandler,
+  legacyResultHandler,
 } from "./result-handler";
 import { FrozenSet } from "./frozen-set";
 import { createCacheMiddleware } from "./cache-middleware";
@@ -254,6 +255,14 @@ export class EndpointsFactory<
 export const defaultEndpointsFactory = new EndpointsFactory(
   defaultResultHandler,
 );
+
+/**
+ * @deprecated Use defaultEndpointsFactory for new APIs.
+ * @desc For migration purposes only: preserves the response wrappers.
+ * @see legacyResultHandler
+ * @todo remove in v31
+ * */
+export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);
 
 /**
  * @deprecated Resist the urge of using it: this factory is designed only to simplify the migration of legacy APIs.

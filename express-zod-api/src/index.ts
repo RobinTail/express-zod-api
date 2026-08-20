@@ -2,6 +2,7 @@ export { createConfig } from "./config-type";
 export {
   EndpointsFactory,
   defaultEndpointsFactory,
+  legacyEndpointsFactory,
   arrayEndpointsFactory,
 } from "./endpoints-factory";
 export { getMessageFromError } from "./common-helpers";
@@ -14,6 +15,7 @@ export { createRateLimitMiddleware } from "./rate-limit-middleware";
 export {
   ResultHandler,
   defaultResultHandler,
+  legacyResultHandler,
   arrayResultHandler,
 } from "./result-handler";
 export { createApiResponse } from "./api-response";

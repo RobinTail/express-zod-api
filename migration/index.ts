@@ -7,12 +7,14 @@ import {
 
 interface Queries {
   expressZodApiImport: ESTree.ImportDeclaration;
+  defaultId: ESTree.IdentifierName;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
   expressZodApiImport: `ImportDeclaration[source.value="express-zod-api"]`,
+  defaultId: `Identifier[name]`,
 };
 
 const listen = <S extends { [K in Listener]: (node: Queries[K]) => void }>(
@@ -28,6 +30,11 @@ const listen = <S extends { [K in Listener]: (node: Queries[K]) => void }>(
 
 const moveTargets = new Map<string, string[]>([
   ["express-zod-api/documentation", ["DocumentationError"]],
+]);
+
+const renameTargets = new Map([
+  ["defaultResultHandler", "legacyResultHandler"],
+  ["defaultEndpointsFactory", "legacyEndpointsFactory"],
 ]);
 
 const ruleName = `v${import.meta.TSDOWN_VERSION.split(".")[0]}`;
@@ -101,6 +108,16 @@ const theRule: Rule = {
             }
             return fixer.replaceText(node, parts.join("\n"));
           },
+        });
+      },
+      defaultId: (node) => {
+        const replacement = renameTargets.get(node.name);
+        if (!replacement) return;
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "entity", from: node.name, to: replacement },
+          fix: (fixer) => fixer.replaceText(node, replacement),
         });
       },
     }),

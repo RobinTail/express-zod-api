@@ -11,9 +11,10 @@
   - Uses the `statusCode` option given to `EndpointsFactory::useRateLimit()` and `createRateLimitMiddleware()` or 429;
   - This will override or narrow the negative status codes declared in ResultHandler when generating Documentation;
   - The Endpoints using this Middleware should declare its other negative status codes explicitly to preserve them.
-- The `defaultResultHandler` changed both positive and negative schemas:
+- The `defaultResultHandler` (and `defaultEndpointsFactory`) changed both positive and negative response schemas:
   - The positive response is now the Endpoint output as is: the `{ status: "success", data: {...} }` wrapper removed;
-  - The negative response is now the `{ message }`: the `{ status: "error", error: {...} }` wrapper removed.
+  - The negative response is now the `{ message }`: the `{ status: "error", error: {...} }` wrapper removed;
+  - Existing APIs can migrate to `legacyResultHandler` and `legacyEndpointsFactory` for preserving those wrappers.
 - The `Integration` generator changed to discriminate responses by HTTP status code or legacy `success|error` fallback:
   - New `EncodedResponse` interface holding payloads along with `status: number, discriminator: "success" | "error"`;
   - New public static method `Client::discriminate(status: number): "success" | "error"`;
@@ -33,6 +34,16 @@ if (status === 200)
   console.log(data.name); // success
 else if (status === 400 || discriminator === "error")
   console.error(data.message); // error
+```
+
+```diff
+@@ Keeping the response wrappers: @@
+- import { defaultEndpointsFactory } from "express-zod-api";
++ import { legacyEndpointsFactory } from "express-zod-api";
+  const factory = new EndpointsFactory(
+-   defaultResultHandler
++   legacyResultHandler
+  );
 ```
 
 ## Version 29
