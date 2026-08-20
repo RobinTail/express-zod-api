@@ -385,34 +385,29 @@ const endpointC = defaultEndpointsFactory // or inline in a single chain:
 
 ## Context
 
-If you need to provide your endpoints with a context that does not depend on Request, like non-persistent database
-connection, consider shorthand method `addContext`. For static values consider reusing a `const` across your files.
+Context (`ctx`) is information or tools that complement the request beyond the aggregated `input`. Regularly, Context is
+the aggregation of returns from the [Middlewares](#middlewares) connected to the [EndpointsFactory](#endpoints-factory)
+where the Endpoint is built. You can also equip Context with Endpoint-specific entities unrelated to the request itself
+by using the `addContext()` shorthand. If such an entity is absolutely static, it could just be a `const` in your code.
 
 ```ts
-import { readFile } from "node:fs/promises";
 import { defaultEndpointsFactory } from "express-zod-api";
+import jwt from "jsonwebtoken";
 
-const endpointsFactory = defaultEndpointsFactory.addContext(async (ctx) => {
-  // caution: new connection on every request:
-  const db = mongoose.connect("mongodb://connection.string");
-  const privateKey = await readFile("private-key.pem", "utf-8");
-  return { db, privateKey };
+const signingFactory = defaultEndpointsFactory.addContext(async () => {
+  const privateKey = "..."; // loaded from config or secret manager
+  return {
+    signToken: (payload: Record<string, unknown>) =>
+      jwt.sign(payload, privateKey, { expiresIn: "1h" }),
+  };
 });
-```
 
-**Notice on resources cleanup**: If necessary, you can release resources at the end of the request processing in a
-custom [Result Handler](#response-customization):
-
-```ts
-import { ResultHandler } from "express-zod-api";
-
-const resultHandlerWithCleanup = new ResultHandler({
-  handler: ({ ctx }) => {
-    // necessary to check the presence of a certain property:
-    if ("db" in ctx && ctx.db) {
-      ctx.db.connection.close(); // sample cleanup
-    }
-  },
+const issueToken = signingFactory.build({
+  input: z.object({ userId: z.string() }),
+  output: z.object({ token: z.string() }),
+  handler: async ({ input: { userId }, ctx: { signToken } }) => ({
+    token: signToken({ sub: userId }),
+  }),
 });
 ```
 
