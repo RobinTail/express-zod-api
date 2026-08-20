@@ -13,25 +13,29 @@ import {
   type HandlingRules,
 } from "./schema-walker";
 import {
+  makeInterfacePropText,
   ensureTypeNode,
   f,
   makeInterfaceProp,
   makeLiteralType,
   makeUnion,
   ts,
+  customizations,
 } from "./typescript-api";
 import type { Producer, ZTSContext } from "./zts-helpers";
 
 const nodePath = {
   name: R.path([
-    "name" satisfies keyof ts.TypeElement,
+    "name" satisfies keyof ts.PropertySignatureDeclaration,
     "text" satisfies keyof Exclude<
-      NonNullable<ts.TypeElement["name"]>,
+      NonNullable<ts.PropertySignatureDeclaration["name"]>,
       ts.ComputedPropertyName
     >,
   ]),
-  type: R.path(["type" satisfies keyof ts.PropertySignature]),
-  optional: R.path(["questionToken" satisfies keyof ts.TypeElement]),
+  type: R.path(["type" satisfies keyof ts.PropertySignatureDeclaration]),
+  optional: R.path([
+    "postfixToken" satisfies keyof ts.PropertySignatureDeclaration,
+  ]),
 };
 
 const onLiteral: Producer = ({ _zod: { def } }: z.core.$ZodLiteral) => {
@@ -60,17 +64,22 @@ const onTemplateLiteral: Producer = (
     }
     return text;
   };
-  const head = f.createTemplateHead(readText());
+  const headText = readText();
+  const head = f.createTemplateHead(headText, headText, ts.TokenFlags.None);
   const spans: ts.TemplateLiteralTypeSpan[] = [];
   while (idx < parts.length) {
     const schema = next(parts[idx++] as z.core.$ZodType);
     const text = readText();
     const textWrapper =
       idx < parts.length ? f.createTemplateMiddle : f.createTemplateTail;
-    spans.push(f.createTemplateLiteralTypeSpan(schema, textWrapper(text)));
+    const span = f.createTemplateLiteralTypeSpan(
+      schema,
+      textWrapper(text, text, ts.TokenFlags.None),
+    );
+    spans.push(span);
   }
   if (!spans.length) return makeLiteralType(head.text);
-  return f.createTemplateLiteralType(head, spans);
+  return f.createTemplateLiteralTypeNode(head, spans);
 };
 
 const onObject: Producer = (
@@ -78,23 +87,36 @@ const onObject: Producer = (
   { isResponse, next, makeAlias },
 ) => {
   const produce = () => {
-    const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
-      ([key, value]) => {
-        const { description: comment, deprecated: isDeprecated } =
-          globalRegistry.get(value) || {};
-        const isOptional =
-          (isResponse ? value._zod.optout : value._zod.optin) === "optional";
-        const hasUndefined =
-          isOptional && !(value instanceof z.core.$ZodExactOptional);
-        return makeInterfaceProp(key, next(value), {
-          comment,
-          isDeprecated,
+    const entries = Object.entries(obj._zod.def.shape);
+    const members = entries.map<ts.TypeElement>(([key, value]) => {
+      const { description: comment, deprecated: isDeprecated } =
+        globalRegistry.get(value) || {};
+      const isOptional =
+        (isResponse ? value._zod.optout : value._zod.optin) === "optional";
+      const hasUndefined =
+        isOptional && !(value instanceof z.core.$ZodExactOptional);
+      const typeNode = next(value);
+      const member = makeInterfaceProp(key, typeNode, {
+        isOptional,
+        hasUndefined,
+      });
+      customizations.set(
+        member,
+        makeInterfacePropText(key, typeNode, {
           isOptional,
           hasUndefined,
-        });
-      },
-    );
-    return f.createTypeLiteralNode(members);
+          isDeprecated,
+          comment,
+        }),
+      );
+      return member;
+    });
+    const typeNode = f.createTypeLiteralNode(members);
+    customizations.set(typeNode, (opts) => {
+      const propTexts = members.map((one) => customizations.get(one)?.(opts));
+      return propTexts.length ? `{\n${propTexts.join("\n")}\n}` : "{}";
+    });
+    return typeNode;
   };
   return hasCycle(obj, { io: isResponse ? "output" : "input" })
     ? makeAlias(obj, produce)
@@ -145,7 +167,15 @@ const intersect = R.tryCatch(
         return true;
       throw new Error("Has conflicting prop");
     }, members);
-    return f.createTypeLiteralNode(uniqs);
+    const typeNode = f.createTypeLiteralNode(uniqs);
+    const propFns = uniqs.map((m) => customizations.get(m));
+    if (propFns.every(Boolean)) {
+      customizations.set(typeNode, (opts) => {
+        const propTexts = propFns.map((fn) => fn!(opts));
+        return `{\n${propTexts.join("\n")}\n}`;
+      });
+    }
+    return typeNode;
   },
   (_err, nodes) => f.createIntersectionTypeNode(nodes),
 );
