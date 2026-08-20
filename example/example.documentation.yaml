@@ -295,22 +295,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: created
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        exclusiveMinimum: 0
-                        maximum: 9007199254740991
-                    required:
-                      - id
-                    additionalProperties: false
+                  id:
+                    type: integer
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
                 required:
-                  - status
-                  - data
+                  - id
                 additionalProperties: false
         "400":
           description: POST /v1/user/create Negative response 400
@@ -319,13 +309,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: error
                   reason:
                     type: string
                 required:
-                  - status
                   - reason
                 additionalProperties: false
         "409":
@@ -335,15 +321,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: exists
                   id:
                     type: integer
                     minimum: -9007199254740991
                     maximum: 9007199254740991
+                    description: id of the existing entity
                 required:
-                  - status
                   - id
                 additionalProperties: false
         "500":
@@ -353,13 +336,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: error
                   reason:
                     type: string
                 required:
-                  - status
                   - reason
                 additionalProperties: false
   /v1/user/list:

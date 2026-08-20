@@ -75,18 +75,18 @@ export const arrayRespondingFactory = new EndpointsFactory(arrayResultHandler);
 /** @desc The factory demonstrates slightly different response schemas depending on the negative status code */
 export const statusDependingFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: (data) => ({
-      statusCode: [201, 202],
-      schema: z.object({ status: z.literal("created"), data }),
+    positive: (output) => ({
+      statusCode: [201, 202], // created or will be created
+      schema: output,
     }),
     negative: [
       {
-        statusCode: 409,
-        schema: z.object({ status: z.literal("exists"), id: z.int() }),
+        statusCode: 409, // conflict: entity already exists
+        schema: z.object({ id: z.int().describe("id of the existing entity") }),
       },
       {
-        statusCode: [400, 500],
-        schema: z.object({ status: z.literal("error"), reason: z.string() }),
+        statusCode: [400, 500], // validation or internal error
+        schema: z.object({ reason: z.string() }),
       },
     ],
     handler: ({ error, response, output }) => {
@@ -99,12 +99,10 @@ export const statusDependingFactory = new EndpointsFactory(
         return void response
           .status(httpError.statusCode)
           .json(
-            doesExist
-              ? { status: "exists", id: httpError.id }
-              : { status: "error", reason: httpError.message },
+            doesExist ? { id: httpError.id } : { reason: httpError.message },
           );
       }
-      response.status(201).json({ status: "created", data: output });
+      response.status(201).json(output);
     },
   }),
 );

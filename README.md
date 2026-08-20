@@ -1400,18 +1400,18 @@ response schemas and their corresponding status codes.
 import { ResultHandler } from "express-zod-api";
 
 const resultHandler = new ResultHandler({
-  positive: (data) => ({
+  positive: (output) => ({
     statusCode: [201, 202], // created or will be created
-    schema: z.object({ status: z.literal("created"), data }),
+    schema: output,
   }),
   negative: [
     {
       statusCode: 409, // conflict: entity already exists
-      schema: z.object({ status: z.literal("exists"), id: z.int() }),
+      schema: z.object({ id: z.int().describe("id of the existing entity") }),
     },
     {
       statusCode: [400, 500], // validation or internal error
-      schema: z.object({ status: z.literal("error"), reason: z.string() }),
+      schema: z.object({ reason: z.string() }),
     },
   ],
 });
