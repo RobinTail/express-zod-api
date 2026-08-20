@@ -169,11 +169,10 @@ globalRegistry.add(legacyNegativeSchema, {
 });
 
 /**
- * @deprecated This handler is designed only to simplify the migration of APIs from v29.
- * @since v30.0.0
+ * @deprecated Use defaultResultHandler for new APIs.
+ * @desc For migration purposes: preserves the response shapes of v0–v29:
+ * @example `{ status: "success", data: {...} }` and `{ status: "error", error: {...} }`.
  * @todo remove in v31
- * @desc Preserves the v29 response shapes: `{ status: "success", data: {...} }` and `{ status: "error", error: {...} }`.
- * @desc Use defaultResultHandler for new APIs — the old envelope is removed in v30.
  * */
 export const legacyResultHandler = new ResultHandler({
   positive: (output) =>
