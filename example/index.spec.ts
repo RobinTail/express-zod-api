@@ -58,10 +58,7 @@ describe("Example", async () => {
       });
       expect(response.status).toBe(201);
       const json = await response.json();
-      expect(json).toMatchObject({
-        status: "created",
-        data: { id: 16 },
-      });
+      expect(json).toMatchObject({ id: 16 });
     });
 
     test("Should handle valid PATCH request with rate limit headers", async ({
@@ -438,7 +435,7 @@ describe("Example", async () => {
       });
       expect(response.status).toBe(409);
       const json = await response.json();
-      expect(json).toEqual({ status: "exists", id: 16 });
+      expect(json).toEqual({ id: 16 });
     });
 
     test("POST request should fail on demand", async ({ signal }) => {
@@ -450,7 +447,7 @@ describe("Example", async () => {
       });
       expect(response.status).toBe(500);
       const json = await response.json();
-      expect(json).toEqual({ status: "error", reason: "That went wrong" });
+      expect(json).toEqual({ reason: "That went wrong" });
     });
 
     test("PATCH request should fail on auth middleware key check", async ({

@@ -75,21 +75,17 @@ type PostV1UserCreateInput = {
 
 /** post /v1/user/create */
 type PostV1UserCreatePositiveVariant1 = {
-  status: "created";
-  data: {
-    id: number;
-  };
+  id: number;
 };
 
 /** post /v1/user/create */
 type PostV1UserCreateNegativeVariant1 = {
-  status: "exists";
+  /** id of the existing entity */
   id: number;
 };
 
 /** post /v1/user/create */
 type PostV1UserCreateNegativeVariant2 = {
-  status: "error";
   reason: string;
 };
 
