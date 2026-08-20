@@ -364,10 +364,10 @@ const authMiddleware = new Middleware({
 
 `EndpointsFactory` accumulates a sequence of `Middlewares` and holds a `ResultHandler` enabling the response
 consistency: formatting outputs and errors. Use the `.build()` (or `.buildVoid()` for no output) methods to create
-`Endpoint` that inherits all the middlewares and the result handler from the factory. Thus, every Endpoint produced by
-the same factory shares the same preprocessing logic, context, and response shape. The `defaultEndpointsFactory` uses
-the [`defaultResultHandler`](#response-customization). You can derive specialized factories by adding middlewares: each
-call creates a new factory, retaining the original one unchanged:
+`Endpoint` that inherits all the middlewares and the ResultHandler from the factory. Thus, every Endpoint produced by
+the same factory shares the same preprocessing logic, [Context](#context), and response shape. The
+`defaultEndpointsFactory` uses the [`defaultResultHandler`](#response-customization). You can derive specialized
+factories by adding middlewares: each call creates a new factory, retaining the original one unchanged:
 
 ```ts
 import { defaultEndpointsFactory } from "express-zod-api";
