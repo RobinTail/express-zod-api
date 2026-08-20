@@ -170,7 +170,7 @@ globalRegistry.add(legacyNegativeSchema, {
 
 /**
  * @deprecated Use defaultResultHandler for new APIs.
- * @desc For migration purposes: preserves the response shapes of v0–v29:
+ * @desc For migration purposes: preserves the response shapes of v0–v29.
  * @example `{ status: "success", data: {...} }` and `{ status: "error", error: {...} }`.
  * @todo remove in v31
  * */

@@ -11,7 +11,7 @@
   - Uses the `statusCode` option given to `EndpointsFactory::useRateLimit()` and `createRateLimitMiddleware()` or 429;
   - This will override or narrow the negative status codes declared in ResultHandler when generating Documentation;
   - The Endpoints using this Middleware should declare its other negative status codes explicitly to preserve them.
-- The `defaultResultHandler` (and `defaultEndpointsFactory`) changed both positive and negative reponse schemas:
+- The `defaultResultHandler` (and `defaultEndpointsFactory`) changed both positive and negative response schemas:
   - The positive response is now the Endpoint output as is: the `{ status: "success", data: {...} }` wrapper removed;
   - The negative response is now the `{ message }`: the `{ status: "error", error: {...} }` wrapper removed;
   - Existing APIs can migrate to `legacyResultHandler` and `legacyEndpointsFactory` for preserving those wrappers.
