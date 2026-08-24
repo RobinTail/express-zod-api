@@ -1,4 +1,4 @@
-import ts from "typescript";
+import { ensureTypeNode, ts } from "../src/typescript-api";
 import { globalRegistry, z } from "zod";
 import {
   EndpointsFactory,
@@ -145,8 +145,7 @@ describe("Integration", () => {
         config: configMock,
         variant: "types",
         brandHandling: {
-          CUSTOM: () =>
-            ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+          CUSTOM: () => ensureTypeNode(ts.SyntaxKind.BooleanKeyword),
           DEEP: rule,
         },
         routing: {
@@ -176,7 +175,7 @@ describe("Integration", () => {
           config: configMock,
           variant: "types",
           brandHandling: {
-            CUSTOM: () => ts.factory.createTypeReferenceNode("## WRONG ##"),
+            CUSTOM: () => ensureTypeNode("## WRONG ##"),
           },
           routing: {
             v1: {
@@ -204,7 +203,7 @@ describe("Integration", () => {
 
   test("Producer type should be satisfied", () => {
     expectTypeOf(() =>
-      ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+      ensureTypeNode(ts.SyntaxKind.AnyKeyword),
     ).toExtend<Producer>();
   });
 });
