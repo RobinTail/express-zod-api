@@ -2,6 +2,13 @@
 
 ## Version 29
 
+### v29.3.5
+
+- Fixed a Documentation generation defect for input schemas carrying `.meta({ id })`:
+  - Putting `id` on the root input schema made the whole request depiction a reference, so path parameters
+    appeared missing and the generator threw instead of producing the document;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
 ### v29.3.4
 
 - Fixed mocked logger compatibility (returned by `testEndpoint()` and `testMiddleware()`);

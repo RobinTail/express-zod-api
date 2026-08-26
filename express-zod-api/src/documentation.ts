@@ -13,6 +13,7 @@ import {
   type ServerObject,
   OpenApiBuilder,
   type RequestBodyObject,
+  isReferenceObject,
 } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { type ResponseVariant, responseVariants } from "./api-response";
@@ -152,6 +153,18 @@ export class Documentation extends OpenApiBuilder {
     return { $ref: `#/components/schemas/${name}` };
   }
 
+  /** Resolves a top-level component reference back to the depicted object (issue #3659) */
+  #resolveRequest<T extends z.core.JSONSchema.BaseSchema>(request: T): T {
+    if (isReferenceObject(request)) {
+      const name = request.$ref.split("/").at(-1);
+      const resolved = name
+        ? this.rootDoc.components?.schemas?.[name]
+        : undefined;
+      if (resolved) return resolved as T;
+    }
+    return request;
+  }
+
   #ensureUniqOperationId(
     path: string,
     method: ClientMethod,
@@ -248,7 +261,8 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
-      const flatRequest = flattenIO(request);
+      const resolvedRequest = this.#resolveRequest(request);
+      const flatRequest = flattenIO(resolvedRequest);
       const depictedParams = depictRequestParams({
         ...commons,
         getLocation,
@@ -293,8 +307,15 @@ export class Documentation extends OpenApiBuilder {
       let requestBody: RequestBodyObject | undefined = undefined;
       if (inputSources.includes("body")) {
         const paramNames = R.pluck("name", depictedParams);
+        // When the whole request is a shared component reference and there is
+        // nothing to strip, keep reusing that reference (#3570); otherwise
+        // operate on the resolved subject so path params can be excluded (#3659)
+        const bodySubject =
+          resolvedRequest !== request && paramNames.length
+            ? resolvedRequest
+            : request;
         const [bodyJsonSchema, hasRequiredBodyProps] =
-          excludeParamsFromDepiction(request, paramNames);
+          excludeParamsFromDepiction(bodySubject, paramNames);
         requestBody = depictBody({
           ...commons,
           bodyJsonSchema,

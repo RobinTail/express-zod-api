@@ -1741,6 +1741,84 @@ describe("Documentation", () => {
     });
   });
 
+  describe("Issue #3659: root meta id on input with a path parameter", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Issue 3659", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+    };
+
+    const createSpec = (
+      routing: Routing,
+      composition: "inline" | "components",
+    ) => new Documentation({ ...commons, composition, routing }).getSpec();
+
+    const resolve = (spec: OpenAPIObject, ref: ReferenceObject) =>
+      R.path(ref.$ref.split("/").slice(1), spec);
+
+    const bodyRef = (spec: OpenAPIObject, path: string) =>
+      R.path<ReferenceObject>(
+        `paths|${path}|post|requestBody|content|${contentTypes.json}|schema`.split(
+          "|",
+        ),
+        spec,
+      );
+
+    const build = (input: IOSchema) =>
+      defaultEndpointsFactory.buildVoid({
+        method: "post",
+        input,
+        handler: vi.fn(),
+      });
+
+    const shared = z
+      .object({ id: z.string(), name: z.string() })
+      .meta({ id: "UserInput" });
+
+    test.each(["components", "inline"] as const)(
+      "root meta id with a path param documents correctly with composition=%s",
+      (composition) => {
+        const spec = createSpec(
+          { "post /users/:id": build(shared) },
+          composition,
+        );
+        const operation = spec.paths!["/users/{id}"]!.post!;
+        expect(operation.parameters).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ name: "id", in: "path", required: true }),
+          ]),
+        );
+        const bodySchema = R.path(
+          ["content", contentTypes.json, "schema"],
+          operation.requestBody,
+        );
+        if (composition === "components") {
+          expect(resolve(spec, bodySchema as ReferenceObject)).toEqual({
+            type: "object",
+            properties: { name: { type: "string" } },
+            required: ["name"],
+          });
+        } else {
+          expect(bodySchema).toEqual({
+            type: "object",
+            properties: { name: { type: "string" } },
+            required: ["name"],
+          });
+        }
+      },
+    );
+
+    test("root meta id without path params reuses the shared component", () => {
+      const spec = createSpec({ "post /users": build(shared) }, "components");
+      const ref = bodyRef(spec, "/users");
+      if (!ref) throw "no body ref";
+      expect(resolve(spec, ref)).toEqual({
+        $ref: "#/components/schemas/UserInput",
+      });
+      expect(Object.keys(spec.components!.schemas!)).toContain("UserInput");
+    });
+  });
+
   test("Depicter type should be satisfied", () => {
     expectTypeOf(
       ({
