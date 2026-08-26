@@ -1655,6 +1655,53 @@ describe("Documentation", () => {
     });
   });
 
+  describe("Issue #3660: Cookie-sourced input and QUERY query params", () => {
+    test("Should depict cookie params when cookies are in inputSources without CookieSecurity", () => {
+      const spec = new Documentation({
+        config: createConfig({
+          cors: false,
+          logger: { level: "silent" },
+          inputSources: { get: ["params", "cookies"] },
+        }),
+        routing: {
+          c: defaultEndpointsFactory.buildVoid({
+            input: z.object({ session: z.string() }),
+            handler: vi.fn(),
+          }),
+        },
+        info: { title: "Issue 3660", version: "1.0.0" },
+      }).getSpec();
+      expect(spec.paths!["/c"]!.get!.parameters).toEqual([
+        expect.objectContaining({
+          name: "session",
+          in: "cookie",
+          required: true,
+        }),
+      ]);
+    });
+
+    test("Should depict QUERY fields as query parameters when query is in inputSources", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          q: defaultEndpointsFactory.buildVoid({
+            method: "query",
+            input: z.object({ filter: z.string() }),
+            handler: vi.fn(),
+          }),
+        },
+        info: { title: "Issue 3660", version: "1.0.0" },
+      }).getSpec();
+      expect(spec.paths!["/q"]!.query!.parameters).toEqual([
+        expect.objectContaining({
+          name: "filter",
+          in: "query",
+          required: true,
+        }),
+      ]);
+    });
+  });
+
   describe("Issue #3601: shared input schema should not share the request body component", () => {
     const commons = {
       config: sampleConfig,

@@ -446,6 +446,32 @@ describe("Documentation helpers", () => {
       expect(getLocation("test")).toBe("query");
       expect(getLocation("session")).toBe("cookie");
     });
+
+    test.each(["cookies", "signedCookies"] as const)(
+      "Issue #3660: should depict %s as cookie params without CookieSecurity",
+      (source) => {
+        const { pathParams, isQueryEnabled, getLocation } = makeParamLocator({
+          ...requestCtx,
+          inputSources: ["params", source],
+        });
+        expect(pathParams).toEqual(new Set(["id"]));
+        expect(isQueryEnabled).toBe(false);
+        expect(getLocation("id")).toBe("path");
+        expect(getLocation("session")).toBe("cookie");
+      },
+    );
+
+    test("Issue #3660: QUERY method should emit query params when query is enabled", () => {
+      const { pathParams, isQueryEnabled, getLocation } = makeParamLocator({
+        ...requestCtx,
+        method: "query",
+        inputSources: ["query", "body", "params"],
+      });
+      expect(pathParams).toEqual(new Set(["id"]));
+      expect(isQueryEnabled).toBe(true);
+      expect(getLocation("id")).toBe("path");
+      expect(getLocation("test")).toBe("query");
+    });
   });
 
   describe("depictRequestParams()", () => {
