@@ -247,7 +247,7 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
 export const defaultIsHeader = (
   name: string,
   familiar?: Set<string>,
-): name is `x-${string}` =>
+): boolean =>
   familiar?.has(name) ||
   name.startsWith("x-") ||
   getWellKnownHeaders().has(name);
