@@ -157,9 +157,7 @@ export class Documentation extends OpenApiBuilder {
   #resolveRequest<T extends z.core.JSONSchema.BaseSchema>(request: T): T {
     if (isReferenceObject(request)) {
       const name = request.$ref.split("/").at(-1);
-      const resolved = name
-        ? this.rootDoc.components?.schemas?.[name]
-        : undefined;
+      const resolved = name && this.rootDoc.components?.schemas?.[name];
       if (resolved) return resolved as T;
     }
     return request;
