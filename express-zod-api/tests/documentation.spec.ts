@@ -1663,11 +1663,8 @@ describe("Documentation", () => {
       composition: "components" as const,
     };
 
-    const createSpec = (routing: Routing) =>
-      new Documentation({ ...commons, routing }).getSpec();
-
-    const resolve = (spec: OpenAPIObject, ref: ReferenceObject) =>
-      R.path(ref.$ref.split("/").slice(1), spec);
+    const createDoc = (routing: Routing) =>
+      new Documentation({ ...commons, routing });
 
     const bodyRef = (spec: OpenAPIObject, path: string) =>
       R.path<ReferenceObject>(
@@ -1686,20 +1683,21 @@ describe("Documentation", () => {
 
     test("two routes sharing an input schema instance get their own body", () => {
       const shared = z.object({ id: z.string(), name: z.string() });
-      const spec = createSpec({
+      const doc = createDoc({
         "post /a/:id": build(shared),
         "post /b/:name": build(shared),
       });
+      const spec = doc.getSpec();
       const refA = bodyRef(spec, "/a/{id}");
       const refB = bodyRef(spec, "/b/{name}");
       if (!refA || !refB) throw "no body ref";
       expect(refA).not.toEqual(refB);
-      expect(resolve(spec, refA)).toEqual({
+      expect(doc.resolve(refA)).toEqual({
         type: "object",
         properties: { name: { type: "string" } },
         required: ["name"],
       });
-      expect(resolve(spec, refB)).toEqual({
+      expect(doc.resolve(refB)).toEqual({
         type: "object",
         properties: { id: { type: "string" } },
         required: ["id"],
@@ -1708,10 +1706,10 @@ describe("Documentation", () => {
 
     test("identical bodies across routes sharing a schema instance still dedup", () => {
       const shared = z.object({ id: z.string(), name: z.string() });
-      const spec = createSpec({
+      const spec = createDoc({
         "post /a/:id": build(shared),
         "post /b/:id": build(shared),
-      });
+      }).getSpec();
       const names = Object.keys(spec.components!.schemas ?? {}).filter((name) =>
         name.includes("RequestBody"),
       );
@@ -1720,24 +1718,165 @@ describe("Documentation", () => {
 
     test("one endpoint mounted at two paths gets a distinct body per route", () => {
       const endpoint = build(z.object({ id: z.string(), name: z.string() }));
-      const spec = createSpec({
+      const doc = createDoc({
         "post /a/:id": endpoint,
         "post /b/:name": endpoint,
       });
+      const spec = doc.getSpec();
       const refA = bodyRef(spec, "/a/{id}");
       const refB = bodyRef(spec, "/b/{name}");
       if (!refA || !refB) throw "no body ref";
       expect(refA).not.toEqual(refB);
-      expect(resolve(spec, refA)).toEqual({
+      expect(doc.resolve(refA)).toEqual({
         type: "object",
         properties: { name: { type: "string" } },
         required: ["name"],
       });
-      expect(resolve(spec, refB)).toEqual({
+      expect(doc.resolve(refB)).toEqual({
         type: "object",
         properties: { id: { type: "string" } },
         required: ["id"],
       });
+    });
+  });
+
+  describe("Issue #3659: root meta id on input with a path parameter", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Issue 3659", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+    };
+
+    const createDoc = (
+      routing: Routing,
+      composition: "inline" | "components",
+    ) => new Documentation({ ...commons, composition, routing });
+
+    const bodyRef = (spec: OpenAPIObject, path: string) =>
+      R.path<ReferenceObject>(
+        `paths|${path}|post|requestBody|content|${contentTypes.json}|schema`.split(
+          "|",
+        ),
+        spec,
+      );
+
+    const build = (input: IOSchema) =>
+      defaultEndpointsFactory.buildVoid({
+        method: "post",
+        input,
+        handler: vi.fn(),
+      });
+
+    const shared = z
+      .object({ id: z.string(), name: z.string() })
+      .meta({ id: "UserInput" });
+
+    test.each(["components", "inline"] as const)(
+      "root meta id with a path param documents correctly with composition=%s",
+      (composition) => {
+        const doc = createDoc(
+          { "post /users/:id": build(shared) },
+          composition,
+        );
+        const spec = doc.getSpec();
+        const operation = spec.paths!["/users/{id}"]!.post!;
+        expect(operation.parameters).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ name: "id", in: "path", required: true }),
+          ]),
+        );
+        const bodySchema = R.path(
+          ["content", contentTypes.json, "schema"],
+          operation.requestBody,
+        );
+        if (composition === "components") {
+          expect(doc.resolve(bodySchema as ReferenceObject)).toEqual({
+            type: "object",
+            properties: { name: { type: "string" } },
+            required: ["name"],
+          });
+        } else {
+          expect(bodySchema).toEqual({
+            type: "object",
+            properties: { name: { type: "string" } },
+            required: ["name"],
+          });
+        }
+      },
+    );
+
+    test("root meta id without path params reuses the shared component", () => {
+      const doc = createDoc({ "post /users": build(shared) }, "components");
+      const spec = doc.getSpec();
+      const ref = bodyRef(spec, "/users");
+      if (!ref) throw "no body ref";
+      expect(doc.resolve(ref)).toEqual({
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          name: { type: "string" },
+        },
+        required: ["id", "name"],
+      });
+      expect(spec.components!.schemas!.PostUsersRequestBody).toEqual({
+        $ref: "#/components/schemas/UserInput",
+      });
+    });
+  });
+
+  describe("::resolve()", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Resolve", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+    };
+
+    const createDoc = () => new Documentation({ ...commons, routing: {} });
+
+    test("returns the subject as is when it is not a reference", () => {
+      const subject = { type: "object" as const };
+      expect(createDoc().resolve(subject)).toBe(subject);
+    });
+
+    test("resolves a reference pointing to a component", () => {
+      const doc = createDoc();
+      doc.addSchema("User", {
+        type: "object",
+        properties: { name: { type: "string" } },
+      });
+      expect(doc.resolve({ $ref: "#/components/schemas/User" })).toEqual({
+        type: "object",
+        properties: { name: { type: "string" } },
+      });
+    });
+
+    test("returns the reference as is when it cannot be resolved", () => {
+      const ref = { $ref: "#/components/schemas/NonExistent" };
+      expect(createDoc().resolve(ref)).toBe(ref);
+    });
+
+    test("follows a chain of references", () => {
+      const doc = createDoc();
+      doc.addSchema("Alias", { $ref: "#/components/schemas/User" });
+      doc.addSchema("User", { type: "object" });
+      expect(doc.resolve({ $ref: "#/components/schemas/Alias" })).toEqual({
+        type: "object",
+      });
+    });
+
+    test("returns the reference as is when it refers to itself", () => {
+      const doc = createDoc();
+      doc.addSchema("SelfRef", { $ref: "#/components/schemas/SelfRef" });
+      const ref = { $ref: "#/components/schemas/SelfRef" };
+      expect(doc.resolve(ref)).toBe(ref);
+    });
+
+    test("returns the reference as is on a circular chain", () => {
+      const doc = createDoc();
+      doc.addSchema("CircularA", { $ref: "#/components/schemas/CircularB" });
+      doc.addSchema("CircularB", { $ref: "#/components/schemas/CircularA" });
+      const ref = { $ref: "#/components/schemas/CircularA" };
+      expect(doc.resolve(ref)).toBe(ref);
     });
   });
 
