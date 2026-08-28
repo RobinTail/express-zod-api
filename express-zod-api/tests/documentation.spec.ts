@@ -1824,6 +1824,62 @@ describe("Documentation", () => {
     });
   });
 
+  describe("Documentation#resolve()", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Resolve", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+    };
+
+    const createDoc = () => new Documentation({ ...commons, routing: {} });
+
+    test("returns the subject as is when it is not a reference", () => {
+      const subject = { type: "object" as const };
+      expect(createDoc().resolve(subject)).toBe(subject);
+    });
+
+    test("resolves a reference pointing to a component", () => {
+      const doc = createDoc();
+      doc.addSchema("User", {
+        type: "object",
+        properties: { name: { type: "string" } },
+      });
+      expect(doc.resolve({ $ref: "#/components/schemas/User" })).toEqual({
+        type: "object",
+        properties: { name: { type: "string" } },
+      });
+    });
+
+    test("returns the reference as is when it cannot be resolved", () => {
+      const ref = { $ref: "#/components/schemas/NonExistent" };
+      expect(createDoc().resolve(ref)).toBe(ref);
+    });
+
+    test("follows a chain of references", () => {
+      const doc = createDoc();
+      doc.addSchema("Alias", { $ref: "#/components/schemas/User" });
+      doc.addSchema("User", { type: "object" });
+      expect(doc.resolve({ $ref: "#/components/schemas/Alias" })).toEqual({
+        type: "object",
+      });
+    });
+
+    test("returns the reference as is when it refers to itself", () => {
+      const doc = createDoc();
+      doc.addSchema("SelfRef", { $ref: "#/components/schemas/SelfRef" });
+      const ref = { $ref: "#/components/schemas/SelfRef" };
+      expect(doc.resolve(ref)).toBe(ref);
+    });
+
+    test("returns the reference as is on a circular chain", () => {
+      const doc = createDoc();
+      doc.addSchema("CircularA", { $ref: "#/components/schemas/CircularB" });
+      doc.addSchema("CircularB", { $ref: "#/components/schemas/CircularA" });
+      const ref = { $ref: "#/components/schemas/CircularA" };
+      expect(doc.resolve(ref)).toBe(ref);
+    });
+  });
+
   test("Depicter type should be satisfied", () => {
     expectTypeOf(
       ({
