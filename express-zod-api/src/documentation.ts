@@ -322,9 +322,9 @@ export class Documentation extends OpenApiBuilder {
         // nothing to strip, keep reusing that reference (#3570); otherwise
         // operate on the resolved subject so path params can be excluded (#3659)
         const bodySubject =
-          resolvedRequest !== request && paramNames.length
-            ? resolvedRequest
-            : request;
+          !paramNames.length || resolvedRequest === request
+            ? request
+            : resolvedRequest;
         const [bodyJsonSchema, hasRequiredBodyProps] =
           excludeParamsFromDepiction(bodySubject, paramNames);
         requestBody = depictBody({
