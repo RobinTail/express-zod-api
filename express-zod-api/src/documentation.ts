@@ -318,13 +318,10 @@ export class Documentation extends OpenApiBuilder {
       let requestBody: RequestBodyObject | undefined = undefined;
       if (inputSources.includes("body")) {
         const paramNames = R.pluck("name", depictedParams);
-        // When the whole request is a shared component reference and there is
-        // nothing to strip, keep reusing that reference (#3570); otherwise
-        // operate on the resolved subject so path params can be excluded (#3659)
         const bodySubject =
           !paramNames.length || resolvedRequest === request
-            ? request
-            : resolvedRequest;
+            ? request // the whole request is a shared component reference, or nothing to strip (issue #3570)
+            : resolvedRequest; // issue #3659
         const [bodyJsonSchema, hasRequiredBodyProps] =
           excludeParamsFromDepiction(bodySubject, paramNames);
         requestBody = depictBody({
