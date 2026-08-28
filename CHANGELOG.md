@@ -2,14 +2,14 @@
 
 ## Version 29
 
-### v29.3.5
+### v29.4.0
 
-- Fixed a Documentation generation defect for input schemas of endpoints without middlewares carrying `.meta({ id })`:
-  - Putting `id` on the root input schema made the whole request depiction a reference, so path parameters
-    appeared missing and the generator threw instead of producing the document;
+- Added the `Documentation::resolve()` method:
+  - it returns a schema referenced by an OpenAPI reference object `{ $ref: '#/components/...' }`.
+- Fixed a Documentation generation defect for input schemas of endpoints without middlewares having `.meta({ id })`:
+  - Putting `id` meta on the Endpoint input schema made the whole request depiction a reference, so path parameters
+    appeared missing, and the generator threw an error instead of producing the documentation;
   - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
-- Added the `Documentation#resolve()` method: it dereferences a component reference (`#/components/schemas/...`)
-  within the documented object back to the referenced schema.
 
 ### v29.3.4
 
