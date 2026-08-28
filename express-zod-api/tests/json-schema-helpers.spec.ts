@@ -361,18 +361,18 @@ describe("JSON Schema helpers", () => {
       },
     );
 
-    test.each(["query", "path"] as const)(
-      "oneOf is acceptable in %s when some member is",
-      (location) => {
+    test.each(R.xprod(["oneOf", "anyOf"] as const, ["query", "path"] as const))(
+      "%s is acceptable in %s when some member is",
+      (prop, location) => {
         expect(
           isParamAcceptable(
-            { oneOf: [{ type: "string" }, { type: "number" }] },
+            { [prop]: [{ type: "string" }, { type: "number" }] },
             location,
           ),
         ).toBe(true);
         expect(
           isParamAcceptable(
-            { oneOf: [{ type: "number" }, { type: "boolean" }] },
+            { [prop]: [{ type: "number" }, { type: "boolean" }] },
             location,
           ),
         ).toBe(false);
