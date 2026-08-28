@@ -1824,7 +1824,7 @@ describe("Documentation", () => {
     });
   });
 
-  describe("Documentation#resolve()", () => {
+  describe("::resolve()", () => {
     const commons = {
       config: sampleConfig,
       info: { title: "Resolve", version: "1.0.0" },
