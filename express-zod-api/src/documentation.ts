@@ -154,8 +154,7 @@ export class Documentation extends OpenApiBuilder {
   }
 
   /**
-   * @desc Resolves a top-level component reference within the documented object to the referenced schema.
-   * @desc Non-reference input is returned as is.
+   * @desc Resolves a ReferenceObject to the referenced schema. Non-reference input is returned as is.
    * @see getSpec
    * @example subject.resolve({ $ref: "#/components/schemas/UserInput" })
    * */

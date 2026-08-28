@@ -5,7 +5,7 @@
 ### v29.4.0
 
 - Added the `Documentation::resolve()` method:
-  - it returns a schema referenced by an OpenAPI reference object `{ $ref: '#/components/...' }`.
+  - it returns a component referenced by an OpenAPI reference object `{ $ref: "#/components/..." }`.
 - Fixed a Documentation generation defect for input schemas of endpoints without middlewares having `.meta({ id })`:
   - Putting `id` meta on the Endpoint input schema made the whole request depiction a reference, so path parameters
     appeared missing, and the generator threw an error instead of producing the documentation;
