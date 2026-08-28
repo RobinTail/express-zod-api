@@ -164,7 +164,10 @@ export class Documentation extends OpenApiBuilder {
   ): T {
     if (isReferenceObject(subject)) {
       const resolved = R.path(subject.$ref.split("/").slice(1), this.rootDoc);
-      if (resolved) return resolved as T;
+      if (resolved) {
+        // a component may itself reference another one, so resolve recursively
+        return this.resolve(resolved as T);
+      }
     }
     return subject;
   }
