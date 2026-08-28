@@ -153,13 +153,20 @@ export class Documentation extends OpenApiBuilder {
     return { $ref: `#/components/schemas/${name}` };
   }
 
-  /** Resolves a top-level component reference back to the depicted object (issue #3659) */
-  #resolveRequest<T extends z.core.JSONSchema.BaseSchema>(request: T): T {
-    if (isReferenceObject(request)) {
-      const resolved = R.path(request.$ref.split("/").slice(1), this.rootDoc);
+  /**
+   * @desc Resolves a top-level component reference within the documented object to the referenced schema.
+   * @desc Non-reference input is returned as is.
+   * @see getSpec
+   * @example subject.resolve({ $ref: "#/components/schemas/UserInput" })
+   * */
+  public resolve<T extends z.core.JSONSchema.BaseSchema | ReferenceObject>(
+    subject: T,
+  ): T {
+    if (isReferenceObject(subject)) {
+      const resolved = R.path(subject.$ref.split("/").slice(1), this.rootDoc);
       if (resolved) return resolved as T;
     }
-    return request;
+    return subject;
   }
 
   #ensureUniqOperationId(
@@ -258,7 +265,7 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
-      const resolvedRequest = this.#resolveRequest(request);
+      const resolvedRequest = this.resolve(request);
       const flatRequest = flattenIO(resolvedRequest);
       const depictedParams = depictRequestParams({
         ...commons,

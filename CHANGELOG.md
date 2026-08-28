@@ -8,6 +8,8 @@
   - Putting `id` on the root input schema made the whole request depiction a reference, so path parameters
     appeared missing and the generator threw instead of producing the document;
   - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+- Added the `Documentation#resolve()` method: it dereferences a component reference (`#/components/schemas/...`)
+  within the documented object back to the referenced schema.
 
 ### v29.3.4
 

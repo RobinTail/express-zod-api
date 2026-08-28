@@ -1663,11 +1663,8 @@ describe("Documentation", () => {
       composition: "components" as const,
     };
 
-    const createSpec = (routing: Routing) =>
-      new Documentation({ ...commons, routing }).getSpec();
-
-    const resolve = (spec: OpenAPIObject, ref: ReferenceObject) =>
-      R.path(ref.$ref.split("/").slice(1), spec);
+    const createDoc = (routing: Routing) =>
+      new Documentation({ ...commons, routing });
 
     const bodyRef = (spec: OpenAPIObject, path: string) =>
       R.path<ReferenceObject>(
@@ -1686,20 +1683,21 @@ describe("Documentation", () => {
 
     test("two routes sharing an input schema instance get their own body", () => {
       const shared = z.object({ id: z.string(), name: z.string() });
-      const spec = createSpec({
+      const doc = createDoc({
         "post /a/:id": build(shared),
         "post /b/:name": build(shared),
       });
+      const spec = doc.getSpec();
       const refA = bodyRef(spec, "/a/{id}");
       const refB = bodyRef(spec, "/b/{name}");
       if (!refA || !refB) throw "no body ref";
       expect(refA).not.toEqual(refB);
-      expect(resolve(spec, refA)).toEqual({
+      expect(doc.resolve(refA)).toEqual({
         type: "object",
         properties: { name: { type: "string" } },
         required: ["name"],
       });
-      expect(resolve(spec, refB)).toEqual({
+      expect(doc.resolve(refB)).toEqual({
         type: "object",
         properties: { id: { type: "string" } },
         required: ["id"],
@@ -1708,10 +1706,10 @@ describe("Documentation", () => {
 
     test("identical bodies across routes sharing a schema instance still dedup", () => {
       const shared = z.object({ id: z.string(), name: z.string() });
-      const spec = createSpec({
+      const spec = createDoc({
         "post /a/:id": build(shared),
         "post /b/:id": build(shared),
-      });
+      }).getSpec();
       const names = Object.keys(spec.components!.schemas ?? {}).filter((name) =>
         name.includes("RequestBody"),
       );
@@ -1720,20 +1718,21 @@ describe("Documentation", () => {
 
     test("one endpoint mounted at two paths gets a distinct body per route", () => {
       const endpoint = build(z.object({ id: z.string(), name: z.string() }));
-      const spec = createSpec({
+      const doc = createDoc({
         "post /a/:id": endpoint,
         "post /b/:name": endpoint,
       });
+      const spec = doc.getSpec();
       const refA = bodyRef(spec, "/a/{id}");
       const refB = bodyRef(spec, "/b/{name}");
       if (!refA || !refB) throw "no body ref";
       expect(refA).not.toEqual(refB);
-      expect(resolve(spec, refA)).toEqual({
+      expect(doc.resolve(refA)).toEqual({
         type: "object",
         properties: { name: { type: "string" } },
         required: ["name"],
       });
-      expect(resolve(spec, refB)).toEqual({
+      expect(doc.resolve(refB)).toEqual({
         type: "object",
         properties: { id: { type: "string" } },
         required: ["id"],
@@ -1748,13 +1747,10 @@ describe("Documentation", () => {
       serverUrl: "http://localhost:8090",
     };
 
-    const createSpec = (
+    const createDoc = (
       routing: Routing,
       composition: "inline" | "components",
-    ) => new Documentation({ ...commons, composition, routing }).getSpec();
-
-    const resolve = (spec: OpenAPIObject, ref: ReferenceObject) =>
-      R.path(ref.$ref.split("/").slice(1), spec);
+    ) => new Documentation({ ...commons, composition, routing });
 
     const bodyRef = (spec: OpenAPIObject, path: string) =>
       R.path<ReferenceObject>(
@@ -1778,10 +1774,11 @@ describe("Documentation", () => {
     test.each(["components", "inline"] as const)(
       "root meta id with a path param documents correctly with composition=%s",
       (composition) => {
-        const spec = createSpec(
+        const doc = createDoc(
           { "post /users/:id": build(shared) },
           composition,
         );
+        const spec = doc.getSpec();
         const operation = spec.paths!["/users/{id}"]!.post!;
         expect(operation.parameters).toEqual(
           expect.arrayContaining([
@@ -1793,7 +1790,7 @@ describe("Documentation", () => {
           operation.requestBody,
         );
         if (composition === "components") {
-          expect(resolve(spec, bodySchema as ReferenceObject)).toEqual({
+          expect(doc.resolve(bodySchema as ReferenceObject)).toEqual({
             type: "object",
             properties: { name: { type: "string" } },
             required: ["name"],
@@ -1809,10 +1806,11 @@ describe("Documentation", () => {
     );
 
     test("root meta id without path params reuses the shared component", () => {
-      const spec = createSpec({ "post /users": build(shared) }, "components");
+      const doc = createDoc({ "post /users": build(shared) }, "components");
+      const spec = doc.getSpec();
       const ref = bodyRef(spec, "/users");
       if (!ref) throw "no body ref";
-      expect(resolve(spec, ref)).toEqual({
+      expect(doc.resolve(ref)).toEqual({
         $ref: "#/components/schemas/UserInput",
       });
       expect(Object.keys(spec.components!.schemas!)).toContain("UserInput");
