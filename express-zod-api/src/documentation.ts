@@ -162,11 +162,19 @@ export class Documentation extends OpenApiBuilder {
   public resolve<T extends z.core.JSONSchema.BaseSchema | ReferenceObject>(
     subject: T,
   ): T {
-    if (isReferenceObject(subject)) {
-      const resolved = R.path(subject.$ref.split("/").slice(1), this.rootDoc);
-      if (resolved) return resolved as T;
+    let current: z.core.JSONSchema.BaseSchema | ReferenceObject = subject;
+    const visited = new Set<string>(); // guarding against circular references
+    while (isReferenceObject(current)) {
+      if (visited.has(current.$ref)) return subject;
+      visited.add(current.$ref);
+      const resolved:
+        | z.core.JSONSchema.BaseSchema
+        | ReferenceObject
+        | undefined = R.path(current.$ref.split("/").slice(1), this.rootDoc);
+      if (!resolved) return subject; // unresolvable reference
+      current = resolved;
     }
-    return subject;
+    return current as T;
   }
 
   #ensureUniqOperationId(

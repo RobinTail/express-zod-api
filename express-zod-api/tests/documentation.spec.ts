@@ -1811,9 +1811,16 @@ describe("Documentation", () => {
       const ref = bodyRef(spec, "/users");
       if (!ref) throw "no body ref";
       expect(doc.resolve(ref)).toEqual({
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          name: { type: "string" },
+        },
+        required: ["id", "name"],
+      });
+      expect(spec.components!.schemas!.PostUsersRequestBody).toEqual({
         $ref: "#/components/schemas/UserInput",
       });
-      expect(Object.keys(spec.components!.schemas!)).toContain("UserInput");
     });
   });
 
