@@ -318,11 +318,13 @@ export class Documentation extends OpenApiBuilder {
       let requestBody: RequestBodyObject | undefined = undefined;
       if (inputSources.includes("body")) {
         const paramNames = R.pluck("name", depictedParams);
-        const bodySubject = paramNames.length
-          ? resolvedRequest // dereference the request so path params can be stripped from the body (issue #3659)
-          : request; // nothing to strip: reuse the shared component reference in the body (issue #3570)
         const [bodyJsonSchema, hasRequiredBodyProps] =
-          excludeParamsFromDepiction(bodySubject, paramNames);
+          excludeParamsFromDepiction(
+            paramNames.length
+              ? resolvedRequest // dereference the request so path params can be stripped from the body (issue #3659)
+              : request, // nothing to strip: reuse the shared component reference in the body (issue #3570)
+            paramNames,
+          );
         requestBody = depictBody({
           ...commons,
           bodyJsonSchema,
