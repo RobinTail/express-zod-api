@@ -156,8 +156,7 @@ export class Documentation extends OpenApiBuilder {
   /** Resolves a top-level component reference back to the depicted object (issue #3659) */
   #resolveRequest<T extends z.core.JSONSchema.BaseSchema>(request: T): T {
     if (isReferenceObject(request)) {
-      const name = request.$ref.split("/").at(-1);
-      const resolved = name && this.rootDoc.components?.schemas?.[name];
+      const resolved = R.path(request.$ref.split("/").slice(1), this.rootDoc);
       if (resolved) return resolved as T;
     }
     return request;
