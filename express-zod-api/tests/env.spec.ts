@@ -250,6 +250,12 @@ describe("Environment checks", () => {
       const c = z.object({ a: z.string() }).and(z.object({ b: z.string() }));
       expect(c.toJSONSchema()).not.toHaveProperty("allOf"); // @since 4.5.0
     });
+
+    // @todo require zod 4.5 and use compiled schemas everywhere
+    test("compiled schemas have identical shape", () => {
+      const schema = z.iso.date();
+      expect(Object.keys(z.compile(schema))).toEqual(Object.keys(schema));
+    });
   });
 
   describe("Node.js HTTP method support", () => {
