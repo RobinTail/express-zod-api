@@ -37,20 +37,21 @@ export const hasCycle = (
   subject: z.core.$ZodType,
   { io }: Pick<NestedSchemaLookupProps, "io">,
 ) => {
-  const json = z.toJSONSchema(subject, { io, unrepresentable: "any" });
-  const { $ref: selfRef } = json;
+  const { $ref: selfRef, ...json } = z.toJSONSchema(subject, {
+    io,
+    unrepresentable: "any",
+  });
   const stack: unknown[] = [json];
   for (let idx = 0; idx < stack.length; idx++) {
     const entry = stack[idx];
     if (R.is(Object, entry)) {
       const { $ref } = entry as z.core.JSONSchema.BaseSchema;
-      if ($ref === "#") return true;
-      if (idx && $ref && $ref === selfRef) return true;
+      if ($ref === "#" || ($ref && $ref === selfRef)) return true;
       stack.push(...R.values(entry));
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
-  return false;
+  return selfRef === "#";
 };
 
 const isRequestDefiningBrand = Set.prototype.has.bind(
