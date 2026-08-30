@@ -38,12 +38,17 @@ export const hasCycle = (
   { io }: Pick<NestedSchemaLookupProps, "io">,
 ) => {
   const json = z.toJSONSchema(subject, { io, unrepresentable: "any" });
-  if (json.$ref?.startsWith("#/$defs/")) return true; // @since 4.5.0, has id meta
+  const seenRefs = new Set<string>();
   const stack: unknown[] = [json];
   for (let idx = 0; idx < stack.length; idx++) {
     const entry = stack[idx];
     if (R.is(Object, entry)) {
-      if ((entry as z.core.JSONSchema.BaseSchema).$ref === "#") return true;
+      const { $ref } = entry as z.core.JSONSchema.BaseSchema;
+      if ($ref === "#") return true;
+      if ($ref) {
+        if (seenRefs.has($ref)) return true;
+        else seenRefs.add($ref);
+      }
       stack.push(...R.values(entry));
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
