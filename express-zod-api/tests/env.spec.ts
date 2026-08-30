@@ -17,11 +17,11 @@ describe("Environment checks", () => {
     test.each(["2021-01-32", "22/01/2022", "2021-01-31T25:00:00.000Z"])(
       "should detect invalid date %#",
       (str) => {
-        expect(z.date().safeParse(new Date(str)).success).toBeFalsy();
-        expect(z.string().date().safeParse(str).success).toBeFalsy();
-        expect(z.string().datetime().safeParse(str).success).toBeFalsy();
-        expect(z.iso.date().safeParse(str).success).toBeFalsy();
-        expect(z.iso.datetime().safeParse(str).success).toBeFalsy();
+        expect(z.validate(z.date(), new Date(str))).toBeFalsy();
+        expect(z.validate(z.string().date(), str)).toBeFalsy();
+        expect(z.validate(z.string().datetime(), str)).toBeFalsy();
+        expect(z.validate(z.iso.date(), str)).toBeFalsy();
+        expect(z.validate(z.iso.datetime(), str)).toBeFalsy();
       },
     );
   });
