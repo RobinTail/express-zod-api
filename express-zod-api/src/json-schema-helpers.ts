@@ -161,11 +161,11 @@ export const isParamAcceptable = (
   if (subject.allOf)
     return subject.allOf.every((one) => isParamAcceptable(one, location));
   if (subject.type === undefined || subject.type === "string") return true;
-  // @todo consider doing this within condition below
+  if (location === "path") return false;
   const isObjectOrArray = Array.isArray(subject.type)
     ? Boolean(ttt.intersection(new Set(subject.type)).size)
     : ttt.has(subject.type);
-  if (location === "query" && isObjectOrArray) {
+  if (isObjectOrArray) {
     const sub = [
       subject.items,
       subject.prefixItems,
