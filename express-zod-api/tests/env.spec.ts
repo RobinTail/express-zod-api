@@ -89,10 +89,10 @@ describe("Environment checks", () => {
       expect(real).toHaveProperty("message");
     });
 
-    test("z.enum() can be empty, but z.literal() can not", () => {
+    test("both z.enum() and z.literal() can be empty", () => {
       expect(z.enum([])._zod.def.entries).toEqual({});
-      /** @since 4.0.9 4e7a3ef180f6a5525d9021638e9df20b3ca50456 */
-      expect(() => z.literal([])).toThrow(/no valid values/);
+      /** @since 4.5.0 https://github.com/colinhacks/zod/pull/6459, 4.0.9 — 4.3.4 throws */
+      expect(z.literal([])._zod.def.values).toEqual([]);
     });
 
     test.each([z.coerce.number(), z.preprocess(Number, z.number())])(
