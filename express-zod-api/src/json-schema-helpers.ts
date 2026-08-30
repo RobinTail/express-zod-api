@@ -143,6 +143,8 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
 /** @desc Marks a coerced primitive in the JSON depiction (via the `override` of `toJSONSchema`). */
 export const coerceMarker = "x-coerce";
 
+const ttt = new Set(["array", "object"]); // @todo naming
+
 /**
  * @desc Whether the given JSON schema is acceptable as a query/path parameter.
  * @desc Mostly strings or coerced primitives. Query parser can also accept certain arrays and objects.
@@ -159,7 +161,11 @@ export const isParamAcceptable = (
   if (subject.allOf)
     return subject.allOf.every((one) => isParamAcceptable(one, location));
   if (subject.type === undefined || subject.type === "string") return true;
-  if (location === "query" && ["array", "object"].includes(subject.type)) {
+  // @todo consider doing this within condition below
+  const isObjectOrArray = Array.isArray(subject.type)
+    ? Boolean(ttt.intersection(new Set(subject.type)).size)
+    : ttt.has(subject.type);
+  if (location === "query" && isObjectOrArray) {
     const sub = [
       subject.items,
       subject.prefixItems,

@@ -14,6 +14,7 @@ dedupePeers: true
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - eslint-plugin-allowed-dependencies # maintained by myself
+  - zod
 publicHoistPattern:
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
   - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
@@ -37,7 +38,7 @@ catalogs:
     "http-errors": "^2.0.1"
     "typescript": "npm:@typescript/typescript6@^6.0.2"
     "@typescript/native-preview": "npm:typescript@^7.0.2" # the name used by tsdown
-    "zod": "^4.4.3"
+    "zod": "^4.5.0"
 overrides:
   "@scarf/scarf": "-"
   "lightningcss": "-"
