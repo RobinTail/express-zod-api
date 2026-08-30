@@ -186,14 +186,15 @@ export const isParamAcceptable = (
   if (subject.allOf)
     return subject.allOf.every((one) => isParamAcceptable(one, location));
   if (subject.type === undefined || subject.type === "string") return true;
-  if (location === "path") return false;
-  let isObjectOrArray = false;
   if (Array.isArray(subject.type)) {
-    const types = new Set(subject.type);
-    if (types.difference(acceptableComplexTypes).size) return false; // contains something besides array and object
-    isObjectOrArray = Boolean(acceptableComplexTypes.intersection(types).size);
-  } else {
-    isObjectOrArray = acceptableComplexTypes.has(subject.type);
+    return isParamAcceptable(
+      { anyOf: subject.type.map((type) => ({ ...subject, type })) }, // @since 4.5.0
+      location,
+    );
   }
-  return isObjectOrArray && _hasAcceptableInterior(subject, location);
+  if (location === "path") return false;
+  return (
+    acceptableComplexTypes.has(subject.type) &&
+    _hasAcceptableInterior(subject, location)
+  );
 };

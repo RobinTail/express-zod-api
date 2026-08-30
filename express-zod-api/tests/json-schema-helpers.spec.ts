@@ -380,6 +380,18 @@ describe("JSON Schema helpers", () => {
     );
 
     test.each(["query", "path"] as const)(
+      "multitype is treated as anyOf in %s",
+      (location) => {
+        expect(
+          isParamAcceptable({ type: ["string", "number"] }, location),
+        ).toBe(true);
+        expect(
+          isParamAcceptable({ type: ["boolean", "number"] }, location),
+        ).toBe(false);
+      },
+    );
+
+    test.each(["query", "path"] as const)(
       "allOf is acceptable in %s when all members are",
       (location) => {
         expect(
