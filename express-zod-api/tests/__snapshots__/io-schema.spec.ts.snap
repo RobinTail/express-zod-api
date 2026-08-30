@@ -3,39 +3,63 @@
 exports[`I/O Schema and related helpers > ensureExtension() > Should merge intersection object schemas 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "allOf": [
+  "additionalProperties": false,
+  "properties": {
+    "five": {
+      "type": "string",
+    },
+    "four": {
+      "type": "boolean",
+    },
+    "one": {
+      "type": "string",
+    },
+    "six": {
+      "type": "number",
+    },
+    "three": {
+      "type": "null",
+    },
+    "two": {
+      "type": "number",
+    },
+  },
+  "required": [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`I/O Schema and related helpers > ensureExtension() > Should merge mixed object schemas 1`] = `
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
     {
       "additionalProperties": false,
       "properties": {
+        "five": {
+          "type": "string",
+        },
         "one": {
           "type": "string",
         },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
+        "three": {
+          "type": "null",
+        },
         "two": {
           "type": "number",
         },
       },
       "required": [
+        "one",
         "two",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "three": {
-          "type": "null",
-        },
-      },
-      "required": [
+        "five",
         "three",
       ],
       "type": "object",
@@ -43,108 +67,24 @@ exports[`I/O Schema and related helpers > ensureExtension() > Should merge inter
     {
       "additionalProperties": false,
       "properties": {
-        "four": {
-          "type": "boolean",
-        },
-      },
-      "required": [
-        "four",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
         "five": {
           "type": "string",
         },
-      },
-      "required": [
-        "five",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "six": {
-          "type": "number",
+        "four": {
+          "type": "boolean",
         },
-      },
-      "required": [
-        "six",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`I/O Schema and related helpers > ensureExtension() > Should merge mixed object schemas 1`] = `
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "allOf": [
-    {
-      "additionalProperties": false,
-      "properties": {
         "one": {
           "type": "string",
         },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
         "two": {
           "type": "number",
         },
       },
       "required": [
+        "one",
         "two",
-      ],
-      "type": "object",
-    },
-    {
-      "anyOf": [
-        {
-          "additionalProperties": false,
-          "properties": {
-            "three": {
-              "type": "null",
-            },
-          },
-          "required": [
-            "three",
-          ],
-          "type": "object",
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "four": {
-              "type": "boolean",
-            },
-          },
-          "required": [
-            "four",
-          ],
-          "type": "object",
-        },
-      ],
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "five": {
-          "type": "string",
-        },
-      },
-      "required": [
         "five",
+        "four",
       ],
       "type": "object",
     },
@@ -253,55 +193,27 @@ Error({
 exports[`I/O Schema and related helpers > makeFinalInputSchema() > Should merge input object schemas 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "allOf": [
-    {
-      "additionalProperties": false,
-      "properties": {
-        "one": {
-          "type": "string",
-        },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "four": {
+      "type": "boolean",
     },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "two": {
-          "type": "number",
-        },
-      },
-      "required": [
-        "two",
-      ],
-      "type": "object",
+    "one": {
+      "type": "string",
     },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "three": {
-          "type": "null",
-        },
-      },
-      "required": [
-        "three",
-      ],
-      "type": "object",
+    "three": {
+      "type": "null",
     },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "four": {
-          "type": "boolean",
-        },
-      },
-      "required": [
-        "four",
-      ],
-      "type": "object",
+    "two": {
+      "type": "number",
     },
+  },
+  "required": [
+    "one",
+    "two",
+    "three",
+    "four",
   ],
+  "type": "object",
 }
 `;

@@ -238,6 +238,11 @@ describe("Environment checks", () => {
       expect(metaBeta).toBeTruthy();
       expect(metaAlpha.id).toBe(metaBeta.id);
     });
+
+    test("depicting intersection of objects is a flat object", () => {
+      const c = z.object({ a: z.string() }).and(z.object({ b: z.string() }));
+      expect(c.toJSONSchema()).not.toHaveProperty("allOf"); // @since 4.5.0
+    });
   });
 
   describe("Node.js HTTP method support", () => {
