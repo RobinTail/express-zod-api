@@ -145,8 +145,8 @@ export const coerceMarker = "x-coerce";
 
 const ttt = new Set(["array", "object"]); // @todo naming
 
-/** @todo naming */
-const mmm = (
+/** @desc Verifies that parameter typed as array or object has acceptable props or items */
+const _hasAcceptableInterior = (
   subject: z.core.JSONSchema.BaseSchema,
   location: "path" | "query",
 ) => {
@@ -194,5 +194,5 @@ export const isParamAcceptable = (
   } else {
     isObjectOrArray = ttt.has(subject.type);
   }
-  return isObjectOrArray && mmm(subject, location);
+  return isObjectOrArray && _hasAcceptableInterior(subject, location);
 };
