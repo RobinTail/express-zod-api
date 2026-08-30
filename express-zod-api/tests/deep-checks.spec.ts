@@ -91,6 +91,15 @@ describe("Checks", () => {
         expect(result).toBeTruthy();
       },
     );
+
+    test.each(["input", "output"] as const)(
+      "can detect a bare self-reference %#",
+      (io) => {
+        const schema: z.core.$ZodType = z.lazy(() => schema);
+        const result = hasCycle(schema, { io });
+        expect(result).toBeTruthy();
+      },
+    );
   });
 
   test.each(["input", "output"] as const)(
