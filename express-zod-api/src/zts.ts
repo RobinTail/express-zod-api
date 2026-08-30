@@ -83,7 +83,7 @@ const onObject: Producer = (
         const { description: comment, deprecated: isDeprecated } =
           globalRegistry.get(value) || {};
         const isOptional =
-          (isResponse ? value._zod.optout : value._zod.optin) === "optional";
+          (isResponse ? value._zod.optout : value._zod.optin) !== undefined;
         const hasUndefined =
           isOptional && !(value instanceof z.core.$ZodExactOptional);
         return makeInterfaceProp(key, next(value), {
