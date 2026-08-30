@@ -143,7 +143,8 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
 /** @desc Marks a coerced primitive in the JSON depiction (via the `override` of `toJSONSchema`). */
 export const coerceMarker = "x-coerce";
 
-const ttt = new Set(["array", "object"]); // @todo naming
+/** @desc Query param types that can be parsed conditionally */
+const acceptableComplexTypes = new Set(["array", "object"]); // @todo naming
 
 /** @desc Verifies that parameter typed as array or object has acceptable props or items */
 const _hasAcceptableInterior = (
@@ -189,10 +190,10 @@ export const isParamAcceptable = (
   let isObjectOrArray = false;
   if (Array.isArray(subject.type)) {
     const types = new Set(subject.type);
-    if (types.difference(ttt).size) return false; // contains something besides array and object
-    isObjectOrArray = Boolean(ttt.intersection(types).size);
+    if (types.difference(acceptableComplexTypes).size) return false; // contains something besides array and object
+    isObjectOrArray = Boolean(acceptableComplexTypes.intersection(types).size);
   } else {
-    isObjectOrArray = ttt.has(subject.type);
+    isObjectOrArray = acceptableComplexTypes.has(subject.type);
   }
   return isObjectOrArray && _hasAcceptableInterior(subject, location);
 };
