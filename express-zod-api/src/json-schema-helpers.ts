@@ -162,9 +162,14 @@ export const isParamAcceptable = (
     return subject.allOf.every((one) => isParamAcceptable(one, location));
   if (subject.type === undefined || subject.type === "string") return true;
   if (location === "path") return false;
-  const isObjectOrArray = Array.isArray(subject.type)
-    ? Boolean(ttt.intersection(new Set(subject.type)).size)
-    : ttt.has(subject.type);
+  let isObjectOrArray = false;
+  if (Array.isArray(subject.type)) {
+    const types = new Set(subject.type);
+    if (types.difference(ttt).size) return false; // contains something besides array and object
+    isObjectOrArray = Boolean(ttt.intersection(types).size);
+  } else {
+    isObjectOrArray = ttt.has(subject.type);
+  }
   if (isObjectOrArray) {
     const sub = [
       subject.items,
