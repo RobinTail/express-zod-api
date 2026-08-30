@@ -200,6 +200,13 @@ describe("Environment checks", () => {
       expect(boolSchema.isNullable()).toBeTruthy();
     });
 
+    test("nullable depicted as multitype", () => {
+      expect(z.string().nullable().toJSONSchema().type).toEqual([
+        "string",
+        "null",
+      ]);
+    });
+
     /** @link https://github.com/colinhacks/zod/issues/4274 */
     test.each(["input", "output"] as const)(
       "%s examples of transformations",
