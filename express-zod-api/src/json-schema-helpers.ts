@@ -144,7 +144,7 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
 export const coerceMarker = "x-coerce";
 
 /** @desc Query param types that can be parsed conditionally */
-const acceptableComplexTypes = new Set(["array", "object"]); // @todo naming
+const acceptableComplexTypes = new Set(["array", "object"]);
 
 /** @desc Verifies that parameter typed as array or object has acceptable props or items */
 const _hasAcceptableInterior = (
