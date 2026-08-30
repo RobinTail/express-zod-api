@@ -92,4 +92,12 @@ describe("Checks", () => {
       },
     );
   });
+
+  test.each(["input", "output"] as const)(
+    "should avoid false-positive results for non-cyclic schemas having id %#",
+    (io) => {
+      const schema = z.object({ title: z.string() }).meta({ id: "Feature" });
+      expect(hasCycle(schema, { io })).toBe(false);
+    },
+  );
 });
