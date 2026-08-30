@@ -145,6 +145,30 @@ export const coerceMarker = "x-coerce";
 
 const ttt = new Set(["array", "object"]); // @todo naming
 
+/** @todo naming */
+const mmm = (
+  subject: z.core.JSONSchema.BaseSchema,
+  location: "path" | "query",
+) => {
+  const sub = [
+    subject.items,
+    subject.prefixItems,
+    subject.additionalItems,
+    Object.values(subject.properties ?? {}),
+    subject.additionalProperties,
+    subject.propertyNames,
+  ];
+  for (const nested of sub) {
+    if (!isObject(nested)) continue;
+    const arr = Array.isArray(nested) ? nested : [nested];
+    for (const item of arr) {
+      if (!isObject(item)) continue;
+      if (!isParamAcceptable(item, location)) return false;
+    }
+  }
+  return true;
+};
+
 /**
  * @desc Whether the given JSON schema is acceptable as a query/path parameter.
  * @desc Mostly strings or coerced primitives. Query parser can also accept certain arrays and objects.
@@ -170,24 +194,5 @@ export const isParamAcceptable = (
   } else {
     isObjectOrArray = ttt.has(subject.type);
   }
-  if (isObjectOrArray) {
-    const sub = [
-      subject.items,
-      subject.prefixItems,
-      subject.additionalItems,
-      Object.values(subject.properties ?? {}),
-      subject.additionalProperties,
-      subject.propertyNames,
-    ];
-    for (const nested of sub) {
-      if (!isObject(nested)) continue;
-      const arr = Array.isArray(nested) ? nested : [nested];
-      for (const item of arr) {
-        if (!isObject(item)) continue;
-        if (!isParamAcceptable(item, location)) return false;
-      }
-    }
-    return true;
-  }
-  return false;
+  return isObjectOrArray && mmm(subject, location);
 };
