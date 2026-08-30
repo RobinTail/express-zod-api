@@ -176,7 +176,7 @@ describe("Environment checks", () => {
       expect(schema._zod.def.shape.one._zod.optout).toBeUndefined();
       expect(schema._zod.def.shape.two._zod.optin).toBe("optional");
       expect(schema._zod.def.shape.two._zod.optout).toBe("optional");
-      expect(schema._zod.def.shape.three._zod.optin).toBe("optional");
+      expect(schema._zod.def.shape.three._zod.optin).toBe("defaulted"); // @since 4.5.0
       expect(schema._zod.def.shape.three._zod.optout).toBe(undefined);
       expect(schema._zod.def.shape.four._zod.optin).toBe("optional");
       expect(schema._zod.def.shape.four._zod.optout).toBe(undefined);
