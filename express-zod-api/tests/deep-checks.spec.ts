@@ -75,5 +75,21 @@ describe("Checks", () => {
         expect(result).toBeTruthy();
       },
     );
+
+    test.each(["input", "output"] as const)(
+      "can handle references having meta id %#",
+      (io) => {
+        const schema = z
+          .object({
+            title: z.string(),
+            get features() {
+              return z.array(schema).optional();
+            },
+          })
+          .meta({ id: "Feature" });
+        const result = hasCycle(schema, { io });
+        expect(result).toBeTruthy();
+      },
+    );
   });
 });

@@ -38,6 +38,7 @@ export const hasCycle = (
   { io }: Pick<NestedSchemaLookupProps, "io">,
 ) => {
   const json = z.toJSONSchema(subject, { io, unrepresentable: "any" });
+  if (json.$ref?.startsWith("#/$defs/")) return true; // @since 4.5.0, has id meta
   const stack: unknown[] = [json];
   for (let idx = 0; idx < stack.length; idx++) {
     const entry = stack[idx];
