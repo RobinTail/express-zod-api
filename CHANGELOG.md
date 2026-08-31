@@ -4,7 +4,8 @@
 
 ### v30.0.0
 
-- Supported Zod versions: `^4.5.4`.
+- Supported Zod versions: `^4.5.4`:
+  - Using [compiled](https://zod.dev/compile) I/O schemas for Endpoint runtime performance boost.
 - Supported TypeScript versions (optional peer): `^6.0.3`:
   - Entirely `#private` props are now restored in the classes of the distributed `.d.ts` files.
 - `DocumentationError` removed from main entrypoint: import from `express-zod-api/documentation` instead.
