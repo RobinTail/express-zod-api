@@ -13,7 +13,7 @@ import {
 import type { NormalizedResponse } from "./api-response";
 
 /** @since zod 3.25.61 output type fixed */
-export const emptySchema = z.object({});
+export const emptySchema = z.compile(z.object({}));
 export type EmptySchema = typeof emptySchema;
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = z.output<EmptySchema>;
