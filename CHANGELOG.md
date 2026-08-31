@@ -2,6 +2,13 @@
 
 ## Version 29
 
+### v29.4.1
+
+- Compatibility fix for Zod 4.5:
+  - Schemas with `.meta({ id })` could cause stack overflow for Integration generator;
+  - Input schemas with object properties with `.default()` could be depicted as required by Integration generator;
+  - Self-diagnostics could falsely warn on query parameter schema that would not accept the parsed data.
+
 ### v29.4.0
 
 - Added the `Documentation::resolve()` method:
