@@ -17,11 +17,11 @@ describe("Environment checks", () => {
     test.each(["2021-01-32", "22/01/2022", "2021-01-31T25:00:00.000Z"])(
       "should detect invalid date %#",
       (str) => {
-        expect(z.date().safeParse(new Date(str)).success).toBeFalsy();
-        expect(z.string().date().safeParse(str).success).toBeFalsy();
-        expect(z.string().datetime().safeParse(str).success).toBeFalsy();
-        expect(z.iso.date().safeParse(str).success).toBeFalsy();
-        expect(z.iso.datetime().safeParse(str).success).toBeFalsy();
+        expect(z.validate(z.date(), new Date(str))).toBeFalsy();
+        expect(z.validate(z.string().date(), str)).toBeFalsy();
+        expect(z.validate(z.string().datetime(), str)).toBeFalsy();
+        expect(z.validate(z.iso.date(), str)).toBeFalsy();
+        expect(z.validate(z.iso.datetime(), str)).toBeFalsy();
       },
     );
   });
@@ -89,10 +89,10 @@ describe("Environment checks", () => {
       expect(real).toHaveProperty("message");
     });
 
-    test("z.enum() can be empty, but z.literal() can not", () => {
+    test("both z.enum() and z.literal() can be empty", () => {
       expect(z.enum([])._zod.def.entries).toEqual({});
-      /** @since 4.0.9 4e7a3ef180f6a5525d9021638e9df20b3ca50456 */
-      expect(() => z.literal([])).toThrow(/no valid values/);
+      /** @since 4.5.0 https://github.com/colinhacks/zod/pull/6459, 4.0.9 — 4.3.4 throws */
+      expect(z.literal([])._zod.def.values).toEqual([]);
     });
 
     test.each([z.coerce.number(), z.preprocess(Number, z.number())])(
@@ -176,7 +176,7 @@ describe("Environment checks", () => {
       expect(schema._zod.def.shape.one._zod.optout).toBeUndefined();
       expect(schema._zod.def.shape.two._zod.optin).toBe("optional");
       expect(schema._zod.def.shape.two._zod.optout).toBe("optional");
-      expect(schema._zod.def.shape.three._zod.optin).toBe("optional");
+      expect(schema._zod.def.shape.three._zod.optin).toBe("defaulted"); // @since 4.5.0
       expect(schema._zod.def.shape.three._zod.optout).toBe(undefined);
       expect(schema._zod.def.shape.four._zod.optin).toBe("optional");
       expect(schema._zod.def.shape.four._zod.optout).toBe(undefined);
@@ -198,6 +198,13 @@ describe("Environment checks", () => {
       const boolSchema = z.coerce.boolean();
       expect(boolSchema.isOptional()).toBeTruthy();
       expect(boolSchema.isNullable()).toBeTruthy();
+    });
+
+    test("nullable depicted as multitype", () => {
+      expect(z.string().nullable().toJSONSchema().type).toEqual([
+        "string",
+        "null",
+      ]);
     });
 
     /** @link https://github.com/colinhacks/zod/issues/4274 */
@@ -237,6 +244,17 @@ describe("Environment checks", () => {
       expect(metaAlpha).toBeTruthy();
       expect(metaBeta).toBeTruthy();
       expect(metaAlpha.id).toBe(metaBeta.id);
+    });
+
+    test("depicting intersection of objects is a flat object", () => {
+      const c = z.object({ a: z.string() }).and(z.object({ b: z.string() }));
+      expect(c.toJSONSchema()).not.toHaveProperty("allOf"); // @since 4.5.0
+    });
+
+    // @todo require zod 4.5 and use compiled schemas everywhere
+    test("compiled schemas have identical shape", () => {
+      const schema = z.iso.date();
+      expect(Object.keys(z.compile(schema))).toEqual(Object.keys(schema));
     });
   });
 

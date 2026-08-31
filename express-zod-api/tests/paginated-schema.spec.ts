@@ -88,19 +88,19 @@ describe("ez.paginated()", () => {
       });
 
       test("rejects limit above maxLimit", () => {
-        const result = pagination.input.safeParse({
+        const result = z.validate(pagination.input, {
           limit: "101",
           offset: "0",
         });
-        expect(result.success).toBe(false);
+        expect(result).toBe(false);
       });
 
       test("rejects negative offset", () => {
-        const result = pagination.input.safeParse({
+        const result = z.validate(pagination.input, {
           limit: "10",
           offset: "-1",
         });
-        expect(result.success).toBe(false);
+        expect(result).toBe(false);
       });
 
       test("accepts custom defaultLimit and maxLimit", () => {
@@ -115,8 +115,8 @@ describe("ez.paginated()", () => {
         if (result.success)
           expect(result.data).toEqual({ limit: 10, offset: 0 });
 
-        const overMax = custom.input.safeParse({ limit: "51" });
-        expect(overMax.success).toBe(false);
+        const overMax = z.validate(custom.input, { limit: "51" });
+        expect(overMax).toBe(false);
       });
     });
 
@@ -149,12 +149,12 @@ describe("ez.paginated()", () => {
       });
 
       test("rejects missing required fields", () => {
-        const result = outputSchema.safeParse({
+        const result = z.validate(outputSchema, {
           items: [],
           total: 0,
           // missing limit, offset
         });
-        expect(result.success).toBe(false);
+        expect(result).toBe(false);
       });
     });
   });
@@ -192,8 +192,8 @@ describe("ez.paginated()", () => {
       });
 
       test("rejects limit above maxLimit", () => {
-        const result = pagination.input.safeParse({ limit: "51" });
-        expect(result.success).toBe(false);
+        const result = z.validate(pagination.input, { limit: "51" });
+        expect(result).toBe(false);
       });
     });
 
@@ -221,12 +221,12 @@ describe("ez.paginated()", () => {
       });
 
       test("accepts nextCursor null", () => {
-        const result = outputSchema.safeParse({
+        const result = z.validate(outputSchema, {
           items: [],
           nextCursor: null,
           limit: 20,
         });
-        expect(result.success).toBe(true);
+        expect(result).toBe(true);
       });
     });
   });

@@ -44,8 +44,8 @@ catalogs:
       specifier: npm:@typescript/typescript6@^6.0.2
       version: 6.0.2
     zod:
-      specifier: ^4.4.3
-      version: 4.4.3
+      specifier: ^4.5.0
+      version: 4.5.4
   prod:
     ramda:
       specifier: ^0.32.0
@@ -79,7 +79,7 @@ importers:
         version: 9.1.7
       openai:
         specifier: ^7.0.0
-        version: 7.5.0(zod@4.4.3)
+        version: 7.5.0(zod@4.5.4)
       oxfmt:
         specifier: 0.64.0
         version: 0.64.0
@@ -106,7 +106,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.4.3
+        version: 4.5.4
 
   compat-test:
     devDependencies:
@@ -136,7 +136,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.4.3
+        version: 4.5.4
 
   example:
     devDependencies:
@@ -169,7 +169,7 @@ importers:
         version: '@typescript/typescript6@6.0.2'
       zod:
         specifier: catalog:dev
-        version: 4.4.3
+        version: 4.5.4
 
   express-zod-api:
     dependencies:
@@ -260,7 +260,7 @@ importers:
         version: 8.10.0
       zod:
         specifier: catalog:dev
-        version: 4.4.3
+        version: 4.5.4
 
   issue952-test:
     dependencies:
@@ -278,7 +278,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.4.3
+        version: 4.5.4
 
   migration:
     dependencies:
@@ -307,7 +307,7 @@ importers:
         version: 3.0.0
       zod:
         specifier: catalog:dev
-        version: 4.4.3
+        version: 4.5.4
 
 packages:
 
@@ -1949,8 +1949,8 @@ packages:
   zod@4.3.4:
     resolution: {integrity: sha512-Zw/uYiiyF6pUT1qmKbZziChgNPRu+ZRneAsMUDU6IwmXdWt5JwcUfy2bvLOCUtz5UniaN/Zx5aFttZYbYc7O/A==}
 
-  zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+  zod@4.5.4:
+    resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
 
 snapshots:
 
@@ -2873,9 +2873,9 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@7.5.0(zod@4.4.3):
+  openai@7.5.0(zod@4.5.4):
     optionalDependencies:
-      zod: 4.4.3
+      zod: 4.5.4
 
   openapi3-ts@4.6.1:
     dependencies:
@@ -3306,4 +3306,4 @@ snapshots:
 
   zod@4.3.4: {}
 
-  zod@4.4.3: {}
+  zod@4.5.4: {}
