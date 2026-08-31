@@ -192,7 +192,7 @@ export class EndpointsFactory<
    * */
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
     input = emptySchema as unknown as BIN,
-    output: outputSchema,
+    output,
     operationId,
     scope,
     tag,
@@ -214,7 +214,7 @@ export class EndpointsFactory<
     return new Endpoint({
       ...rest,
       middlewares,
-      outputSchema,
+      outputSchema: z.compile(output),
       resultHandler,
       scopes,
       tags,
