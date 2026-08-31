@@ -135,7 +135,7 @@ export const depictIntersection = R.tryCatch<Depicter>(
 
 /**
  * @since OAS 3.1 nullable replaced with type array having null
- * @todo require zod 4.5 and remove this
+ * @todo remove when it learns to merge types having additional props https://github.com/colinhacks/zod/pull/6339
  * */
 export const depictNullable: Depicter = ({ jsonSchema }) => {
   if (!jsonSchema.anyOf || !jsonSchema.anyOf.length) return jsonSchema;
