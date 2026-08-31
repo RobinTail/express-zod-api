@@ -48,6 +48,15 @@ else if (status === 400 || discriminator === "error")
 
 ## Version 29
 
+### v29.4.0
+
+- Added the `Documentation::resolve()` method:
+  - it returns a component referenced by an OpenAPI reference object `{ $ref: "#/components/..." }`.
+- Fixed a Documentation generation defect for input schemas of endpoints without middlewares having `.meta({ id })`:
+  - Putting `id` meta on the Endpoint input schema made the whole request depiction a reference, so path parameters
+    appeared missing, and the generator threw an error instead of producing the documentation;
+  - Found and reported by [@marco-carvalho](https://github.com/marco-carvalho).
+
 ### v29.3.4
 
 - Fixed mocked logger compatibility (returned by `testEndpoint()` and `testMiddleware()`);

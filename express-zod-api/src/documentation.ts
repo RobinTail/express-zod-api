@@ -13,6 +13,7 @@ import {
   type ServerObject,
   OpenApiBuilder,
   type RequestBodyObject,
+  isReferenceObject,
 } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { type ResponseVariant, responseVariants } from "./api-response";
@@ -152,6 +153,29 @@ export class Documentation extends OpenApiBuilder {
     return { $ref: `#/components/schemas/${name}` };
   }
 
+  /**
+   * @desc Resolves a ReferenceObject to the referenced schema. Non-reference input is returned as is.
+   * @see getSpec
+   * @example subject.resolve({ $ref: "#/components/schemas/UserInput" })
+   * */
+  public resolve<T extends SchemaObjectValue | z.core.JSONSchema.BaseSchema>(
+    subject: T,
+  ): T {
+    let current = subject;
+    const visited = new Set<string>(); // guarding against circular references
+    while (isReferenceObject(current)) {
+      if (visited.has(current.$ref)) return subject;
+      visited.add(current.$ref);
+      const resolved = R.path<T>(
+        current.$ref.split("/").slice(1),
+        this.rootDoc,
+      );
+      if (!resolved) return subject; // unresolvable reference
+      current = resolved;
+    }
+    return current as T;
+  }
+
   #ensureUniqOperationId(
     path: string,
     method: ClientMethod,
@@ -248,7 +272,8 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
-      const flatRequest = flattenIO(request);
+      const resolvedRequest = this.resolve(request);
+      const flatRequest = flattenIO(resolvedRequest);
       const depictedParams = depictRequestParams({
         ...commons,
         getLocation,
@@ -294,7 +319,12 @@ export class Documentation extends OpenApiBuilder {
       if (inputSources.includes("body")) {
         const paramNames = R.pluck("name", depictedParams);
         const [bodyJsonSchema, hasRequiredBodyProps] =
-          excludeParamsFromDepiction(request, paramNames);
+          excludeParamsFromDepiction(
+            paramNames.length
+              ? resolvedRequest // dereference the request so path params can be stripped from the body (issue #3659)
+              : request, // nothing to strip: reuse the shared component reference in the body (issue #3570)
+            paramNames,
+          );
         requestBody = depictBody({
           ...commons,
           bodyJsonSchema,
