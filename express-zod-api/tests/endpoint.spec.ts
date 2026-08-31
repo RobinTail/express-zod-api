@@ -300,7 +300,9 @@ describe("Endpoint", () => {
           output,
           handler: vi.fn(),
         });
-        expect(endpoint[prop]).toEqual(prop === "inputSchema" ? input : output);
+        expect(
+          R.path("_zod|def|shape|something|type".split("|"), endpoint[prop]),
+        ).toEqual(prop === "inputSchema" ? "number" : "string");
       });
     },
   );
@@ -455,9 +457,8 @@ describe("Endpoint", () => {
   describe(".getProbableRequestType()", () => {
     test("should return 'form' for QUERY method %#", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
+      const endpoint = factory.buildVoid({
         input: ez.raw(),
-        output: z.object({}),
         handler: vi.fn(),
       });
       expect(endpoint.getProbableRequestType()).toBe("raw");
@@ -473,11 +474,7 @@ describe("Endpoint", () => {
       "should return the one based on the input schema %#",
       ({ input, expected }) => {
         const factory = new EndpointsFactory(defaultResultHandler);
-        const endpoint = factory.build({
-          input,
-          output: z.object({}),
-          handler: vi.fn(),
-        });
+        const endpoint = factory.buildVoid({ input, handler: vi.fn() });
         expect(endpoint.getProbableRequestType()).toEqual(expected);
       },
     );

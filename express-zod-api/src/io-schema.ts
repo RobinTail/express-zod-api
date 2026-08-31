@@ -42,6 +42,6 @@ export const makeFinalInputSchema = <
   factorySchema: FIN,
   buildSchema: BIN,
 ) =>
-  (factorySchema
-    ? factorySchema.and(buildSchema)
-    : buildSchema) as FinalInputSchema<FIN, BIN>;
+  z.compile(
+    factorySchema ? factorySchema.and(buildSchema) : buildSchema,
+  ) as FinalInputSchema<FIN, BIN>;

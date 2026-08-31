@@ -53,14 +53,19 @@ export const hasCycle = (
   return false;
 };
 
-const isRequestDefiningBrand = Set.prototype.has.bind(
-  new Set([ezUploadBrand, ezRawBrand, ezFormBrand]),
-);
-export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
-  findNestedSchema(subject, {
-    condition: (schema) => isRequestDefiningBrand(getBrand(schema)),
+const requestDefiningBrands = new Set([ezUploadBrand, ezRawBrand, ezFormBrand]);
+export const findRequestTypeDefiningBrands = (subject: IOSchema) => {
+  const foundBrands = new Set<symbol | string | number>();
+  void z.toJSONSchema(subject, {
     io: "input",
+    unrepresentable: "any",
+    override: ({ zodSchema }) => {
+      const brand = getBrand(zodSchema);
+      if (brand) foundBrands.add(brand);
+    },
   });
+  return requestDefiningBrands.intersection(foundBrands);
+};
 
 const unsupported = new Set<FirstPartyKind>([
   "nan",
