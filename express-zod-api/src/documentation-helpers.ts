@@ -124,7 +124,7 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   };
 };
 
-/** @todo require min zod 4.5.0 and remove this */
+/** @todo remove when it learns to merge examples https://github.com/colinhacks/zod/pull/6461 */
 export const depictIntersection = R.tryCatch<Depicter>(
   ({ jsonSchema }) => {
     if (!jsonSchema.allOf) throw "no allOf";
