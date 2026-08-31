@@ -143,6 +143,33 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
 /** @desc Marks a coerced primitive in the JSON depiction (via the `override` of `toJSONSchema`). */
 export const coerceMarker = "x-coerce";
 
+/** @desc Query param types that can be parsed conditionally */
+const acceptableComplexTypes = new Set(["array", "object"]);
+
+/** @desc Verifies that parameter typed as array or object has acceptable props or items */
+const _hasAcceptableInterior = (
+  subject: z.core.JSONSchema.BaseSchema,
+  location: "path" | "query",
+) => {
+  const sub = [
+    subject.items,
+    subject.prefixItems,
+    subject.additionalItems,
+    Object.values(subject.properties ?? {}),
+    subject.additionalProperties,
+    subject.propertyNames,
+  ];
+  for (const nested of sub) {
+    if (!isObject(nested)) continue;
+    const arr = Array.isArray(nested) ? nested : [nested];
+    for (const item of arr) {
+      if (!isObject(item)) continue;
+      if (!isParamAcceptable(item, location)) return false;
+    }
+  }
+  return true;
+};
+
 /**
  * @desc Whether the given JSON schema is acceptable as a query/path parameter.
  * @desc Mostly strings or coerced primitives. Query parser can also accept certain arrays and objects.
@@ -159,24 +186,15 @@ export const isParamAcceptable = (
   if (subject.allOf)
     return subject.allOf.every((one) => isParamAcceptable(one, location));
   if (subject.type === undefined || subject.type === "string") return true;
-  if (location === "query" && ["array", "object"].includes(subject.type)) {
-    const sub = [
-      subject.items,
-      subject.prefixItems,
-      subject.additionalItems,
-      Object.values(subject.properties ?? {}),
-      subject.additionalProperties,
-      subject.propertyNames,
-    ];
-    for (const nested of sub) {
-      if (!isObject(nested)) continue;
-      const arr = Array.isArray(nested) ? nested : [nested];
-      for (const item of arr) {
-        if (!isObject(item)) continue;
-        if (!isParamAcceptable(item, location)) return false;
-      }
-    }
-    return true;
+  if (Array.isArray(subject.type)) {
+    return isParamAcceptable(
+      { anyOf: subject.type.map((type) => ({ ...subject, type })) }, // @since 4.5.0
+      location,
+    );
   }
-  return false;
+  if (location === "path") return false;
+  return (
+    acceptableComplexTypes.has(subject.type) &&
+    _hasAcceptableInterior(subject, location)
+  );
 };

@@ -25,15 +25,15 @@ describe("ez.buffer()", () => {
     test("should accept Buffer", () => {
       const schema = ez.buffer();
       const subject = Buffer.from("test", "utf-8");
-      const result = schema.safeParse(subject);
-      expect(result).toEqual({ success: true, data: subject });
+      const result = z.validate(schema, subject);
+      expect(result).toBe(true);
     });
 
     test("should accept data read into buffer", async () => {
       const schema = ez.buffer();
       const data = await readFile("../logo.svg");
-      const result = schema.safeParse(data);
-      expect(result).toEqual({ success: true, data });
+      const result = z.validate(schema, data);
+      expect(result).toBe(true);
     });
   });
 });

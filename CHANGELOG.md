@@ -48,6 +48,13 @@ else if (status === 400 || discriminator === "error")
 
 ## Version 29
 
+### v29.4.1
+
+- Compatibility fix for Zod 4.5:
+  - Cyclic schemas with `.meta({ id })` could cause stack overflow for Integration generator;
+  - Input schemas with object properties having `.default()` could be depicted as required by Integration generator;
+  - Self-diagnostics could falsely warn on query parameter schema that would not accept the parsed data.
+
 ### v29.4.0
 
 - Added the `Documentation::resolve()` method:

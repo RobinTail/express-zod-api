@@ -124,6 +124,7 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   };
 };
 
+/** @todo require min zod 4.5.0 and remove this */
 export const depictIntersection = R.tryCatch<Depicter>(
   ({ jsonSchema }) => {
     if (!jsonSchema.allOf) throw "no allOf";
@@ -132,7 +133,10 @@ export const depictIntersection = R.tryCatch<Depicter>(
   (_err, { jsonSchema }) => jsonSchema,
 );
 
-/** @since OAS 3.1 nullable replaced with type array having null */
+/**
+ * @since OAS 3.1 nullable replaced with type array having null
+ * @todo require zod 4.5 and remove this
+ * */
 export const depictNullable: Depicter = ({ jsonSchema }) => {
   if (!jsonSchema.anyOf || !jsonSchema.anyOf.length) return jsonSchema;
   const original = jsonSchema.anyOf[0]!;
