@@ -14,7 +14,7 @@ dedupePeers: true
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - eslint-plugin-allowed-dependencies # maintained by myself
-  - zod
+  - zod@4.5.4 # verified by Socket Security
 publicHoistPattern:
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
   - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
