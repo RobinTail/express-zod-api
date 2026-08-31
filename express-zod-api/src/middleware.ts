@@ -84,7 +84,7 @@ export class Middleware<
     handler: Handler<z.output<IN>, CTX, RET>;
   }) {
     super();
-    this.#schema = input as IN;
+    this.#schema = (input && z.compile(input)) as IN;
     this.#security = security;
     this.#statusCode = new FrozenSet(
       typeof statusCode === "number" ? [statusCode] : statusCode,
