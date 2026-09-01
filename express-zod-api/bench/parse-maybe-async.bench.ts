@@ -7,10 +7,10 @@ describe.each([
   [z.string().refine(async () => true), "async"],
 ])("Parsing $1 schemas", (schema) => {
   bench(".parseAsync()", async () => {
-    return void schema.parseAsync("");
+    await schema.parseAsync("");
   });
 
   bench("parseMaybeAsync()", async () => {
-    return void parseMaybeAsync(schema, "");
+    await parseMaybeAsync(schema, "");
   });
 });
