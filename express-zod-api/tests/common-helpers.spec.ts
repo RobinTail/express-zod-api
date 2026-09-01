@@ -434,6 +434,22 @@ describe("Common Helpers", () => {
       ).rejects.toBeInstanceOf(z.ZodError);
       expect(spy).not.toHaveBeenCalled();
     });
+
+    test("should set the state for an async schema and skip the sync attempt on the next call", async () => {
+      const schema = z.object({ str: z.string() }).refine(async () => true);
+      const parseSpy = vi.spyOn(schema, "parse");
+      const state = { syncImpossible: false };
+      await expect(
+        parseMaybeAsync(schema, { str: "test" }, state),
+      ).resolves.toEqual({ str: "test" });
+      expect(parseSpy).toHaveBeenCalledTimes(1); // the futile sync attempt
+      expect(state.syncImpossible).toBe(true);
+      parseSpy.mockClear();
+      await expect(
+        parseMaybeAsync(schema, { str: "again" }, state),
+      ).resolves.toEqual({ str: "again" });
+      expect(parseSpy).not.toHaveBeenCalled(); // straight to parseAsync
+    });
   });
 
   describe("makeCleanId()", () => {

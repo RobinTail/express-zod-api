@@ -90,6 +90,9 @@ export class Endpoint<
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
   #requestType?: ContentType;
+  /** @desc Set to true once a schema turns out to be async, to skip sync attempts in the future. */
+  #inputParsingState = { syncImpossible: false };
+  #outputParsingState = { syncImpossible: false };
 
   /** considered an expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
@@ -218,7 +221,11 @@ export class Endpoint<
   ): Promise<FlatObject> {
     try {
       return trySyncValidation
-        ? await parseMaybeAsync(this.#def.outputSchema, output)
+        ? await parseMaybeAsync(
+            this.#def.outputSchema,
+            output,
+            this.#outputParsingState,
+          )
         : await this.#def.outputSchema.parseAsync(output);
     } catch (e) {
       throw e instanceof z.ZodError ? new OutputValidationError(e) : e;
@@ -271,7 +278,11 @@ export class Endpoint<
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
       finalInput = trySyncValidation
-        ? await parseMaybeAsync(this.#def.inputSchema, input)
+        ? await parseMaybeAsync(
+            this.#def.inputSchema,
+            input,
+            this.#inputParsingState,
+          )
         : await this.#def.inputSchema.parseAsync(input);
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;

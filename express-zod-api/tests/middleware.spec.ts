@@ -136,6 +136,17 @@ describe("Middleware", () => {
         expect(refineMock).toHaveBeenCalledTimes(
           trySyncValidation ? 2 : 1, // sync attempt then parseAsync retry
         );
+        await mw.execute({
+          input: { test: "something else" },
+          ctx: {},
+          logger: loggerMock,
+          request: requestMock,
+          response: responseMock,
+          config: { trySyncValidation, cors: false },
+        });
+        expect(refineMock).toHaveBeenCalledTimes(
+          trySyncValidation ? 3 : 2, // the sync attempt is remembered and skipped
+        );
       },
     );
   });

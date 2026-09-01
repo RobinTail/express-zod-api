@@ -584,6 +584,38 @@ describe("Endpoint", () => {
         expect(outputRefinement).toHaveBeenCalledTimes(outputRefineCalls);
       },
     );
+
+    test("should skip the sync attempts for schemas already found to be async", async () => {
+      const mwRefinement = vi.fn(async (m: number) => m < 10);
+      const inputRefinement = vi.fn(async (n: number) => n > 100);
+      const outputRefinement = vi.fn(async (str: string) => str.length > 3);
+      const endpoint = buildAsyncRefinedEndpoint(
+        false,
+        mwRefinement,
+        inputRefinement,
+        outputRefinement,
+      );
+      const requestProps = {
+        method: "POST" as const,
+        body: { n: 123, m: 5 },
+      };
+      await testEndpoint({
+        endpoint,
+        configProps: { trySyncValidation: true },
+        requestProps,
+      });
+      expect(mwRefinement).toHaveBeenCalledTimes(4); // double execution on the first request
+      expect(inputRefinement).toHaveBeenCalledTimes(1);
+      expect(outputRefinement).toHaveBeenCalledTimes(2);
+      await testEndpoint({
+        endpoint,
+        configProps: { trySyncValidation: true },
+        requestProps,
+      });
+      expect(mwRefinement).toHaveBeenCalledTimes(6); // only 2 more calls on the second request
+      expect(inputRefinement).toHaveBeenCalledTimes(2);
+      expect(outputRefinement).toHaveBeenCalledTimes(3);
+    });
   });
 
   describe("Issue #514: Express native middlewares for OPTIONS request", () => {

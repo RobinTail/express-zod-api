@@ -59,6 +59,8 @@ export class Middleware<
   IN extends IOSchema | undefined = undefined,
 > extends AbstractMiddleware {
   readonly #schema: IN;
+  /** @desc Set to true once the input schema turns out to be async, to skip sync attempts in the future. */
+  #parsingState = { syncImpossible: false };
   readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
@@ -129,7 +131,7 @@ export class Middleware<
     const schema = this.#schema || emptySchema;
     try {
       const validInput = config?.trySyncValidation // @todo make it true by default in v30
-        ? await parseMaybeAsync(schema, input)
+        ? await parseMaybeAsync(schema, input, this.#parsingState)
         : await schema.parseAsync(input);
       return this.#handler({ ...rest, input: validInput as z.output<IN> });
     } catch (e) {
