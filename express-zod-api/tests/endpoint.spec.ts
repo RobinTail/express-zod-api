@@ -501,113 +501,51 @@ describe("Endpoint", () => {
   });
 
   describe("Issue #269: Async refinements", () => {
-    const buildAsyncRefinedEndpoint = (
-      shouldCompile: boolean,
-      mwRefinement: (m: number) => Promise<boolean>,
-      inputRefinement: (n: number) => Promise<boolean>,
-      outputRefinement: (str: string) => Promise<boolean>,
-    ) => {
-      const wrapper = <T extends z.ZodType>(schema: T) =>
-        shouldCompile ? z.compile(schema) : schema;
-      return new EndpointsFactory(defaultResultHandler)
-        .addMiddleware({
-          input: wrapper(z.object({ m: z.number().refine(mwRefinement) })),
-          handler: async () => ({}),
-        })
-        .build({
-          method: "post",
-          input: wrapper(z.object({ n: z.number().refine(inputRefinement) })),
-          output: wrapper(
-            z.object({
-              str: z.string().refine(outputRefinement),
-            }),
-          ),
-          handler: async () => ({ str: "This is fine" }),
+    test.each([{ trySyncValidation: false }, { trySyncValidation: true }])(
+      "should handle async refinements with %s config",
+      async (configProps) => {
+        const mwRefinement = vi.fn(async (m: number) => m < 10);
+        const inputRefinement = vi.fn(async (n: number) => n > 100);
+        const outputRefinement = vi.fn(async (str: string) => str.length > 3);
+        const endpoint = new EndpointsFactory(defaultResultHandler)
+          .addMiddleware({
+            input: z.object({ m: z.number().refine(mwRefinement) }),
+            handler: async () => ({}),
+          })
+          .build({
+            method: "post",
+            input: z.object({ n: z.number().refine(inputRefinement) }),
+            output: z.object({ str: z.string().refine(outputRefinement) }),
+            handler: async () => ({ str: "This is fine" }),
+          });
+        const attempt = () =>
+          testEndpoint({
+            endpoint,
+            requestProps: { method: "POST", body: { n: 123, m: 5 } },
+            configProps,
+          });
+        const { responseMock } = await attempt();
+        expect(responseMock._getJSONData()).toEqual({
+          status: "success",
+          data: { str: "This is fine" },
         });
-    };
-
-    test("should handle async refinements in the input and output schemas", async () => {
-      const mwRefinement = vi.fn(async (m: number) => m < 10);
-      const inputRefinement = vi.fn(async (n: number) => n > 100);
-      const outputRefinement = vi.fn(async (str: string) => str.length > 3);
-      const { responseMock } = await testEndpoint({
-        endpoint: buildAsyncRefinedEndpoint(
-          false,
-          mwRefinement,
-          inputRefinement,
-          outputRefinement,
-        ),
-        requestProps: {
-          method: "POST",
-          body: { n: 123, m: 5 },
-        },
-      });
-      expect(responseMock._getJSONData()).toEqual({
-        status: "success",
-        data: { str: "This is fine" },
-      });
-      expect(mwRefinement).toHaveBeenCalledTimes(2); // Middleware::execute(), Endpoint::execute()
-      expect(inputRefinement).toHaveBeenCalledTimes(1);
-      expect(outputRefinement).toHaveBeenCalledTimes(1);
-    });
-
-    test("should handle async refinements in compiled schemas with trySyncValidation", async () => {
-      const mwRefinement = vi.fn(async (m: number) => m < 10);
-      const inputRefinement = vi.fn(async (n: number) => n > 100);
-      const outputRefinement = vi.fn(async (str: string) => str.length > 3);
-      const { responseMock } = await testEndpoint({
-        endpoint: buildAsyncRefinedEndpoint(
-          true,
-          mwRefinement,
-          inputRefinement,
-          outputRefinement,
-        ),
-        configProps: { trySyncValidation: true },
-        requestProps: {
-          method: "POST",
-          body: { n: 123, m: 5 },
-        },
-      });
-      expect(responseMock._getJSONData()).toEqual({
-        status: "success",
-        data: { str: "This is fine" },
-      });
-      expect(mwRefinement).toHaveBeenCalledTimes(4); // Middleware::execute() x2, Endpoint::execute() x2
-      expect(inputRefinement).toHaveBeenCalledTimes(1); // hits Middlewares async during Endpoint::execute()
-      expect(outputRefinement).toHaveBeenCalledTimes(2); // Endpoint::execute() x2
-    });
-
-    test("should skip the sync attempts for schemas already found to be async", async () => {
-      const mwRefinement = vi.fn(async (m: number) => m < 10);
-      const inputRefinement = vi.fn(async (n: number) => n > 100);
-      const outputRefinement = vi.fn(async (str: string) => str.length > 3);
-      const endpoint = buildAsyncRefinedEndpoint(
-        false,
-        mwRefinement,
-        inputRefinement,
-        outputRefinement,
-      );
-      const requestProps = {
-        method: "POST" as const,
-        body: { n: 123, m: 5 },
-      };
-      await testEndpoint({
-        endpoint,
-        configProps: { trySyncValidation: true },
-        requestProps,
-      });
-      expect(mwRefinement).toHaveBeenCalledTimes(4); // double execution on the first request
-      expect(inputRefinement).toHaveBeenCalledTimes(1);
-      expect(outputRefinement).toHaveBeenCalledTimes(2);
-      await testEndpoint({
-        endpoint,
-        configProps: { trySyncValidation: true },
-        requestProps,
-      });
-      expect(mwRefinement).toHaveBeenCalledTimes(6); // only 2 more calls on the second request
-      expect(inputRefinement).toHaveBeenCalledTimes(2);
-      expect(outputRefinement).toHaveBeenCalledTimes(3);
-    });
+        expect(mwRefinement).toHaveBeenCalledTimes(
+          configProps.trySyncValidation ? 4 : 2,
+        );
+        expect(inputRefinement).toHaveBeenCalledTimes(1);
+        expect(outputRefinement).toHaveBeenCalledTimes(
+          configProps.trySyncValidation ? 2 : 1,
+        );
+        await attempt();
+        expect(mwRefinement).toHaveBeenCalledTimes(
+          configProps.trySyncValidation ? 6 : 4,
+        );
+        expect(inputRefinement).toHaveBeenCalledTimes(2);
+        expect(outputRefinement).toHaveBeenCalledTimes(
+          configProps.trySyncValidation ? 3 : 2,
+        );
+      },
+    );
   });
 
   describe("Issue #514: Express native middlewares for OPTIONS request", () => {
