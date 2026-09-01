@@ -435,8 +435,11 @@ describe("Common Helpers", () => {
       expect(asyncSpy).toHaveBeenCalled();
     });
 
-    test("should throw a ZodError on a synchronous validation failure", async () => {
-      const schema = z.object({ num: z.number() });
+    test.each([
+      z.object({ num: z.number() }),
+      z.object({ num: z.number() }).refine(() => true), // doesn't get into refinement
+    ])("should rethrow validation errors", async (schema) => {
+      const asyncSpy = vi.spyOn(schema, "parseAsync");
       await expect(
         parseMaybeAsync(
           schema,
@@ -444,21 +447,7 @@ describe("Common Helpers", () => {
           { trySyncValidation: true, cors: false },
         ),
       ).rejects.toBeInstanceOf(z.ZodError);
-    });
-
-    test("should NOT retry with parseAsync on a non-async validation failure", async () => {
-      const schema = z
-        .object({ num: z.number() })
-        .refine(() => true, "custom issue");
-      const spy = vi.spyOn(schema, "parseAsync");
-      await expect(
-        parseMaybeAsync(
-          schema,
-          { num: "test" },
-          { trySyncValidation: true, cors: false },
-        ),
-      ).rejects.toBeInstanceOf(z.ZodError);
-      expect(spy).not.toHaveBeenCalled();
+      expect(asyncSpy).not.toHaveBeenCalled();
     });
 
     test("should set the state for an async schema and skip the sync attempt on the next call", async () => {
