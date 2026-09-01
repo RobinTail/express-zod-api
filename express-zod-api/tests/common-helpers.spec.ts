@@ -406,7 +406,7 @@ describe("Common Helpers", () => {
     test.each([
       ["sync", { trySyncValidation: true }],
       ["async", { trySyncValidation: false }],
-    ])("should parse %s", async (variant, cfg) => {
+    ])("should parse %s depending on config", async (variant, cfg) => {
       const schema = z.object({ num: z.number() });
       const parseSpy = vi.spyOn(schema, "parse");
       const asyncSpy = vi.spyOn(schema, "parseAsync");
@@ -420,8 +420,10 @@ describe("Common Helpers", () => {
       expect(variant === "sync" ? asyncSpy : parseSpy).not.toHaveBeenCalled();
     });
 
-    test("should fall back to parseAsync for async refinements", async () => {
+    test("should fall back to async when sync parsing met async cb", async () => {
       const schema = z.object({ str: z.string() }).refine(async () => true);
+      const parseSpy = vi.spyOn(schema, "parse");
+      const asyncSpy = vi.spyOn(schema, "parseAsync");
       await expect(
         parseMaybeAsync(
           schema,
@@ -429,6 +431,8 @@ describe("Common Helpers", () => {
           { trySyncValidation: true, cors: false },
         ),
       ).resolves.toEqual({ str: "test" });
+      expect(parseSpy).toHaveBeenCalled();
+      expect(asyncSpy).toHaveBeenCalled();
     });
 
     test("should throw a ZodError on a synchronous validation failure", async () => {
