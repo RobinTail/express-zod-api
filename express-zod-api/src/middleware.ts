@@ -133,7 +133,7 @@ export class Middleware<
       const validInput = await parseMaybeAsync(
         schema,
         input,
-        config ?? ({} as CommonConfig),
+        config ?? {}, // @todo rm fallback in v30
         this.#parsingState,
       );
       return this.#handler({ ...rest, input: validInput as z.output<IN> });

@@ -410,11 +410,7 @@ describe("Common Helpers", () => {
       const schema = z.object({ num: z.number() });
       const parseSpy = vi.spyOn(schema, "parse");
       const asyncSpy = vi.spyOn(schema, "parseAsync");
-      const result = await parseMaybeAsync(
-        schema,
-        { num: 123 },
-        { cors: false, ...cfg },
-      );
+      const result = await parseMaybeAsync(schema, { num: 123 }, cfg);
       expectTypeOf(result).toEqualTypeOf<{ num: number }>();
       expect(result).toEqual({ num: 123 });
       expect(variant === "sync" ? asyncSpy : parseSpy).not.toHaveBeenCalled();
@@ -433,7 +429,7 @@ describe("Common Helpers", () => {
           parseMaybeAsync(
             schema,
             { str: "test" },
-            { trySyncValidation: true, cors: false },
+            { trySyncValidation: true },
             state,
           );
         await expect(attempt()).resolves.toEqual({ str: "test" });
@@ -452,11 +448,7 @@ describe("Common Helpers", () => {
     ])("should rethrow validation errors", async (schema) => {
       const asyncSpy = vi.spyOn(schema, "parseAsync");
       await expect(
-        parseMaybeAsync(
-          schema,
-          { num: "test" },
-          { trySyncValidation: true, cors: false },
-        ),
+        parseMaybeAsync(schema, { num: "test" }, { trySyncValidation: true }),
       ).rejects.toBeInstanceOf(z.ZodError);
       expect(asyncSpy).not.toHaveBeenCalled();
     });

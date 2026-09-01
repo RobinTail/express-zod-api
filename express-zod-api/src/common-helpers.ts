@@ -99,7 +99,7 @@ export const ensureError = (subject: unknown): Error =>
 export const parseMaybeAsync = async <T extends z.ZodType>(
   schema: T,
   value: unknown,
-  { trySyncValidation = false }: CommonConfig,
+  { trySyncValidation = false }: Partial<CommonConfig>, // @todo rm Partial in v30
   prev?: { isAsync: boolean }, // when already found to be async
 ): Promise<z.output<T>> => {
   if (!trySyncValidation || prev?.isAsync) return schema.parseAsync(value);
