@@ -133,7 +133,7 @@ export class Middleware<
       const validInput = await parseMaybeAsync(
         schema,
         input,
-        config?.trySyncValidation,
+        config ?? ({} as CommonConfig),
         this.#parsingState,
       );
       return this.#handler({ ...rest, input: validInput as z.output<IN> });

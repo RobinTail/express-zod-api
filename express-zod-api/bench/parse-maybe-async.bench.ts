@@ -11,6 +11,6 @@ describe.each([
   });
 
   bench("parseMaybeAsync()", async () => {
-    await parseMaybeAsync(schema, "", true);
+    await parseMaybeAsync(schema, "", { trySyncValidation: true, cors: false });
   });
 });

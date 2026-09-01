@@ -223,7 +223,7 @@ export class Endpoint<
       return await parseMaybeAsync(
         this.#def.outputSchema,
         output,
-        config.trySyncValidation,
+        config,
         this.#outputParsingState,
       );
     } catch (e) {
@@ -266,7 +266,7 @@ export class Endpoint<
 
   async #parseAndRunHandler({
     input,
-    config: { trySyncValidation },
+    config,
     ...rest
   }: {
     input: Readonly<FlatObject>;
@@ -279,7 +279,7 @@ export class Endpoint<
       finalInput = await parseMaybeAsync(
         this.#def.inputSchema,
         input,
-        trySyncValidation,
+        config,
         this.#inputParsingState,
       );
     } catch (e) {
