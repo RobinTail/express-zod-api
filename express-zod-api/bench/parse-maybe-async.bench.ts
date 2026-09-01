@@ -11,6 +11,6 @@ describe.each([
   });
 
   bench("parseMaybeAsync()", async () => {
-    await parseMaybeAsync(schema, "");
+    await parseMaybeAsync(schema, "", true);
   });
 });

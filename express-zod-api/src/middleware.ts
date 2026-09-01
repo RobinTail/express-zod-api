@@ -130,9 +130,12 @@ export class Middleware<
   }) {
     const schema = this.#schema || emptySchema;
     try {
-      const validInput = config?.trySyncValidation // @todo make it true by default in v30
-        ? await parseMaybeAsync(schema, input, this.#parsingState)
-        : await schema.parseAsync(input);
+      const validInput = await parseMaybeAsync(
+        schema,
+        input,
+        config?.trySyncValidation,
+        this.#parsingState,
+      );
       return this.#handler({ ...rest, input: validInput as z.output<IN> });
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;

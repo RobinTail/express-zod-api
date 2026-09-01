@@ -109,46 +109,29 @@ describe("Middleware", () => {
       });
     });
 
-    test.each([{ trySyncValidation: true }, { trySyncValidation: false }])(
-      "should handle async refinements in the input schema %#",
-      async ({ trySyncValidation }) => {
-        const refineMock = vi.fn(async () => true);
-        const handlerMock = vi.fn(async () => ({ result: "test" }));
-        const mw = new Middleware({
-          input: z.object({ test: z.string().refine(refineMock) }),
-          handler: handlerMock,
-        });
-        const loggerMock = makeLoggerMock();
-        const requestMock = makeRequestMock();
-        const responseMock = makeResponseMock();
-        const result = await mw.execute({
-          input: { test: "something" },
-          ctx: {},
-          logger: loggerMock,
-          request: requestMock,
-          response: responseMock,
-          config: { trySyncValidation, cors: false },
-        });
-        expect(result).toEqual({ result: "test" });
-        expect(handlerMock).toHaveBeenCalledWith(
-          expect.objectContaining({ input: { test: "something" } }),
-        );
-        expect(refineMock).toHaveBeenCalledTimes(
-          trySyncValidation ? 2 : 1, // sync attempt then parseAsync retry
-        );
-        await mw.execute({
-          input: { test: "something else" },
-          ctx: {},
-          logger: loggerMock,
-          request: requestMock,
-          response: responseMock,
-          config: { trySyncValidation, cors: false },
-        });
-        expect(refineMock).toHaveBeenCalledTimes(
-          trySyncValidation ? 3 : 2, // the sync attempt is remembered and skipped
-        );
-      },
-    );
+    test("should handle async refinements in the input schema with trySyncValidation", async () => {
+      const refineMock = vi.fn(async () => true);
+      const handlerMock = vi.fn(async () => ({ result: "test" }));
+      const mw = new Middleware({
+        input: z.object({ test: z.string().refine(refineMock) }),
+        handler: handlerMock,
+      });
+      const loggerMock = makeLoggerMock();
+      const requestMock = makeRequestMock();
+      const responseMock = makeResponseMock();
+      const commons = {
+        input: { test: "something" },
+        ctx: {},
+        logger: loggerMock,
+        request: requestMock,
+        response: responseMock,
+        config: { trySyncValidation: true, cors: false },
+      };
+      expect(await mw.execute(commons)).toEqual({ result: "test" });
+      expect(refineMock).toHaveBeenCalledTimes(2); // sync attempt then parseAsync retry
+      await mw.execute({ ...commons, input: { test: "something else" } });
+      expect(refineMock).toHaveBeenCalledTimes(3); // the sync attempt is remembered and skipped
+    });
   });
 });
 

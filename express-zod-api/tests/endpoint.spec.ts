@@ -526,64 +526,56 @@ describe("Endpoint", () => {
         });
     };
 
-    test.each([
-      {
-        name: "plain schemas, single execution via parseAsync",
-        shouldCompile: false,
-        mwRefineCalls: 2, // Middleware::execute(), Endpoint::execute()
-        inputRefineCalls: 1,
-        outputRefineCalls: 1,
-      },
-      {
-        name: "plain schemas with trySyncValidation enabled",
-        shouldCompile: false,
+    test("should handle async refinements in the input and output schemas", async () => {
+      const mwRefinement = vi.fn(async (m: number) => m < 10);
+      const inputRefinement = vi.fn(async (n: number) => n > 100);
+      const outputRefinement = vi.fn(async (str: string) => str.length > 3);
+      const { responseMock } = await testEndpoint({
+        endpoint: buildAsyncRefinedEndpoint(
+          false,
+          mwRefinement,
+          inputRefinement,
+          outputRefinement,
+        ),
+        requestProps: {
+          method: "POST",
+          body: { n: 123, m: 5 },
+        },
+      });
+      expect(responseMock._getJSONData()).toEqual({
+        status: "success",
+        data: { str: "This is fine" },
+      });
+      expect(mwRefinement).toHaveBeenCalledTimes(2); // Middleware::execute(), Endpoint::execute()
+      expect(inputRefinement).toHaveBeenCalledTimes(1);
+      expect(outputRefinement).toHaveBeenCalledTimes(1);
+    });
+
+    test("should handle async refinements in compiled schemas with trySyncValidation", async () => {
+      const mwRefinement = vi.fn(async (m: number) => m < 10);
+      const inputRefinement = vi.fn(async (n: number) => n > 100);
+      const outputRefinement = vi.fn(async (str: string) => str.length > 3);
+      const { responseMock } = await testEndpoint({
+        endpoint: buildAsyncRefinedEndpoint(
+          true,
+          mwRefinement,
+          inputRefinement,
+          outputRefinement,
+        ),
         configProps: { trySyncValidation: true },
-        mwRefineCalls: 4, // Middleware::execute() x2, Endpoint::execute() x2
-        inputRefineCalls: 1, // hits Middlewares async during Endpoint::execute()
-        outputRefineCalls: 2, // Endpoint::execute() x2
-      },
-      {
-        name: "compiled schemas with trySyncValidation enabled",
-        shouldCompile: true,
-        configProps: { trySyncValidation: true },
-        mwRefineCalls: 4, // Middleware::execute() x2, Endpoint::execute() x2
-        inputRefineCalls: 1, // hits Middlewares async during Endpoint::execute()
-        outputRefineCalls: 2, // Endpoint::execute() x2
-      },
-    ])(
-      "should handle async refinements for $name",
-      async ({
-        shouldCompile,
-        configProps,
-        mwRefineCalls,
-        inputRefineCalls,
-        outputRefineCalls,
-      }) => {
-        const mwRefinement = vi.fn(async (m: number) => m < 10);
-        const inputRefinement = vi.fn(async (n: number) => n > 100);
-        const outputRefinement = vi.fn(async (str: string) => str.length > 3);
-        const { responseMock } = await testEndpoint({
-          endpoint: buildAsyncRefinedEndpoint(
-            shouldCompile,
-            mwRefinement,
-            inputRefinement,
-            outputRefinement,
-          ),
-          configProps,
-          requestProps: {
-            method: "POST",
-            body: { n: 123, m: 5 },
-          },
-        });
-        expect(responseMock._getJSONData()).toEqual({
-          status: "success",
-          data: { str: "This is fine" },
-        });
-        expect(mwRefinement).toHaveBeenCalledTimes(mwRefineCalls);
-        expect(inputRefinement).toHaveBeenCalledTimes(inputRefineCalls);
-        expect(outputRefinement).toHaveBeenCalledTimes(outputRefineCalls);
-      },
-    );
+        requestProps: {
+          method: "POST",
+          body: { n: 123, m: 5 },
+        },
+      });
+      expect(responseMock._getJSONData()).toEqual({
+        status: "success",
+        data: { str: "This is fine" },
+      });
+      expect(mwRefinement).toHaveBeenCalledTimes(4); // Middleware::execute() x2, Endpoint::execute() x2
+      expect(inputRefinement).toHaveBeenCalledTimes(1); // hits Middlewares async during Endpoint::execute()
+      expect(outputRefinement).toHaveBeenCalledTimes(2); // Endpoint::execute() x2
+    });
 
     test("should skip the sync attempts for schemas already found to be async", async () => {
       const mwRefinement = vi.fn(async (m: number) => m < 10);

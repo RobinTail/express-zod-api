@@ -217,16 +217,15 @@ export class Endpoint<
 
   async #parseOutput(
     output: z.input<OUT>,
-    { trySyncValidation = false }: CommonConfig, // @todo set true in v30
+    config: CommonConfig,
   ): Promise<FlatObject> {
     try {
-      return trySyncValidation
-        ? await parseMaybeAsync(
-            this.#def.outputSchema,
-            output,
-            this.#outputParsingState,
-          )
-        : await this.#def.outputSchema.parseAsync(output);
+      return await parseMaybeAsync(
+        this.#def.outputSchema,
+        output,
+        config.trySyncValidation,
+        this.#outputParsingState,
+      );
     } catch (e) {
       throw e instanceof z.ZodError ? new OutputValidationError(e) : e;
     }
@@ -267,7 +266,7 @@ export class Endpoint<
 
   async #parseAndRunHandler({
     input,
-    config: { trySyncValidation = false }, // @todo set true in v30
+    config: { trySyncValidation },
     ...rest
   }: {
     input: Readonly<FlatObject>;
@@ -277,13 +276,12 @@ export class Endpoint<
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
-      finalInput = trySyncValidation
-        ? await parseMaybeAsync(
-            this.#def.inputSchema,
-            input,
-            this.#inputParsingState,
-          )
-        : await this.#def.inputSchema.parseAsync(input);
+      finalInput = await parseMaybeAsync(
+        this.#def.inputSchema,
+        input,
+        trySyncValidation,
+        this.#inputParsingState,
+      );
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
