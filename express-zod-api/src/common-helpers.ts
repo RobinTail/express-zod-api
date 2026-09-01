@@ -98,17 +98,17 @@ export const ensureError = (subject: unknown): Error =>
  * */
 export const parseMaybeAsync = async <T extends z.ZodType>(
   schema: T,
-  input: unknown,
+  value: unknown,
   { trySyncValidation = false }: CommonConfig,
   prev?: { isAsync: boolean }, // when already found to be async
 ): Promise<z.output<T>> => {
-  if (!trySyncValidation || prev?.isAsync) return schema.parseAsync(input);
+  if (!trySyncValidation || prev?.isAsync) return schema.parseAsync(value);
   try {
-    return schema.parse(input);
+    return schema.parse(value);
   } catch (err) {
     if (err instanceof z.core.$ZodAsyncError) {
       if (prev) prev.isAsync = true;
-      return schema.parseAsync(input);
+      return schema.parseAsync(value);
     }
     throw err;
   }

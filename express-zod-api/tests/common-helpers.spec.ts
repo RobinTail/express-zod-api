@@ -405,16 +405,15 @@ describe("Common Helpers", () => {
   describe("parseMaybeAsync()", () => {
     test("should parse synchronously when the schema is synchronous", async () => {
       const schema = z.object({ num: z.number() });
+      const asyncSpy = vi.spyOn(schema, "parseAsync");
       const result = await parseMaybeAsync(
         schema,
         { num: 123 },
-        {
-          trySyncValidation: true,
-          cors: false,
-        },
+        { trySyncValidation: true, cors: false },
       );
       expectTypeOf(result).toEqualTypeOf<{ num: number }>();
       expect(result).toEqual({ num: 123 });
+      expect(asyncSpy).not.toHaveBeenCalled();
     });
 
     test("should use parseAsync when the sync validation is not enabled", async () => {
