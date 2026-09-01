@@ -11,6 +11,7 @@ import type { IOSchema } from "./io-schema";
 import type { LogicalContainer } from "./logical-container";
 import type { Security } from "./security";
 import type { ActualLogger } from "./logger-helpers";
+import type { CommonConfig } from "./config-type";
 import { isPromise } from "node:util/types";
 
 type Handler<IN, CTX, RET> = (params: {
@@ -114,6 +115,7 @@ export class Middleware<
   /** @throws InputValidationError */
   public override async execute({
     input,
+    config,
     ...rest
   }: {
     input: unknown;
@@ -121,12 +123,13 @@ export class Middleware<
     request: Request;
     response: Response;
     logger: ActualLogger;
+    config?: CommonConfig; // @todo either make config required in v30 or remove it from here
   }) {
+    const schema = this.#schema || emptySchema;
     try {
-      const validInput = (await parseMaybeAsync(
-        this.#schema || emptySchema,
-        input,
-      )) as z.output<IN>;
+      const validInput = (await (config?.trySyncValidation
+        ? parseMaybeAsync(schema, input)
+        : schema.parseAsync(input))) as z.output<IN>;
       return this.#handler({ ...rest, input: validInput });
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;

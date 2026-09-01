@@ -2,6 +2,19 @@
 
 ## Version 29
 
+### v29.5.0
+
+- Added the `trySyncValidation` option to the configuration (opt-in, disabled by default):
+  - When enabled, the framework attempts a synchronous I/O `parse()` first, falling back to `parseAsync()` only for
+    schemas containing async refinements or transforms;
+  - This benefits [compiled](https://zod.dev/compile) schemas (Zod 4.5+) by keeping them on the fast parsing path;
+  - Even without schema compilation it gives a ~1.3x performance boost for synchronous I/O validation, but when hitting
+    an async schema, the performance decrease is ~14x, so it's an opt-in feature now;
+  - The flag is applied to the I/O schemas of `Endpoint` and the input schema of `Middleware`.
+- The `Middleware::execute()` now accepts optional `config` property on its argument:
+  - It might become required in v30;
+  - `testMiddleware()` now forwards the mocked configuration into the `Middleware::execute()`.
+
 ### v29.4.1
 
 - Compatibility fix for Zod 4.5:
@@ -5247,7 +5260,8 @@ const config = createConfig({
 ### v5.3.1
 
 - Fixed issue #269: async refinements in I/O schemas of endpoints and middlewares.
-  - There was an error `Async refinement encountered during synchronous parse operation. Use .parseAsync instead.`
+  - There was an error `Async refinement encountered during synchronous parse operation. Use .parseAsync instead.`;
+  - Found and reported by [@BlessedRaccoon](https://github.com/BlessedRaccoon).
 
 ### v5.3.0
 

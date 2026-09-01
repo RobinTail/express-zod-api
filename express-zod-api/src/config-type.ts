@@ -89,6 +89,14 @@ export interface CommonConfig {
    * @see defaultInputSources
    */
   inputSources?: Partial<InputSources>;
+  /**
+   * @desc Attempts using .parse() method first, falling back to .parseAsync() if fails due to async refinements.
+   * @example true — parses sync schemas ~1.3x faster, but it's ~14x slower if it occasionally hits an async one.
+   * @example false — always uses .parseAsync() and does not support compiled schemas (legacy behavior).
+   * @default false
+   * @todo remove in v30 or enable by default
+   */
+  trySyncValidation?: boolean;
 }
 
 type BeforeUpload = (params: {

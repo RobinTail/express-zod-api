@@ -137,15 +137,14 @@ export const testMiddleware = async <
   /** @desc The aggregated returns of previously executed middlewares */
   ctx?: FlatObject;
 }) => {
-  const {
-    configMock: { inputSources, errorHandler = defaultResultHandler },
-    ...mocks
-  } = makeTestingMocks(rest);
+  const { configMock, ...mocks } = makeTestingMocks(rest);
+  const { inputSources, errorHandler = defaultResultHandler } = configMock;
   const input = getInput(mocks.requestMock, inputSources);
   const commons = {
     request: mocks.requestMock,
     response: mocks.responseMock,
     logger: mocks.loggerMock,
+    config: configMock,
     input,
     ctx,
   };

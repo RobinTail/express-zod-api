@@ -109,24 +109,35 @@ describe("Middleware", () => {
       });
     });
 
-    test("should handle async refinements in the input schema", async () => {
-      const handlerMock = vi.fn(async () => ({ result: "test" }));
-      const mw = new Middleware({
-        input: z.object({ test: z.string().refine(async (s) => s.length > 3) }),
-        handler: handlerMock,
-      });
-      const result = await mw.execute({
-        input: { test: "something" },
-        ctx: {},
-        logger: makeLoggerMock(),
-        request: makeRequestMock(),
-        response: makeResponseMock(),
-      });
-      expect(result).toEqual({ result: "test" });
-      expect(handlerMock).toHaveBeenCalledWith(
-        expect.objectContaining({ input: { test: "something" } }),
-      );
-    });
+    test.each([{ trySyncValidation: true }, { trySyncValidation: false }])(
+      "should handle async refinements in the input schema %#",
+      async ({ trySyncValidation }) => {
+        const refineMock = vi.fn(async () => true);
+        const handlerMock = vi.fn(async () => ({ result: "test" }));
+        const mw = new Middleware({
+          input: z.object({ test: z.string().refine(refineMock) }),
+          handler: handlerMock,
+        });
+        const loggerMock = makeLoggerMock();
+        const requestMock = makeRequestMock();
+        const responseMock = makeResponseMock();
+        const result = await mw.execute({
+          input: { test: "something" },
+          ctx: {},
+          logger: loggerMock,
+          request: requestMock,
+          response: responseMock,
+          config: { trySyncValidation, cors: false },
+        });
+        expect(result).toEqual({ result: "test" });
+        expect(handlerMock).toHaveBeenCalledWith(
+          expect.objectContaining({ input: { test: "something" } }),
+        );
+        expect(refineMock).toHaveBeenCalledTimes(
+          trySyncValidation ? 2 : 1, // sync attempt then parseAsync retry
+        );
+      },
+    );
   });
 });
 

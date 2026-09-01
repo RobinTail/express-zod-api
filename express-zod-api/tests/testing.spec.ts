@@ -82,6 +82,25 @@ describe("Testing", () => {
       });
     });
 
+    test.each([{ trySyncValidation: true }, { trySyncValidation: false }])(
+      "Should forward config.trySyncValidation to the middleware %#",
+      async (configProps) => {
+        const refineMock = vi.fn(async () => true);
+        const { output } = await testMiddleware({
+          requestProps: { method: "POST", body: { test: "something" } },
+          configProps,
+          middleware: new Middleware({
+            input: z.object({ test: z.string().refine(refineMock) }),
+            handler: async () => ({}),
+          }),
+        });
+        expect(refineMock).toHaveBeenCalledTimes(
+          configProps.trySyncValidation ? 2 : 1,
+        ); // sync attempt then parseAsync retry
+        expect(output).toEqual({});
+      },
+    );
+
     test.each<CommonConfig["errorHandler"]>([
       undefined,
       new ResultHandler({

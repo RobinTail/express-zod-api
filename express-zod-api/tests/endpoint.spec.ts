@@ -501,77 +501,89 @@ describe("Endpoint", () => {
   });
 
   describe("Issue #269: Async refinements", () => {
-    test("should handle async refinements in input, output and middleware", async () => {
-      const endpoint = new EndpointsFactory(defaultResultHandler)
+    const buildAsyncRefinedEndpoint = (
+      shouldCompile: boolean,
+      mwRefinement: (m: number) => Promise<boolean>,
+      inputRefinement: (n: number) => Promise<boolean>,
+      outputRefinement: (str: string) => Promise<boolean>,
+    ) => {
+      const wrapper = <T extends z.ZodType>(schema: T) =>
+        shouldCompile ? z.compile(schema) : schema;
+      return new EndpointsFactory(defaultResultHandler)
         .addMiddleware({
-          input: z.object({
-            m: z.number().refine(async (m) => m < 10),
-          }),
+          input: wrapper(z.object({ m: z.number().refine(mwRefinement) })),
           handler: async () => ({}),
         })
         .build({
           method: "post",
-          input: z.object({
-            n: z.number().refine(async (n) => n > 100),
-          }),
-          output: z.object({
-            str: z.string().refine(async (str) => str.length > 3),
-          }),
-          handler: async () => ({
-            str: "This is fine",
-          }),
+          input: wrapper(z.object({ n: z.number().refine(inputRefinement) })),
+          output: wrapper(
+            z.object({
+              str: z.string().refine(outputRefinement),
+            }),
+          ),
+          handler: async () => ({ str: "This is fine" }),
         });
-      const { responseMock } = await testEndpoint({
-        endpoint,
-        requestProps: {
-          method: "POST",
-          body: { n: 123, m: 5 },
-        },
-      });
-      expect(responseMock._getJSONData()).toEqual({
-        status: "success",
-        data: { str: "This is fine" },
-      });
-    });
+    };
 
-    test("should handle compiled schemas with async refinements", async () => {
-      const endpoint = defaultEndpointsFactory
-        .addMiddleware({
-          input: z.compile(
-            z.object({
-              m: z.number().refine(async (m) => m < 10),
-            }),
+    test.each([
+      {
+        name: "plain schemas, single execution via parseAsync",
+        shouldCompile: false,
+        mwRefineCalls: 2, // Middleware::execute(), Endpoint::execute()
+        inputRefineCalls: 1,
+        outputRefineCalls: 1,
+      },
+      {
+        name: "plain schemas with trySyncValidation enabled",
+        shouldCompile: false,
+        configProps: { trySyncValidation: true },
+        mwRefineCalls: 4, // Middleware::execute() x2, Endpoint::execute() x2
+        inputRefineCalls: 1, // hits Middlewares async during Endpoint::execute()
+        outputRefineCalls: 2, // Endpoint::execute() x2
+      },
+      {
+        name: "compiled schemas with trySyncValidation enabled",
+        shouldCompile: true,
+        configProps: { trySyncValidation: true },
+        mwRefineCalls: 4, // Middleware::execute() x2, Endpoint::execute() x2
+        inputRefineCalls: 1, // hits Middlewares async during Endpoint::execute()
+        outputRefineCalls: 2, // Endpoint::execute() x2
+      },
+    ])(
+      "should handle async refinements for $name",
+      async ({
+        shouldCompile,
+        configProps,
+        mwRefineCalls,
+        inputRefineCalls,
+        outputRefineCalls,
+      }) => {
+        const mwRefinement = vi.fn(async (m: number) => m < 10);
+        const inputRefinement = vi.fn(async (n: number) => n > 100);
+        const outputRefinement = vi.fn(async (str: string) => str.length > 3);
+        const { responseMock } = await testEndpoint({
+          endpoint: buildAsyncRefinedEndpoint(
+            shouldCompile,
+            mwRefinement,
+            inputRefinement,
+            outputRefinement,
           ),
-          handler: async () => ({}),
-        })
-        .build({
-          method: "post",
-          input: z.compile(
-            z.object({
-              n: z.number().refine(async (n) => n > 100),
-            }),
-          ),
-          output: z.compile(
-            z.object({
-              str: z.string().refine(async (str) => str.length > 3),
-            }),
-          ),
-          handler: async () => ({
-            str: "This is fine",
-          }),
+          configProps,
+          requestProps: {
+            method: "POST",
+            body: { n: 123, m: 5 },
+          },
         });
-      const { responseMock } = await testEndpoint({
-        endpoint,
-        requestProps: {
-          method: "POST",
-          body: { n: 123, m: 5 },
-        },
-      });
-      expect(responseMock._getJSONData()).toEqual({
-        status: "success",
-        data: { str: "This is fine" },
-      });
-    });
+        expect(responseMock._getJSONData()).toEqual({
+          status: "success",
+          data: { str: "This is fine" },
+        });
+        expect(mwRefinement).toHaveBeenCalledTimes(mwRefineCalls);
+        expect(inputRefinement).toHaveBeenCalledTimes(inputRefineCalls);
+        expect(outputRefinement).toHaveBeenCalledTimes(outputRefineCalls);
+      },
+    );
   });
 
   describe("Issue #514: Express native middlewares for OPTIONS request", () => {
