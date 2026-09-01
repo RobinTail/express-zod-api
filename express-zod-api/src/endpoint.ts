@@ -90,7 +90,6 @@ export class Endpoint<
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
   #requestType?: ContentType;
-  /** @desc Set to true once a schema turns out to be async, to skip sync attempts in the future. */
   #inputParsingState = { isAsync: false };
   #outputParsingState = { isAsync: false };
 
