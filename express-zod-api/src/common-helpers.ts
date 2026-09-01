@@ -92,11 +92,7 @@ export const ensureError = (subject: unknown): Error =>
       ? new z.ZodRealError(subject.issues)
       : new Error(String(subject));
 
-/**
- * @desc Parses the schema synchronously via `.parse()` when possible, falling back to `.parseAsync()` for schemas
- *       containing async refinements (which throw `$ZodAsyncError` on a synchronous parse). This keeps compiled
- *       schemas on the fast path while covering schemas with async logic.
- * */
+/** @desc Attempts to parse the schema synchronously first. Made for parsing compiled schemas */
 export const parseMaybeAsync = async <T extends z.ZodType>(
   schema: T,
   input: unknown,
