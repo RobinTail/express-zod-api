@@ -6,10 +6,10 @@
 
 - Added the `trySyncValidation` option to the configuration (opt-in, disabled by default):
   - When enabled, the framework attempts a synchronous I/O `parse()` first, falling back to `parseAsync()` only for
-    schemas containing async refinements or transforms;
+    schemas containing async refinements or transformations;
   - This benefits [compiled](https://zod.dev/compile) schemas (Zod 4.5+) by keeping them on the fast parsing path;
   - Even without schema compilation it gives a ~1.3x performance boost for synchronous I/O validation, but when hitting
-    an async schema, the performance decrease is ~14x, so it's an opt-in feature now:
+    an async schema, the performance decrease is ~14x, so it will only attempt sync parsing once per schema:
     - Also, async refinements and transformations execute twice in that case, so avoid side effects in them;
   - The flag is applied to the I/O schemas of `Endpoint` and the input schema of `Middleware`.
 - The `Middleware::execute()` now accepts optional `config` property on its argument:
