@@ -108,6 +108,25 @@ describe("Middleware", () => {
         response: responseMock,
       });
     });
+
+    test("should handle async refinements in the input schema", async () => {
+      const handlerMock = vi.fn(async () => ({ result: "test" }));
+      const mw = new Middleware({
+        input: z.object({ test: z.string().refine(async (s) => s.length > 3) }),
+        handler: handlerMock,
+      });
+      const result = await mw.execute({
+        input: { test: "something" },
+        ctx: {},
+        logger: makeLoggerMock(),
+        request: makeRequestMock(),
+        response: makeResponseMock(),
+      });
+      expect(result).toEqual({ result: "test" });
+      expect(handlerMock).toHaveBeenCalledWith(
+        expect.objectContaining({ input: { test: "something" } }),
+      );
+    });
   });
 });
 

@@ -533,6 +533,45 @@ describe("Endpoint", () => {
         data: { str: "This is fine" },
       });
     });
+
+    test("should handle compiled schemas with async refinements", async () => {
+      const endpoint = defaultEndpointsFactory
+        .addMiddleware({
+          input: z.compile(
+            z.object({
+              m: z.number().refine(async (m) => m < 10),
+            }),
+          ),
+          handler: async () => ({}),
+        })
+        .build({
+          method: "post",
+          input: z.compile(
+            z.object({
+              n: z.number().refine(async (n) => n > 100),
+            }),
+          ),
+          output: z.compile(
+            z.object({
+              str: z.string().refine(async (str) => str.length > 3),
+            }),
+          ),
+          handler: async () => ({
+            str: "This is fine",
+          }),
+        });
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: { n: 123, m: 5 },
+        },
+      });
+      expect(responseMock._getJSONData()).toEqual({
+        status: "success",
+        data: { str: "This is fine" },
+      });
+    });
   });
 
   describe("Issue #514: Express native middlewares for OPTIONS request", () => {

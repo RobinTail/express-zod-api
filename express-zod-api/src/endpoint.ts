@@ -9,6 +9,7 @@ import {
   getInput,
   ensureError,
   isSchema,
+  parseMaybeAsync,
 } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -213,7 +214,10 @@ export class Endpoint<
 
   async #parseOutput(output: z.input<OUT>) {
     try {
-      return (await this.#def.outputSchema.parseAsync(output)) as FlatObject;
+      return (await parseMaybeAsync(
+        this.#def.outputSchema,
+        output,
+      )) as FlatObject;
     } catch (e) {
       throw e instanceof z.ZodError ? new OutputValidationError(e) : e;
     }
@@ -261,7 +265,7 @@ export class Endpoint<
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
-      finalInput = await this.#def.inputSchema.parseAsync(input);
+      finalInput = await parseMaybeAsync(this.#def.inputSchema, input);
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }

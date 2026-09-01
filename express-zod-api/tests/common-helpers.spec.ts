@@ -11,6 +11,7 @@ import {
   shouldHaveContent,
   getInputSources,
   emptySchema,
+  parseMaybeAsync,
   type EmptySchema,
   type EmptyObject,
   type FlatObject,
@@ -398,6 +399,40 @@ describe("Common Helpers", () => {
       expect(result).toHaveProperty("message");
       expect(typeof result.message).toBe("string");
       expect(result.message).toBe(expected);
+    });
+  });
+
+  describe("parseBySchema()", () => {
+    test("should parse synchronously when the schema is synchronous", async () => {
+      const schema = z.object({ num: z.number() });
+      const result = await parseMaybeAsync(schema, { num: 123 });
+      expectTypeOf(result).toEqualTypeOf<{ num: number }>();
+      expect(result).toEqual({ num: 123 });
+    });
+
+    test("should fall back to parseAsync for async refinements", async () => {
+      const schema = z.object({ str: z.string() }).refine(async () => true);
+      await expect(parseMaybeAsync(schema, { str: "test" })).resolves.toEqual({
+        str: "test",
+      });
+    });
+
+    test("should throw a ZodError on a synchronous validation failure", async () => {
+      const schema = z.object({ num: z.number() });
+      await expect(
+        parseMaybeAsync(schema, { num: "test" }),
+      ).rejects.toBeInstanceOf(z.ZodError);
+    });
+
+    test("should NOT retry with parseAsync on a non-async validation failure", async () => {
+      const schema = z
+        .object({ num: z.number() })
+        .refine(() => true, "custom issue");
+      const spy = vi.spyOn(schema, "parseAsync");
+      await expect(
+        parseMaybeAsync(schema, { num: "test" }),
+      ).rejects.toBeInstanceOf(z.ZodError);
+      expect(spy).not.toHaveBeenCalled();
     });
   });
 

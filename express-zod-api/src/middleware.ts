@@ -1,6 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { emptySchema, type FlatObject } from "./common-helpers";
+import {
+  emptySchema,
+  parseMaybeAsync,
+  type FlatObject,
+} from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
@@ -119,7 +123,8 @@ export class Middleware<
     logger: ActualLogger;
   }) {
     try {
-      const validInput = (await (this.#schema || emptySchema).parseAsync(
+      const validInput = (await parseMaybeAsync(
+        this.#schema || emptySchema,
         input,
       )) as z.output<IN>;
       return this.#handler({ ...rest, input: validInput });
