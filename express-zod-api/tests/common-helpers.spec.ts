@@ -420,20 +420,31 @@ describe("Common Helpers", () => {
       expect(variant === "sync" ? asyncSpy : parseSpy).not.toHaveBeenCalled();
     });
 
-    test("should fall back to async when sync parsing met async cb", async () => {
-      const schema = z.object({ str: z.string() }).refine(async () => true);
-      const parseSpy = vi.spyOn(schema, "parse");
-      const asyncSpy = vi.spyOn(schema, "parseAsync");
-      await expect(
-        parseMaybeAsync(
-          schema,
-          { str: "test" },
-          { trySyncValidation: true, cors: false },
-        ),
-      ).resolves.toEqual({ str: "test" });
-      expect(parseSpy).toHaveBeenCalled();
-      expect(asyncSpy).toHaveBeenCalled();
-    });
+    test.each([
+      undefined,
+      { isAsync: false }, // should flip it
+    ])(
+      "should fall back to async when sync parsing met async cb %#",
+      async (state) => {
+        const schema = z.object({ str: z.string() }).refine(async () => true);
+        const parseSpy = vi.spyOn(schema, "parse");
+        const asyncSpy = vi.spyOn(schema, "parseAsync");
+        const attempt = () =>
+          parseMaybeAsync(
+            schema,
+            { str: "test" },
+            { trySyncValidation: true, cors: false },
+            state,
+          );
+        await expect(attempt()).resolves.toEqual({ str: "test" });
+        expect(parseSpy).toHaveBeenCalledTimes(1);
+        expect(asyncSpy).toHaveBeenCalledTimes(1);
+        if (state) expect(state.isAsync).toBe(true);
+        await attempt();
+        expect(parseSpy).toHaveBeenCalledTimes(state ? 1 : 2); // the state prevents another sync attempt
+        expect(asyncSpy).toHaveBeenCalledTimes(2);
+      },
+    );
 
     test.each([
       z.object({ num: z.number() }),
@@ -448,32 +459,6 @@ describe("Common Helpers", () => {
         ),
       ).rejects.toBeInstanceOf(z.ZodError);
       expect(asyncSpy).not.toHaveBeenCalled();
-    });
-
-    test("should set the state for an async schema and skip the sync attempt on the next call", async () => {
-      const schema = z.object({ str: z.string() }).refine(async () => true);
-      const parseSpy = vi.spyOn(schema, "parse");
-      const state = { isAsync: false };
-      await expect(
-        parseMaybeAsync(
-          schema,
-          { str: "test" },
-          { trySyncValidation: true, cors: false },
-          state,
-        ),
-      ).resolves.toEqual({ str: "test" });
-      expect(parseSpy).toHaveBeenCalledTimes(1); // the futile sync attempt
-      expect(state.isAsync).toBe(true);
-      parseSpy.mockClear();
-      await expect(
-        parseMaybeAsync(
-          schema,
-          { str: "again" },
-          { trySyncValidation: true, cors: false },
-          state,
-        ),
-      ).resolves.toEqual({ str: "again" });
-      expect(parseSpy).not.toHaveBeenCalled(); // straight to parseAsync
     });
   });
 
