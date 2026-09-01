@@ -144,12 +144,11 @@ export const testMiddleware = async <
     request: mocks.requestMock,
     response: mocks.responseMock,
     logger: mocks.loggerMock,
-    config: configMock,
     input,
     ctx,
   };
   try {
-    const output = await middleware.execute(commons);
+    const output = await middleware.execute({ ...commons, config: configMock });
     return { ...mocks, output };
   } catch (e) {
     await errorHandler.execute({

@@ -43,6 +43,7 @@ export abstract class AbstractMiddleware {
     request: Request;
     response: Response;
     logger: ActualLogger;
+    config?: CommonConfig; // @todo either make it required in v30 or remove it from here
   }): Promise<FlatObject>;
 }
 
@@ -123,7 +124,7 @@ export class Middleware<
     request: Request;
     response: Response;
     logger: ActualLogger;
-    config?: CommonConfig; // @todo either make config required in v30 or remove it from here
+    config?: CommonConfig; // @todo either make it required in v30 or remove it from here
   }) {
     const schema = this.#schema || emptySchema;
     try {
