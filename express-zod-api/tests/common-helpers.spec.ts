@@ -402,7 +402,7 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("parseBySchema()", () => {
+  describe("parseMaybeAsync()", () => {
     test("should parse synchronously when the schema is synchronous", async () => {
       const schema = z.object({ num: z.number() });
       const result = await parseMaybeAsync(schema, { num: 123 });
