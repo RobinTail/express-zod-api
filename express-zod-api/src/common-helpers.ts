@@ -95,22 +95,21 @@ export const ensureError = (subject: unknown): Error =>
 /**
  * @desc Attempts to parse the schema synchronously first, falling back to async for schemas with async refinements.
  * @param trySyncValidation Enables sync attempts (per the `trySyncValidation` config option)
- * @param state Tracks whether a synchronous parsing attempt is viable for the schema between requests
+ * @param state Tracks when the schema is discovered to be async, to skip futile sync attempts on subsequent requests
  * */
 export const parseMaybeAsync = async <T extends z.ZodType>(
   schema: T,
   input: unknown,
   trySyncValidation: boolean | undefined,
-  state?: { syncImpossible: boolean },
+  state?: { isAsync: boolean },
 ): Promise<z.output<T>> => {
   // Skip the futile attempt when the feature is disabled or the schema was already found to be async
-  if (!trySyncValidation || state?.syncImpossible)
-    return schema.parseAsync(input);
+  if (!trySyncValidation || state?.isAsync) return schema.parseAsync(input);
   try {
     return schema.parse(input);
   } catch (e) {
     if (e instanceof z.core.$ZodAsyncError) {
-      if (state) state.syncImpossible = true;
+      if (state) state.isAsync = true;
       return schema.parseAsync(input);
     }
     throw e;

@@ -447,12 +447,12 @@ describe("Common Helpers", () => {
     test("should set the state for an async schema and skip the sync attempt on the next call", async () => {
       const schema = z.object({ str: z.string() }).refine(async () => true);
       const parseSpy = vi.spyOn(schema, "parse");
-      const state = { syncImpossible: false };
+      const state = { isAsync: false };
       await expect(
         parseMaybeAsync(schema, { str: "test" }, true, state),
       ).resolves.toEqual({ str: "test" });
       expect(parseSpy).toHaveBeenCalledTimes(1); // the futile sync attempt
-      expect(state.syncImpossible).toBe(true);
+      expect(state.isAsync).toBe(true);
       parseSpy.mockClear();
       await expect(
         parseMaybeAsync(schema, { str: "again" }, true, state),

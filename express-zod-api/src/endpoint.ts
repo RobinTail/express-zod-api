@@ -91,8 +91,8 @@ export class Endpoint<
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
   #requestType?: ContentType;
   /** @desc Set to true once a schema turns out to be async, to skip sync attempts in the future. */
-  #inputParsingState = { syncImpossible: false };
-  #outputParsingState = { syncImpossible: false };
+  #inputParsingState = { isAsync: false };
+  #outputParsingState = { isAsync: false };
 
   /** considered an expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {

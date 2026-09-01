@@ -60,7 +60,7 @@ export class Middleware<
 > extends AbstractMiddleware {
   readonly #schema: IN;
   /** @desc Set to true once the input schema turns out to be async, to skip sync attempts in the future. */
-  #parsingState = { syncImpossible: false };
+  #parsingState = { isAsync: false };
   readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
