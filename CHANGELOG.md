@@ -8,6 +8,10 @@
   - Using [compiled](https://zod.dev/compile) I/O schemas for Endpoint runtime performance boost.
 - Supported TypeScript versions (optional peer): `^6.0.3`:
   - Entirely `#private` props are now restored in the classes of the distributed `.d.ts` files.
+- Config option `trySyncValidation` is now enabled by default (potentially breaking behavior change):
+  - First request to Endpoints having schemas with async refinements would execute those refinements twice. If those
+    refinements have side effects sensitive to the number of calls, then the option should be disabled.
+- The `config` property on the `Middleware::execute()` argument is now required: `testMiddleware()` already handles it.
 - `DocumentationError` removed from main entrypoint: import from `express-zod-api/documentation` instead.
 - The rate-limiting Middleware now explicitly declares the `statusCode` that it may interrupt the request handling:
   - Uses the `statusCode` option given to `EndpointsFactory::useRateLimit()` and `createRateLimitMiddleware()` or 429;

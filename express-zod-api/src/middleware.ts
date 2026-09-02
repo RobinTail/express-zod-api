@@ -43,7 +43,7 @@ export abstract class AbstractMiddleware {
     request: Request;
     response: Response;
     logger: ActualLogger;
-    config?: CommonConfig; // @todo either make it required in v30 or remove it from here
+    config: CommonConfig;
   }): Promise<FlatObject>;
 }
 
@@ -126,13 +126,13 @@ export class Middleware<
     request: Request;
     response: Response;
     logger: ActualLogger;
-    config?: CommonConfig; // @todo either make it required in v30 or remove it from here
+    config: CommonConfig;
   }) {
     try {
       const validInput = await parseMaybeAsync(
         this.#schema || emptySchema,
         input,
-        config ?? {}, // @todo rm fallback in v30
+        config,
         this.#parsingState,
       );
       return this.#handler({ ...rest, input: validInput as z.output<IN> });

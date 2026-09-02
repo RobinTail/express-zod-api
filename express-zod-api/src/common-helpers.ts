@@ -92,14 +92,11 @@ export const ensureError = (subject: unknown): Error =>
       ? new z.ZodRealError(subject.issues)
       : new Error(String(subject));
 
-/**
- * @desc Attempts to parse the schema synchronously first, falling back to async for schemas with async refinements.
- * @todo enable trySyncValidation by default in v30
- * */
+/** @desc Attempts to parse the schema synchronously first, falling back to async for schemas with async refinements. */
 export const parseMaybeAsync = async <T extends z.ZodType>(
   schema: T,
   value: unknown,
-  { trySyncValidation = false }: Partial<CommonConfig>, // @todo rm Partial in v30
+  { trySyncValidation = true }: Partial<CommonConfig>,
   prev?: { isAsync: boolean }, // when already found to be async
 ): Promise<z.output<T>> => {
   if (!trySyncValidation || prev?.isAsync) return schema.parseAsync(value);
