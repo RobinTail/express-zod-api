@@ -454,43 +454,15 @@ const factory = defaultEndpointsFactory.use(auth(), {
 
 ## Refinements
 
-You can implement additional validations within schemas using refinements.
-Validation errors are reported in a response with a status code `400`.
+[Refinements](https://zod.dev/api#refinements) provide additional validations for your schemas. Though those functions
+can be async, the framework attempts to parse the first request to an Endpoint synchronously, which will run such async
+functions twice. Therefore, refinements should avoid side effects sensitive to the number of calls.
 
 ```ts
-import { z } from "zod";
-import { Middleware } from "express-zod-api";
-
-const nicknameConstraintMiddleware = new Middleware({
-  input: z.object({
-    nickname: z
-      .string()
-      .min(1)
-      .refine(
-        (nick) => !/^\d.*$/.test(nick),
-        "Nickname cannot start with a digit",
-      ),
-  }),
-  // ...,
-});
-```
-
-By the way, you can also refine the whole I/O object, for example, in case you need a complex validation of its props.
-
-```ts
-const endpoint = endpointsFactory.build({
-  input: z
-    .object({
-      email: z.email().optional(),
-      id: z.string().optional(),
-      otherThing: z.string().optional(),
-    })
-    .refine(
-      (inputs) => Object.keys(inputs).length >= 1,
-      "Please provide at least one property",
-    ),
-  // ...,
-});
+const nickname = z
+  .string()
+  .min(1)
+  .refine((nick) => !/^\d.*$/.test(nick), "Nickname cannot start with a digit");
 ```
 
 ## Query string parser
