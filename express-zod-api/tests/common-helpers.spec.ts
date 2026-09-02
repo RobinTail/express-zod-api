@@ -11,6 +11,7 @@ import {
   shouldHaveContent,
   getInputSources,
   emptySchema,
+  parseMaybeAsync,
   type EmptySchema,
   type EmptyObject,
   type FlatObject,
@@ -398,6 +399,58 @@ describe("Common Helpers", () => {
       expect(result).toHaveProperty("message");
       expect(typeof result.message).toBe("string");
       expect(result.message).toBe(expected);
+    });
+  });
+
+  describe("parseMaybeAsync()", () => {
+    test.each([
+      ["sync", { trySyncValidation: true }],
+      ["async", { trySyncValidation: false }],
+    ])("should parse %s depending on config", async (variant, cfg) => {
+      const schema = z.object({ num: z.number() });
+      const parseSpy = vi.spyOn(schema, "parse");
+      const asyncSpy = vi.spyOn(schema, "parseAsync");
+      const result = await parseMaybeAsync(schema, { num: 123 }, cfg);
+      expectTypeOf(result).toEqualTypeOf<{ num: number }>();
+      expect(result).toEqual({ num: 123 });
+      expect(variant === "sync" ? asyncSpy : parseSpy).not.toHaveBeenCalled();
+    });
+
+    test.each([
+      undefined,
+      { isAsync: false }, // should flip it
+    ])(
+      "should fall back to async when sync parsing met async cb %#",
+      async (state) => {
+        const schema = z.object({ str: z.string() }).refine(async () => true);
+        const parseSpy = vi.spyOn(schema, "parse");
+        const asyncSpy = vi.spyOn(schema, "parseAsync");
+        const attempt = () =>
+          parseMaybeAsync(
+            schema,
+            { str: "test" },
+            { trySyncValidation: true },
+            state,
+          );
+        await expect(attempt()).resolves.toEqual({ str: "test" });
+        expect(parseSpy).toHaveBeenCalledTimes(1);
+        expect(asyncSpy).toHaveBeenCalledTimes(1);
+        if (state) expect(state.isAsync).toBe(true);
+        await attempt();
+        expect(parseSpy).toHaveBeenCalledTimes(state ? 1 : 2); // the state prevents another sync attempt
+        expect(asyncSpy).toHaveBeenCalledTimes(2);
+      },
+    );
+
+    test.each([
+      z.object({ num: z.number() }),
+      z.object({ num: z.number() }).refine(() => true), // doesn't get into refinement
+    ])("should rethrow validation errors", async (schema) => {
+      const asyncSpy = vi.spyOn(schema, "parseAsync");
+      await expect(
+        parseMaybeAsync(schema, { num: "test" }, { trySyncValidation: true }),
+      ).rejects.toBeInstanceOf(z.ZodError);
+      expect(asyncSpy).not.toHaveBeenCalled();
     });
   });
 

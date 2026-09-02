@@ -1,12 +1,17 @@
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { emptySchema, type FlatObject } from "./common-helpers";
+import {
+  emptySchema,
+  parseMaybeAsync,
+  type FlatObject,
+} from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { LogicalContainer } from "./logical-container";
 import type { Security } from "./security";
 import type { ActualLogger } from "./logger-helpers";
+import type { CommonConfig } from "./config-type";
 import { isPromise } from "node:util/types";
 
 type Handler<IN, CTX, RET> = (params: {
@@ -38,6 +43,7 @@ export abstract class AbstractMiddleware {
     request: Request;
     response: Response;
     logger: ActualLogger;
+    config?: CommonConfig; // @todo either make it required in v30 or remove it from here
   }): Promise<FlatObject>;
 }
 
@@ -53,6 +59,8 @@ export class Middleware<
   IN extends IOSchema | undefined = undefined,
 > extends AbstractMiddleware {
   readonly #schema: IN;
+  /** @desc Set to true once the input schema turns out to be async, to skip sync attempts in the future. */
+  #parsingState = { isAsync: false };
   readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
@@ -110,6 +118,7 @@ export class Middleware<
   /** @throws InputValidationError */
   public override async execute({
     input,
+    config,
     ...rest
   }: {
     input: unknown;
@@ -117,12 +126,16 @@ export class Middleware<
     request: Request;
     response: Response;
     logger: ActualLogger;
+    config?: CommonConfig; // @todo either make it required in v30 or remove it from here
   }) {
     try {
-      const validInput = (await (this.#schema || emptySchema).parseAsync(
+      const validInput = await parseMaybeAsync(
+        this.#schema || emptySchema,
         input,
-      )) as z.output<IN>;
-      return this.#handler({ ...rest, input: validInput });
+        config ?? {}, // @todo rm fallback in v30
+        this.#parsingState,
+      );
+      return this.#handler({ ...rest, input: validInput as z.output<IN> });
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }

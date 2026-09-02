@@ -146,6 +146,7 @@ These people contributed to the improvement of the framework by reporting bugs, 
 [<img src="https://github.com/foxfirecodes.png" alt="@foxfirecodes" width="50" />](https://github.com/foxfirecodes)
 [<img src="https://github.com/HardCoreQual.png" alt="@HardCoreQual" width="50" />](https://github.com/HardCoreQual)
 [<img src="https://github.com/hellovai.png" alt="@hellovai" width="50" />](https://github.com/hellovai)
+[<img src="https://github.com/BlessedRaccoon.png" alt="@BlessedRaccoon" width="50" />](https://github.com/BlessedRaccoon)
 [<img src="https://github.com/Isaac-Leonard.png" alt="@Isaac-Leonard" width="50" />](https://github.com/Isaac-Leonard)
 [<img src="https://github.com/digimuza.png" alt="@digimuza" width="50" />](https://github.com/digimuza)
 [<img src="https://github.com/glitch452.png" alt="@glitch452" width="50" />](https://github.com/glitch452)

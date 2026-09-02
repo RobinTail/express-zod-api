@@ -498,34 +498,59 @@ describe("Endpoint", () => {
   });
 
   describe("Issue #269: Async refinements", () => {
-    test("should handle async refinements in input, output and middleware", async () => {
-      const endpoint = new EndpointsFactory(defaultResultHandler)
-        .addMiddleware({
-          input: z.object({
-            m: z.number().refine(async (m) => m < 10),
-          }),
-          handler: async () => ({}),
-        })
-        .build({
-          method: "post",
-          input: z.object({
-            n: z.number().refine(async (n) => n > 100),
-          }),
-          output: z.object({
-            str: z.string().refine(async (str) => str.length > 3),
-          }),
-          handler: async () => ({
-            str: "This is fine",
-          }),
-        });
-      const { responseMock } = await testEndpoint({
-        endpoint,
-        requestProps: {
-          method: "POST",
-          body: { n: 123, m: 5 },
+    const mwRefinement = vi.fn(async (m: number) => m < 10);
+    const inputRefinement = vi.fn(async (n: number) => n > 100);
+    const outputRefinement = vi.fn(async (str: string) => str.length > 3);
+    const mwInput = z.object({ m: z.number().refine(mwRefinement) });
+    const epInput = z.object({ n: z.number().refine(inputRefinement) });
+    const epOutput = z.object({ str: z.string().refine(outputRefinement) });
+
+    beforeEach(() => {
+      mwRefinement.mockClear();
+      inputRefinement.mockClear();
+      outputRefinement.mockClear();
+    });
+
+    describe.each(["plain", "compiled"] as const)("%s schemas", (variant) => {
+      test.each([{ trySyncValidation: false }, { trySyncValidation: true }])(
+        "should handle async refinements with %s config",
+        async (configProps) => {
+          const endpoint = new EndpointsFactory(defaultResultHandler)
+            .addMiddleware({
+              input: variant === "plain" ? mwInput : z.compile(mwInput),
+              handler: async () => ({}),
+            })
+            .build({
+              method: "post",
+              input: variant === "plain" ? epInput : z.compile(epInput),
+              output: variant === "plain" ? epOutput : z.compile(epOutput),
+              handler: async () => ({ str: "This is fine" }),
+            });
+          const attempt = () =>
+            testEndpoint({
+              endpoint,
+              requestProps: { method: "POST", body: { n: 123, m: 5 } },
+              configProps,
+            });
+          const { responseMock } = await attempt();
+          expect(responseMock._getJSONData()).toEqual({ str: "This is fine" });
+          expect(mwRefinement).toHaveBeenCalledTimes(
+            configProps.trySyncValidation ? 4 : 2,
+          );
+          expect(inputRefinement).toHaveBeenCalledTimes(1);
+          expect(outputRefinement).toHaveBeenCalledTimes(
+            configProps.trySyncValidation ? 2 : 1,
+          );
+          await attempt();
+          expect(mwRefinement).toHaveBeenCalledTimes(
+            configProps.trySyncValidation ? 6 : 4,
+          );
+          expect(inputRefinement).toHaveBeenCalledTimes(2);
+          expect(outputRefinement).toHaveBeenCalledTimes(
+            configProps.trySyncValidation ? 3 : 2,
+          );
         },
-      });
-      expect(responseMock._getJSONData()).toEqual({ str: "This is fine" });
+      );
     });
   });
 

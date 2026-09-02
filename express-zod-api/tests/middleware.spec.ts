@@ -108,6 +108,33 @@ describe("Middleware", () => {
         response: responseMock,
       });
     });
+
+    test.each([{ trySyncValidation: true }, { trySyncValidation: false }])(
+      "should handle async refinements with %s config",
+      async (cfg) => {
+        const refineMock = vi.fn(async () => true);
+        const mw = new Middleware({
+          input: z.object({ test: z.string().refine(refineMock) }),
+          handler: vi.fn(async () => ({ result: "test" })),
+        });
+        const loggerMock = makeLoggerMock();
+        const requestMock = makeRequestMock();
+        const responseMock = makeResponseMock();
+        const attempt = () =>
+          mw.execute({
+            input: { test: "something" },
+            ctx: {},
+            logger: loggerMock,
+            request: requestMock,
+            response: responseMock,
+            config: { ...cfg, cors: false },
+          });
+        await expect(attempt()).resolves.toEqual({ result: "test" });
+        expect(refineMock).toHaveBeenCalledTimes(cfg.trySyncValidation ? 2 : 1); // sync+async
+        await attempt();
+        expect(refineMock).toHaveBeenCalledTimes(cfg.trySyncValidation ? 3 : 2); // sync attempt skipped
+      },
+    );
   });
 });
 
