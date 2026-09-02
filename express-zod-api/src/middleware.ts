@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import {
+  compileOnce,
   emptySchema,
   parseMaybeAsync,
   type FlatObject,
@@ -92,7 +93,7 @@ export class Middleware<
     handler: Handler<z.output<IN>, CTX, RET>;
   }) {
     super();
-    this.#schema = (input && z.compile(input)) as IN;
+    this.#schema = (input && compileOnce(input)) as IN;
     this.#security = security;
     this.#statusCode = new FrozenSet(
       typeof statusCode === "number" ? [statusCode] : statusCode,

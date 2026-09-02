@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
 import {
+  compileOnce,
   emptySchema,
   type EmptyObject,
   type EmptySchema,
@@ -214,7 +215,7 @@ export class EndpointsFactory<
     return new Endpoint({
       ...rest,
       middlewares,
-      outputSchema: z.compile(output),
+      outputSchema: compileOnce(output),
       resultHandler,
       scopes,
       tags,

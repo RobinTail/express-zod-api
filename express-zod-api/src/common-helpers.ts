@@ -19,6 +19,23 @@ export type EmptySchema = typeof emptySchema;
 export type EmptyObject = z.output<EmptySchema>;
 export type FlatObject = Record<string, unknown>;
 
+/**
+ * @desc Compiles the schema once and caches the compiled clone per schema instance.
+ * @desc Keeps the identity of schemas shared between Endpoints and Middlewares so that they are not recompiled on
+ *       each construction and the component deduplication in the Documentation keeps working.
+ * @desc Schemas already compiled by z.compile() or the zod global shim are passed through as is.
+ * */
+const compiledSchemas = new WeakMap<object, object>();
+export const compileOnce = <T extends z.ZodType>(schema: T): T => {
+  if ((schema._zod.run as { __originalRun?: unknown }).__originalRun)
+    return schema; // already compiled
+  const cached = compiledSchemas.get(schema);
+  if (cached) return cached as T;
+  const compiled = z.compile(schema);
+  compiledSchemas.set(schema, compiled);
+  return compiled as T;
+};
+
 /** @link https://stackoverflow.com/a/65492934 */
 type NoNever<T, F> = [T] extends [never] ? F : T;
 
