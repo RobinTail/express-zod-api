@@ -128,10 +128,9 @@ export class Middleware<
     logger: ActualLogger;
     config?: CommonConfig; // @todo either make it required in v30 or remove it from here
   }) {
-    const schema = this.#schema || emptySchema;
     try {
       const validInput = await parseMaybeAsync(
-        schema,
+        this.#schema || emptySchema,
         input,
         config ?? {}, // @todo rm fallback in v30
         this.#parsingState,
