@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import {
   combinations,
   compileOnce,
+  isCompiled,
   defaultInputSources,
   getInput,
   getMessageFromError,
@@ -35,19 +36,36 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("compileOnce()", () => {
-    test("should pass through a schema already compiled by z.compile()", () => {
-      const schema = z.compile(z.object({ num: z.number() }));
-      expect(schema._zod.run).toHaveProperty("__originalRun");
-      expect(compileOnce(schema)).toBe(schema);
+  describe("isCompiled()", () => {
+    test("should return false for a plain schema", () => {
+      expect(isCompiled(z.object({ num: z.number() }))).toBe(false);
     });
 
-    test("should pass through a schema flagged by alternative bag markers", () => {
+    test("should return true for a schema compiled by z.compile()", () => {
+      const schema = z.compile(z.object({ num: z.number() }));
+      expect(schema._zod.run).toHaveProperty("__originalRun");
+      expect(isCompiled(schema)).toBe(true);
+    });
+
+    test("should return true for a schema flagged by alternative bag markers", () => {
       const schema = z.object({ num: z.number() });
       Object.assign(schema._zod.bag, {
         validator: () => true,
         fallbackRun: () => ({}),
       });
+      expect(isCompiled(schema)).toBe(true);
+    });
+
+    test("should return true for a schema flagged by the __originalRun marker alone", () => {
+      const schema = z.object({ num: z.number() });
+      Object.assign(schema._zod.run, { __originalRun: () => {} });
+      expect(isCompiled(schema)).toBe(true);
+    });
+  });
+
+  describe("compileOnce()", () => {
+    test("should pass through a schema already compiled", () => {
+      const schema = z.compile(z.object({ num: z.number() }));
       expect(compileOnce(schema)).toBe(schema);
     });
 
@@ -55,7 +73,7 @@ describe("Common Helpers", () => {
       const schema = z.object({ num: z.number() });
       const compiled = compileOnce(schema);
       expect(compiled).not.toBe(schema);
-      expect(compiled._zod.run).toHaveProperty("__originalRun");
+      expect(isCompiled(compiled)).toBe(true);
       expect(compileOnce(schema)).toBe(compiled);
     });
   });
