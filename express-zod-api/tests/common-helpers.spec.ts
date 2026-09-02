@@ -406,6 +406,7 @@ describe("Common Helpers", () => {
     test.each([
       ["sync", { trySyncValidation: true }],
       ["async", { trySyncValidation: false }],
+      ["sync by default", {}],
     ])("should parse %s depending on config", async (variant, cfg) => {
       const schema = z.object({ num: z.number() });
       const parseSpy = vi.spyOn(schema, "parse");
@@ -413,7 +414,7 @@ describe("Common Helpers", () => {
       const result = await parseMaybeAsync(schema, { num: 123 }, cfg);
       expectTypeOf(result).toEqualTypeOf<{ num: number }>();
       expect(result).toEqual({ num: 123 });
-      expect(variant === "sync" ? asyncSpy : parseSpy).not.toHaveBeenCalled();
+      expect(variant === "async" ? parseSpy : asyncSpy).not.toHaveBeenCalled();
     });
 
     test.each([
