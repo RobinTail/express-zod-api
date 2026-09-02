@@ -3,6 +3,7 @@ import * as R from "ramda";
 import { z } from "zod";
 import { createRequire } from "node:module";
 import { METHODS } from "node:http";
+import { expect } from "vitest";
 
 describe("Environment checks", () => {
   describe("Zod", () => {
@@ -260,10 +261,25 @@ describe("Environment checks", () => {
       expect(c.toJSONSchema()).not.toHaveProperty("allOf"); // @since 4.5.0
     });
 
-    // @todo require zod 4.5 and use compiled schemas everywhere
-    test("compiled schemas have identical shape", () => {
+    test("compiled schemas have identical shape but remain distinguishable", () => {
       const schema = z.iso.date();
-      expect(Object.keys(z.compile(schema))).toEqual(Object.keys(schema));
+      const compiled = z.compile(schema);
+      expect(Object.keys(compiled)).toEqual(Object.keys(schema));
+      expect(schema._zod.run).not.toHaveProperty("__originalRun");
+      expect(schema._zod.bag).not.toHaveProperty("validator");
+      expect(schema._zod.bag).not.toHaveProperty("fallbackRun");
+      expect(compiled._zod.run).toHaveProperty(
+        "__originalRun",
+        expect.any(Function),
+      );
+      expect(compiled._zod.bag).toHaveProperty(
+        "validator",
+        expect.any(Function),
+      );
+      expect(compiled._zod.bag).toHaveProperty(
+        "fallbackRun",
+        expect.any(Function),
+      );
     });
   });
 
