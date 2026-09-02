@@ -82,6 +82,29 @@ describe("Testing", () => {
       });
     });
 
+    test.each([{ trySyncValidation: true }, { trySyncValidation: false }])(
+      "Should forward config.trySyncValidation to the middleware %#",
+      async (configProps) => {
+        const middleware = new Middleware({
+          input: z.object({ test: z.string().refine(async () => true) }),
+          handler: async () => ({}),
+        });
+        const execSpy = vi.spyOn(middleware, "execute");
+        await testMiddleware({
+          requestProps: { method: "POST", body: { test: "something" } },
+          configProps,
+          middleware,
+        });
+        expect(execSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            config: expect.objectContaining({
+              trySyncValidation: configProps.trySyncValidation,
+            }),
+          }),
+        );
+      },
+    );
+
     test.each<CommonConfig["errorHandler"]>([
       undefined,
       new ResultHandler({
