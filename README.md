@@ -454,7 +454,7 @@ const factory = defaultEndpointsFactory.use(auth(), {
 
 ## Refinements
 
-[Refinements](https://zod.dev/api#refinements) provide additional validations for your schemas. Though those functions
+[Refinements](https://zod.dev/api#refinements) provide additional validations for your schemas. Albeit those functions
 can be async, the framework attempts to parse the first request to an Endpoint synchronously, which will run such async
 functions twice. Therefore, refinements should avoid side effects sensitive to the number of calls.
 
