@@ -1,6 +1,7 @@
 import createHttpError from "http-errors";
 import {
   combinations,
+  compileOnce,
   defaultInputSources,
   getInput,
   getMessageFromError,
@@ -31,6 +32,31 @@ describe("Common Helpers", () => {
   describe("EmptySchema", () => {
     test("should be the type of emptySchema", () => {
       expectTypeOf<EmptySchema>().toEqualTypeOf(emptySchema);
+    });
+  });
+
+  describe("compileOnce()", () => {
+    test("should pass through a schema already compiled by z.compile()", () => {
+      const schema = z.compile(z.object({ num: z.number() }));
+      expect(schema._zod.run).toHaveProperty("__originalRun");
+      expect(compileOnce(schema)).toBe(schema);
+    });
+
+    test("should pass through a schema flagged by alternative bag markers", () => {
+      const schema = z.object({ num: z.number() });
+      Object.assign(schema._zod.bag, {
+        validator: () => true,
+        fallbackRun: () => ({}),
+      });
+      expect(compileOnce(schema)).toBe(schema);
+    });
+
+    test("should compile and cache the clone per schema instance", () => {
+      const schema = z.object({ num: z.number() });
+      const compiled = compileOnce(schema);
+      expect(compiled).not.toBe(schema);
+      expect(compiled._zod.run).toHaveProperty("__originalRun");
+      expect(compileOnce(schema)).toBe(compiled);
     });
   });
 

@@ -23,11 +23,16 @@ export type FlatObject = Record<string, unknown>;
  * @desc Compiles the schema once and caches the compiled clone per schema instance.
  * @desc Keeps the identity of schemas shared between Endpoints and Middlewares so that they are not recompiled on
  *       each construction and the component deduplication in the Documentation keeps working.
- * @desc Schemas already compiled by z.compile() or the zod global shim are passed through as is.
+ * @desc Schemas already compiled by z.compile() or the zod global shim are passed through as is, detected by the
+ *       markers that the external library sets on the instance internals.
  * */
 const compiledSchemas = new WeakMap<object, object>();
 export const compileOnce = <T extends z.ZodType>(schema: T): T => {
-  if ((schema._zod.run as { __originalRun?: unknown }).__originalRun)
+  if (
+    (schema._zod.run as { __originalRun?: unknown }).__originalRun ||
+    schema._zod.bag.validator ||
+    schema._zod.bag.fallbackRun
+  )
     return schema; // already compiled
   const cached = compiledSchemas.get(schema);
   if (cached) return cached as T;
