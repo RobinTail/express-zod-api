@@ -9,6 +9,7 @@ import {
   getInput,
   ensureError,
   isSchema,
+  parseMaybeAsync,
 } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -89,6 +90,8 @@ export class Endpoint<
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
   #requestType?: ContentType;
+  #inputParsingState = { isAsync: false };
+  #outputParsingState = { isAsync: false };
 
   /** considered an expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
@@ -211,9 +214,17 @@ export class Endpoint<
     return this.#def.getOperationId?.(method);
   }
 
-  async #parseOutput(output: z.input<OUT>) {
+  async #parseOutput(
+    output: z.input<OUT>,
+    config: CommonConfig,
+  ): Promise<FlatObject> {
     try {
-      return (await this.#def.outputSchema.parseAsync(output)) as FlatObject;
+      return await parseMaybeAsync(
+        this.#def.outputSchema,
+        output,
+        config,
+        this.#outputParsingState,
+      );
     } catch (e) {
       throw e instanceof z.ZodError ? new OutputValidationError(e) : e;
     }
@@ -232,6 +243,7 @@ export class Endpoint<
     response: Response;
     logger: ActualLogger;
     ctx: Partial<CTX>;
+    config: CommonConfig;
   }) {
     for (const mw of this.#def.middlewares || []) {
       if (
@@ -253,15 +265,22 @@ export class Endpoint<
 
   async #parseAndRunHandler({
     input,
+    config,
     ...rest
   }: {
     input: Readonly<FlatObject>;
     ctx: CTX;
     logger: ActualLogger;
+    config: CommonConfig;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
-      finalInput = await this.#def.inputSchema.parseAsync(input);
+      finalInput = await parseMaybeAsync(
+        this.#def.inputSchema,
+        input,
+        config,
+        this.#inputParsingState,
+      );
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
@@ -303,6 +322,7 @@ export class Endpoint<
         response,
         logger,
         ctx,
+        config,
       });
       if (response.writableEnded) return;
       if (method === ("options" satisfies CORSMethod))
@@ -310,10 +330,11 @@ export class Endpoint<
       const output = await this.#parseAndRunHandler({
         input,
         logger,
+        config,
         ctx: ctx as CTX, // ensured the complete CTX by writableEnded condition and try-catch
       });
       if (response.writableEnded) return; // Endpoint closed the stream (304)
-      result = { output: await this.#parseOutput(output), error: null };
+      result = { output: await this.#parseOutput(output, config), error: null };
     } catch (e) {
       result = { output: null, error: ensureError(e) };
     }
