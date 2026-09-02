@@ -261,9 +261,10 @@ describe("Environment checks", () => {
       expect(c.toJSONSchema()).not.toHaveProperty("allOf"); // @since 4.5.0
     });
 
-    test("compiled schemas have identical shape but remain distinguishable", () => {
+    test("z.compile() always return a new identical shape but with some distinguishable hidden props", () => {
       const schema = z.iso.date();
       const compiled = z.compile(schema);
+      expect(compiled).not.toBe(schema);
       expect(Object.keys(compiled)).toEqual(Object.keys(schema));
       expect(schema._zod.run).not.toHaveProperty("__originalRun");
       expect(schema._zod.bag).not.toHaveProperty("validator");
@@ -280,6 +281,7 @@ describe("Environment checks", () => {
         "fallbackRun",
         expect.any(Function),
       );
+      expect(z.compile(compiled)).not.toBe(compiled); // second compile also makes new instance
     });
   });
 
