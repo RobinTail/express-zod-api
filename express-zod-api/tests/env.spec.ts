@@ -48,6 +48,20 @@ describe("Environment checks", () => {
     });
 
     describe("imperfections", () => {
+      test("object intersection with examples does not get merged", () => {
+        expect(
+          z
+            .object({ a: z.number() })
+            .meta({ examples: [{ a: 1 }] })
+            .and(z.object({ b: z.number() }).meta({ examples: [{ b: 2 }] }))
+            .toJSONSchema(),
+        ).toHaveProperty("allOf"); // rm depictIntersection when this test fails
+      });
+
+      test("nullable does not merge types for schemas having other props", () => {
+        expect(z.int().nullable().toJSONSchema()).toHaveProperty("anyOf"); // rm depictNullable when it fails
+      });
+
       test("discriminated unions are depicted without discriminator", () => {
         expect(
           z.toJSONSchema(

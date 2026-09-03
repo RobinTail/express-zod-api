@@ -15,6 +15,8 @@ minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - eslint-plugin-allowed-dependencies # maintained by myself
   - zod@4.5.4 # verified by Socket Security
+  # Renovate security update: qs@6.16.0
+  - qs@6.16.0
 publicHoistPattern:
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
   - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
