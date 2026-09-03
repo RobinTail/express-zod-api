@@ -81,18 +81,18 @@ export const findJsonIncompatible = (
 ) =>
   findNestedSchema(subject, {
     io,
-    condition: ({ zodSchema, jsonSchema }) => {
+    condition: ({ zodSchema, jsonSchema: { [brandProperty]: brand } }) => {
       const { type } = zodSchema._zod.def;
       if (unsupported.has(type)) return true;
-      if (jsonSchema[brandProperty] === ezBufferBrand) return true;
+      if (brand === ezBufferBrand) return true;
       if (io === "input") {
         if (type === "date") return true;
-        if (jsonSchema[brandProperty] === ezDateOutBrand) return true;
+        if (brand === ezDateOutBrand) return true;
       }
       if (io === "output") {
-        if (jsonSchema[brandProperty] === ezDateInBrand) return true;
-        if (jsonSchema[brandProperty] === ezRawBrand) return true;
-        if (jsonSchema[brandProperty] === ezUploadBrand) return true;
+        if (brand === ezDateInBrand) return true;
+        if (brand === ezRawBrand) return true;
+        if (brand === ezUploadBrand) return true;
       }
       return false;
     },

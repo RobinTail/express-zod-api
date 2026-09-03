@@ -170,7 +170,7 @@ export class Endpoint<
     return (this.#requestType ??= (() => {
       const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
       if (found) {
-        const brand = found.jsonSchema[brandProperty];
+        const { [brandProperty]: brand } = found.jsonSchema;
         if (brand === ezUploadBrand) return "upload";
         if (brand === ezRawBrand) return "raw";
         if (brand === ezFormBrand) return "form";
