@@ -18,7 +18,7 @@ import type { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
-import { getBrand, getExamples } from "./metadata";
+import { brandProperty, getExamples } from "./metadata";
 import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import type { ContentType } from "./content-type";
@@ -170,7 +170,7 @@ export class Endpoint<
     return (this.#requestType ??= (() => {
       const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
       if (found) {
-        const brand = getBrand(found);
+        const { [brandProperty]: brand } = found.jsonSchema;
         if (brand === ezUploadBrand) return "upload";
         if (brand === ezRawBrand) return "raw";
         if (brand === ezFormBrand) return "form";

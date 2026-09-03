@@ -535,11 +535,27 @@ describe("Routing", () => {
       expect(logger._getLogs().warn).toEqual([
         [
           "The final input schema of the endpoint contains an unsupported JSON payload type.",
-          { method: "get", path: "/path", reason: expect.any(z.ZodType) },
+          {
+            method: "get",
+            path: "/path",
+            reason: {
+              zodSchema: expect.any(z.ZodType),
+              jsonSchema: expect.any(Object),
+              path: expect.any(Array),
+            },
+          },
         ],
         [
           "The final positive response schema of the endpoint contains an unsupported JSON payload type.",
-          { method: "get", path: "/path", reason: expect.any(z.ZodType) },
+          {
+            method: "get",
+            path: "/path",
+            reason: {
+              zodSchema: expect.any(z.ZodType),
+              jsonSchema: expect.any(Object),
+              path: expect.any(Array),
+            },
+          },
         ],
       ]);
     });
