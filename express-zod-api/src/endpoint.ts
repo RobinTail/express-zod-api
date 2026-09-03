@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
 import type { NormalizedResponse, ResponseVariant } from "./api-response";
-import { findRequestTypeDefiningSchema } from "./deep-checks";
+import { findNestedSchema } from "./deep-checks";
 import {
   type FlatObject,
   getActualMethod,
@@ -168,14 +168,21 @@ export class Endpoint<
   public override getProbableRequestType(method?: ClientMethod) {
     if (method === "query") return "form";
     return (this.#requestType ??= (() => {
-      const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
+      let hasForm = false; // the order is not guaranteed since zod 4.5 for compiled schemas
+      const found = findNestedSchema(this.#def.inputSchema, {
+        io: "input",
+        condition: ({ jsonSchema: { [brandProperty]: brand } }) => {
+          if (brand === ezUploadBrand || brand === ezRawBrand) return true;
+          if (brand === ezFormBrand) hasForm = true;
+          return false;
+        },
+      });
       if (found) {
         const { [brandProperty]: brand } = found.jsonSchema;
         if (brand === ezUploadBrand) return "upload";
         if (brand === ezRawBrand) return "raw";
-        if (brand === ezFormBrand) return "form";
       }
-      return "json";
+      return hasForm ? "form" : "json";
     })());
   }
 
