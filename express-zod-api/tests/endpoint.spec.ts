@@ -455,9 +455,8 @@ describe("Endpoint", () => {
   describe(".getProbableRequestType()", () => {
     test("should return 'form' for QUERY method %#", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
+      const endpoint = factory.buildVoid({
         input: ez.raw(),
-        output: z.object({}),
         handler: vi.fn(),
       });
       expect(endpoint.getProbableRequestType()).toBe("raw");
@@ -469,15 +468,12 @@ describe("Endpoint", () => {
       { input: z.object({ file: ez.upload() }), expected: "upload" },
       { input: ez.form({}), expected: "form" },
       { input: ez.form({ file: ez.upload() }), expected: "upload" },
+      { input: z.compile(ez.form({ file: ez.upload() })), expected: "upload" },
     ])(
       "should return the one based on the input schema %#",
       ({ input, expected }) => {
         const factory = new EndpointsFactory(defaultResultHandler);
-        const endpoint = factory.build({
-          input,
-          output: z.object({}),
-          handler: vi.fn(),
-        });
+        const endpoint = factory.buildVoid({ input, handler: vi.fn() });
         expect(endpoint.getProbableRequestType()).toEqual(expected);
       },
     );

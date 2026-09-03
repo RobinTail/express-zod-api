@@ -4,8 +4,6 @@ import { ezBufferBrand } from "./buffer-schema";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DeepCheckError, type LookupContext } from "./errors";
-import { ezFormBrand } from "./form-schema";
-import type { IOSchema } from "./io-schema";
 import { brandProperty } from "./metadata";
 import type { FirstPartyKind } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
@@ -52,16 +50,6 @@ export const hasCycle = (
   }
   return false;
 };
-
-const isRequestDefiningBrand = Set.prototype.has.bind(
-  new Set([ezUploadBrand, ezRawBrand, ezFormBrand]),
-);
-export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
-  findNestedSchema(subject, {
-    condition: ({ jsonSchema }) =>
-      isRequestDefiningBrand(jsonSchema[brandProperty]),
-    io: "input",
-  });
 
 const unsupported = new Set<FirstPartyKind>([
   "nan",
