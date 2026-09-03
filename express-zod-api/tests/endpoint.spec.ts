@@ -470,6 +470,7 @@ describe("Endpoint", () => {
       { input: z.object({ file: ez.upload() }), expected: "upload" },
       { input: ez.form({}), expected: "form" },
       { input: ez.form({ file: ez.upload() }), expected: "upload" },
+      { input: z.compile(ez.form({ file: ez.upload() })), expected: "upload" },
     ])(
       "should return the one based on the input schema %#",
       ({ input, expected }) => {

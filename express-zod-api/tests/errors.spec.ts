@@ -8,6 +8,7 @@ import {
   DeepCheckError,
   DocumentationError,
   RoutingError,
+  type LookupContext,
 } from "../src/errors";
 
 describe("Errors", () => {
@@ -76,8 +77,12 @@ describe("Errors", () => {
   });
 
   describe("DeepCheckError", () => {
-    const schema = z.any();
-    const error = new DeepCheckError(schema);
+    const ctx: LookupContext = {
+      zodSchema: z.any(),
+      jsonSchema: {},
+      path: ["test"],
+    };
+    const error = new DeepCheckError(ctx);
 
     test("should be an instance of IOSchemaError and Error", () => {
       expect(error).toBeInstanceOf(IOSchemaError);
@@ -88,8 +93,8 @@ describe("Errors", () => {
       expect(error.name).toBe("DeepCheckError");
     });
 
-    test("should have the cause matching the schema", () => {
-      expect(error.cause).toBe(schema);
+    test("should have the cause matching the context", () => {
+      expect(error.cause).toBe(ctx);
     });
   });
 

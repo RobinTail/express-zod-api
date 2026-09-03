@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
 import type { NormalizedResponse, ResponseVariant } from "./api-response";
-import { findRequestTypeDefiningBrands } from "./deep-checks";
+import { findNestedSchema } from "./deep-checks";
 import {
   type FlatObject,
   getActualMethod,
@@ -18,7 +18,7 @@ import type { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
-import { getExamples } from "./metadata";
+import { brandProperty, getExamples } from "./metadata";
 import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import type { ContentType } from "./content-type";
@@ -168,11 +168,19 @@ export class Endpoint<
   public override getProbableRequestType(method?: ClientMethod) {
     if (method === "query") return "form";
     return (this.#requestType ??= (() => {
-      const found = findRequestTypeDefiningBrands(this.#def.inputSchema);
-      if (found.has(ezUploadBrand)) return "upload";
-      if (found.has(ezRawBrand)) return "raw";
-      if (found.has(ezFormBrand)) return "form";
-      return "json";
+      let found: ContentType | undefined;
+      const exitEarly = (value: ContentType) => Boolean((found = value));
+      let hasForm = false; // the order is not guaranteed since zod 4.5 for compiled schemas
+      void findNestedSchema(this.#def.inputSchema, {
+        io: "input",
+        condition: ({ jsonSchema: { [brandProperty]: brand } }) => {
+          if (brand === ezUploadBrand) return exitEarly("upload");
+          if (brand === ezRawBrand) return exitEarly("raw");
+          if (brand === ezFormBrand) hasForm = true;
+          return false;
+        },
+      });
+      return found ?? (hasForm ? "form" : "json");
     })());
   }
 
