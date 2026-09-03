@@ -168,21 +168,19 @@ export class Endpoint<
   public override getProbableRequestType(method?: ClientMethod) {
     if (method === "query") return "form";
     return (this.#requestType ??= (() => {
+      let found: ContentType | undefined;
+      const exitEarly = (value: ContentType) => Boolean((found = value));
       let hasForm = false; // the order is not guaranteed since zod 4.5 for compiled schemas
-      const found = findNestedSchema(this.#def.inputSchema, {
+      void findNestedSchema(this.#def.inputSchema, {
         io: "input",
         condition: ({ jsonSchema: { [brandProperty]: brand } }) => {
-          if (brand === ezUploadBrand || brand === ezRawBrand) return true;
+          if (brand === ezUploadBrand) return exitEarly("upload");
+          if (brand === ezRawBrand) return exitEarly("raw");
           if (brand === ezFormBrand) hasForm = true;
           return false;
         },
       });
-      if (found) {
-        const { [brandProperty]: brand } = found.jsonSchema;
-        if (brand === ezUploadBrand) return "upload";
-        if (brand === ezRawBrand) return "raw";
-      }
-      return hasForm ? "form" : "json";
+      return found ?? (hasForm ? "form" : "json");
     })());
   }
 
