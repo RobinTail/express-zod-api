@@ -41,10 +41,14 @@ export class IOSchemaError extends Error {
   public override name = "IOSchemaError";
 }
 
+export type LookupContext = Parameters<
+  Required<z.core.JSONSchemaGeneratorParams>["override"]
+>[0];
+
 export class DeepCheckError extends IOSchemaError {
   public override name = "DeepCheckError";
 
-  constructor(public override readonly cause: z.core.$ZodType) {
+  constructor(public override readonly cause: LookupContext) {
     super("Found", { cause });
   }
 }

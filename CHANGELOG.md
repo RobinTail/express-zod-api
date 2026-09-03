@@ -52,6 +52,11 @@ else if (status === 400 || discriminator === "error")
 
 ## Version 29
 
+### v29.5.1
+
+- Performance tuning for startup diagnostics and Documentation generator:
+  - Delegated the `x-brand` acquisition to Zod JSON Schema instead of checking the `globalRegistry` during the traverse.
+
 ### v29.5.0
 
 - Added the `trySyncValidation` option to the configuration (opt-in, disabled by default):
