@@ -6,14 +6,17 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { DeepCheckError } from "./errors";
 import { ezFormBrand } from "./form-schema";
 import type { IOSchema } from "./io-schema";
-import { getBrand } from "./metadata";
+import { brandProperty } from "./metadata";
 import type { FirstPartyKind } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 import { ezRawBrand } from "./raw-schema";
 
+export type LookupContext = Parameters<
+  Required<z.core.JSONSchemaGeneratorParams>["override"]
+>[0];
 interface NestedSchemaLookupProps {
   io: "input" | "output";
-  condition: (zodSchema: z.core.$ZodType) => boolean;
+  condition: (ctx: LookupContext) => boolean;
 }
 
 export const findNestedSchema = (
@@ -25,8 +28,8 @@ export const findNestedSchema = (
       void z.toJSONSchema(subject, {
         io,
         unrepresentable: "any",
-        override: ({ zodSchema }) => {
-          if (condition(zodSchema)) throw new DeepCheckError(zodSchema); // exits early
+        override: (ctx) => {
+          if (condition(ctx)) throw new DeepCheckError(ctx.zodSchema); // exits early
         },
       }),
     (err: DeepCheckError) => err.cause,
@@ -58,7 +61,8 @@ const isRequestDefiningBrand = Set.prototype.has.bind(
 );
 export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
   findNestedSchema(subject, {
-    condition: (schema) => isRequestDefiningBrand(getBrand(schema)),
+    condition: ({ jsonSchema }) =>
+      isRequestDefiningBrand(jsonSchema[brandProperty]),
     io: "input",
   });
 
@@ -80,19 +84,18 @@ export const findJsonIncompatible = (
 ) =>
   findNestedSchema(subject, {
     io,
-    condition: (zodSchema) => {
-      const brand = getBrand(zodSchema);
+    condition: ({ zodSchema, jsonSchema }) => {
       const { type } = zodSchema._zod.def;
       if (unsupported.has(type)) return true;
-      if (brand === ezBufferBrand) return true;
+      if (jsonSchema[brandProperty] === ezBufferBrand) return true;
       if (io === "input") {
         if (type === "date") return true;
-        if (brand === ezDateOutBrand) return true;
+        if (jsonSchema[brandProperty] === ezDateOutBrand) return true;
       }
       if (io === "output") {
-        if (brand === ezDateInBrand) return true;
-        if (brand === ezRawBrand) return true;
-        if (brand === ezUploadBrand) return true;
+        if (jsonSchema[brandProperty] === ezDateInBrand) return true;
+        if (jsonSchema[brandProperty] === ezRawBrand) return true;
+        if (jsonSchema[brandProperty] === ezUploadBrand) return true;
       }
       return false;
     },

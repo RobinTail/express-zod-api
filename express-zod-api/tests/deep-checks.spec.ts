@@ -1,14 +1,18 @@
 import type { UploadedFile } from "express-fileupload";
 import { z } from "zod";
 import { ez } from "../src";
-import { findNestedSchema, hasCycle } from "../src/deep-checks";
-import { getBrand } from "../src/metadata";
+import {
+  findNestedSchema,
+  hasCycle,
+  type LookupContext,
+} from "../src/deep-checks";
+import { brandProperty } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("Checks", () => {
   describe("findNestedSchema()", () => {
-    const condition = (subject: z.core.$ZodType) =>
-      getBrand(subject) === ezUploadBrand;
+    const condition = ({ jsonSchema }: LookupContext) =>
+      jsonSchema[brandProperty] === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
       expect(
@@ -52,7 +56,9 @@ describe("Checks", () => {
           }),
         }),
       });
-      const check = vi.fn((schema) => schema instanceof z.ZodNumber);
+      const check = vi.fn(
+        ({ zodSchema }: LookupContext) => zodSchema instanceof z.ZodNumber,
+      );
       findNestedSchema(subject, {
         condition: check,
         io: "input",
