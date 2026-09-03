@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ezBufferBrand } from "./buffer-schema";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
-import { DeepCheckError } from "./errors";
+import { DeepCheckError, type LookupContext } from "./errors";
 import { ezFormBrand } from "./form-schema";
 import type { IOSchema } from "./io-schema";
 import { brandProperty } from "./metadata";
@@ -11,9 +11,6 @@ import type { FirstPartyKind } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 import { ezRawBrand } from "./raw-schema";
 
-export type LookupContext = Parameters<
-  Required<z.core.JSONSchemaGeneratorParams>["override"]
->[0];
 interface NestedSchemaLookupProps {
   io: "input" | "output";
   condition: (ctx: LookupContext) => boolean;
@@ -29,7 +26,7 @@ export const findNestedSchema = (
         io,
         unrepresentable: "any",
         override: (ctx) => {
-          if (condition(ctx)) throw new DeepCheckError(ctx.zodSchema); // exits early
+          if (condition(ctx)) throw new DeepCheckError(ctx); // exits early
         },
       }),
     (err: DeepCheckError) => err.cause,

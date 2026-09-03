@@ -1,13 +1,10 @@
 import type { UploadedFile } from "express-fileupload";
 import { z } from "zod";
 import { ez } from "../src";
-import {
-  findNestedSchema,
-  hasCycle,
-  type LookupContext,
-} from "../src/deep-checks";
+import { findNestedSchema, hasCycle } from "../src/deep-checks";
 import { brandProperty } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
+import type { LookupContext } from "../src/errors.ts";
 
 describe("Checks", () => {
   describe("findNestedSchema()", () => {
