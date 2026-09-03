@@ -2,6 +2,11 @@
 
 ## Version 29
 
+### v29.5.2
+
+- Compatibility fix for the Zod 4.5 feature of [compiled](https://zod.dev/compile) schemas:
+  - Ensured the correct recognition of the expected request type for the case where `ez.form()` wraps `ez.upload()`.
+
 ### v29.5.1
 
 - Performance tuning for startup diagnostics and Documentation generator:
