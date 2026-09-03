@@ -3,7 +3,6 @@ import * as R from "ramda";
 import { z } from "zod";
 import { createRequire } from "node:module";
 import { METHODS } from "node:http";
-import { expect } from "vitest";
 
 describe("Environment checks", () => {
   describe("Zod", () => {
