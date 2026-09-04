@@ -4,21 +4,12 @@
 
 ### v29.6.0
 
-- Fixed a Documentation generation defect for input fields sourced from cookies when the request body is not among the
-  method's enabled sources:
-  - A field read from `request.cookies`/`request.signedCookies` (because `"cookies"`/`"signedCookies"` is in
-    `inputSources`) is now depicted as `in: cookie` even without a matching `CookieSecurity` declaration, provided
-    `"query"` is not among the sources either;
-  - Previously such a field was depicted as `in: query` (or omitted entirely when `"query"` was not among the sources),
-    contradicting the source that wins at runtime;
-  - The explicit `CookieSecurity` declaration keeps precedence, and when `"body"` is among the sources the field stays
-    in the request body depiction as the primary fallback for both regular methods and the `QUERY` method;
-  - When `"body"` is not among the sources, `in: query` remains the higher-priority fallback than `in: cookie`;
+- Added the `isCookie` (a boolean returning function) option to the Documentation generator for your customizations:
+  - The default one recognizes names that are typical for sessions: `session`, `session_id`, `sessionId`.
+- Fixed a Documentation generation defect for the params of request when its body is not among the enabled sources:
+  - Using the `isCookie()` besides the Middleware's `CookieSecurity` to recognize the inputs originating from cookies;
+  - Either `query` or `cookie` would be the designated param location (if the corresponding input source is enabled);
   - 🙏[@marco-carvalho](https://github.com/marco-carvalho), [@BetterAndBetterII](https://github.com/BetterAndBetterII).
-- Added the `isCookie` and `defaultIsCookie` options to the Documentation generator, mirroring the existing header
-  detection:
-  - Cookie names typical for sessions (`session`, `session_id`, `sessionId`) are now recognized among the input data even
-    without a `CookieSecurity` declaration, whenever cookies are among the enabled sources.
 
 ### v29.5.2
 
