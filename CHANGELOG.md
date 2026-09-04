@@ -7,13 +7,13 @@
 - Fixed a Documentation generation defect for input fields sourced from cookies when the request body is not among the
   method's enabled sources:
   - A field read from `request.cookies`/`request.signedCookies` (because `"cookies"`/`"signedCookies"` is in
-    `inputSources`) is now depicted as `in: cookie` even without a matching `CookieSecurity` declaration;
+    `inputSources`) is now depicted as `in: cookie` even without a matching `CookieSecurity` declaration, provided
+    `"query"` is not among the sources either;
   - Previously such a field was depicted as `in: query` (or omitted entirely when `"query"` was not among the sources),
     contradicting the source that wins at runtime;
   - The explicit `CookieSecurity` declaration keeps precedence, and when `"body"` is among the sources the field stays
-    in the request body depiction as the primary fallback;
-  - For the `QUERY` method, the request body also remains the primary fallback, so fields are only relocated to
-    `in: query` when `"body"` is not among the configured sources;
+    in the request body depiction as the primary fallback for both regular methods and the `QUERY` method;
+  - When `"body"` is not among the sources, `in: query` remains the higher-priority fallback than `in: cookie`;
 - Added the `isCookie` and `defaultIsCookie` options to the Documentation generator, mirroring the existing header
   detection:
   - Cookie names typical for sessions (`session`, `auth`, `token`, etc.) are now recognized among the input data even

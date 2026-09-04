@@ -470,7 +470,7 @@ describe("Documentation helpers", () => {
       expect(isQueryEnabled).toBe(true);
       expect(isBodyEnabled).toBe(false);
       expect(getLocation("id")).toBe("path");
-      expect(getLocation("test")).toBe("cookie");
+      expect(getLocation("test")).toBe("query");
       expect(getLocation("session")).toBe("cookie");
     });
 
@@ -485,14 +485,15 @@ describe("Documentation helpers", () => {
       expect(getLocation("test")).toBeUndefined();
     });
 
-    test("should not move the rest to cookie when query is also enabled", () => {
-      const { isBodyEnabled, getLocation } = makeParamLocator({
+    test("should depict unmatched fields as cookie when query and body are disabled", () => {
+      const { isQueryEnabled, isBodyEnabled, getLocation } = makeParamLocator({
         ...requestCtx,
-        inputSources: ["query", "body", "cookies", "params"],
+        inputSources: ["cookies", "params"],
       });
-      expect(isBodyEnabled).toBe(true);
+      expect(isQueryEnabled).toBe(false);
+      expect(isBodyEnabled).toBe(false);
       expect(getLocation("id")).toBe("path");
-      expect(getLocation("test")).toBe("query");
+      expect(getLocation("test")).toBe("cookie");
     });
 
     test("QUERY method: should keep the rest in the body when body is enabled", () => {
@@ -519,15 +520,16 @@ describe("Documentation helpers", () => {
       expect(getLocation("test")).toBe("query");
     });
 
-    test("QUERY method: cookies win over query when body is disabled", () => {
-      const { isBodyEnabled, getLocation } = makeParamLocator({
+    test("QUERY method: should prioritize query over cookies when body is disabled", () => {
+      const { isQueryEnabled, isBodyEnabled, getLocation } = makeParamLocator({
         ...requestCtx,
         method: "query",
         inputSources: ["query", "cookies", "params"],
       });
+      expect(isQueryEnabled).toBe(true);
       expect(isBodyEnabled).toBe(false);
       expect(getLocation("id")).toBe("path");
-      expect(getLocation("test")).toBe("cookie");
+      expect(getLocation("test")).toBe("query");
     });
 
     test("should let a custom isCookie recognize arbitrary cookie names", () => {
