@@ -271,6 +271,7 @@ export const makeParamLocator = ({
 }) => {
   const pathParams = new Set(getRoutePathParams(path));
   const isQueryEnabled = inputSources.includes("query");
+  const isBodyEnabled = inputSources.includes("body");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");
   const areCookiesEnabled =
@@ -291,9 +292,11 @@ export const makeParamLocator = ({
       (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders))
     )
       return "header";
-    if (isQueryEnabled && method !== "query") return "query";
+    if (areCookiesEnabled && !isBodyEnabled) return "cookie";
+    if (isQueryEnabled && (method !== "query" || !isBodyEnabled))
+      return "query";
   };
-  return { pathParams, getLocation, isQueryEnabled };
+  return { pathParams, getLocation, isQueryEnabled, isBodyEnabled };
 };
 
 export const depictRequestParams = ({

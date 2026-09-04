@@ -2,6 +2,19 @@
 
 ## Version 29
 
+### v29.5.3
+
+- Fixed a Documentation generation defect for input fields sourced from cookies when the request body is not among the
+  method's enabled sources:
+  - A field read from `request.cookies`/`request.signedCookies` (because `"cookies"`/`"signedCookies"` is in
+    `inputSources`) is now depicted as `in: cookie` even without a matching `CookieSecurity` declaration;
+  - Previously such a field was depicted as `in: query` (or omitted entirely when `"query"` was not among the sources),
+    contradicting the source that wins at runtime;
+  - The explicit `CookieSecurity` declaration keeps precedence, and when `"body"` is among the sources the field stays
+    in the request body depiction as the primary fallback;
+  - For the `QUERY` method, the request body also remains the primary fallback, so fields are only relocated to
+    `in: query` when `"body"` is not among the configured sources.
+
 ### v29.5.2
 
 - Compatibility fix for the Zod 4.5 feature of [compiled](https://zod.dev/compile) schemas:

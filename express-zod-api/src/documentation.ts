@@ -258,7 +258,7 @@ export class Documentation extends OpenApiBuilder {
       const commons = { ...shared, path, method, endpoint };
       const { description, summary, scopes, inputSchema, security } = endpoint;
       const inputSources = getInputSources(method, config.inputSources);
-      const { pathParams, getLocation } = makeParamLocator({
+      const { pathParams, getLocation, isBodyEnabled } = makeParamLocator({
         method,
         path,
         security,
@@ -316,7 +316,7 @@ export class Documentation extends OpenApiBuilder {
       }
 
       let requestBody: RequestBodyObject | undefined = undefined;
-      if (inputSources.includes("body")) {
+      if (isBodyEnabled) {
         const paramNames = R.pluck("name", depictedParams);
         const [bodyJsonSchema, hasRequiredBodyProps] =
           excludeParamsFromDepiction(

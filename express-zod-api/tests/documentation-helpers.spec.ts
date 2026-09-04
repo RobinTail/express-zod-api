@@ -399,35 +399,41 @@ describe("Documentation helpers", () => {
 
   describe("makeParamLocator", () => {
     test("should handle query and path params", () => {
-      const { pathParams, isQueryEnabled, getLocation } = makeParamLocator({
-        ...requestCtx,
-        inputSources: ["query", "params"],
-      });
+      const { pathParams, isQueryEnabled, isBodyEnabled, getLocation } =
+        makeParamLocator({
+          ...requestCtx,
+          inputSources: ["query", "params"],
+        });
       expect(pathParams).toEqual(new Set(["id"]));
       expect(isQueryEnabled).toBe(true);
+      expect(isBodyEnabled).toBe(false);
       expect(getLocation("id")).toBe("path");
       expect(getLocation("test")).toBe("query");
     });
 
     test("should consider the rest is body when query is disabled", () => {
-      const { pathParams, isQueryEnabled, getLocation } = makeParamLocator({
-        ...requestCtx,
-        inputSources: ["body", "params"],
-      });
+      const { pathParams, isQueryEnabled, isBodyEnabled, getLocation } =
+        makeParamLocator({
+          ...requestCtx,
+          inputSources: ["body", "params"],
+        });
       expect(pathParams).toEqual(new Set(["id"]));
       expect(isQueryEnabled).toBe(false);
+      expect(isBodyEnabled).toBe(true);
       expect(getLocation("id")).toBe("path");
       expect(getLocation("test")).toBeUndefined();
     });
 
     test("Features 1180 and 2344: should handle headers when enabled", () => {
-      const { pathParams, isQueryEnabled, getLocation } = makeParamLocator({
-        ...requestCtx,
-        inputSources: ["query", "headers", "params"],
-        security: [{ type: "header", name: "secure" }],
-      });
+      const { pathParams, isQueryEnabled, isBodyEnabled, getLocation } =
+        makeParamLocator({
+          ...requestCtx,
+          inputSources: ["query", "headers", "params"],
+          security: [{ type: "header", name: "secure" }],
+        });
       expect(pathParams).toEqual(new Set(["id"]));
       expect(isQueryEnabled).toBe(true);
+      expect(isBodyEnabled).toBe(false);
       expect(getLocation("id")).toBe("path");
       expect(getLocation("test")).toBe("query");
       expect(getLocation("x-request-id")).toBe("header");
@@ -435,16 +441,74 @@ describe("Documentation helpers", () => {
     });
 
     test("should handle cookies when enabled", () => {
-      const { pathParams, isQueryEnabled, getLocation } = makeParamLocator({
-        ...requestCtx,
-        inputSources: ["query", "cookies", "params"],
-        security: [{ type: "cookie", name: "session" }],
-      });
+      const { pathParams, isQueryEnabled, isBodyEnabled, getLocation } =
+        makeParamLocator({
+          ...requestCtx,
+          inputSources: ["query", "cookies", "params"],
+          security: [{ type: "cookie", name: "session" }],
+        });
       expect(pathParams).toEqual(new Set(["id"]));
       expect(isQueryEnabled).toBe(true);
+      expect(isBodyEnabled).toBe(false);
+      expect(getLocation("id")).toBe("path");
+      expect(getLocation("test")).toBe("cookie");
+      expect(getLocation("session")).toBe("cookie");
+    });
+
+    test("should keep the rest in the body when body is enabled", () => {
+      const { isBodyEnabled, getLocation } = makeParamLocator({
+        ...requestCtx,
+        inputSources: ["body", "cookies", "params"],
+      });
+      expect(isBodyEnabled).toBe(true);
+      expect(getLocation("id")).toBe("path");
+      expect(getLocation("test")).toBeUndefined();
+      expect(getLocation("session")).toBeUndefined();
+    });
+
+    test("should not move the rest to cookie when query is also enabled", () => {
+      const { isBodyEnabled, getLocation } = makeParamLocator({
+        ...requestCtx,
+        inputSources: ["query", "body", "cookies", "params"],
+      });
+      expect(isBodyEnabled).toBe(true);
       expect(getLocation("id")).toBe("path");
       expect(getLocation("test")).toBe("query");
-      expect(getLocation("session")).toBe("cookie");
+    });
+
+    test("QUERY method: should keep the rest in the body when body is enabled", () => {
+      const { isQueryEnabled, isBodyEnabled, getLocation } = makeParamLocator({
+        ...requestCtx,
+        method: "query",
+        inputSources: ["query", "body", "params"],
+      });
+      expect(isQueryEnabled).toBe(true);
+      expect(isBodyEnabled).toBe(true);
+      expect(getLocation("id")).toBe("path");
+      expect(getLocation("test")).toBeUndefined();
+    });
+
+    test("QUERY method: should depict the rest as query when body is disabled", () => {
+      const { isQueryEnabled, isBodyEnabled, getLocation } = makeParamLocator({
+        ...requestCtx,
+        method: "query",
+        inputSources: ["query", "params"],
+      });
+      expect(isQueryEnabled).toBe(true);
+      expect(isBodyEnabled).toBe(false);
+      expect(getLocation("id")).toBe("path");
+      expect(getLocation("test")).toBe("query");
+    });
+
+    test("QUERY method: cookies win over query when body is disabled", () => {
+      const { isBodyEnabled, getLocation } = makeParamLocator({
+        ...requestCtx,
+        method: "query",
+        inputSources: ["query", "cookies", "params"],
+      });
+      expect(isBodyEnabled).toBe(false);
+      expect(getLocation("id")).toBe("path");
+      expect(getLocation("test")).toBe("cookie");
     });
   });
 
