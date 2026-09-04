@@ -1,21 +1,8 @@
+/**
+ * @desc Cookie names that we're certain about to be actual cookies (not query parameters)
+ * @since v29.6.0
+ * */
 let cache: Set<string>;
 
 export const getWellKnownCookies = () =>
-  (cache ??= new Set([
-    "auth",
-    "auth_token",
-    "authToken",
-    "csrf",
-    "csrf-token",
-    "csrfToken",
-    "preferences",
-    "prefs",
-    "remember-me",
-    "remember",
-    "session",
-    "session_id",
-    "sessionId",
-    "theme",
-    "token",
-    "xsrf",
-  ]));
+  (cache ??= new Set(["session", "session_id", "sessionId"]));

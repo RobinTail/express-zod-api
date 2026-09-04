@@ -387,7 +387,7 @@ describe("Documentation helpers", () => {
   describe("defaultIsCookie()", () => {
     test.each([
       { name: "session", expected: true },
-      { name: "auth_token", expected: true },
+      { name: "session_id", expected: true },
       {
         name: "secure",
         familiar: new Set(["secure"]),

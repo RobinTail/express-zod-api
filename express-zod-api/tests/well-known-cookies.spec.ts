@@ -1,11 +1,12 @@
 import { getWellKnownCookies } from "../src/well-known-cookies";
 
 describe("getWellKnownCookies()", () => {
-  test("should return a memoized Set having a lot of entries", () => {
+  test("should return a memoized Set of certain cookie names", () => {
     const first = getWellKnownCookies();
     expect(first).toBeInstanceOf(Set);
+    expect(first.size).toBeGreaterThan(1);
+    expect([...first].every((name) => name.includes("session"))).toBe(true);
     const second = getWellKnownCookies();
-    expect(second.size).toBeGreaterThan(10);
     expect(first).toBe(second); // same by reference
   });
 });

@@ -16,7 +16,7 @@
   - When `"body"` is not among the sources, `in: query` remains the higher-priority fallback than `in: cookie`;
 - Added the `isCookie` and `defaultIsCookie` options to the Documentation generator, mirroring the existing header
   detection:
-  - Cookie names typical for sessions (`session`, `auth`, `token`, etc.) are now recognized among the input data even
+  - Cookie names typical for sessions (`session`, `session_id`, `sessionId`) are now recognized among the input data even
     without a `CookieSecurity` declaration, whenever cookies are among the enabled sources.
 
 Test coverage for this fix also accounts for the `"signedCookies"` input source, thanks to the contributor of
