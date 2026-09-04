@@ -2,7 +2,7 @@
 
 ## Version 29
 
-### v29.5.3
+### v29.6.0
 
 - Fixed a Documentation generation defect for input fields sourced from cookies when the request body is not among the
   method's enabled sources:
