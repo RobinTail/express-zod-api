@@ -19,6 +19,9 @@
   - Cookie names typical for sessions (`session`, `auth`, `token`, etc.) are now recognized among the input data even
     without a `CookieSecurity` declaration, whenever cookies are among the enabled sources.
 
+Test coverage for this fix also accounts for the `"signedCookies"` input source, thanks to the contributor of
+[#3662](https://github.com/RobinTail/express-zod-api/pull/3662).
+
 ### v29.5.2
 
 - Compatibility fix for the Zod 4.5 feature of [compiled](https://zod.dev/compile) schemas:
