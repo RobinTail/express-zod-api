@@ -292,9 +292,10 @@ export const makeParamLocator = ({
       (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders))
     )
       return "header";
-    if (areCookiesEnabled && !isBodyEnabled) return "cookie";
-    if (isQueryEnabled && (method !== "query" || !isBodyEnabled))
-      return "query";
+    if (!isBodyEnabled) {
+      if (isQueryEnabled) return "query";
+      if (areCookiesEnabled) return "cookie";
+    }
   };
   return { pathParams, getLocation, isQueryEnabled, isBodyEnabled };
 };
