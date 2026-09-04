@@ -488,10 +488,12 @@ describe("Documentation helpers", () => {
     test.each(["cookies", "signedCookies"] as const)(
       "should depict unmatched fields as %s when query and body are disabled",
       (source) => {
-        const { isQueryEnabled, isBodyEnabled, getLocation } = makeParamLocator({
-          ...requestCtx,
-          inputSources: [source, "params"],
-        });
+        const { isQueryEnabled, isBodyEnabled, getLocation } = makeParamLocator(
+          {
+            ...requestCtx,
+            inputSources: [source, "params"],
+          },
+        );
         expect(isQueryEnabled).toBe(false);
         expect(isBodyEnabled).toBe(false);
         expect(getLocation("id")).toBe("path");
