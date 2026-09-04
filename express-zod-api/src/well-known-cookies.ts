@@ -8,8 +8,6 @@ export const getWellKnownCookies = () =>
     "csrf",
     "csrf-token",
     "csrfToken",
-    "lang",
-    "locale",
     "preferences",
     "prefs",
     "remember-me",
