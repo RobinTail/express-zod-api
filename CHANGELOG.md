@@ -14,13 +14,11 @@
   - The explicit `CookieSecurity` declaration keeps precedence, and when `"body"` is among the sources the field stays
     in the request body depiction as the primary fallback for both regular methods and the `QUERY` method;
   - When `"body"` is not among the sources, `in: query` remains the higher-priority fallback than `in: cookie`;
+  - 🙏[@marco-carvalho](https://github.com/marco-carvalho), [@BetterAndBetterII](https://github.com/BetterAndBetterII).
 - Added the `isCookie` and `defaultIsCookie` options to the Documentation generator, mirroring the existing header
   detection:
   - Cookie names typical for sessions (`session`, `session_id`, `sessionId`) are now recognized among the input data even
     without a `CookieSecurity` declaration, whenever cookies are among the enabled sources.
-
-Test coverage for this fix also accounts for the `"signedCookies"` input source, thanks to the contributor of
-[#3662](https://github.com/RobinTail/express-zod-api/pull/3662).
 
 ### v29.5.2
 
