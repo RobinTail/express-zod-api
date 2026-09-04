@@ -9,6 +9,7 @@
 - Fixed a Documentation generation defect for the params of request when its body is not among the enabled sources:
   - Using the `isCookie()` besides the Middleware's `CookieSecurity` to recognize the inputs originating from cookies;
   - Either `query` or `cookie` would be the designated param location (if the corresponding input source is enabled);
+  - Respects customization of the `inputSources` config for the QUERY method (you can omit the `body`);
   - 🙏[@marco-carvalho](https://github.com/marco-carvalho), [@BetterAndBetterII](https://github.com/BetterAndBetterII).
 
 ### v29.5.2
