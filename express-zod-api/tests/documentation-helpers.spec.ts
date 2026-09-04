@@ -385,19 +385,11 @@ describe("Documentation helpers", () => {
   });
 
   describe("defaultIsCookie()", () => {
-    test.each([
-      { name: "session", expected: true },
-      { name: "session_id", expected: true },
-      {
-        name: "secure",
-        familiar: new Set(["secure"]),
-        expected: true,
-      },
-      { name: "unknown", expected: false },
-    ])(
+    const seed = "secure";
+    test.each(["session", "session_id", seed, "unknown"])(
       "should validate familiar and well-known cookies %#",
-      ({ name, familiar, expected }) => {
-        expect(defaultIsCookie(name, familiar)).toBe(expected);
+      (name) => {
+        expect(defaultIsCookie(name, new Set([seed]))).toBe(name !== "unknown");
       },
     );
   });
