@@ -73,15 +73,8 @@ export type Depicter = (
   oasCtx: OpenAPIContext,
 ) => z.core.JSONSchema.BaseSchema | SchemaObjectValue;
 
-/** @desc Using defaultIsHeader when returns null or undefined */
-export type IsHeader = (
-  name: string,
-  method: ClientMethod,
-  path: string,
-) => boolean | null | undefined;
-
-/** @desc Using defaultIsCookie when returns null or undefined */
-export type IsCookie = (
+/** @desc Using defaultIsHeader or defaultIsCookie when returns null or undefined */
+export type ParamRecognizer = (
   name: string,
   method: ClientMethod,
   path: string,
@@ -281,8 +274,8 @@ export const makeParamLocator = ({
   path: string;
   security?: LogicalContainer<Security>[];
   inputSources: InputSource[];
-  isHeader?: IsHeader;
-  isCookie?: IsCookie;
+  isHeader?: ParamRecognizer;
+  isCookie?: ParamRecognizer;
 }) => {
   const pathParams = new Set(getRoutePathParams(path));
   const isQueryEnabled = inputSources.includes("query");

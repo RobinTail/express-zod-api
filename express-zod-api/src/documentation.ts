@@ -39,8 +39,7 @@ import {
   nonEmpty,
   depictRequest,
   makeParamLocator,
-  type IsHeader,
-  type IsCookie,
+  type ParamRecognizer,
   type BrandHandling,
   excludeParamsFromDepiction,
 } from "./documentation-helpers";
@@ -121,13 +120,13 @@ interface DocumentationParams {
    * @see defaultIsHeader
    * @link https://www.iana.org/assignments/http-fields/http-fields.xhtml
    * */
-  isHeader?: IsHeader;
+  isHeader?: ParamRecognizer;
   /**
    * @desc Ability to configure recognition of cookies among other input data
    * @desc Only applicable when "cookies" or "signedCookies" is present within inputSources config option
    * @see defaultIsCookie
    * */
-  isCookie?: IsCookie;
+  isCookie?: ParamRecognizer;
   /**
    * @desc Extended description of tags used in endpoints. For enforcing constraints:
    * @see TagOverrides
