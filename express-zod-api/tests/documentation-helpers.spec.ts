@@ -11,6 +11,7 @@ import {
   trimSummary,
   excludeParamsFromDepiction,
   defaultIsHeader,
+  defaultIsCookie,
   reformatParamsInPath,
   depictNullable,
   depictRaw,
@@ -383,6 +384,24 @@ describe("Documentation helpers", () => {
     );
   });
 
+  describe("defaultIsCookie()", () => {
+    test.each([
+      { name: "session", expected: true },
+      { name: "auth_token", expected: true },
+      {
+        name: "secure",
+        familiar: new Set(["secure"]),
+        expected: true,
+      },
+      { name: "unknown", expected: false },
+    ])(
+      "should validate familiar and well-known cookies %#",
+      ({ name, familiar, expected }) => {
+        expect(defaultIsCookie(name, familiar)).toBe(expected);
+      },
+    );
+  });
+
   describe("depictRequest", () => {
     test("should simply delegate it all to Zod 4", () => {
       expect(
@@ -462,8 +481,8 @@ describe("Documentation helpers", () => {
       });
       expect(isBodyEnabled).toBe(true);
       expect(getLocation("id")).toBe("path");
+      expect(getLocation("session")).toBe("cookie");
       expect(getLocation("test")).toBeUndefined();
-      expect(getLocation("session")).toBeUndefined();
     });
 
     test("should not move the rest to cookie when query is also enabled", () => {
@@ -509,6 +528,17 @@ describe("Documentation helpers", () => {
       expect(isBodyEnabled).toBe(false);
       expect(getLocation("id")).toBe("path");
       expect(getLocation("test")).toBe("cookie");
+    });
+
+    test("should let a custom isCookie recognize arbitrary cookie names", () => {
+      const { isBodyEnabled, getLocation } = makeParamLocator({
+        ...requestCtx,
+        inputSources: ["body", "cookies", "params"],
+        isCookie: (name) => name === "theme",
+      });
+      expect(isBodyEnabled).toBe(true);
+      expect(getLocation("session")).toBeUndefined();
+      expect(getLocation("theme")).toBe("cookie");
     });
   });
 

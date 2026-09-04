@@ -47,6 +47,7 @@ import { ezRawBrand } from "./raw-schema";
 import type { FirstPartyKind } from "./schema-walker";
 import { getSecurityNames, type Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
+import { getWellKnownCookies } from "./well-known-cookies";
 import { getWellKnownHeaders } from "./well-known-headers";
 
 interface ReqResCommons {
@@ -74,6 +75,13 @@ export type Depicter = (
 
 /** @desc Using defaultIsHeader when returns null or undefined */
 export type IsHeader = (
+  name: string,
+  method: ClientMethod,
+  path: string,
+) => boolean | null | undefined;
+
+/** @desc Using defaultIsCookie when returns null or undefined */
+export type IsCookie = (
   name: string,
   method: ClientMethod,
   path: string,
@@ -256,18 +264,25 @@ export const defaultIsHeader = (
   name.startsWith("x-") ||
   getWellKnownHeaders().has(name);
 
+export const defaultIsCookie = (
+  name: string,
+  familiar?: Set<string>,
+): boolean => familiar?.has(name) || getWellKnownCookies().has(name);
+
 export const makeParamLocator = ({
   method,
   path,
   security,
   inputSources,
   isHeader,
+  isCookie,
 }: {
   method: ClientMethod;
   path: string;
   security?: LogicalContainer<Security>[];
   inputSources: InputSource[];
   isHeader?: IsHeader;
+  isCookie?: IsCookie;
 }) => {
   const pathParams = new Set(getRoutePathParams(path));
   const isQueryEnabled = inputSources.includes("query");
@@ -282,11 +297,13 @@ export const makeParamLocator = ({
   let securityCookies: Set<string> | undefined;
   if (areCookiesEnabled && security)
     securityCookies = getSecurityNames(security, "cookie");
+  const fitsCookie = (name: string) =>
+    isCookie?.(name, method, path) ?? defaultIsCookie(name, securityCookies);
   /** @modifies pathParams when the parameter's location is "path" */
   const getLocation = (name: string): ParameterLocation | undefined => {
     if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))
       return "path";
-    if (areCookiesEnabled && securityCookies?.has(name)) return "cookie";
+    if (areCookiesEnabled && fitsCookie(name)) return "cookie";
     if (
       areHeadersEnabled &&
       (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders))

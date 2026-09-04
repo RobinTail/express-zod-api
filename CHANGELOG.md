@@ -13,7 +13,11 @@
   - The explicit `CookieSecurity` declaration keeps precedence, and when `"body"` is among the sources the field stays
     in the request body depiction as the primary fallback;
   - For the `QUERY` method, the request body also remains the primary fallback, so fields are only relocated to
-    `in: query` when `"body"` is not among the configured sources.
+    `in: query` when `"body"` is not among the configured sources;
+- Added the `isCookie` and `defaultIsCookie` options to the Documentation generator, mirroring the existing header
+  detection:
+  - Cookie names typical for sessions (`session`, `auth`, `token`, etc.) are now recognized among the input data even
+    without a `CookieSecurity` declaration, whenever cookies are among the enabled sources.
 
 ### v29.5.2
 

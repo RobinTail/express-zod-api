@@ -40,6 +40,7 @@ import {
   depictRequest,
   makeParamLocator,
   type IsHeader,
+  type IsCookie,
   type BrandHandling,
   excludeParamsFromDepiction,
 } from "./documentation-helpers";
@@ -121,6 +122,12 @@ interface DocumentationParams {
    * @link https://www.iana.org/assignments/http-fields/http-fields.xhtml
    * */
   isHeader?: IsHeader;
+  /**
+   * @desc Ability to configure recognition of cookies among other input data
+   * @desc Only applicable when "cookies" or "signedCookies" is present within inputSources config option
+   * @see defaultIsCookie
+   * */
+  isCookie?: IsCookie;
   /**
    * @desc Extended description of tags used in endpoints. For enforcing constraints:
    * @see TagOverrides
@@ -244,6 +251,7 @@ export class Documentation extends OpenApiBuilder {
     descriptions,
     brandHandling,
     isHeader,
+    isCookie,
     summarizer = defaultSummarizer,
     composition = "inline",
   }: DocumentationParams): OnEndpoint<ClientMethod> {
@@ -264,6 +272,7 @@ export class Documentation extends OpenApiBuilder {
         security,
         inputSources,
         isHeader,
+        isCookie,
       });
       const operationId = this.#ensureUniqOperationId(
         path,
