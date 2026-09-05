@@ -125,10 +125,9 @@ describe("Server", () => {
             }),
             handler: vi.fn(),
           }),
-          raw: factory.build({
+          raw: factory.buildVoid({
             method: "patch",
             input: ez.raw(),
-            output: z.object({}),
             handler: vi.fn(),
           }),
           form: factory.buildVoid({
@@ -230,8 +229,7 @@ describe("Server", () => {
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
-            output: z.object({}),
+          test: new EndpointsFactory(defaultResultHandler).buildVoid({
             handler: vi.fn(),
           }),
         },
@@ -326,11 +324,8 @@ describe("Server", () => {
       } satisfies ServerConfig;
       const routingMock = {
         v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
-            input: z.object({
-              file: ez.upload(),
-            }),
-            output: z.object({}),
+          test: new EndpointsFactory(defaultResultHandler).buildVoid({
+            input: z.object({ file: ez.upload() }),
             handler: vi.fn(),
           }),
         },
@@ -354,9 +349,8 @@ describe("Server", () => {
       } satisfies ServerConfig;
       const routingMock = {
         v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
+          test: new EndpointsFactory(defaultResultHandler).buildVoid({
             input: ez.raw(),
-            output: z.object({}),
             handler: vi.fn(),
           }),
         },

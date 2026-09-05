@@ -128,6 +128,21 @@ const tsFactoryConcerns = [
   },
 ];
 
+const redundancyConcerns = [
+  {
+    selector:
+      "Property[key.name='input'] > " +
+      "CallExpression[callee.property.name='object'] > ObjectExpression[properties.length=0]",
+    message: "empty object input is redundant",
+  },
+  {
+    selector:
+      "Property[key.name='output'] > " +
+      "CallExpression[callee.property.name='object'] > ObjectExpression[properties.length=0]",
+    message: "use .buildVoid() and remove the output property",
+  },
+];
+
 export default defineConfig({
   jsPlugins: [
     { name: "allowed", specifier: "eslint-plugin-allowed-dependencies" },
@@ -310,6 +325,7 @@ export default defineConfig({
       rules: {
         "typescript/no-explicit-any": "off",
         "typescript/no-empty-object-type": "warn",
+        "eslint-js/no-restricted-syntax": ["warn", ...redundancyConcerns],
       },
     },
     {

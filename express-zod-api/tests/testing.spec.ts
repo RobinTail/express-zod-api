@@ -22,10 +22,7 @@ describe("Testing", () => {
             return {};
           },
         })
-        .build({
-          output: z.object({}),
-          handler: async () => ({}),
-        });
+        .buildVoid({ handler: vi.fn() });
       const { responseMock, requestMock, loggerMock } = await testEndpoint({
         endpoint,
         responseOptions: { locals: { prop1: vi.fn(), prop2: 123 } },
@@ -118,7 +115,6 @@ describe("Testing", () => {
         const { output, loggerMock, responseMock } = await testMiddleware({
           configProps: { errorHandler },
           middleware: new Middleware({
-            input: z.object({}),
             handler: async ({ logger }) => {
               logger.info("logging something");
               throw new Error("something went wrong");
