@@ -115,11 +115,11 @@ describe("Routing", () => {
     });
 
     test("Should handle method depending assignments", () => {
-      const handlerMock = vi.fn();
+      const handler = vi.fn();
       const factory = new EndpointsFactory(defaultResultHandler);
-      const getEndpoint = factory.buildVoid({ handler: handlerMock });
-      const postEndpoint = factory.buildVoid({ handler: handlerMock });
-      const putAndPatchEndpoint = factory.buildVoid({ handler: handlerMock });
+      const getEndpoint = factory.buildVoid({ handler });
+      const postEndpoint = factory.buildVoid({ handler });
+      const putAndPatchEndpoint = factory.buildVoid({ handler });
       const routing: Routing = {
         v1: {
           user: {
