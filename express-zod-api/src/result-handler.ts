@@ -127,29 +127,60 @@ export class ResultHandler<
   }
 }
 
-const defaultNegativeSchema = z.object({
-  status: z.literal("error"),
-  error: z.object({ message: z.string() }),
-});
+const defaultNegativeSchema = z.object({ message: z.string() });
 globalRegistry.add(defaultNegativeSchema, {
-  examples: [
-    { status: "error", error: { message: "Sample error message" } },
-  ] satisfies z.output<typeof defaultNegativeSchema>[],
+  examples: [{ message: "Sample error message" }] satisfies z.output<
+    typeof defaultNegativeSchema
+  >[],
 });
 
 /**
- * @desc The default ResultHandler wrapping Endpoint output in `{ status: "success", data: output }`
- *       and errors in `{ status: "error", error: { message } }`. Responds with JSON Content-Type.
+ * @desc The default ResultHandler relaying Endpoint output and error messages. Responds with JSON Content-Type.
  *       Respects the status of errors from createHttpError(), others become InternalServerError (500).
  * @see ensureHttpError
  * */
 export const defaultResultHandler = new ResultHandler({
+  positive: (output) => output,
+  negative: defaultNegativeSchema,
+  handler: ({ error, input, output, request, response, logger }) => {
+    if (error) {
+      const httpError = ensureHttpError(error);
+      logServerError(httpError, logger, request, input);
+      return void response
+        .status(httpError.statusCode)
+        .set(httpError.headers)
+        .json({ message: getPublicErrorMessage(httpError) });
+    }
+    response.status(defaultStatusCodes.positive).json(output);
+  },
+});
+
+const legacyNegativeSchema = z.object({
+  status: z.literal("error"),
+  error: z.object({ message: z.string() }),
+});
+globalRegistry.add(legacyNegativeSchema, {
+  examples: [
+    {
+      status: "error",
+      error: { message: "Sample error message" },
+    },
+  ] satisfies z.output<typeof legacyNegativeSchema>[],
+});
+
+/**
+ * @deprecated Use defaultResultHandler for new APIs.
+ * @desc For migration purposes: preserves the response shapes of v0–v29.
+ * @example `{ status: "success", data: {...} }` and `{ status: "error", error: {...} }`.
+ * @todo remove in v31
+ * */
+export const legacyResultHandler = new ResultHandler({
   positive: (output) => {
     const responseSchema = z.object({
       status: z.literal("success"),
       data: output,
     });
-    const examples = getExamples(output); // pulling down:
+    const examples = getExamples(output); // pulling up:
     if (examples.length) {
       globalRegistry.add(responseSchema, {
         examples: examples.map((data) => ({
@@ -160,7 +191,7 @@ export const defaultResultHandler = new ResultHandler({
     }
     return responseSchema;
   },
-  negative: defaultNegativeSchema,
+  negative: legacyNegativeSchema,
   handler: ({ error, input, output, request, response, logger }) => {
     if (error) {
       const httpError = ensureHttpError(error);

@@ -44,7 +44,7 @@ catalogs:
       specifier: npm:@typescript/typescript6@^6.0.2
       version: 6.0.2
     zod:
-      specifier: ^4.5.0
+      specifier: ^4.5.4
       version: 4.5.4
   prod:
     ramda:
@@ -123,11 +123,11 @@ importers:
         specifier: npm:http-errors@2.0.1
         version: 2.0.1
       typescript:
-        specifier: npm:typescript@5.1.3
-        version: 5.1.3
+        specifier: npm:typescript@6.0.3
+        version: 6.0.3
       zod:
-        specifier: npm:zod@4.3.4
-        version: 4.3.4
+        specifier: npm:zod@4.5.4
+        version: 4.5.4
 
   esm-test:
     devDependencies:
@@ -1798,11 +1798,6 @@ packages:
   types-ramda@0.32.0:
     resolution: {integrity: sha512-iZtriSUdsDqOlip/wUaDNcoiskbVf5RdcqLNpQdUcOM1JKFClochCvPZCDjn/cc9HzoBzi4DEB4iPr1PbrhN1w==}
 
-  typescript@5.1.3:
-    resolution: {integrity: sha512-XH627E9vkeqhlZFQuL+UsyAXEnibT0kWR2FWONlr4sTjvxyJYnyefgrkyECLzM5NenmKzRAy2rR/OlYLA1HkZw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   typescript@5.6.1-rc:
     resolution: {integrity: sha512-E3b2+1zEFu84jB0YQi9BORDjz9+jGbwwy1Zi3G0LUNw7a7cePUrHMRNy8aPh53nXpkFGVHSxIZo5vKTfYaFiBQ==}
     engines: {node: '>=14.17'}
@@ -1948,9 +1943,6 @@ packages:
 
   yuku-parser@0.8.2:
     resolution: {integrity: sha512-VD94CjEoAwCRoJzO4S151dGMlR9l1ned1VLYjsUIPH/v9N/MIP8yZD8K/p3hYon3VfuuIfUNvl3E1Ujq+i4Blw==}
-
-  zod@4.3.4:
-    resolution: {integrity: sha512-Zw/uYiiyF6pUT1qmKbZziChgNPRu+ZRneAsMUDU6IwmXdWt5JwcUfy2bvLOCUtz5UniaN/Zx5aFttZYbYc7O/A==}
 
   zod@4.5.4:
     resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
@@ -3166,8 +3158,6 @@ snapshots:
     dependencies:
       ts-toolbelt: 9.6.0
 
-  typescript@5.1.3: {}
-
   typescript@5.6.1-rc: {}
 
   typescript@6.0.3: {}
@@ -3307,7 +3297,5 @@ snapshots:
       '@yuku-parser/binding-linux-x64-musl': 0.8.2
       '@yuku-parser/binding-win32-arm64': 0.8.2
       '@yuku-parser/binding-win32-x64': 0.8.2
-
-  zod@4.3.4: {}
 
   zod@4.5.4: {}

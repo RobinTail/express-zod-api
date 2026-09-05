@@ -56,10 +56,7 @@ exports[`ResultHandler > 'arrayResultHandler' > should generate negative respons
 
 exports[`ResultHandler > 'defaultResultHandler' > Should handle HTTP error 1`] = `
 {
-  "error": {
-    "message": "Something not found",
-  },
-  "status": "error",
+  "message": "Something not found",
 }
 `;
 
@@ -85,6 +82,83 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle generic error 1`
 
 exports[`ResultHandler > 'defaultResultHandler' > Should handle generic error 2`] = `
 {
+  "message": "Some error",
+}
+`;
+
+exports[`ResultHandler > 'defaultResultHandler' > Should handle regular response 1`] = `
+{
+  "anything": 118,
+  "items": [
+    "One",
+    "Two",
+    "Three",
+  ],
+}
+`;
+
+exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`] = `
+{
+  "message": "something: Expected string, got number",
+}
+`;
+
+exports[`ResultHandler > 'defaultResultHandler' > should forward output schema examples 1`] = `
+{
+  "examples": [
+    {
+      "items": [
+        "One",
+        "Two",
+        "Three",
+      ],
+      "str": "test",
+    },
+  ],
+}
+`;
+
+exports[`ResultHandler > 'defaultResultHandler' > should generate negative response example 1`] = `
+{
+  "examples": [
+    {
+      "message": "Sample error message",
+    },
+  ],
+}
+`;
+
+exports[`ResultHandler > 'legacyResultHandler' > Should handle HTTP error 1`] = `
+{
+  "error": {
+    "message": "Something not found",
+  },
+  "status": "error",
+}
+`;
+
+exports[`ResultHandler > 'legacyResultHandler' > Should handle generic error 1`] = `
+[
+  [
+    "Server side error",
+    {
+      "error": InternalServerError({
+        "cause": Error({
+          "message": "Some error",
+        }),
+        "message": "Some error",
+      }),
+      "payload": {
+        "something": 453,
+      },
+      "url": "http://something/v1/anything",
+    },
+  ],
+]
+`;
+
+exports[`ResultHandler > 'legacyResultHandler' > Should handle generic error 2`] = `
+{
   "error": {
     "message": "Some error",
   },
@@ -92,7 +166,7 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle generic error 2`
 }
 `;
 
-exports[`ResultHandler > 'defaultResultHandler' > Should handle regular response 1`] = `
+exports[`ResultHandler > 'legacyResultHandler' > Should handle regular response 1`] = `
 {
   "data": {
     "anything": 118,
@@ -106,7 +180,7 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle regular response
 }
 `;
 
-exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`] = `
+exports[`ResultHandler > 'legacyResultHandler' > Should handle schema error 1`] = `
 {
   "error": {
     "message": "something: Expected string, got number",
@@ -115,7 +189,7 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`]
 }
 `;
 
-exports[`ResultHandler > 'defaultResultHandler' > should forward output schema examples 1`] = `
+exports[`ResultHandler > 'legacyResultHandler' > should forward output schema examples 1`] = `
 {
   "examples": [
     {
@@ -133,7 +207,7 @@ exports[`ResultHandler > 'defaultResultHandler' > should forward output schema e
 }
 `;
 
-exports[`ResultHandler > 'defaultResultHandler' > should generate negative response example 1`] = `
+exports[`ResultHandler > 'legacyResultHandler' > should generate negative response example 1`] = `
 {
   "examples": [
     {

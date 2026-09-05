@@ -1,7 +1,6 @@
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
 import {
-  DocumentationError,
   EndpointsFactory,
   createConfig,
   Middleware,
@@ -11,7 +10,11 @@ import {
   type Method,
   type Routing,
 } from "../src";
-import { Documentation, type Depicter } from "../src/documentation";
+import {
+  Documentation,
+  DocumentationError,
+  type Depicter,
+} from "../src/documentation";
 import { contentTypes } from "../src/content-type";
 import type { IOSchema } from "../src/io-schema";
 import { z } from "zod";
@@ -1423,6 +1426,30 @@ describe("Documentation", () => {
         name.startsWith("Item"),
       );
       expect(itemKeys).toEqual(["ItemA", "ItemB"]);
+    });
+  });
+
+  describe("Shared output schema should share the positive response component", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Shared output", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+      composition: "components" as const,
+    };
+
+    test("two endpoints reusing one output schema instance emit a single component", () => {
+      const output = z.object({ id: z.string(), name: z.string() });
+      const spec = new Documentation({
+        routing: {
+          "get /a": defaultEndpointsFactory.build({ output, handler: vi.fn() }),
+          "get /b": defaultEndpointsFactory.build({ output, handler: vi.fn() }),
+        },
+        ...commons,
+      }).getSpec();
+      const responseKeys = Object.keys(spec.components?.schemas ?? {}).filter(
+        (name) => name.includes("PositiveResponse"),
+      );
+      expect(responseKeys).toEqual(["GetAPositiveResponse"]);
     });
   });
 

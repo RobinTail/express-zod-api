@@ -26,7 +26,7 @@ catalogs:
   prod:
     "ramda": "^0.32.0"
   peer:
-    "zod": "^4.3.4"
+    "zod": "^4.5.4"
   dev:
     "@types/compression": "^1.8.1"
     "@types/express": "^5.0.6"
@@ -40,7 +40,7 @@ catalogs:
     "http-errors": "^2.0.1"
     "typescript": "npm:@typescript/typescript6@^6.0.2"
     "@typescript/native-preview": "npm:typescript@^7.0.2" # the name used by tsdown
-    "zod": "^4.5.0"
+    "zod": "^4.5.4"
 overrides:
   "@scarf/scarf": "-"
   "lightningcss": "-"
