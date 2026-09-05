@@ -19,6 +19,7 @@ import {
   type FlatObject,
 } from "../src/common-helpers";
 import { z } from "zod";
+import * as R from "ramda";
 import { makeRequestMock } from "../src/testing";
 import { methods } from "../src/method";
 import type { CommonConfig, InputSources } from "../src/config-type";
@@ -47,19 +48,19 @@ describe("Common Helpers", () => {
       expect(isCompiled(schema)).toBe(true);
     });
 
-    test("should return true for a schema flagged by alternative bag markers", () => {
-      const schema = z.object({ num: z.number() });
-      Object.assign(schema._zod.bag, {
-        validator: () => true,
-        fallbackRun: () => ({}),
+    describe("should return true for a schema having a compilation marker", () => {
+      test.each([
+        "_zod|bag|validator",
+        "_zod|bag|fallbackRun",
+        "_zod|run|__originalRun",
+      ])("at %s", (path) => {
+        const schema = R.assocPath(
+          path.split("|"),
+          vi.fn(),
+          z.object({ num: z.number() }),
+        );
+        expect(isCompiled(schema)).toBe(true);
       });
-      expect(isCompiled(schema)).toBe(true);
-    });
-
-    test("should return true for a schema flagged by the __originalRun marker alone", () => {
-      const schema = z.object({ num: z.number() });
-      Object.assign(schema._zod.run, { __originalRun: () => {} });
-      expect(isCompiled(schema)).toBe(true);
     });
   });
 
