@@ -396,10 +396,9 @@ describe("EndpointsFactory", () => {
 
     test("should create an endpoint without input schema", () => {
       const factory = new EndpointsFactory(resultHandlerMock);
-      const endpoint = factory.build({
+      const endpoint = factory.buildVoid({
         method: "get",
         deprecated: true,
-        output: z.object({}),
         handler: vi.fn(),
       });
       expectTypeOf(

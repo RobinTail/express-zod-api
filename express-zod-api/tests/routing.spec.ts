@@ -117,18 +117,9 @@ describe("Routing", () => {
     test("Should handle method depending assignments", () => {
       const handlerMock = vi.fn();
       const factory = new EndpointsFactory(defaultResultHandler);
-      const getEndpoint = factory.build({
-        output: z.object({}),
-        handler: handlerMock,
-      });
-      const postEndpoint = factory.build({
-        output: z.object({}),
-        handler: handlerMock,
-      });
-      const putAndPatchEndpoint = factory.build({
-        output: z.object({}),
-        handler: handlerMock,
-      });
+      const getEndpoint = factory.buildVoid({ handler: handlerMock });
+      const postEndpoint = factory.buildVoid({ handler: handlerMock });
+      const putAndPatchEndpoint = factory.buildVoid({ handler: handlerMock });
       const routing: Routing = {
         v1: {
           user: {
@@ -162,9 +153,8 @@ describe("Routing", () => {
 
     test("Should check if endpoint supports the method it's assigned to", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
-      const putAndPatchEndpoint = factory.build({
+      const putAndPatchEndpoint = factory.buildVoid({
         method: ["put", "patch"],
-        output: z.object({}),
         handler: vi.fn(),
       });
       const routing: Routing = {
@@ -236,10 +226,11 @@ describe("Routing", () => {
     });
 
     test("Should accept parameters", () => {
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        output: z.object({}),
-        handler: vi.fn(),
-      });
+      const endpointMock = new EndpointsFactory(defaultResultHandler).buildVoid(
+        {
+          handler: vi.fn(),
+        },
+      );
       const routing: Routing = {
         v1: {
           user: {
@@ -259,10 +250,11 @@ describe("Routing", () => {
     });
 
     test("Should handle empty paths and trim spaces", () => {
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        output: z.object({}),
-        handler: vi.fn(),
-      });
+      const endpointMock = new EndpointsFactory(defaultResultHandler).buildVoid(
+        {
+          handler: vi.fn(),
+        },
+      );
       const routing: Routing = {
         v1: {
           user: {
@@ -291,10 +283,11 @@ describe("Routing", () => {
     });
 
     test("Should handle slashes in routing keys", () => {
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        output: z.object({}),
-        handler: vi.fn(),
-      });
+      const endpointMock = new EndpointsFactory(defaultResultHandler).buildVoid(
+        {
+          handler: vi.fn(),
+        },
+      );
       const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
@@ -363,11 +356,12 @@ describe("Routing", () => {
     });
 
     test("Should check if endpoint supports an explicitly specified method", () => {
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        method: "post",
-        output: z.object({}),
-        handler: vi.fn(),
-      });
+      const endpointMock = new EndpointsFactory(defaultResultHandler).buildVoid(
+        {
+          method: "post",
+          handler: vi.fn(),
+        },
+      );
       const logger = makeLoggerMock();
       expect(() =>
         initRouting({
@@ -384,10 +378,11 @@ describe("Routing", () => {
     });
 
     test("Should prohibit nested routing within a route having explicit method", () => {
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        output: z.object({}),
-        handler: vi.fn(),
-      });
+      const endpointMock = new EndpointsFactory(defaultResultHandler).buildVoid(
+        {
+          handler: vi.fn(),
+        },
+      );
       const logger = makeLoggerMock();
       expect(() =>
         initRouting({
@@ -437,10 +432,11 @@ describe("Routing", () => {
 
     test("Should prohibit duplicated routes", () => {
       const logger = makeLoggerMock();
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        output: z.object({}),
-        handler: vi.fn(),
-      });
+      const endpointMock = new EndpointsFactory(defaultResultHandler).buildVoid(
+        {
+          handler: vi.fn(),
+        },
+      );
       const routing: Routing = {
         v1: { test: endpointMock },
         "/v1/test": endpointMock,

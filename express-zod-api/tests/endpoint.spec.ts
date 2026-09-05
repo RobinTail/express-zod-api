@@ -117,18 +117,15 @@ describe("Endpoint", () => {
     });
 
     test("should close the stream on OPTIONS request", async () => {
-      const handlerMock = vi.fn();
-      const endpoint = defaultEndpointsFactory.build({
-        output: z.object({}),
-        handler: handlerMock,
-      });
+      const handler = vi.fn();
+      const endpoint = defaultEndpointsFactory.buildVoid({ handler });
       const { responseMock, loggerMock } = await testEndpoint({
         endpoint,
         requestProps: { method: "OPTIONS" },
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(handlerMock).toHaveBeenCalledTimes(0);
+      expect(handler).toHaveBeenCalledTimes(0);
       expect(responseMock.writableEnded).toBeTruthy();
     });
 
@@ -152,8 +149,7 @@ describe("Endpoint", () => {
 
   describe(".deprecated()", () => {
     test("should make a deprecated copy of the endpoint", () => {
-      const endpointMock = defaultEndpointsFactory.build({
-        output: z.object({}),
+      const endpointMock = defaultEndpointsFactory.buildVoid({
         handler: vi.fn(),
       });
       expect(endpointMock.isDeprecated).toBe(false);
@@ -165,10 +161,7 @@ describe("Endpoint", () => {
 
   describe(".nest()", () => {
     test("should return Routing arrangement", () => {
-      const subject = defaultEndpointsFactory.build({
-        output: z.object({}),
-        handler: vi.fn(),
-      });
+      const subject = defaultEndpointsFactory.buildVoid({ handler: vi.fn() });
       expect(subject).toHaveProperty("nest", expect.any(Function));
       expect(subject.nest({ subpath: subject })).toEqual({
         "": subject,
@@ -225,9 +218,8 @@ describe("Endpoint", () => {
         handler: middlewareMock,
       });
       const handlerMock = vi.fn();
-      const endpoint = factory.build({
+      const endpoint = factory.buildVoid({
         method: "post",
-        output: z.object({}),
         handler: handlerMock,
       });
       const { responseMock, loggerMock } = await testEndpoint({
@@ -443,7 +435,7 @@ describe("Endpoint", () => {
           security: { type: "header", name: "X-API-Key" },
           handler: vi.fn(),
         })
-        .build({ output: z.object({}), handler: vi.fn() });
+        .buildVoid({ handler: vi.fn() });
       const { security } = endpoint;
       expect(security).toEqual([
         { name: "X-Token", type: "header" },
@@ -463,7 +455,7 @@ describe("Endpoint", () => {
       expect(endpoint.getProbableRequestType("query")).toBe("form");
     });
     test.each([
-      { input: z.object({}), expected: "json" },
+      { input: z.object(), expected: "json" },
       { input: ez.raw(), expected: "raw" },
       { input: z.object({ file: ez.upload() }), expected: "upload" },
       { input: ez.form({}), expected: "form" },
@@ -755,7 +747,7 @@ describe("Endpoint", () => {
   });
 
   describe("Feature #600: Top level refinements", () => {
-    const endpoint = defaultEndpointsFactory.build({
+    const endpoint = defaultEndpointsFactory.buildVoid({
       method: "post",
       input: z
         .object({
@@ -767,8 +759,7 @@ describe("Endpoint", () => {
           (x) => Object.keys(x).length >= 1,
           "Please provide at least one property",
         ),
-      output: z.object({}),
-      handler: async () => ({}),
+      handler: vi.fn(),
     });
 
     test("should accept valid inputs", async () => {
