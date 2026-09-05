@@ -100,9 +100,8 @@ describe("App in production mode", () => {
         };
       },
     });
-  const longEndpoint = new EndpointsFactory(defaultResultHandler).build({
-    output: z.object({}),
-    handler: async () => setTimeout(5000, {}),
+  const longEndpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+    handler: async () => setTimeout(5000),
   });
   const formEndpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
     method: "post",

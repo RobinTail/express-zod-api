@@ -14,7 +14,7 @@ import {
 } from "./json-schema-helpers";
 import type { ActualLogger } from "./logger-helpers";
 import type { OnEndpoint } from "./routing-walker";
-import type { Method } from "./method.ts";
+import type { Method } from "./method";
 
 interface Findings {
   isSchemaChecked: boolean;

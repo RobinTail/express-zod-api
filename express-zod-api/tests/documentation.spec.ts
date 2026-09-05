@@ -564,18 +564,18 @@ describe("Documentation", () => {
               }),
               handler: async () => ({ num: 123 }),
             }),
-            setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
+            setSomething: defaultEndpointsFactory.addMiddleware(mw2).buildVoid({
               scope: "write",
               method: "post",
-              output: z.object({}),
-              handler: async () => ({}),
+              handler: vi.fn(),
             }),
-            updateSomething: defaultEndpointsFactory.addMiddleware(mw3).build({
-              scope: "this should be omitted",
-              method: "put",
-              output: z.object({}),
-              handler: async () => ({}),
-            }),
+            updateSomething: defaultEndpointsFactory
+              .addMiddleware(mw3)
+              .buildVoid({
+                scope: "this should be omitted",
+                method: "put",
+                handler: vi.fn(),
+              }),
           },
         },
       }).getSpecAsYaml();
@@ -613,19 +613,17 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSome: {
-              thing: defaultEndpointsFactory.build({
+              thing: defaultEndpointsFactory.buildVoid({
                 description: "thing is the path segment",
                 summary: "operationIdEndpoint",
-                output: z.object({}),
-                handler: async () => ({}),
+                handler: vi.fn(),
               }),
-              ":thing": defaultEndpointsFactory.build({
+              ":thing": defaultEndpointsFactory.buildVoid({
                 description: "thing is the path parameter",
                 input: z.object({
                   thing: z.string(),
                 }),
-                output: z.object({}),
-                handler: async () => ({}),
+                handler: vi.fn(),
               }),
             },
           },
@@ -641,11 +639,10 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSome: {
-              thing: defaultEndpointsFactory.build({
+              thing: defaultEndpointsFactory.buildVoid({
                 description: "thing is the path segment",
                 operationId,
-                output: z.object({}),
-                handler: async () => ({}),
+                handler: vi.fn(),
               }),
             },
           },
@@ -662,12 +659,11 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSome: {
-              thing: defaultEndpointsFactory.build({
+              thing: defaultEndpointsFactory.buildVoid({
                 description: "thing is the path segment",
                 method: ["get", "post"],
                 operationId: (method) => `${method}${operationId}`,
-                output: z.object({}),
-                handler: async () => ({}),
+                handler: vi.fn(),
               }),
             },
           },
@@ -694,19 +690,17 @@ describe("Documentation", () => {
             routing: {
               v1: {
                 getSome: {
-                  thing: defaultEndpointsFactory.build({
+                  thing: defaultEndpointsFactory.buildVoid({
                     description: "thing is the path segment",
                     operationId,
-                    output: z.object({}),
-                    handler: async () => ({}),
+                    handler: vi.fn(),
                   }),
                 },
                 getSomeTwo: {
-                  thing: defaultEndpointsFactory.build({
+                  thing: defaultEndpointsFactory.buildVoid({
                     description: "thing is the path segment",
                     operationId,
-                    output: z.object({}),
-                    handler: async () => ({}),
+                    handler: vi.fn(),
                   }),
                 },
               },
@@ -734,10 +728,7 @@ describe("Documentation", () => {
         config: sampleConfig,
         routing: {
           v1: {
-            getSomething: factory.build({
-              output: z.object({}),
-              handler: async () => ({}),
-            }),
+            getSomething: factory.buildVoid({ handler: vi.fn() }),
           },
         },
       }).getSpecAsYaml();
@@ -810,7 +801,7 @@ describe("Documentation", () => {
         config: sampleConfig,
         routing: {
           v1: {
-            ":name": defaultEndpointsFactory.build({
+            ":name": defaultEndpointsFactory.buildVoid({
               method: "post",
               input: z.object({
                 name: z
@@ -819,7 +810,6 @@ describe("Documentation", () => {
                   .meta({ id: "NameParam" }),
                 other: z.boolean(),
               }),
-              output: z.object({}),
               handler: vi.fn(),
             }),
           },
@@ -845,13 +835,12 @@ describe("Documentation", () => {
           },
           routing: {
             v1: {
-              ":name": defaultEndpointsFactory.build({
+              ":name": defaultEndpointsFactory.buildVoid({
                 method: "post",
                 input: z.object({
                   name: z.literal("John").or(z.literal("Jane")),
                   other: z.boolean(),
                 }),
-                output: z.object({}),
                 handler: vi.fn(),
               }),
             },
@@ -866,12 +855,11 @@ describe("Documentation", () => {
         config: sampleConfig,
         routing: {
           v1: {
-            ":name": defaultEndpointsFactory.build({
+            ":name": defaultEndpointsFactory.buildVoid({
               input: z.object({
                 name: z.literal("John").or(z.literal("Jane")),
                 other: z.boolean(),
               }),
-              output: z.object({}),
               handler: vi.fn(),
             }),
           },
@@ -887,7 +875,7 @@ describe("Documentation", () => {
         config: sampleConfig,
         routing: {
           v1: {
-            ":id": defaultEndpointsFactory.build({
+            ":id": defaultEndpointsFactory.buildVoid({
               method: "post",
               input: z
                 .object({
@@ -900,7 +888,6 @@ describe("Documentation", () => {
                     { id: "456", bodyField: false },
                   ],
                 }),
-              output: z.object({}),
               handler: vi.fn(),
             }),
           },
@@ -988,13 +975,12 @@ describe("Documentation", () => {
           config: specificConfig,
           routing: {
             v1: {
-              test: defaultEndpointsFactory.build({
+              test: defaultEndpointsFactory.buildVoid({
                 method,
                 input: z.object({
                   id: z.string(),
                   "x-request-id": z.string(),
                 }),
-                output: z.object({}),
                 handler: vi.fn(),
               }),
             },
@@ -1099,11 +1085,8 @@ describe("Documentation", () => {
     });
 
     test("Feature #2390: should support deprecations", () => {
-      const endpoint = defaultEndpointsFactory.build({
-        input: z.object({
-          str: z.string().meta({ deprecated: true }),
-        }),
-        output: z.object({}),
+      const endpoint = defaultEndpointsFactory.buildVoid({
+        input: z.object({ str: z.string().meta({ deprecated: true }) }),
         handler: vi.fn(),
       });
       const spec = new Documentation({
@@ -1119,7 +1102,7 @@ describe("Documentation", () => {
         config: sampleConfig,
         routing: {
           hris: {
-            employees: defaultEndpointsFactory.build({
+            employees: defaultEndpointsFactory.buildVoid({
               input: z.object({
                 cursor: z
                   .string()
@@ -1129,8 +1112,7 @@ describe("Documentation", () => {
                       " This can be retrieved from the `next` property of the previous page response.",
                   ),
               }),
-              output: z.object({}),
-              handler: async () => ({}),
+              handler: vi.fn(),
             }),
           },
         },
@@ -1372,12 +1354,10 @@ describe("Documentation", () => {
       const spec = new Documentation({
         routing: {
           "get /a": defaultEndpointsFactory.build({
-            input: z.object({}),
             output: item,
             handler: vi.fn(),
           }),
           "get /b": defaultEndpointsFactory.build({
-            input: z.object({}),
             output: item,
             handler: vi.fn(),
           }),
@@ -1423,22 +1403,18 @@ describe("Documentation", () => {
       const spec = new Documentation({
         routing: {
           "get /a": defaultEndpointsFactory.build({
-            input: z.object({}),
             output: itemA,
             handler: vi.fn(),
           }),
           "get /b": defaultEndpointsFactory.build({
-            input: z.object({}),
             output: itemA,
             handler: vi.fn(),
           }),
           "get /c": defaultEndpointsFactory.build({
-            input: z.object({}),
             output: itemB,
             handler: vi.fn(),
           }),
           "get /d": defaultEndpointsFactory.build({
-            input: z.object({}),
             output: itemB,
             handler: vi.fn(),
           }),
@@ -1495,12 +1471,10 @@ describe("Documentation", () => {
           new Documentation({
             routing: {
               "get /a": defaultEndpointsFactory.build({
-                input: z.object({}),
                 output: alpha,
                 handler: vi.fn(),
               }),
               "get /b": defaultEndpointsFactory.build({
-                input: z.object({}),
                 output: beta,
                 handler: vi.fn(),
               }),
