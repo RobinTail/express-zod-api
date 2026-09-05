@@ -47,6 +47,7 @@ import { ezRawBrand } from "./raw-schema";
 import type { FirstPartyKind } from "./schema-walker";
 import { getSecurityNames, type Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
+import { getWellKnownCookies } from "./well-known-cookies";
 import { getWellKnownHeaders } from "./well-known-headers";
 
 interface ReqResCommons {
@@ -72,8 +73,8 @@ export type Depicter = (
   oasCtx: OpenAPIContext,
 ) => z.core.JSONSchema.BaseSchema | SchemaObjectValue;
 
-/** @desc Using defaultIsHeader when returns null or undefined */
-export type IsHeader = (
+/** @desc Using defaultIsHeader or defaultIsCookie when returns null or undefined */
+export type ParamRecognizer = (
   name: string,
   method: ClientMethod,
   path: string,
@@ -256,21 +257,29 @@ export const defaultIsHeader = (
   name.startsWith("x-") ||
   getWellKnownHeaders().has(name);
 
+export const defaultIsCookie = (
+  name: string,
+  familiar?: Set<string>,
+): boolean => familiar?.has(name) || getWellKnownCookies().has(name);
+
 export const makeParamLocator = ({
   method,
   path,
   security,
   inputSources,
   isHeader,
+  isCookie,
 }: {
   method: ClientMethod;
   path: string;
   security?: LogicalContainer<Security>[];
   inputSources: InputSource[];
-  isHeader?: IsHeader;
+  isHeader?: ParamRecognizer;
+  isCookie?: ParamRecognizer;
 }) => {
   const pathParams = new Set(getRoutePathParams(path));
   const isQueryEnabled = inputSources.includes("query");
+  const isBodyEnabled = inputSources.includes("body");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");
   const areCookiesEnabled =
@@ -281,19 +290,24 @@ export const makeParamLocator = ({
   let securityCookies: Set<string> | undefined;
   if (areCookiesEnabled && security)
     securityCookies = getSecurityNames(security, "cookie");
+  const fitsCookie = (name: string) =>
+    isCookie?.(name, method, path) ?? defaultIsCookie(name, securityCookies);
   /** @modifies pathParams when the parameter's location is "path" */
   const getLocation = (name: string): ParameterLocation | undefined => {
     if (areParamsEnabled && pathParams.has(name) && pathParams.delete(name))
       return "path";
-    if (areCookiesEnabled && securityCookies?.has(name)) return "cookie";
+    if (areCookiesEnabled && fitsCookie(name)) return "cookie";
     if (
       areHeadersEnabled &&
       (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders))
     )
       return "header";
-    if (isQueryEnabled && method !== "query") return "query";
+    if (!isBodyEnabled) {
+      if (isQueryEnabled) return "query";
+      if (areCookiesEnabled) return "cookie";
+    }
   };
-  return { pathParams, getLocation, isQueryEnabled };
+  return { pathParams, getLocation, isQueryEnabled, isBodyEnabled };
 };
 
 export const depictRequestParams = ({
