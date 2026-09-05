@@ -32,13 +32,10 @@ describe("Integration", () => {
         routing: {
           v1: {
             test: defaultEndpointsFactory
-              .build({
+              .buildVoid({
                 method: "query",
-                input: z.object({
-                  features: recursiveSchema,
-                }),
-                output: z.object({}),
-                handler: async () => ({}),
+                input: z.object({ features: recursiveSchema }),
+                handler: vi.fn(),
               })
               .deprecated(),
           },
