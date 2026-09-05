@@ -52,6 +52,19 @@ else if (status === 400 || discriminator === "error")
 
 ## Version 29
 
+### v29.6.0
+
+- Added the `isCookie` (a boolean returning function) option to the Documentation generator for your customizations:
+  - The default one recognizes names that are typical for sessions: `session`, `session_id`, `sessionId`.
+- Fixed depiction of API request by the Documentation generator:
+  - When `body` is among the configured `inputSources` for a certain HTTP method (POST, PUT, PATCH, QUERY by default):
+    - The request body would be the default location for the inputs that are not headers or cookies;
+  - When `body` is not enabled for a certain HTTP method (GET and DELETE methods by default):
+    - `isCookie()` would be used beside the Middleware's `CookieSecurity` to recognize cookies;
+    - Either `query` or `cookie` would be the default param location (if the corresponding input source is enabled);
+  - The customization of the `inputSources` config is respected for the QUERY method (you can exclude the `body`);
+  - 🙏[@marco-carvalho](https://github.com/marco-carvalho), [@BetterAndBetterII](https://github.com/BetterAndBetterII).
+
 ### v29.5.2
 
 - Compatibility fix for the Zod 4.5 feature of [compiled](https://zod.dev/compile) schemas:

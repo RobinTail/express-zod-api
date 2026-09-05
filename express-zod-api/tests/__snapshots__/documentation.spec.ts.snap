@@ -2665,12 +2665,6 @@ paths:
     post:
       operationId: PostV1Test
       parameters:
-        - name: id
-          in: query
-          required: true
-          description: POST /v1/test Parameter
-          schema:
-            type: string
         - name: x-request-id
           in: header
           required: true
@@ -2683,8 +2677,12 @@ paths:
           application/json:
             schema:
               type: object
-              properties: {}
-              required: []
+              properties:
+                id:
+                  type: string
+              required:
+                - id
+        required: true
       responses:
         "200":
           description: POST /v1/test Positive response
