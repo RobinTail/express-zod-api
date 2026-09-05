@@ -28,6 +28,9 @@ describe("Migration", async () => {
       `import { legacyResultHandler, legacyEndpointsFactory } from "express-zod-api"`,
       `const foo = new EndpointsFactory(legacyResultHandler)`,
       `const bar = legacyEndpointsFactory.build({})`,
+      // createConfigCall
+      `createConfig({ trySyncValidation: false })`,
+      `createConfig({ trySyncValidation: true, cors: true })`,
     ],
     invalid: [
       {
@@ -202,6 +205,28 @@ describe("Migration", async () => {
               from: "defaultEndpointsFactory",
               to: "legacyEndpointsFactory",
             },
+          },
+        ],
+      },
+      {
+        name: "add trySyncValidation to empty createConfig",
+        code: `createConfig({})`,
+        output: `createConfig({\n  // @todo remove it when made sure that async refinements of your schemas do not have side effects sensitive to the calls count\n  trySyncValidation: false,})`,
+        errors: [
+          {
+            messageId: "add",
+            data: { subject: "trySyncValidation: false", to: "createConfig()" },
+          },
+        ],
+      },
+      {
+        name: "add trySyncValidation to createConfig with existing properties",
+        code: `createConfig({\n  cors: true,\n})`,
+        output: `createConfig({\n  // @todo remove it when made sure that async refinements of your schemas do not have side effects sensitive to the calls count\n  trySyncValidation: false,\n  cors: true,\n})`,
+        errors: [
+          {
+            messageId: "add",
+            data: { subject: "trySyncValidation: false", to: "createConfig()" },
           },
         ],
       },

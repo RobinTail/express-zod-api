@@ -8,6 +8,7 @@ import {
 interface Queries {
   expressZodApiImport: ESTree.ImportDeclaration;
   defaultId: ESTree.IdentifierName;
+  createConfigCall: ESTree.ObjectExpression;
 }
 
 type Listener = keyof Queries;
@@ -15,6 +16,7 @@ type Listener = keyof Queries;
 const queries: Record<Listener, string> = {
   expressZodApiImport: `ImportDeclaration[source.value="express-zod-api"]`,
   defaultId: `Identifier[name]`,
+  createConfigCall: `CallExpression[callee.name="createConfig"] > ObjectExpression`,
 };
 
 const listen = <S extends { [K in Listener]: (node: Queries[K]) => void }>(
@@ -118,6 +120,30 @@ const theRule: Rule = {
           messageId: "change",
           data: { subject: "entity", from: node.name, to: replacement },
           fix: (fixer) => fixer.replaceText(node, replacement),
+        });
+      },
+      createConfigCall: (node) => {
+        const hasTrySyncValidation = node.properties.some(
+          (property) =>
+            property.type === "Property" &&
+            property.key.type === "Identifier" &&
+            property.key.name === "trySyncValidation",
+        );
+        if (hasTrySyncValidation) return;
+        ctx.report({
+          node,
+          messageId: "add",
+          data: { subject: "trySyncValidation: false", to: "createConfig()" },
+          fix: (fixer) => {
+            const openBrace = ctx.sourceCode.getFirstToken(node)!;
+            const comment =
+              "@todo remove it when made sure that async refinements " +
+              "of your schemas do not have side effects sensitive to the calls count";
+            return fixer.insertTextAfter(
+              openBrace,
+              `\n  // ${comment}\n  trySyncValidation: false,`,
+            );
+          },
         });
       },
     }),
