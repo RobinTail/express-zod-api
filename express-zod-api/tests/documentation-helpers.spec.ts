@@ -460,11 +460,14 @@ describe("Documentation helpers", () => {
     );
 
     test.each<InputSource[]>([
+      ["cookies"],
+      ["signedCookies"],
       ["cookies", "query"],
       ["signedCookies", "query"],
       ["query"],
     ])("should locate cookies when enabled $#", (...inputSources) => {
       const hasCookies = inputSources.some((one) => one.endsWith("okies"));
+      const hasQuery = inputSources.includes("query");
       const { getLocation } = makeParamLocator({
         ...requestCtx,
         inputSources,
@@ -472,7 +475,7 @@ describe("Documentation helpers", () => {
       });
       expect(getLocation("store")).toBe(hasCookies ? "cookie" : "query"); // security
       expect(getLocation("session")).toBe(hasCookies ? "cookie" : "query"); // familiar
-      expect(getLocation("unknown")).toBe("query");
+      expect(getLocation("unknown")).toBe(hasQuery ? "query" : "cookie"); // fallback
     });
 
     test("should locate custom cookies and custom headers by recognizer fn", () => {
