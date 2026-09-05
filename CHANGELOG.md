@@ -4,6 +4,8 @@
 
 ### v30.0.0
 
+- Supported Zod versions: `^4.5.4`:
+  - Using [compiled](https://zod.dev/compile) I/O schemas for Endpoint runtime performance boost.
 - Supported TypeScript versions (optional peer): `^6.0.3`:
   - Entirely `#private` props are now restored in the classes of the distributed `.d.ts` files.
 - Config option `trySyncValidation` is now enabled by default (potentially breaking behavior change):

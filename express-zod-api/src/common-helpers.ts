@@ -13,11 +13,32 @@ import {
 import type { NormalizedResponse } from "./api-response";
 
 /** @since zod 3.25.61 output type fixed */
-export const emptySchema = z.object({});
+export const emptySchema = z.compile(z.object({}));
 export type EmptySchema = typeof emptySchema;
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = z.output<EmptySchema>;
 export type FlatObject = Record<string, unknown>;
+
+/** @desc Detects whether the schema has already been compiled by z.compile() or the zod global shim. */
+export const isCompiled = (schema: z.ZodType): boolean =>
+  Boolean(
+    (schema._zod.run as { __originalRun?: unknown }).__originalRun ||
+    schema._zod.bag.validator ||
+    schema._zod.bag.fallbackRun, // Zod 4.5.4 sets these markers on compiled schemas
+  );
+
+/** @see compileOnce */
+const compiledSchemas = new WeakMap<z.ZodType, z.ZodType>();
+
+/** @desc Compiles the schema once to enable sharing the originals between Endpoints and Middlewares. */
+export const compileOnce = <T extends z.ZodType>(schema: T): T => {
+  if (isCompiled(schema)) return schema; // already compiled
+  const cached = compiledSchemas.get(schema);
+  if (cached) return cached as T;
+  const compiled = z.compile(schema);
+  compiledSchemas.set(schema, compiled);
+  return compiled;
+};
 
 /** @link https://stackoverflow.com/a/65492934 */
 type NoNever<T, F> = [T] extends [never] ? F : T;

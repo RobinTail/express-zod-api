@@ -13,6 +13,6 @@
     "express-zod-api": "workspace:*",
     "http-errors": "npm:http-errors@2.0.1",
     "typescript": "npm:typescript@6.0.3",
-    "zod": "npm:zod@4.3.4"
+    "zod": "npm:zod@4.5.4"
   }
 }

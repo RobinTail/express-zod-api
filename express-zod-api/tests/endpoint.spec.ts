@@ -292,7 +292,9 @@ describe("Endpoint", () => {
           output,
           handler: vi.fn(),
         });
-        expect(endpoint[prop]).toEqual(prop === "inputSchema" ? input : output);
+        expect(
+          R.path("_zod|def|shape|something|type".split("|"), endpoint[prop]),
+        ).toEqual(prop === "inputSchema" ? "number" : "string");
       });
     },
   );

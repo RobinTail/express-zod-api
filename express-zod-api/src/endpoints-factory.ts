@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
 import {
+  compileOnce,
   emptySchema,
   type EmptyObject,
   type EmptySchema,
@@ -192,7 +193,7 @@ export class EndpointsFactory<
    * */
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
     input = emptySchema as unknown as BIN,
-    output: outputSchema,
+    output,
     operationId,
     scope,
     tag,
@@ -214,13 +215,13 @@ export class EndpointsFactory<
     return new Endpoint({
       ...rest,
       middlewares,
-      outputSchema,
       resultHandler,
       scopes,
       tags,
       methods,
       getOperationId,
       inputSchema: makeFinalInputSchema(this.schema, input),
+      outputSchema: compileOnce(output),
       statusCodes: this.statusCodes.union(
         new Set(
           typeof statusCode === "number" ? [statusCode] : statusCode || [],
