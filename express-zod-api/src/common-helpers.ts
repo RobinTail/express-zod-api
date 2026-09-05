@@ -19,32 +19,25 @@ export type EmptySchema = typeof emptySchema;
 export type EmptyObject = z.output<EmptySchema>;
 export type FlatObject = Record<string, unknown>;
 
-/**
- * @desc Detects whether the schema has already been compiled by z.compile() or the zod global shim.
- * @desc The external library sets the matching markers on the instance internals: __originalRun on _zod.run and
- *       validator with fallbackRun on _zod.bag.
- * */
+/** @desc Detects whether the schema has already been compiled by z.compile() or the zod global shim. */
 export const isCompiled = (schema: z.ZodType): boolean =>
   Boolean(
     (schema._zod.run as { __originalRun?: unknown }).__originalRun ||
     schema._zod.bag.validator ||
-    schema._zod.bag.fallbackRun,
+    schema._zod.bag.fallbackRun, // Zod 4.5.4 sets these markers on compiled schemas
   );
 
-/**
- * @desc Compiles the schema once and caches the compiled clone per schema instance.
- * @desc Keeps the identity of schemas shared between Endpoints and Middlewares so that they are not recompiled on
- *       each construction and the component deduplication in the Documentation keeps working.
- * @desc Schemas already compiled (see isCompiled()) are passed through as is.
- * */
-const compiledSchemas = new WeakMap<object, object>();
+/** @see compileOnce */
+const compiledSchemas = new WeakMap<z.ZodType, z.ZodType>();
+
+/** @desc Compiles the schema once to enable sharing the originals between Endpoints and Middlewares. */
 export const compileOnce = <T extends z.ZodType>(schema: T): T => {
   if (isCompiled(schema)) return schema; // already compiled
   const cached = compiledSchemas.get(schema);
   if (cached) return cached as T;
   const compiled = z.compile(schema);
   compiledSchemas.set(schema, compiled);
-  return compiled as T;
+  return compiled;
 };
 
 /** @link https://stackoverflow.com/a/65492934 */
