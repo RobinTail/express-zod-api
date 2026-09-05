@@ -215,13 +215,13 @@ export class EndpointsFactory<
     return new Endpoint({
       ...rest,
       middlewares,
-      outputSchema: compileOnce(output),
       resultHandler,
       scopes,
       tags,
       methods,
       getOperationId,
       inputSchema: makeFinalInputSchema(this.schema, input),
+      outputSchema: compileOnce(output),
       statusCodes: this.statusCodes.union(
         new Set(
           typeof statusCode === "number" ? [statusCode] : statusCode || [],
