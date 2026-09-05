@@ -1462,19 +1462,11 @@ describe("Documentation", () => {
     };
 
     test("two endpoints reusing one output schema instance emit a single component", () => {
-      const shared = z.object({ id: z.string(), name: z.string() });
+      const output = z.object({ id: z.string(), name: z.string() });
       const spec = new Documentation({
         routing: {
-          "get /a": defaultEndpointsFactory.build({
-            input: z.object({}),
-            output: shared,
-            handler: vi.fn(),
-          }),
-          "get /b": defaultEndpointsFactory.build({
-            input: z.object({}),
-            output: shared,
-            handler: vi.fn(),
-          }),
+          "get /a": defaultEndpointsFactory.build({ output, handler: vi.fn() }),
+          "get /b": defaultEndpointsFactory.build({ output, handler: vi.fn() }),
         },
         ...commons,
       }).getSpec();
