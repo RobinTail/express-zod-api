@@ -4,6 +4,12 @@ import * as entrypoint from "../src";
 describe("Entrypoint", () => {
   test("Augmentation", () => {
     expectTypeOf<z.ZodAny>()
+      .toHaveProperty("deprecated")
+      .toEqualTypeOf<() => z.ZodAny>();
+    expectTypeOf<z.ZodAny>()
+      .toHaveProperty("xAsync")
+      .toEqualTypeOf<() => z.ZodAny>();
+    expectTypeOf<z.ZodAny>()
       .toHaveProperty("xBrand")
       .toEqualTypeOf<(brand?: PropertyKey) => z.ZodAny>();
     expectTypeOf<z.ZodAny>()
@@ -28,6 +34,10 @@ describe("Entrypoint", () => {
       .exclude(undefined)
       .toHaveProperty("x-brand")
       .toEqualTypeOf<PropertyKey | undefined>();
+    expectTypeOf<ReturnType<typeof globalRegistry.get>>()
+      .exclude(undefined)
+      .toHaveProperty("x-async")
+      .toEqualTypeOf<boolean | undefined>();
   });
 
   test("has no exports", () => {

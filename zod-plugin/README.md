@@ -8,6 +8,9 @@ This module extends Zod functionality when it's imported:
   - shorthand for `.meta({ examples: [...] })`;
 - Adds `.deprecated()` method to all Zod schemas:
   - shorthand for `.meta({ deprecated: true })`;
+- Adds `.xAsync()` method to all Zod schemas:
+  - shorthand for `.meta({ "x-async": true })`;
+  - It reflects that the schema has async refinements or transformations;
 - Adds `.xBrand()` method to all Zod schemas:
   - shorthand for `.meta({ "x-brand": ... })` making the brand available in runtime;
   - This method does not conflict with Zod 4.4+ internal mechanisms;

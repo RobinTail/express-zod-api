@@ -1,12 +1,13 @@
 import type { z } from "zod";
 import type { Intact, Remap } from "./remap";
-import type { brandProperty } from "./shared";
+import type { brandProperty, asyncProperty } from "./shared";
 
 declare module "zod/v4/core" {
   interface GlobalMeta {
     default?: unknown; // can be an actual value or a label like "Today"
     examples?: unknown[]; // see zod commit ee5615d
     [brandProperty]?: PropertyKey;
+    [asyncProperty]?: boolean;
   }
 }
 
@@ -16,6 +17,7 @@ declare module "zod/v4/core" {
  * @desc This code modifies and extends zod's functionality immediately when importing the plugin.
  * @desc Enables .example() and .deprecated() on all schemas (ZodType)
  * @desc Enables .xBrand() on all schemas as an alternative to .brand() that doesn't conflict with Zod 4.4+
+ * @desc Enabled .xAsync() on all schemas to reflect that the schema has async refinements or transformations
  * @desc Enables .label() on ZodDefault
  * @desc Enables .remap() on ZodObject
  * @desc Stores the argument supplied to .xBrand() on all schemas (runtime distinguishable)
@@ -29,9 +31,12 @@ declare module "zod" {
   > extends z.core.$ZodType<Output, Input, Internals> {
     /** @desc Shorthand for .meta({ examples }) */
     example(example: z.output<this>): this;
+    /** @desc Shorthand for .meta({ "deprecated": true }) */
     deprecated(): this;
     /** @desc Shorthand for .meta({ "x-brand": ... }) */
     xBrand(brand?: PropertyKey): this;
+    /** @desc Shorthand for .meta({ "x-async": true }) */
+    xAsync(): this;
   }
   interface ZodDefault<T extends z.core.SomeType = z.core.$ZodType>
     extends z._ZodType<z.core.$ZodDefaultInternals<T>>, z.core.$ZodDefault<T> {
