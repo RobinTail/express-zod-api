@@ -18,7 +18,7 @@ import type { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
-import { brandProperty, getExamples, isAsync } from "./metadata";
+import { brandProperty, getExamples } from "./metadata";
 import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import type { ContentType } from "./content-type";
@@ -109,7 +109,9 @@ export class Endpoint<
     deprecated?: boolean;
     middlewares?: AbstractMiddleware[];
     inputSchema: IN;
+    isInputSchemaAsync: boolean;
     outputSchema: OUT;
+    isOutputSchemaAsync: boolean;
     handler: Handler<z.output<IN>, z.input<OUT>, CTX>;
     resultHandler: AbstractResultHandler;
     description?: string;
@@ -122,8 +124,8 @@ export class Endpoint<
   }) {
     super();
     this.#def = def;
-    this.#inputParsingState = { isAsync: isAsync(def.inputSchema) };
-    this.#outputParsingState = { isAsync: isAsync(def.outputSchema) };
+    this.#inputParsingState = { isAsync: def.isInputSchemaAsync };
+    this.#outputParsingState = { isAsync: def.isOutputSchemaAsync };
   }
 
   #clone(

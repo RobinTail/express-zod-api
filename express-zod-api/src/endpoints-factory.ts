@@ -215,9 +215,6 @@ export class EndpointsFactory<
             operationId && `${operationId}${mtd === "head" ? "__HEAD" : ""}`; // ensure non-breaking change
     const scopes = new FrozenSet(typeof scope === "string" ? [scope] : scope);
     const tags = new FrozenSet(typeof tag === "string" ? [tag] : tag);
-    const inputSchema = makeFinalInputSchema(this.schema, input);
-    // @todo ensure it doesn't overwrite, or even make a argument to avoid communication via registry
-    if (this.isAsync || isAsync(inputSchema)) z.globalRegistry.add(inputSchema, {[asyncProperty]: true});
     return new Endpoint({
       ...rest,
       middlewares,
@@ -226,8 +223,10 @@ export class EndpointsFactory<
       tags,
       methods,
       getOperationId,
-      inputSchema,
+      inputSchema: makeFinalInputSchema(this.schema, input),
+      isInputSchemaAsync: this.isAsync || isAsync(input),
       outputSchema: compileOnce(output),
+      isOutputSchemaAsync: isAsync(output),
       statusCodes: this.statusCodes.union(
         new Set(
           typeof statusCode === "number" ? [statusCode] : statusCode || [],
