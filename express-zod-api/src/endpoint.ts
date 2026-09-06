@@ -18,7 +18,7 @@ import type { FrozenSet } from "./frozen-set";
 import type { IOSchema } from "./io-schema";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
-import { brandProperty, getExamples } from "./metadata";
+import { brandProperty, getExamples, isAsync } from "./metadata";
 import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import type { ContentType } from "./content-type";
@@ -122,6 +122,8 @@ export class Endpoint<
   }) {
     super();
     this.#def = def;
+    this.#inputParsingState = { isAsync: isAsync(def.inputSchema) };
+    this.#outputParsingState = { isAsync: isAsync(def.outputSchema) };
   }
 
   #clone(

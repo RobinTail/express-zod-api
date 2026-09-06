@@ -1,7 +1,11 @@
-import type { brandProperty as brandProp } from "@express-zod-api/zod-plugin/shared";
+import type {
+  brandProperty as brandProp,
+  asyncProperty as asyncProp,
+} from "@express-zod-api/zod-plugin/shared";
 import { globalRegistry, type z } from "zod";
 
 export const brandProperty = "x-brand" satisfies typeof brandProp;
+const asyncProperty = "x-async" satisfies typeof asyncProp;
 
 export const getBrand = (subject: z.core.$ZodType) => {
   const { [brandProperty]: brand } = globalRegistry.get(subject) || {};
@@ -13,6 +17,9 @@ export const getBrand = (subject: z.core.$ZodType) => {
     return brand;
   return undefined;
 };
+
+export const isAsync = (subject: z.core.$ZodType) =>
+  globalRegistry.get(subject)?.[asyncProperty] === true;
 
 /** @desc Returns examples from the schema metadata always as an array */
 export const getExamples = (subject: z.core.$ZodType): unknown[] => {
