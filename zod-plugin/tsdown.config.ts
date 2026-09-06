@@ -10,7 +10,7 @@ declare global {
 export default defineConfig({
   entry: {
     index: "src/index.ts",
-    brand: "src/brand.ts",
+    shared: "src/shared.ts",
   },
   fixedExtension: false,
   minify: true,

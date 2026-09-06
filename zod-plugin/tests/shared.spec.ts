@@ -1,4 +1,4 @@
-import { brandProperty } from "../src/brand";
+import { brandProperty } from "../src/shared";
 
 describe("Brand", () => {
   describe("brandProperty", () => {

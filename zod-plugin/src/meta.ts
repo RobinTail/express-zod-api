@@ -1,5 +1,5 @@
 import { globalRegistry, type z } from "zod";
-import { brandProperty } from "./brand";
+import { brandProperty } from "./shared";
 
 export const exampleSetter = function (
   this: z.ZodType,

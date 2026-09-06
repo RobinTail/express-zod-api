@@ -1,6 +1,6 @@
 import type { z } from "zod";
 import type { Intact, Remap } from "./remap";
-import type { brandProperty } from "./brand";
+import type { brandProperty } from "./shared";
 
 declare module "zod/v4/core" {
   interface GlobalMeta {
