@@ -1,5 +1,5 @@
 import { globalRegistry, type z } from "zod";
-import { brandProperty } from "./shared";
+import { asyncProperty, brandProperty } from "./shared";
 
 export const exampleSetter = function (
   this: z.ZodType,
@@ -12,6 +12,10 @@ export const exampleSetter = function (
 
 export const deprecationSetter = function (this: z.ZodType) {
   return this.meta({ deprecated: true });
+};
+
+export const asyncSetter = function (this: z.ZodType) {
+  return this.meta({ [asyncProperty]: true });
 };
 
 export const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {

@@ -58,6 +58,20 @@ describe.each<{ variant: string; z: typeof zESM }>([
     });
   });
 
+  describe(".xAsync()", () => {
+    test("should be present", () => {
+      const schema = z.string();
+      expect(schema).toHaveProperty("xAsync");
+      expect(typeof schema.xAsync).toBe("function");
+    });
+
+    test("should set the corresponding metadata in the schema definition", () => {
+      const schema = z.string().refine(async () => true);
+      const schemaWithMeta = schema.xAsync();
+      expect(schemaWithMeta.meta()).toHaveProperty("x-async", true);
+    });
+  });
+
   describe(".label()", () => {
     test("should set the corresponding metadata in the schema definition", () => {
       const schema = z.iso.datetime().default(() => new Date().toISOString());

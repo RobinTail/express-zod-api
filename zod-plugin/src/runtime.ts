@@ -5,6 +5,7 @@ import {
   exampleSetter,
   labelSetter,
   brandSetter,
+  asyncSetter,
 } from "./meta";
 import { getClasses, getPackages } from "./packages";
 
@@ -25,6 +26,10 @@ if (!(pluginFlag in globalThis)) {
         },
         ["xBrand" satisfies keyof z.ZodType]: {
           value: brandSetter,
+          writable: false,
+        },
+        ["xAsync" satisfies keyof z.ZodType]: {
+          value: asyncSetter,
           writable: false,
         },
       });
