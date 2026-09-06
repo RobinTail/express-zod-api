@@ -14,6 +14,7 @@ import type { Security } from "./security";
 import type { ActualLogger } from "./logger-helpers";
 import type { CommonConfig } from "./config-type";
 import { isPromise } from "node:util/types";
+import { isAsync } from "./metadata.ts";
 
 type Handler<IN, CTX, RET> = (params: {
   /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware. */
@@ -93,6 +94,7 @@ export class Middleware<
     handler: Handler<z.output<IN>, CTX, RET>;
   }) {
     super();
+    this.#parsingState = { isAsync: input ? isAsync(input) : false };
     this.#schema = (input && compileOnce(input)) as IN;
     this.#security = security;
     this.#statusCode = new FrozenSet(
