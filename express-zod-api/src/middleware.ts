@@ -14,7 +14,7 @@ import type { Security } from "./security";
 import type { ActualLogger } from "./logger-helpers";
 import type { CommonConfig } from "./config-type";
 import { isPromise } from "node:util/types";
-import { isAsync } from "./metadata.ts";
+import { isAsync } from "./metadata";
 
 type Handler<IN, CTX, RET> = (params: {
   /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware. */
