@@ -548,7 +548,11 @@ describe("Endpoint", () => {
               str: "This is fine",
             });
             expect(mwRefinement).toHaveBeenCalledTimes(
-              configProps.trySyncValidation ? 4 : 2, // @todo explicit should impact
+              configProps.trySyncValidation
+                ? variant === "explicit"
+                  ? 3
+                  : 4
+                : 2,
             );
             expect(inputRefinement).toHaveBeenCalledTimes(1);
             expect(outputRefinement).toHaveBeenCalledTimes(
@@ -556,7 +560,11 @@ describe("Endpoint", () => {
             );
             await attempt();
             expect(mwRefinement).toHaveBeenCalledTimes(
-              configProps.trySyncValidation ? 6 : 4,
+              configProps.trySyncValidation
+                ? variant === "explicit"
+                  ? 5
+                  : 6
+                : 4,
             );
             expect(inputRefinement).toHaveBeenCalledTimes(2);
             expect(outputRefinement).toHaveBeenCalledTimes(

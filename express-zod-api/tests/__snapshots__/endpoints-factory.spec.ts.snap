@@ -21,6 +21,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with intersecti
     "s",
   ],
   "type": "object",
+  "x-async": false,
 }
 `;
 
@@ -59,6 +60,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with refined ob
     "i",
   ],
   "type": "object",
+  "x-async": false,
 }
 `;
 
@@ -95,6 +97,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with simple mid
     "s",
   ],
   "type": "object",
+  "x-async": false,
 }
 `;
 
@@ -151,6 +154,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with union midd
       "type": "object",
     },
   ],
+  "x-async": false,
 }
 `;
 

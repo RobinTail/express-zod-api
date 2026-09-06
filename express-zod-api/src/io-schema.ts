@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { compileOnce } from "./common-helpers";
+import { asyncProperty, isAsync } from "./metadata.ts";
 
 type Base = object & { [Symbol.iterator]?: never };
 
@@ -24,10 +25,11 @@ export const ensureExtension = <
   current: Current,
   inc: Inc,
 ) =>
-  (current && inc ? current.and(inc) : current || inc) as Extension<
-    Current,
-    Inc
-  >;
+  (current && inc
+    ? current
+        .and(inc)
+        .meta({ [asyncProperty]: isAsync(inc) || isAsync(current) })
+    : current || inc) as Extension<Current, Inc>;
 
 /** The Endpoint input schema type, condition wrapped into schema to make it z.output-compatible */
 export type FinalInputSchema<
@@ -44,5 +46,9 @@ export const makeFinalInputSchema = <
   buildSchema: BIN,
 ) =>
   compileOnce(
-    factorySchema ? factorySchema.and(buildSchema) : buildSchema,
+    factorySchema
+      ? factorySchema.and(buildSchema).meta({
+          [asyncProperty]: isAsync(buildSchema) || isAsync(factorySchema),
+        })
+      : buildSchema,
   ) as FinalInputSchema<FIN, BIN>;

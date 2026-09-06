@@ -33,6 +33,7 @@ exports[`I/O Schema and related helpers > ensureExtension() > Should merge inter
     "six",
   ],
   "type": "object",
+  "x-async": false,
 }
 `;
 
@@ -89,6 +90,7 @@ exports[`I/O Schema and related helpers > ensureExtension() > Should merge mixed
       "type": "object",
     },
   ],
+  "x-async": false,
 }
 `;
 
@@ -181,6 +183,7 @@ exports[`I/O Schema and related helpers > ensureExtension() > Should merge union
       ],
     },
   ],
+  "x-async": false,
 }
 `;
 
@@ -215,5 +218,6 @@ exports[`I/O Schema and related helpers > makeFinalInputSchema() > Should merge 
     "four",
   ],
   "type": "object",
+  "x-async": false,
 }
 `;
