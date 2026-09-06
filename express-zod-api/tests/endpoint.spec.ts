@@ -12,7 +12,7 @@ import {
 } from "../src";
 import { Endpoint } from "../src/endpoint";
 import { FrozenSet } from "../src/frozen-set";
-import { asyncProperty } from "../src/metadata.ts";
+import { asyncProperty } from "../src/metadata";
 
 describe("Endpoint", () => {
   describe(".methods", () => {
