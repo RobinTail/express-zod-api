@@ -12,6 +12,7 @@ import {
 } from "../src";
 import { Endpoint } from "../src/endpoint";
 import { FrozenSet } from "../src/frozen-set";
+import { asyncProperty } from "../src/metadata.ts";
 
 describe("Endpoint", () => {
   describe(".methods", () => {
@@ -504,47 +505,67 @@ describe("Endpoint", () => {
       outputRefinement.mockClear();
     });
 
-    describe.each(["plain", "compiled"] as const)("%s schemas", (variant) => {
-      test.each([{ trySyncValidation: false }, { trySyncValidation: true }])(
-        "should handle async refinements with %s config",
-        async (configProps) => {
-          const endpoint = new EndpointsFactory(defaultResultHandler)
-            .addMiddleware({
-              input: variant === "plain" ? mwInput : z.compile(mwInput),
-              handler: async () => ({}),
-            })
-            .build({
-              method: "post",
-              input: variant === "plain" ? epInput : z.compile(epInput),
-              output: variant === "plain" ? epOutput : z.compile(epOutput),
-              handler: async () => ({ str: "This is fine" }),
+    describe.each(["plain", "compiled", "explicit"] as const)(
+      "%s schemas",
+      (variant) => {
+        test.each([{ trySyncValidation: false }, { trySyncValidation: true }])(
+          "should handle async refinements with %s config",
+          async (configProps) => {
+            const endpoint = new EndpointsFactory(defaultResultHandler)
+              .addMiddleware({
+                input:
+                  variant === "compiled"
+                    ? z.compile(mwInput)
+                    : variant === "explicit"
+                      ? mwInput.meta({ [asyncProperty]: true })
+                      : mwInput,
+                handler: async () => ({}),
+              })
+              .build({
+                method: "post",
+                input:
+                  variant === "compiled"
+                    ? z.compile(epInput)
+                    : variant === "explicit"
+                      ? epInput.meta({ [asyncProperty]: true })
+                      : epInput,
+                output:
+                  variant === "compiled"
+                    ? z.compile(epOutput)
+                    : variant === "explicit"
+                      ? epOutput.meta({ [asyncProperty]: true })
+                      : epOutput,
+                handler: async () => ({ str: "This is fine" }),
+              });
+            const attempt = () =>
+              testEndpoint({
+                endpoint,
+                requestProps: { method: "POST", body: { n: 123, m: 5 } },
+                configProps,
+              });
+            const { responseMock } = await attempt();
+            expect(responseMock._getJSONData()).toEqual({
+              str: "This is fine",
             });
-          const attempt = () =>
-            testEndpoint({
-              endpoint,
-              requestProps: { method: "POST", body: { n: 123, m: 5 } },
-              configProps,
-            });
-          const { responseMock } = await attempt();
-          expect(responseMock._getJSONData()).toEqual({ str: "This is fine" });
-          expect(mwRefinement).toHaveBeenCalledTimes(
-            configProps.trySyncValidation ? 4 : 2,
-          );
-          expect(inputRefinement).toHaveBeenCalledTimes(1);
-          expect(outputRefinement).toHaveBeenCalledTimes(
-            configProps.trySyncValidation ? 2 : 1,
-          );
-          await attempt();
-          expect(mwRefinement).toHaveBeenCalledTimes(
-            configProps.trySyncValidation ? 6 : 4,
-          );
-          expect(inputRefinement).toHaveBeenCalledTimes(2);
-          expect(outputRefinement).toHaveBeenCalledTimes(
-            configProps.trySyncValidation ? 3 : 2,
-          );
-        },
-      );
-    });
+            expect(mwRefinement).toHaveBeenCalledTimes(
+              configProps.trySyncValidation ? 4 : 2, // @todo explicit should impact
+            );
+            expect(inputRefinement).toHaveBeenCalledTimes(1);
+            expect(outputRefinement).toHaveBeenCalledTimes(
+              variant !== "explicit" && configProps.trySyncValidation ? 2 : 1,
+            );
+            await attempt();
+            expect(mwRefinement).toHaveBeenCalledTimes(
+              configProps.trySyncValidation ? 6 : 4,
+            );
+            expect(inputRefinement).toHaveBeenCalledTimes(2);
+            expect(outputRefinement).toHaveBeenCalledTimes(
+              variant !== "explicit" && configProps.trySyncValidation ? 3 : 2,
+            );
+          },
+        );
+      },
+    );
   });
 
   describe("Issue #514: Express native middlewares for OPTIONS request", () => {

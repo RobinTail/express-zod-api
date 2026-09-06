@@ -5,7 +5,7 @@ import type {
 import { globalRegistry, type z } from "zod";
 
 export const brandProperty = "x-brand" satisfies typeof brandProp;
-const asyncProperty = "x-async" satisfies typeof asyncProp;
+export const asyncProperty = "x-async" satisfies typeof asyncProp;
 
 export const getBrand = (subject: z.core.$ZodType) => {
   const { [brandProperty]: brand } = globalRegistry.get(subject) || {};
