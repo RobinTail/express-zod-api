@@ -32,6 +32,7 @@ import { FrozenSet } from "./frozen-set";
 import { createCacheMiddleware } from "./cache-middleware";
 import { createCookieMiddleware } from "./cookie-middleware";
 import { createRateLimitMiddleware } from "./rate-limit-middleware";
+import { asyncProperty, isAsync } from "./metadata";
 
 interface BuildProps<
   IN extends IOSchema,
@@ -94,6 +95,7 @@ export class EndpointsFactory<
   SCO extends string = string,
 > {
   protected schema = undefined as IN;
+  protected isAsync = false;
   protected statusCodes = new Set<number>();
   protected middlewares: AbstractMiddleware[] = [];
 
@@ -116,6 +118,7 @@ export class EndpointsFactory<
     factory.middlewares = this.middlewares.concat(middleware);
     factory.schema = ensureExtension(this.schema, middleware.schema);
     factory.statusCodes = this.statusCodes.union(middleware.statusCodes);
+    if (middleware.schema) factory.isAsync ||= isAsync(middleware.schema);
     return factory;
   }
 
@@ -212,6 +215,9 @@ export class EndpointsFactory<
             operationId && `${operationId}${mtd === "head" ? "__HEAD" : ""}`; // ensure non-breaking change
     const scopes = new FrozenSet(typeof scope === "string" ? [scope] : scope);
     const tags = new FrozenSet(typeof tag === "string" ? [tag] : tag);
+    const inputSchema = makeFinalInputSchema(this.schema, input);
+    // @todo ensure it doesn't overwrite, or even make a argument to avoid communication via registry
+    if (this.isAsync || isAsync(inputSchema)) z.globalRegistry.add(inputSchema, {[asyncProperty]: true});
     return new Endpoint({
       ...rest,
       middlewares,
@@ -220,7 +226,7 @@ export class EndpointsFactory<
       tags,
       methods,
       getOperationId,
-      inputSchema: makeFinalInputSchema(this.schema, input),
+      inputSchema,
       outputSchema: compileOnce(output),
       statusCodes: this.statusCodes.union(
         new Set(

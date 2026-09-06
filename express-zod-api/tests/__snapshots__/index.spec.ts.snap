@@ -22,6 +22,7 @@ exports[`Index Entrypoint > exports > ServeStatic should have certain value 1`] 
 
 exports[`Index Entrypoint > exports > arrayEndpointsFactory should have certain value 1`] = `
 EndpointsFactory {
+  "isAsync": false,
   "middlewares": [],
   "resultHandler": ResultHandler {},
   "schema": undefined,
@@ -48,6 +49,7 @@ exports[`Index Entrypoint > exports > createServer should have certain value 1`]
 
 exports[`Index Entrypoint > exports > defaultEndpointsFactory should have certain value 1`] = `
 EndpointsFactory {
+  "isAsync": false,
   "middlewares": [],
   "resultHandler": ResultHandler {},
   "schema": undefined,
@@ -76,6 +78,7 @@ exports[`Index Entrypoint > exports > getMessageFromError should have certain va
 
 exports[`Index Entrypoint > exports > legacyEndpointsFactory should have certain value 1`] = `
 EndpointsFactory {
+  "isAsync": false,
   "middlewares": [],
   "resultHandler": ResultHandler {},
   "schema": undefined,
