@@ -32,7 +32,7 @@ import { FrozenSet } from "./frozen-set";
 import { createCacheMiddleware } from "./cache-middleware";
 import { createCookieMiddleware } from "./cookie-middleware";
 import { createRateLimitMiddleware } from "./rate-limit-middleware";
-import { asyncProperty, isAsync } from "./metadata";
+import { isAsync } from "./metadata";
 
 interface BuildProps<
   IN extends IOSchema,
