@@ -109,9 +109,9 @@ export class Endpoint<
     deprecated?: boolean;
     middlewares?: AbstractMiddleware[];
     inputSchema: IN;
-    isInputSchemaAsync: boolean;
+    isInputSchemaAsync?: boolean;
     outputSchema: OUT;
-    isOutputSchemaAsync: boolean;
+    isOutputSchemaAsync?: boolean;
     handler: Handler<z.output<IN>, z.input<OUT>, CTX>;
     resultHandler: AbstractResultHandler;
     description?: string;
@@ -124,8 +124,8 @@ export class Endpoint<
   }) {
     super();
     this.#def = def;
-    this.#inputParsingState = { isAsync: def.isInputSchemaAsync };
-    this.#outputParsingState = { isAsync: def.isOutputSchemaAsync };
+    this.#inputParsingState = { isAsync: def.isInputSchemaAsync ?? false };
+    this.#outputParsingState = { isAsync: def.isOutputSchemaAsync ?? false };
   }
 
   #clone(
