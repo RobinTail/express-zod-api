@@ -177,11 +177,11 @@ exports[`zod-to-ts > PrimitiveSchema (isResponse=true) > outputs correct typescr
 }"
 `;
 
-exports[`zod-to-ts > enums > handles 'numeric' literals 1`] = `""Red" | "Green" | "Blue" | 0 | 1 | 2"`;
+exports[`zod-to-ts > enums > handles numeric literals 1`] = `""Red" | "Green" | "Blue" | 0 | 1 | 2"`;
 
-exports[`zod-to-ts > enums > handles 'quoted string' literals 1`] = `""Two Words" | "'Quotes\\"" | "\\\\\\"Escaped\\\\\\"" | 0 | 1 | 2"`;
+exports[`zod-to-ts > enums > handles quoted string literals 1`] = `""Two Words" | "'Quotes\\"" | "\\\\\\"Escaped\\\\\\"" | 0 | 1 | 2"`;
 
-exports[`zod-to-ts > enums > handles 'string' literals 1`] = `""apple" | "banana" | "cantaloupe""`;
+exports[`zod-to-ts > enums > handles string literals 1`] = `""apple" | "banana" | "cantaloupe""`;
 
 exports[`zod-to-ts > ez.buffer() > should be Blob 1`] = `"Blob"`;
 
@@ -301,9 +301,9 @@ exports[`zod-to-ts > z.pipe() > transformations > should handle preprocess error
 
 exports[`zod-to-ts > z.pipe() > transformations > should handle unsupported transformation in response 1`] = `"unknown"`;
 
-exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type 'intact' 1`] = `"number"`;
+exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type intact 1`] = `"number"`;
 
-exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type 'transformed' 1`] = `"string"`;
+exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type transformed 1`] = `"string"`;
 
 exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 0 1`] = `"\`start\${number}mid\${boolean}end\`"`;
 

@@ -169,13 +169,13 @@ exports[`Documentation helpers > depictNullable() > should not add null type whe
 }
 `;
 
-exports[`Documentation helpers > depictPipeline > should depict as 'number (out)' 1`] = `
+exports[`Documentation helpers > depictPipeline > should depict as number (out) 1`] = `
 {
   "type": "number",
 }
 `;
 
-exports[`Documentation helpers > depictPipeline > should depict as 'string (preprocess)' 1`] = `
+exports[`Documentation helpers > depictPipeline > should depict as string (preprocess) 1`] = `
 {
   "format": "string (preprocessed)",
 }
@@ -502,7 +502,7 @@ exports[`Documentation helpers > depictSecurity() > should handle undefined flow
 ]
 `;
 
-exports[`Documentation helpers > depictSecurity() > should inform on 'actual' placement of the input security parameter 1`] = `
+exports[`Documentation helpers > depictSecurity() > should inform on actual placement of the input security parameter 1`] = `
 [
   [
     {
@@ -517,7 +517,7 @@ exports[`Documentation helpers > depictSecurity() > should inform on 'actual' pl
 ]
 `;
 
-exports[`Documentation helpers > depictSecurity() > should inform on 'alternative' placement of the input security parameter 1`] = `
+exports[`Documentation helpers > depictSecurity() > should inform on alternative placement of the input security parameter 1`] = `
 [
   [
     {
