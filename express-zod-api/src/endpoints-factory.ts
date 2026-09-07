@@ -118,8 +118,8 @@ export class EndpointsFactory<
     factory.middlewares = this.middlewares.concat(middleware);
     factory.schema = ensureExtension(this.schema, middleware.schema);
     factory.statusCodes = this.statusCodes.union(middleware.statusCodes);
-    if (middleware.schema)
-      factory.isAsync = this.isAsync || isAsync(middleware.schema);
+    factory.isAsync = this.isAsync;
+    if (middleware.schema) factory.isAsync ||= isAsync(middleware.schema);
     return factory;
   }
 
