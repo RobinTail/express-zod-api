@@ -1,9 +1,8 @@
-import { bench } from "vitest";
 import type { UploadedFile } from "express-fileupload";
 import { isObjectOfUploadShape } from "../src/upload-schema";
 import { z } from "zod";
 
-describe("Experiment for upload schema", () => {
+test("Experiment for upload schema", async ({ bench }) => {
   const current = () =>
     z.custom<UploadedFile>(
       (subject) =>
@@ -44,13 +43,14 @@ describe("Experiment for upload schema", () => {
         typeof subject.mv === "function",
     );
 
-  bench("current", () => {
-    const one = current();
-    one.safeParse({});
-  });
-
-  bench("featured", () => {
-    const one = featured();
-    one.safeParse({});
-  });
+  await bench.compare(
+    bench("current", () => {
+      const one = current();
+      one.safeParse({});
+    }),
+    bench("featured", () => {
+      const one = featured();
+      one.safeParse({});
+    }),
+  );
 });
