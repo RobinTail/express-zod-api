@@ -5,6 +5,7 @@ const target = "x-frame-options";
 test("Array.includes vs Set.has for well-known headers lookup", async ({
   bench,
 }) => {
+  const theSet = getWellKnownHeaders();
   const headersArray = Array.from(getWellKnownHeaders());
 
   await bench.compare(
@@ -12,7 +13,7 @@ test("Array.includes vs Set.has for well-known headers lookup", async ({
       headersArray.includes(target);
     }),
     bench("Set.has", () => {
-      getWellKnownHeaders().has(target);
+      theSet.has(target);
     }),
   );
 });
