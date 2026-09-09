@@ -481,7 +481,8 @@ export interface MergedResponse {
   statusCodes: [string | number];
 }
 
-const statusCodeRange = (statusCode: number) => Math.floor(statusCode / 100);
+const statusCodeRange = (statusCode: number): `${number}XX` =>
+  `${Math.floor(statusCode / 100)}XX`;
 
 /** @internal Responses grouped by their schema and MIME types. */
 interface ResponseBucket {
@@ -520,7 +521,7 @@ const processBucket = (
   allCodes: readonly number[],
 ): MergedResponse[] => {
   const result: MergedResponse[] = [];
-  const byRange = new Map<number, number[]>();
+  const byRange = new Map<string, number[]>();
   for (const statusCode of statusCodes) {
     const range = statusCodeRange(statusCode);
     byRange.set(range, [...(byRange.get(range) || []), statusCode]);
@@ -529,8 +530,8 @@ const processBucket = (
     const foreignInRange = allCodes.some(
       (one) => statusCodeRange(one) === range && !codes.includes(one),
     );
-    if (codes.length > 1 && range >= 2 && range <= 5 && !foreignInRange) {
-      result.push({ schema, mimeTypes, statusCodes: [`${range}XX`] });
+    if (codes.length > 1 && !foreignInRange) {
+      result.push({ schema, mimeTypes, statusCodes: [range] });
     } else {
       for (const statusCode of codes)
         result.push({ schema, mimeTypes, statusCodes: [statusCode] });
