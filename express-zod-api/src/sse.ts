@@ -12,7 +12,7 @@ import {
 } from "./result-helpers";
 import { ResultHandlerError } from "./errors";
 
-/** @public The generic base for user's declaration mapping the event names to the schemas of their data. */
+/** @desc The declaration mapping the event names to the schemas of their data. */
 type EventsMap = Record<string, z.ZodType>;
 
 export interface Emitter<E extends EventsMap> extends FlatObject {
@@ -32,27 +32,14 @@ export const makeMessageSchema = (event: string, data: z.ZodType) =>
     retry: z.int().positive().optional(),
   });
 
-/** @private The schema of an actual message, wrapping the data into an object with event name and optional fields */
-type MessageSchema = ReturnType<typeof makeMessageSchema>;
-/** @private The map of the precomputed message schemas having the same keys as the provided EventsMap. */
-type MessagesMap = ReadonlyMap<string, MessageSchema>;
-
-export const makeMessagesMap = <E extends EventsMap>(events: E) =>
-  new Map(
-    Object.entries(events).map(([event, schema]) => [
-      event,
-      makeMessageSchema(event, schema),
-    ]),
-  );
-
 export const formatMessage = (
-  schemas: MessagesMap,
+  events: EventsMap,
   event: string,
   data: unknown,
 ) => {
-  const schema = schemas.get(event);
+  const schema = events[event];
   if (!schema) throw new Error(`Unknown event: ${event}`);
-  const { data: payload } = schema.parse({ event, data });
+  const payload = schema.parse(data);
   return [
     `event: ${event}`,
     `data: ${JSON.stringify(payload)}`,
@@ -70,7 +57,7 @@ export const ensureStream = (response: Response) =>
     "cache-control": "no-cache",
   });
 
-export const makeMiddleware = <E extends EventsMap>(schemas: MessagesMap) =>
+export const makeMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
     handler: async ({ request, response }): Promise<Emitter<E>> => {
       const controller = new AbortController();
@@ -86,7 +73,7 @@ export const makeMiddleware = <E extends EventsMap>(schemas: MessagesMap) =>
         signal: controller.signal,
         emit: (event, data) => {
           ensureStream(response);
-          response.write(formatMessage(schemas, String(event), data), "utf-8");
+          response.write(formatMessage(events, String(event), data), "utf-8");
           /**
            * Issue 2347: flush is the method of compression, it must be called only when compression is enabled
            * @link https://github.com/RobinTail/express-zod-api/issues/2347
@@ -97,10 +84,12 @@ export const makeMiddleware = <E extends EventsMap>(schemas: MessagesMap) =>
     },
   });
 
-export const makeResultHandler = (schemas: MessagesMap) =>
-  new ResultHandler({
+export const makeResultHandler = (events: EventsMap) => {
+  return new ResultHandler({
     positive: () => {
-      const [first, ...rest] = [...schemas.values()];
+      const [first, ...rest] = Object.entries(events).map(([event, schema]) =>
+        makeMessageSchema(event, schema),
+      );
       if (!first) {
         const cause = new Error("At least one SSE event is required.");
         throw new ResultHandlerError(cause);
@@ -127,14 +116,14 @@ export const makeResultHandler = (schemas: MessagesMap) =>
       response.end();
     },
   });
+};
 
 export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   undefined,
   Emitter<E>
 > {
   constructor(events: E) {
-    const schemas = makeMessagesMap(events);
-    super(makeResultHandler(schemas));
-    this.middlewares = [makeMiddleware<E>(schemas)];
+    super(makeResultHandler(events));
+    this.middlewares = [makeMiddleware<E>(events)];
   }
 }

@@ -12,7 +12,6 @@ import {
   type Emitter,
   ensureStream,
   formatMessage,
-  makeMessagesMap,
   makeMessageSchema,
   makeMiddleware,
   makeResultHandler,
@@ -40,24 +39,24 @@ describe("SSE", () => {
   });
 
   describe("formatMessage()", () => {
-    const schemas = makeMessagesMap({ test: z.string() });
+    const events = { test: z.string() };
     test("should format a valid event into string", () => {
-      expect(formatMessage(schemas, "test", "something")).toBe(
+      expect(formatMessage(events, "test", "something")).toBe(
         `event: test\ndata: "something"\n\n`,
       );
     });
     test("should withstand newlines", () => {
-      expect(formatMessage(schemas, "test", "some\ntext")).toBe(
+      expect(formatMessage(events, "test", "some\ntext")).toBe(
         `event: test\ndata: "some\\ntext"\n\n`,
       );
     });
     test("should fail for unknown event", () => {
-      expect(() => formatMessage(schemas, "another", "text")).toThrow(
+      expect(() => formatMessage(events, "another", "text")).toThrow(
         new Error("Unknown event: another"),
       );
     });
     test("should fail for invalid data", () => {
-      expect(() => formatMessage(schemas, "test", 123)).toThrow(z.ZodError);
+      expect(() => formatMessage(events, "test", 123)).toThrow(z.ZodError);
     });
   });
 
@@ -82,12 +81,12 @@ describe("SSE", () => {
   });
 
   describe("makeMiddleware()", () => {
-    const schemas = makeMessagesMap({ test: z.string() });
+    const events = { test: z.string() };
     // with and without response.flush()
     test.each([vi.fn(), undefined])(
       "should create a Middleware providing context for emission %#",
       async (flushMock) => {
-        const middleware = makeMiddleware<{ test: z.ZodString }>(schemas);
+        const middleware = makeMiddleware<{ test: z.ZodString }>(events);
         expect(middleware).toBeInstanceOf(Middleware);
         expectTypeOf(middleware).toEqualTypeOf<
           Middleware<FlatObject, Emitter<{ test: z.ZodString }>, string>
@@ -112,7 +111,7 @@ describe("SSE", () => {
     );
 
     test("should abort signal on connection close", async () => {
-      const middleware = makeMiddleware<{ test: z.ZodString }>(schemas);
+      const middleware = makeMiddleware<{ test: z.ZodString }>(events);
       const { requestMock, output } = await testMiddleware({ middleware });
       const { signal } = output;
       expect(signal?.aborted).toBeFalsy();
@@ -122,7 +121,7 @@ describe("SSE", () => {
 
     test("should clear the stream timeout when request closes before timeout fires", async () => {
       using timers = useFakeTimers();
-      const middleware = makeMiddleware<{ test: z.ZodString }>(schemas);
+      const middleware = makeMiddleware<{ test: z.ZodString }>(events);
       const { requestMock, responseMock, output } = await testMiddleware({
         middleware,
       });
@@ -137,12 +136,12 @@ describe("SSE", () => {
 
   describe("makeResultHandler()", () => {
     test.each<Parameters<typeof makeResultHandler>[0]>([
-      makeMessagesMap({ test: z.string(), another: z.number() }),
-      makeMessagesMap({ single: z.string() }),
+      { test: z.string(), another: z.number() },
+      { single: z.string() },
     ])(
       "should create ResultHandler describing possible events and handling generic errors %#",
-      async (schemas) => {
-        const resultHandler = makeResultHandler(schemas);
+      async (events) => {
+        const resultHandler = makeResultHandler(events);
         expect(resultHandler).toBeInstanceOf(ResultHandler);
         expect(
           resultHandler.getPositiveResponse(z.object({})),
@@ -178,7 +177,7 @@ describe("SSE", () => {
     );
 
     test("its ::getPositiveResponse() method should throw when events map is empty", () => {
-      const rh = makeResultHandler(makeMessagesMap({}));
+      const rh = makeResultHandler({});
       expect(() =>
         rh.getPositiveResponse(z.object({})),
       ).toThrowErrorMatchingSnapshot();
