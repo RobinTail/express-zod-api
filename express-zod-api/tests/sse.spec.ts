@@ -86,7 +86,7 @@ describe("SSE", () => {
     test.each([vi.fn(), undefined])(
       "should create a Middleware providing context for emission %#",
       async (flushMock) => {
-        const middleware = makeMiddleware<{ test: z.ZodString }>(events);
+        const middleware = makeMiddleware(events);
         expect(middleware).toBeInstanceOf(Middleware);
         expectTypeOf(middleware).toEqualTypeOf<
           Middleware<FlatObject, Emitter<{ test: z.ZodString }>, string>
@@ -111,7 +111,7 @@ describe("SSE", () => {
     );
 
     test("should abort signal on connection close", async () => {
-      const middleware = makeMiddleware<{ test: z.ZodString }>(events);
+      const middleware = makeMiddleware(events);
       const { requestMock, output } = await testMiddleware({ middleware });
       const { signal } = output;
       expect(signal?.aborted).toBeFalsy();
@@ -121,7 +121,7 @@ describe("SSE", () => {
 
     test("should clear the stream timeout when request closes before timeout fires", async () => {
       using timers = useFakeTimers();
-      const middleware = makeMiddleware<{ test: z.ZodString }>(events);
+      const middleware = makeMiddleware(events);
       const { requestMock, responseMock, output } = await testMiddleware({
         middleware,
       });
