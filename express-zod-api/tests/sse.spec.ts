@@ -52,10 +52,12 @@ describe("SSE", () => {
       );
     });
     test("should fail for unknown event", () => {
-      expect(() => formatEmission(schemas, "another", "text")).toThrowError();
+      expect(() => formatEmission(schemas, "another", "text")).toThrow(
+        new Error("Unknown event: another"),
+      );
     });
     test("should fail for invalid data", () => {
-      expect(() => formatEmission(schemas, "test", 123)).toThrowError();
+      expect(() => formatEmission(schemas, "test", 123)).toThrow(z.ZodError);
     });
   });
 

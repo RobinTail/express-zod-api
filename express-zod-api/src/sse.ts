@@ -49,13 +49,17 @@ export const formatEmission = (
   schemas: EmissionMap,
   event: string,
   data: unknown,
-) =>
-  [
+) => {
+  const schema = schemas.get(event);
+  if (!schema) throw new Error(`Unknown event: ${event}`);
+  const { data: payload } = schema.parse({ event, data });
+  return [
     `event: ${event}`,
-    `data: ${JSON.stringify(schemas.get(event)!.parse({ event, data }).data)}`,
+    `data: ${JSON.stringify(payload)}`,
     "",
     "", // empty line: events separator
   ].join("\n");
+};
 
 const headersTimeout = 1e4; // 10s to respond with a status code other than 200
 export const ensureStream = (response: Response) =>
