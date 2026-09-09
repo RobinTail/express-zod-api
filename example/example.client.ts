@@ -604,8 +604,7 @@ export class Subscription<
 /*
 const client = new Client();
 const { status, discriminator, data } = await client.provide("get /v1/user/retrieve", { id: "10" });
-if (status === 200)
-  console.log(data.name); // success
+if (status === 200) console.log(data.name); // success
 else if (status === 400 || discriminator === "error") console.error(data.message); // error
 new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
 */

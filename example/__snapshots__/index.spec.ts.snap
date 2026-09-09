@@ -109,7 +109,7 @@ exports[`Example > Positive > Should handle valid GET request 1`] = `
 }
 `;
 
-exports[`Example > Positive > Should respond with array for 'application/json' 1`] = `
+exports[`Example > Positive > Should respond with array for application/json 1`] = `
 [
   {
     "name": "Maria Merian",
@@ -138,7 +138,7 @@ exports[`Example > Positive > Should respond with array for 'application/json' 1
 ]
 `;
 
-exports[`Example > Positive > Should respond with array for 'application/x-www-form-urlencoded' 1`] = `
+exports[`Example > Positive > Should respond with array for application/x-www-form-urlencoded 1`] = `
 [
   {
     "name": "Maria Merian",
