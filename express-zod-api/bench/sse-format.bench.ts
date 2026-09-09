@@ -2,11 +2,12 @@ import { formatMessage, makeMessageSchema } from "../src/sse";
 import { z } from "zod";
 
 const formatMessageRef = formatMessage; // avoid module export getter overhead per iteration
+const makeMessageSchemaRef = makeMessageSchema;
 
 test("Experiment for SSE event formatting", async ({ bench }) => {
   const events = { message: z.string() } as const;
   const current = () =>
-    makeMessageSchema("message", events.message)
+    makeMessageSchemaRef("message", events.message)
       .transform((props) =>
         [
           `event: ${props.event}`,
