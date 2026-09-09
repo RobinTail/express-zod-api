@@ -12,6 +12,7 @@ import {
 } from "./result-helpers";
 import { ResultHandlerError } from "./errors";
 
+/** @public The generic base for user's declaration mapping the event names to the schemas of their data. */
 type EventsMap = Record<string, z.ZodType>;
 
 export interface Emitter<E extends EventsMap> extends FlatObject {
@@ -31,7 +32,9 @@ export const makeEmissionSchema = (event: string, data: z.ZodType) =>
     retry: z.int().positive().optional(),
   });
 
+/** @private The schema of an actual emission, wrapping the data into an object with event name and optional fields */
 type EmissionSchema = ReturnType<typeof makeEmissionSchema>;
+/** @private The map of the precomputed emission schemas, having the same keys as the provided EventsMap. */
 type EmissionMap = ReadonlyMap<string, EmissionSchema>;
 
 export const makeEmissionMap = <E extends EventsMap>(events: E) =>
