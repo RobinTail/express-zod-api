@@ -2,6 +2,12 @@
 
 ## Version 29
 
+### v29.6.1
+
+- Performance optimization in the SSE event emission:
+  - Emission schemas are now precomputed once per `EventStreamFactory` instance instead of being rebuilt on each event
+    emission, making the `emit()` method roughly 9.5x faster.
+
 ### v29.6.0
 
 - Added the `isCookie` (a boolean returning function) option to the Documentation generator for your customizations:

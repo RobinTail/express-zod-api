@@ -11,8 +11,9 @@ import type { FlatObject } from "../src/common-helpers";
 import {
   type Emitter,
   ensureStream,
-  formatEvent,
-  makeEventSchema,
+  formatEmission,
+  makeEmissionMap,
+  makeEmissionSchema,
   makeMiddleware,
   makeResultHandler,
 } from "../src/sse";
@@ -32,32 +33,29 @@ const useFakeTimers = () => {
 };
 
 describe("SSE", () => {
-  describe("makeEventSchema()", () => {
+  describe("makeEmissionSchema()", () => {
     test("should make a valid schema of SSE event", () => {
-      expect(makeEventSchema("test", z.string())).toMatchSnapshot();
+      expect(makeEmissionSchema("test", z.string())).toMatchSnapshot();
     });
   });
 
-  describe("formatEvent()", () => {
+  describe("formatEmission()", () => {
+    const schemas = makeEmissionMap({ test: z.string() });
     test("should format a valid event into string", () => {
-      expect(formatEvent({ test: z.string() }, "test", "something")).toBe(
+      expect(formatEmission(schemas, "test", "something")).toBe(
         `event: test\ndata: "something"\n\n`,
       );
     });
     test("should withstand newlines", () => {
-      expect(formatEvent({ test: z.string() }, "test", "some\ntext")).toBe(
+      expect(formatEmission(schemas, "test", "some\ntext")).toBe(
         `event: test\ndata: "some\\ntext"\n\n`,
       );
     });
     test("should fail for unknown event", () => {
-      expect(() =>
-        formatEvent({ test: z.string() }, "another" as "test", "text"),
-      ).toThrowError();
+      expect(() => formatEmission(schemas, "another", "text")).toThrowError();
     });
     test("should fail for invalid data", () => {
-      expect(() =>
-        formatEvent({ test: z.string() }, "test", 123),
-      ).toThrowError();
+      expect(() => formatEmission(schemas, "test", 123)).toThrowError();
     });
   });
 
@@ -82,11 +80,12 @@ describe("SSE", () => {
   });
 
   describe("makeMiddleware()", () => {
+    const schemas = makeEmissionMap({ test: z.string() });
     // with and without response.flush()
     test.each([vi.fn(), undefined])(
       "should create a Middleware providing context for emission %#",
       async (flushMock) => {
-        const middleware = makeMiddleware({ test: z.string() });
+        const middleware = makeMiddleware<{ test: z.ZodString }>(schemas);
         expect(middleware).toBeInstanceOf(Middleware);
         expectTypeOf(middleware).toEqualTypeOf<
           Middleware<FlatObject, Emitter<{ test: z.ZodString }>, string>
@@ -111,7 +110,7 @@ describe("SSE", () => {
     );
 
     test("should abort signal on connection close", async () => {
-      const middleware = makeMiddleware({ test: z.string() });
+      const middleware = makeMiddleware<{ test: z.ZodString }>(schemas);
       const { requestMock, output } = await testMiddleware({ middleware });
       const { signal } = output;
       expect(signal?.aborted).toBeFalsy();
@@ -121,7 +120,7 @@ describe("SSE", () => {
 
     test("should clear the stream timeout when request closes before timeout fires", async () => {
       using timers = useFakeTimers();
-      const middleware = makeMiddleware({ test: z.string() });
+      const middleware = makeMiddleware<{ test: z.ZodString }>(schemas);
       const { requestMock, responseMock, output } = await testMiddleware({
         middleware,
       });
@@ -136,12 +135,12 @@ describe("SSE", () => {
 
   describe("makeResultHandler()", () => {
     test.each<Parameters<typeof makeResultHandler>[0]>([
-      { test: z.string(), another: z.number() },
-      { single: z.string() },
+      makeEmissionMap({ test: z.string(), another: z.number() }),
+      makeEmissionMap({ single: z.string() }),
     ])(
       "should create ResultHandler describing possible events and handling generic errors %#",
-      async (events) => {
-        const resultHandler = makeResultHandler(events);
+      async (schemas) => {
+        const resultHandler = makeResultHandler(schemas);
         expect(resultHandler).toBeInstanceOf(ResultHandler);
         expect(
           resultHandler.getPositiveResponse(z.object({})),
@@ -177,7 +176,7 @@ describe("SSE", () => {
     );
 
     test("its ::getPositiveResponse() method should throw when events map is empty", () => {
-      const rh = makeResultHandler({});
+      const rh = makeResultHandler(makeEmissionMap({}));
       expect(() =>
         rh.getPositiveResponse(z.object({})),
       ).toThrowErrorMatchingSnapshot();

@@ -1,14 +1,14 @@
 import type { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
 import { clientMethods, type ClientMethod } from "./method";
-import type { makeEventSchema } from "./sse";
+import type { makeEmissionSchema } from "./sse";
 import type {
   CursorPaginatedResult,
   OffsetPaginatedResult,
 } from "./paginated-schema";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
-type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
+type SSEShape = ReturnType<typeof makeEmissionSchema>["shape"];
 type Store = Record<IOKind, string>;
 
 const ids = {
