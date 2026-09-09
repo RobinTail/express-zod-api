@@ -2,6 +2,11 @@
 
 ## Version 29
 
+### v29.7.0
+
+- Added the `wildcardStatusCodes` option to the Documentation generator for collapsing multiple status codes sharing
+  the same schema and MIME types into OpenAPI wildcard range keys (2XX, 3XX, 4XX, 5XX).
+
 ### v29.6.1
 
 - Performance optimization in the SSE event emission:
