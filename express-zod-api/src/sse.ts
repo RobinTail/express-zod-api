@@ -37,8 +37,9 @@ export const formatMessage = (
   event: string,
   data: unknown,
 ) => {
-  const schema = events[event];
-  if (!schema) throw new Error(`Unknown event: ${event}`);
+  if (!Object.prototype.hasOwnProperty.call(events, event))
+    throw new Error(`Unknown event: ${event}`);
+  const schema = events[event]!; // ensured by hasOwnProperty
   const payload = schema.parse(data);
   return [
     `event: ${event}`,
