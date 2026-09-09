@@ -496,7 +496,7 @@ const collectBuckets = (
 ): ResponseBucket[] => {
   const bySchema = new Map<z.ZodType, Map<string, ResponseBucket>>();
   for (const { schema, mimeTypes, statusCodes } of responses) {
-    const signature = mimeTypes?.join(",") ?? "";
+    const signature = mimeTypes ? [...mimeTypes].sort().join(",") : "";
     const byMimeTypes =
       bySchema.get(schema) || new Map<string, ResponseBucket>();
     bySchema.set(schema, byMimeTypes);

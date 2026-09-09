@@ -1212,6 +1212,30 @@ describe("Documentation", () => {
       expect(Object.keys(responses).sort()).toEqual(["200", "204", "400"]);
     });
 
+    test("should merge the codes sharing a schema and MIME types in a different order", () => {
+      const okSchema = z.literal("ok");
+      const responses = getResponses(
+        new ResultHandler({
+          positive: [
+            {
+              statusCode: 200,
+              schema: okSchema,
+              mimeType: ["application/json", "text/plain"],
+            },
+            {
+              statusCode: 204,
+              schema: okSchema,
+              mimeType: ["text/plain", "application/json"],
+            },
+          ],
+          negative: { statusCode: 400, schema: z.literal("error") },
+          handler: vi.fn(),
+        }),
+        true,
+      );
+      expect(Object.keys(responses).sort()).toEqual(["2XX", "400"]);
+    });
+
     test("should pass the wildcard label to the descriptions callback", () => {
       const responses =
         new Documentation({
