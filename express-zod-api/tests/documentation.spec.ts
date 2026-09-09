@@ -1184,6 +1184,18 @@ describe("Documentation", () => {
       expect(Object.keys(responses).sort()).toEqual(["200", "400", "500"]);
     });
 
+    test("should partially merge the codes spanning multiple ranges", () => {
+      const responses = getResponses(
+        new ResultHandler({
+          positive: { statusCode: 200, schema: z.literal("ok") },
+          negative: { statusCode: [400, 401, 500], schema: z.literal("error") },
+          handler: vi.fn(),
+        }),
+        true,
+      );
+      expect(Object.keys(responses).sort()).toEqual(["200", "4XX", "500"]);
+    });
+
     test("should not merge the codes sharing a schema but differing in MIME types", () => {
       const okSchema = z.literal("ok");
       const responses = getResponses(
