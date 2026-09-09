@@ -5,8 +5,7 @@
 ### v29.6.1
 
 - Performance optimization in the SSE event emission:
-  - The emission no longer builds the intermediate object schema on each event: the data is parsed against the declared
-    schema directly and formatted into a message string, making the `emit()` method roughly 230x faster.
+  - Removed an intermediate schema on each event: made formatting messages within `emit()` method about 230x faster.
 
 ### v29.6.0
 
