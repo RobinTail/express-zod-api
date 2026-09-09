@@ -6,17 +6,19 @@ const formatMessageRef = formatMessage; // avoid module export getter overhead p
 test("Experiment for SSE event formatting", async ({ bench }) => {
   const events = { message: z.string() } as const;
   const current = () =>
-    makeMessageSchema("message", events.message).transform((props) =>
-      [
-        `event: ${props.event}`,
-        `data: ${JSON.stringify(props.data)}`,
-        "",
-        "" // empty line: events separator
-      ].join("\n")
-    ).parse({
-      event: "message",
-      data: "hello"
-    });
+    makeMessageSchema("message", events.message)
+      .transform((props) =>
+        [
+          `event: ${props.event}`,
+          `data: ${JSON.stringify(props.data)}`,
+          "",
+          "", // empty line: events separator
+        ].join("\n"),
+      )
+      .parse({
+        event: "message",
+        data: "hello",
+      });
 
   const featured = () => formatMessageRef(events, "message", "hello");
 

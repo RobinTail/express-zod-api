@@ -84,7 +84,7 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
     },
   });
 
-export const makeResultHandler = (events: EventsMap) => {
+export const makeResultHandler = <E extends EventsMap>(events: E) => {
   return new ResultHandler({
     positive: () => {
       const [first, ...rest] = Object.entries(events).map(([event, schema]) =>
@@ -124,6 +124,6 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
 > {
   constructor(events: E) {
     super(makeResultHandler(events));
-    this.middlewares = [makeMiddleware<E>(events)];
+    this.middlewares = [makeMiddleware(events)];
   }
 }
