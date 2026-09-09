@@ -54,6 +54,11 @@ else if (status === 400 || discriminator === "error")
 
 ## Version 29
 
+### v29.6.1
+
+- Performance optimization in the SSE event emission:
+  - Removed an intermediate schema on each event: made formatting messages within `emit()` method about 230x faster.
+
 ### v29.6.0
 
 - Added the `isCookie` (a boolean returning function) option to the Documentation generator for your customizations:
