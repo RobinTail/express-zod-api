@@ -121,6 +121,7 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   undefined,
   Emitter<E>
 > {
+  /** @todo compile these schemas in v30 */
   constructor(events: E) {
     super(makeResultHandler(events));
     this.middlewares = [makeMiddleware(events)];
