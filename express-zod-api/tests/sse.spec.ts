@@ -49,11 +49,14 @@ describe("SSE", () => {
         `event: test\ndata: "some\\ntext"\n\n`,
       );
     });
-    test("should fail for unknown event", () => {
-      expect(() =>
-        formatMessage({ test: z.string() }, "another", "text"),
-      ).toThrow(new Error("Unknown event: another"));
-    });
+    test.each(["another", "toString", "hasOwnProperty"])(
+      "should fail for unknown event %s",
+      (event) => {
+        expect(() => formatMessage({ test: z.string() }, event, "text")).toThrow(
+          new Error(`Unknown event: ${event}`),
+        );
+      },
+    );
     test("should fail for invalid data", () => {
       expect(() => formatMessage({ test: z.string() }, "test", 123)).toThrow(
         z.ZodError,
