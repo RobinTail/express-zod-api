@@ -11,8 +11,8 @@ import type { FlatObject } from "../src/common-helpers";
 import {
   type Emitter,
   ensureStream,
-  formatEvent,
-  makeEventSchema,
+  formatMessage,
+  makeMessageSchema,
   makeMiddleware,
   makeResultHandler,
 } from "../src/sse";
@@ -32,32 +32,35 @@ const useFakeTimers = () => {
 };
 
 describe("SSE", () => {
-  describe("makeEventSchema()", () => {
+  describe("makeMessageSchema()", () => {
     test("should make a valid schema of SSE event", () => {
-      expect(makeEventSchema("test", z.string())).toMatchSnapshot();
+      expect(makeMessageSchema("test", z.string())).toMatchSnapshot();
     });
   });
 
-  describe("formatEvent()", () => {
+  describe("formatMessage()", () => {
     test("should format a valid event into string", () => {
-      expect(formatEvent({ test: z.string() }, "test", "something")).toBe(
+      expect(formatMessage({ test: z.string() }, "test", "something")).toBe(
         `event: test\ndata: "something"\n\n`,
       );
     });
     test("should withstand newlines", () => {
-      expect(formatEvent({ test: z.string() }, "test", "some\ntext")).toBe(
+      expect(formatMessage({ test: z.string() }, "test", "some\ntext")).toBe(
         `event: test\ndata: "some\\ntext"\n\n`,
       );
     });
-    test("should fail for unknown event", () => {
-      expect(() =>
-        formatEvent({ test: z.string() }, "another" as "test", "text"),
-      ).toThrowError();
-    });
+    test.each(["another", "toString", "hasOwnProperty"])(
+      "should fail for unknown event %s",
+      (event) => {
+        expect(() =>
+          formatMessage({ test: z.string() }, event, "text"),
+        ).toThrow(new Error(`Unknown event: ${event}`));
+      },
+    );
     test("should fail for invalid data", () => {
-      expect(() =>
-        formatEvent({ test: z.string() }, "test", 123),
-      ).toThrowError();
+      expect(() => formatMessage({ test: z.string() }, "test", 123)).toThrow(
+        z.ZodError,
+      );
     });
   });
 

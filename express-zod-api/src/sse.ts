@@ -12,6 +12,7 @@ import {
 } from "./result-helpers";
 import { ResultHandlerError } from "./errors";
 
+/** @desc The declaration mapping the event names to the schemas of their data. */
 type EventsMap = Record<string, z.ZodType>;
 
 export interface Emitter<E extends EventsMap> extends FlatObject {
@@ -23,7 +24,7 @@ export interface Emitter<E extends EventsMap> extends FlatObject {
   emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
 }
 
-export const makeEventSchema = (event: string, data: z.ZodType) =>
+export const makeMessageSchema = (event: string, data: z.ZodType) =>
   z.object({
     data,
     event: z.literal(event),
@@ -31,21 +32,22 @@ export const makeEventSchema = (event: string, data: z.ZodType) =>
     retry: z.int().positive().optional(),
   });
 
-export const formatEvent = <E extends EventsMap>(
-  events: E,
-  event: keyof E,
+export const formatMessage = (
+  events: EventsMap,
+  event: string,
   data: unknown,
-) =>
-  makeEventSchema(String(event), events[event]!) // ensured by key type
-    .transform((props) =>
-      [
-        `event: ${props.event}`,
-        `data: ${JSON.stringify(props.data)}`,
-        "",
-        "", // empty line: events separator
-      ].join("\n"),
-    )
-    .parse({ event, data });
+) => {
+  if (!Object.prototype.hasOwnProperty.call(events, event))
+    throw new Error(`Unknown event: ${event}`);
+  const schema = events[event]!; // ensured by hasOwnProperty
+  const payload = schema.parse(data);
+  return [
+    `event: ${event}`,
+    `data: ${JSON.stringify(payload)}`,
+    "",
+    "", // empty line: events separator
+  ].join("\n");
+};
 
 const headersTimeout = 1e4; // 10s to respond with a status code other than 200
 export const ensureStream = (response: Response) =>
@@ -72,7 +74,7 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
         signal: controller.signal,
         emit: (event, data) => {
           ensureStream(response);
-          response.write(formatEvent(events, event, data), "utf-8");
+          response.write(formatMessage(events, String(event), data), "utf-8");
           /**
            * Issue 2347: flush is the method of compression, it must be called only when compression is enabled
            * @link https://github.com/RobinTail/express-zod-api/issues/2347
@@ -87,7 +89,7 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
   new ResultHandler({
     positive: () => {
       const [first, ...rest] = Object.entries(events).map(([event, schema]) =>
-        makeEventSchema(event, schema),
+        makeMessageSchema(event, schema),
       );
       if (!first) {
         const cause = new Error("At least one SSE event is required.");
@@ -120,6 +122,7 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   undefined,
   Emitter<E>
 > {
+  /** @todo compile these schemas in v30 */
   constructor(events: E) {
     super(makeResultHandler(events));
     this.middlewares = [makeMiddleware(events)];
