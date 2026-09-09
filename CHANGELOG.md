@@ -6,7 +6,7 @@
 
 - Performance optimization in the SSE event emission:
   - Emission schemas are now precomputed once per `EventStreamFactory` instance instead of being rebuilt on each event
-    emission, making the `emit()` method roughly 9.5x faster.
+    emission, making the `emit()` method roughly 180x faster.
 
 ### v29.6.0
 
