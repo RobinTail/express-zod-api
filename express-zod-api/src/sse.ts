@@ -1,6 +1,6 @@
 import type { Response } from "express";
 import { z } from "zod";
-import type { FlatObject } from "./common-helpers";
+import { compileOnce, type FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { EndpointsFactory } from "./endpoints-factory";
 import { Middleware } from "./middleware";
@@ -39,8 +39,7 @@ export const formatMessage = (
 ) => {
   if (!Object.prototype.hasOwnProperty.call(events, event))
     throw new Error(`Unknown event: ${event}`);
-  const schema = events[event]!; // ensured by hasOwnProperty
-  const payload = schema.parse(data);
+  const payload = events[event]!.parse(data); // ensured by hasOwnProperty
   return [
     `event: ${event}`,
     `data: ${JSON.stringify(payload)}`,
@@ -122,8 +121,13 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   undefined,
   Emitter<E>
 > {
-  /** @todo compile these schemas in v30 */
-  constructor(events: E) {
+  constructor(_events: E) {
+    const events = Object.fromEntries(
+      Object.entries(_events).map(([event, schema]) => [
+        event,
+        compileOnce(schema),
+      ]),
+    );
     super(makeResultHandler(events));
     this.middlewares = [makeMiddleware(events)];
   }
