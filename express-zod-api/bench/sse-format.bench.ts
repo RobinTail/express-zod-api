@@ -1,11 +1,11 @@
-import { formatEmission, makeEmissionMap } from "../src/sse";
+import { formatMessage, makeMessagesMap } from "../src/sse";
 import { z } from "zod";
 
-const formatEmissionRef = formatEmission; // avoid module export getter overhead per iteration
+const formatMessageRef = formatMessage; // avoid module export getter overhead per iteration
 
 test("Experiment for SSE event formatting", async ({ bench }) => {
   const events = { message: z.string() } as const;
-  const schemas = makeEmissionMap(events);
+  const schemas = makeMessagesMap(events);
   const current = () =>
     schemas
       .get("message")!
@@ -19,7 +19,7 @@ test("Experiment for SSE event formatting", async ({ bench }) => {
       )
       .parse({ event: "message", data: "hello" });
 
-  const featured = () => formatEmissionRef(schemas, "message", "hello");
+  const featured = () => formatMessageRef(schemas, "message", "hello");
 
   await bench.compare(
     bench("current", () => current()),

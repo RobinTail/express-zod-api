@@ -24,7 +24,7 @@ export interface Emitter<E extends EventsMap> extends FlatObject {
   emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
 }
 
-export const makeEmissionSchema = (event: string, data: z.ZodType) =>
+export const makeMessageSchema = (event: string, data: z.ZodType) =>
   z.object({
     data,
     event: z.literal(event),
@@ -32,21 +32,21 @@ export const makeEmissionSchema = (event: string, data: z.ZodType) =>
     retry: z.int().positive().optional(),
   });
 
-/** @private The schema of an actual emission, wrapping the data into an object with event name and optional fields */
-type EmissionSchema = ReturnType<typeof makeEmissionSchema>;
-/** @private The map of the precomputed emission schemas, having the same keys as the provided EventsMap. */
-type EmissionMap = ReadonlyMap<string, EmissionSchema>;
+/** @private The schema of an actual message, wrapping the data into an object with event name and optional fields */
+type MessageSchema = ReturnType<typeof makeMessageSchema>;
+/** @private The map of the precomputed message schemas having the same keys as the provided EventsMap. */
+type MessagesMap = ReadonlyMap<string, MessageSchema>;
 
-export const makeEmissionMap = <E extends EventsMap>(events: E) =>
+export const makeMessagesMap = <E extends EventsMap>(events: E) =>
   new Map(
     Object.entries(events).map(([event, schema]) => [
       event,
-      makeEmissionSchema(event, schema),
+      makeMessageSchema(event, schema),
     ]),
   );
 
-export const formatEmission = (
-  schemas: EmissionMap,
+export const formatMessage = (
+  schemas: MessagesMap,
   event: string,
   data: unknown,
 ) => {
@@ -70,7 +70,7 @@ export const ensureStream = (response: Response) =>
     "cache-control": "no-cache",
   });
 
-export const makeMiddleware = <E extends EventsMap>(schemas: EmissionMap) =>
+export const makeMiddleware = <E extends EventsMap>(schemas: MessagesMap) =>
   new Middleware({
     handler: async ({ request, response }): Promise<Emitter<E>> => {
       const controller = new AbortController();
@@ -86,7 +86,7 @@ export const makeMiddleware = <E extends EventsMap>(schemas: EmissionMap) =>
         signal: controller.signal,
         emit: (event, data) => {
           ensureStream(response);
-          response.write(formatEmission(schemas, String(event), data), "utf-8");
+          response.write(formatMessage(schemas, String(event), data), "utf-8");
           /**
            * Issue 2347: flush is the method of compression, it must be called only when compression is enabled
            * @link https://github.com/RobinTail/express-zod-api/issues/2347
@@ -97,7 +97,7 @@ export const makeMiddleware = <E extends EventsMap>(schemas: EmissionMap) =>
     },
   });
 
-export const makeResultHandler = (schemas: EmissionMap) =>
+export const makeResultHandler = (schemas: MessagesMap) =>
   new ResultHandler({
     positive: () => {
       const [first, ...rest] = [...schemas.values()];
@@ -133,7 +133,7 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   Emitter<E>
 > {
   constructor(events: E) {
-    const schemas = makeEmissionMap(events);
+    const schemas = makeMessagesMap(events);
     super(makeResultHandler(schemas));
     this.middlewares = [makeMiddleware<E>(schemas)];
   }

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SSE > makeEmissionSchema() > should make a valid schema of SSE event 1`] = `
+exports[`SSE > makeMessageSchema() > should make a valid schema of SSE event 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,

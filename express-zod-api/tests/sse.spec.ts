@@ -11,9 +11,9 @@ import type { FlatObject } from "../src/common-helpers";
 import {
   type Emitter,
   ensureStream,
-  formatEmission,
-  makeEmissionMap,
-  makeEmissionSchema,
+  formatMessage,
+  makeMessagesMap,
+  makeMessageSchema,
   makeMiddleware,
   makeResultHandler,
 } from "../src/sse";
@@ -33,31 +33,31 @@ const useFakeTimers = () => {
 };
 
 describe("SSE", () => {
-  describe("makeEmissionSchema()", () => {
+  describe("makeMessageSchema()", () => {
     test("should make a valid schema of SSE event", () => {
-      expect(makeEmissionSchema("test", z.string())).toMatchSnapshot();
+      expect(makeMessageSchema("test", z.string())).toMatchSnapshot();
     });
   });
 
-  describe("formatEmission()", () => {
-    const schemas = makeEmissionMap({ test: z.string() });
+  describe("formatMessage()", () => {
+    const schemas = makeMessagesMap({ test: z.string() });
     test("should format a valid event into string", () => {
-      expect(formatEmission(schemas, "test", "something")).toBe(
+      expect(formatMessage(schemas, "test", "something")).toBe(
         `event: test\ndata: "something"\n\n`,
       );
     });
     test("should withstand newlines", () => {
-      expect(formatEmission(schemas, "test", "some\ntext")).toBe(
+      expect(formatMessage(schemas, "test", "some\ntext")).toBe(
         `event: test\ndata: "some\\ntext"\n\n`,
       );
     });
     test("should fail for unknown event", () => {
-      expect(() => formatEmission(schemas, "another", "text")).toThrow(
+      expect(() => formatMessage(schemas, "another", "text")).toThrow(
         new Error("Unknown event: another"),
       );
     });
     test("should fail for invalid data", () => {
-      expect(() => formatEmission(schemas, "test", 123)).toThrow(z.ZodError);
+      expect(() => formatMessage(schemas, "test", 123)).toThrow(z.ZodError);
     });
   });
 
@@ -82,7 +82,7 @@ describe("SSE", () => {
   });
 
   describe("makeMiddleware()", () => {
-    const schemas = makeEmissionMap({ test: z.string() });
+    const schemas = makeMessagesMap({ test: z.string() });
     // with and without response.flush()
     test.each([vi.fn(), undefined])(
       "should create a Middleware providing context for emission %#",
@@ -137,8 +137,8 @@ describe("SSE", () => {
 
   describe("makeResultHandler()", () => {
     test.each<Parameters<typeof makeResultHandler>[0]>([
-      makeEmissionMap({ test: z.string(), another: z.number() }),
-      makeEmissionMap({ single: z.string() }),
+      makeMessagesMap({ test: z.string(), another: z.number() }),
+      makeMessagesMap({ single: z.string() }),
     ])(
       "should create ResultHandler describing possible events and handling generic errors %#",
       async (schemas) => {
@@ -178,7 +178,7 @@ describe("SSE", () => {
     );
 
     test("its ::getPositiveResponse() method should throw when events map is empty", () => {
-      const rh = makeResultHandler(makeEmissionMap({}));
+      const rh = makeResultHandler(makeMessagesMap({}));
       expect(() =>
         rh.getPositiveResponse(z.object({})),
       ).toThrowErrorMatchingSnapshot();
