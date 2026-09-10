@@ -49,13 +49,13 @@ const processBucket = (
   const byRange = new Map<Wildcard, number[]>();
   for (const statusCode of statusCodes) {
     const range = makeWildcard(statusCode);
-    byRange.set(range, [...(byRange.get(range) || []), statusCode]);
+    byRange.set(range, [statusCode].concat(byRange.get(range) || []));
   }
   for (const [range, codes] of byRange) {
-    const foreignInRange = allCodes.some(
+    const hasForeign = allCodes.some(
       (one) => makeWildcard(one) === range && !codes.includes(one),
     );
-    if (codes.length > 1 && !foreignInRange) {
+    if (codes.length > 1 && !hasForeign) {
       result.push({ schema, mimeTypes, statusCodes: [range] });
     } else {
       for (const statusCode of codes)
