@@ -16,21 +16,19 @@ const makeWildcard = (statusCode: number): Wildcard =>
   `${Math.floor(statusCode / 100)}XX`;
 
 /** @internal Responses grouped by their schema and MIME types. */
-interface Bucket {
-  schema: z.ZodType;
-  mimeTypes: NormalizedResponse["mimeTypes"];
+interface Bucket extends Omit<NormalizedResponse, "statusCodes"> {
   statusCodes: Set<number>; // for deduplication
 }
 
 const collectBuckets = (responses: readonly NormalizedResponse[]): Bucket[] => {
   const bySchema = new Map<z.ZodType, Map<string, Bucket>>();
   for (const { schema, mimeTypes, statusCodes } of responses) {
-    const signature = mimeTypes ? [...mimeTypes].sort().join(",") : "";
-    const byMimeTypes = bySchema.get(schema) || new Map<string, Bucket>();
-    bySchema.set(schema, byMimeTypes);
-    const previous = byMimeTypes.get(signature);
+    const mimeKey = mimeTypes ? [...mimeTypes].sort().join(",") : "";
+    const byMime = bySchema.get(schema) || new Map<string, Bucket>();
+    bySchema.set(schema, byMime); // @todo consider .getOrInsertComputed() when min Node is 26
+    const previous = byMime.get(mimeKey);
     const codeSet = new Set(statusCodes);
-    byMimeTypes.set(signature, {
+    byMime.set(mimeKey, {
       schema,
       mimeTypes,
       statusCodes: previous ? codeSet.union(previous.statusCodes) : codeSet,
