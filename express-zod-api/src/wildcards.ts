@@ -2,31 +2,29 @@ import * as R from "ramda";
 import { z } from "zod";
 import type { NormalizedResponse } from "./api-response";
 
-/** @internal A flat entry with a single response key: a literal code or a wildcard range label. */
-export interface MergedResponse {
-  schema: z.ZodType;
-  mimeTypes: NormalizedResponse["mimeTypes"];
+/** @internal Similar to NormalizedResponse but with a single item in the statusCodes that can be a wildcard */
+export interface MergedResponse extends Omit<
+  NormalizedResponse,
+  "statusCodes"
+> {
   statusCodes: [string | number];
 }
 
-const statusCodeRange = (statusCode: number): `${number}XX` =>
+const makeWildcard = (statusCode: number): `${number}XX` =>
   `${Math.floor(statusCode / 100)}XX`;
 
 /** @internal Responses grouped by their schema and MIME types. */
-interface ResponseBucket {
+interface Bucket {
   schema: z.ZodType;
   mimeTypes: NormalizedResponse["mimeTypes"];
-  statusCodes: Set<number>;
+  statusCodes: Set<number>; // for deduplication
 }
 
-const collectBuckets = (
-  responses: readonly NormalizedResponse[],
-): ResponseBucket[] => {
-  const bySchema = new Map<z.ZodType, Map<string, ResponseBucket>>();
+const collectBuckets = (responses: readonly NormalizedResponse[]): Bucket[] => {
+  const bySchema = new Map<z.ZodType, Map<string, Bucket>>();
   for (const { schema, mimeTypes, statusCodes } of responses) {
     const signature = mimeTypes ? [...mimeTypes].sort().join(",") : "";
-    const byMimeTypes =
-      bySchema.get(schema) || new Map<string, ResponseBucket>();
+    const byMimeTypes = bySchema.get(schema) || new Map<string, Bucket>();
     bySchema.set(schema, byMimeTypes);
     const previous = byMimeTypes.get(signature);
     const codeSet = new Set(statusCodes);
@@ -36,7 +34,7 @@ const collectBuckets = (
       statusCodes: previous ? codeSet.union(previous.statusCodes) : codeSet,
     });
   }
-  const buckets: ResponseBucket[] = [];
+  const buckets: Bucket[] = [];
   for (const byMimeTypes of bySchema.values())
     for (const bucket of byMimeTypes.values()) buckets.push(bucket);
   return buckets;
@@ -44,18 +42,18 @@ const collectBuckets = (
 
 /** @internal Collapses one bucket into single-key entries, keeping the non-collapsible codes literal. */
 const processBucket = (
-  { schema, mimeTypes, statusCodes }: ResponseBucket,
+  { schema, mimeTypes, statusCodes }: Bucket,
   allCodes: readonly number[],
 ): MergedResponse[] => {
   const result: MergedResponse[] = [];
   const byRange = new Map<string, number[]>();
   for (const statusCode of statusCodes) {
-    const range = statusCodeRange(statusCode);
+    const range = makeWildcard(statusCode);
     byRange.set(range, [...(byRange.get(range) || []), statusCode]);
   }
   for (const [range, codes] of byRange) {
     const foreignInRange = allCodes.some(
-      (one) => statusCodeRange(one) === range && !codes.includes(one),
+      (one) => makeWildcard(one) === range && !codes.includes(one),
     );
     if (codes.length > 1 && !foreignInRange) {
       result.push({ schema, mimeTypes, statusCodes: [range] });
@@ -68,9 +66,8 @@ const processBucket = (
 };
 
 /**
- * @desc Collapses several status codes sharing the same schema and MIME types into wildcard
- * range keys (2XX, 3XX, 4XX, 5XX).
- * @desc Returns the original responses untouched when nothing has been collapsed.
+ * @desc Collapses several status codes sharing the same schema and MIME types into wildcard ranges (2XX, 4XX).
+ * @returns The original responses untouched when nothing has been collapsed.
  * */
 export const mergeStatusCodes = (
   responses: readonly NormalizedResponse[],
