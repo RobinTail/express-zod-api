@@ -16,7 +16,7 @@ const statusCodeRange = (statusCode: number): `${number}XX` =>
 interface ResponseBucket {
   schema: z.ZodType;
   mimeTypes: NormalizedResponse["mimeTypes"];
-  statusCodes: number[];
+  statusCodes: Set<number>;
 }
 
 const collectBuckets = (
@@ -29,12 +29,11 @@ const collectBuckets = (
       bySchema.get(schema) || new Map<string, ResponseBucket>();
     bySchema.set(schema, byMimeTypes);
     const previous = byMimeTypes.get(signature);
+    const codeSet = new Set(statusCodes);
     byMimeTypes.set(signature, {
       schema,
       mimeTypes,
-      statusCodes: previous
-        ? [...previous.statusCodes, ...statusCodes]
-        : [...statusCodes],
+      statusCodes: previous ? codeSet.union(previous.statusCodes) : codeSet,
     });
   }
   const buckets: ResponseBucket[] = [];

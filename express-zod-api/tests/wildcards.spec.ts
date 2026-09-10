@@ -30,6 +30,18 @@ describe("mergeStatusCodes()", () => {
     expect(toCodes(mergeStatusCodes(responses))).toEqual(["2XX", 400]);
   });
 
+  test("should not create a wildcard from duplicated status codes", () => {
+    const responses: NormalizedResponse[] = [
+      {
+        schema: z.literal("ok"),
+        mimeTypes: json,
+        statusCodes: [200, 200],
+      },
+      { schema: z.literal("error"), mimeTypes: json, statusCodes: [400, 404] },
+    ];
+    expect(toCodes(mergeStatusCodes(responses))).toEqual([200, "4XX"]);
+  });
+
   test("should collapse the codes of separate ApiResponse entries sharing the same schema", () => {
     const okSchema = z.object({ ok: z.boolean() });
     const responses: NormalizedResponse[] = [
