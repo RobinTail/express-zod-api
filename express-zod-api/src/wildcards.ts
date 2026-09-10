@@ -26,12 +26,12 @@ const collectBuckets = (responses: readonly NormalizedResponse[]): Bucket[] => {
     const mimeKey = mimeTypes ? [...mimeTypes].sort().join(",") : "";
     const byMime = bySchema.get(schema) || new Map<string, Bucket>();
     bySchema.set(schema, byMime); // @todo consider .getOrInsertComputed() when min Node is 26
-    const previous = byMime.get(mimeKey);
+    const prev = byMime.get(mimeKey);
     const codeSet = new Set(statusCodes);
     byMime.set(mimeKey, {
       schema,
       mimeTypes,
-      statusCodes: previous ? codeSet.union(previous.statusCodes) : codeSet,
+      statusCodes: prev ? codeSet.union(prev.statusCodes) : codeSet,
     });
   }
   const buckets: Bucket[] = [];
@@ -46,16 +46,17 @@ const processBucket = (
   allCodes: readonly number[],
 ): MergedResponse[] => {
   const result: MergedResponse[] = [];
-  const byRange = new Map<Wildcard, number[]>();
-  for (const statusCode of statusCodes) {
-    const range = makeWildcard(statusCode);
-    byRange.set(range, [statusCode].concat(byRange.get(range) || []));
+  const byRange = new Map<Wildcard, Set<number>>();
+  for (const code of statusCodes) {
+    const range = makeWildcard(code);
+    const prev = byRange.get(range);
+    byRange.set(range, prev ? new Set([code]).union(prev) : new Set([code]));
   }
   for (const [range, codes] of byRange) {
     const hasForeign = allCodes.some(
-      (one) => makeWildcard(one) === range && !codes.includes(one),
+      (one) => makeWildcard(one) === range && !codes.has(one),
     );
-    if (codes.length > 1 && !hasForeign) {
+    if (codes.size > 1 && !hasForeign) {
       result.push({ schema, mimeTypes, statusCodes: [range] });
     } else {
       for (const statusCode of codes)
