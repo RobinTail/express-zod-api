@@ -108,9 +108,8 @@ interface DocumentationParams {
   /** @default inline */
   composition?: "inline" | "components";
   /**
-   * @desc Collapses several status codes sharing the same schema and MIME types into OpenAPI wildcard
-   * @desc range keys (2XX, 3XX, 4XX, 5XX) in the generated documentation.
-   * @example true — the responses for 200 and 204 with identical schemas are depicted as a single response for 2XX
+   * @desc Collapses several status codes sharing the same schema (by reference) and MIME types into OpenAPI wildcard.
+   * @example true — [200, 201] —> "2XX"
    * @default false
    * */
   hasWildcardStatusCodes?: boolean;
