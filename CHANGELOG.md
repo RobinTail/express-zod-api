@@ -4,8 +4,8 @@
 
 ### v29.7.0
 
-- Added the `hasWildcardStatusCodes` option to the Documentation generator for collapsing multiple status codes sharing
-  the same schema and MIME types into OpenAPI wildcard range keys (2XX, 3XX, 4XX, 5XX).
+- Added the `hasStatusCodeRanges` option to the Documentation generator for collapsing multiple status codes sharing
+  the same schema and MIME types into OpenAPI range keys (2XX, 3XX, 4XX, 5XX).
 
 ### v29.6.1
 

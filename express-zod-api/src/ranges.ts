@@ -2,17 +2,17 @@ import * as R from "ramda";
 import { z } from "zod";
 import type { NormalizedResponse } from "./api-response";
 
-export type Wildcard = `${number}XX`;
+export type StatusCodeRange = `${number}XX`;
 
-/** @internal Similar to NormalizedResponse but with a single item in the statusCodes that can be a wildcard */
+/** @internal Similar to NormalizedResponse but with a single item in the statusCodes that can be a range key */
 export interface MergedResponse extends Omit<
   NormalizedResponse,
   "statusCodes"
 > {
-  statusCodes: [Wildcard | number];
+  statusCodes: [StatusCodeRange | number];
 }
 
-const makeWildcard = (statusCode: number): Wildcard =>
+const makeRange = (statusCode: number): StatusCodeRange =>
   `${Math.floor(statusCode / 100)}XX`;
 
 /** @internal Responses grouped by their schema and MIME types. */
@@ -46,15 +46,15 @@ const processBucket = (
   allCodes: readonly number[],
 ): MergedResponse[] => {
   const result: MergedResponse[] = [];
-  const byRange = new Map<Wildcard, Set<number>>();
+  const byRange = new Map<StatusCodeRange, Set<number>>();
   for (const code of statusCodes) {
-    const range = makeWildcard(code);
+    const range = makeRange(code);
     const prev = byRange.get(range);
     byRange.set(range, prev ? new Set([code]).union(prev) : new Set([code]));
   }
   for (const [range, codes] of byRange) {
     const hasForeign = allCodes.some(
-      (one) => makeWildcard(one) === range && !codes.has(one),
+      (one) => makeRange(one) === range && !codes.has(one),
     );
     if (codes.size > 1 && !hasForeign) {
       result.push({ schema, mimeTypes, statusCodes: [range] });
@@ -66,11 +66,11 @@ const processBucket = (
   return result;
 };
 
-const hasWildcard = ({ statusCodes }: MergedResponse) =>
+const hasRange = ({ statusCodes }: MergedResponse) =>
   typeof statusCodes[0] === "string";
 
 /**
- * @desc Collapses several status codes sharing the same schema and MIME types into wildcard ranges (2XX, 4XX).
+ * @desc Collapses several status codes sharing the same schema and MIME types into range keys (2XX, 4XX).
  * @returns The original responses untouched when nothing has been collapsed.
  * */
 export const mergeStatusCodes = (
@@ -81,5 +81,5 @@ export const mergeStatusCodes = (
     (bucket) => processBucket(bucket, allCodes),
     collectBuckets(responses),
   );
-  return merged.some(hasWildcard) ? merged : responses;
+  return merged.some(hasRange) ? merged : responses;
 };

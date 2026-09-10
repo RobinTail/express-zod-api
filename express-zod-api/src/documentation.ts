@@ -45,7 +45,7 @@ import {
 } from "./documentation-helpers";
 import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
-import { mergeStatusCodes } from "./wildcards";
+import { mergeStatusCodes } from "./ranges";
 import { z } from "zod";
 
 export { DocumentationError };
@@ -108,11 +108,11 @@ interface DocumentationParams {
   /** @default inline */
   composition?: "inline" | "components";
   /**
-   * @desc Collapses several status codes sharing the same schema (by reference) and MIME types into OpenAPI wildcard.
+   * @desc Collapses several status codes sharing the same schema (by reference) and MIME types into OpenAPI range.
    * @example true — [200, 201] —> "2XX"
    * @default false
    * */
-  hasWildcardStatusCodes?: boolean;
+  hasStatusCodeRanges?: boolean;
   /**
    * @desc Handling rules for your own schemas branded with `x-brand` metadata.
    * @desc Keys: brands (recommended to use unique symbols).
@@ -258,7 +258,7 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     isHeader,
     isCookie,
-    hasWildcardStatusCodes = false,
+    hasStatusCodeRanges = false,
     summarizer = defaultSummarizer,
     composition = "inline",
   }: DocumentationParams): OnEndpoint<ClientMethod> {
@@ -310,7 +310,7 @@ export class Documentation extends OpenApiBuilder {
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
         const apiResponses = endpoint.getResponses(variant);
-        const entries = hasWildcardStatusCodes
+        const entries = hasStatusCodeRanges
           ? mergeStatusCodes(apiResponses)
           : apiResponses;
         for (const { mimeTypes, schema, statusCodes } of entries) {

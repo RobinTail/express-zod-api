@@ -49,7 +49,7 @@ import { getSecurityNames, type Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import { getWellKnownCookies } from "./well-known-cookies";
 import { getWellKnownHeaders } from "./well-known-headers";
-import type { Wildcard } from "./wildcards";
+import type { StatusCodeRange } from "./ranges";
 
 interface ReqResCommons {
   makeRef: (
@@ -497,7 +497,7 @@ export const depictResponse = ({
   brandHandling?: BrandHandling;
   mimeTypes: NormalizedResponse["mimeTypes"];
   variant: ResponseVariant;
-  statusCode: number | Wildcard;
+  statusCode: number | StatusCodeRange;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
   if (!shouldHaveContent(method, mimeTypes)) return { description };

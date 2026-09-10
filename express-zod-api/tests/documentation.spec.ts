@@ -1056,8 +1056,8 @@ describe("Documentation", () => {
     });
   });
 
-  describe("Wildcard status codes", () => {
-    test("should depict wildcard responses accordingly in YAML", () => {
+  describe("Range status codes", () => {
+    test("should depict range responses accordingly in YAML", () => {
       const factory = new EndpointsFactory(
         new ResultHandler({
           positive: { statusCode: [200, 204], schema: z.literal("ok") },
@@ -1078,7 +1078,7 @@ describe("Documentation", () => {
               }),
             },
           },
-          hasWildcardStatusCodes: true,
+          hasStatusCodeRanges: true,
         }).getSpecAsYaml(),
       ).toMatchSnapshot();
     });

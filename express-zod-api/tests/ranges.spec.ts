@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { NormalizedResponse } from "../src/api-response";
 import { contentTypes } from "../src/content-type";
-import { mergeStatusCodes, type MergedResponse } from "../src/wildcards";
+import { mergeStatusCodes, type MergedResponse } from "../src/ranges";
 
 const toCodes = (subject: readonly (NormalizedResponse | MergedResponse)[]) =>
   subject.flatMap(({ statusCodes }) => statusCodes as (string | number)[]);
@@ -18,7 +18,7 @@ describe("mergeStatusCodes()", () => {
     expect(toCodes(mergeStatusCodes(responses))).toEqual([200, 400]);
   });
 
-  test("should collapse the codes of a single schema into a wildcard", () => {
+  test("should collapse the codes of a single schema into a range", () => {
     const responses: NormalizedResponse[] = [
       {
         schema: z.literal("ok"),
@@ -30,7 +30,7 @@ describe("mergeStatusCodes()", () => {
     expect(toCodes(mergeStatusCodes(responses))).toEqual(["2XX", 400]);
   });
 
-  test("should not create a wildcard from duplicated status codes", () => {
+  test("should not create a range from duplicated status codes", () => {
     const responses: NormalizedResponse[] = [
       {
         schema: z.literal("ok"),
@@ -64,7 +64,7 @@ describe("mergeStatusCodes()", () => {
     expect(toCodes(mergeStatusCodes(responses))).toEqual(["2XX", "4XX"]);
   });
 
-  test("should keep non-collapsible literal codes alongside the wildcards", () => {
+  test("should keep non-collapsible literal codes alongside the ranges", () => {
     const errA = z.object({ errA: z.boolean() });
     const errB = z.object({ errB: z.boolean() });
     const responses: NormalizedResponse[] = [
