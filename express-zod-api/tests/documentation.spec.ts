@@ -1056,6 +1056,34 @@ describe("Documentation", () => {
     });
   });
 
+  describe("Range status codes", () => {
+    test("should depict range responses accordingly in YAML", () => {
+      const factory = new EndpointsFactory(
+        new ResultHandler({
+          positive: { statusCode: [200, 204], schema: z.literal("ok") },
+          negative: { statusCode: 400, schema: z.literal("error") },
+          handler: vi.fn(),
+        }),
+      );
+      expect(
+        new Documentation({
+          config: sampleConfig,
+          routing: {
+            v1: {
+              mtpl: factory.build({
+                method: "post",
+                input: z.object({ test: z.number() }),
+                output: z.object({ payload: z.string() }),
+                handler: async () => ({ payload: "test" }),
+              }),
+            },
+          },
+          hasStatusCodeRanges: true,
+        }).getSpecAsYaml(),
+      ).toMatchSnapshot();
+    });
+  });
+
   describe("Metadata", () => {
     test("should pass over the schema description", () => {
       const spec = new Documentation({
