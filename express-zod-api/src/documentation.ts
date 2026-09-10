@@ -38,7 +38,6 @@ import {
   reformatParamsInPath,
   nonEmpty,
   depictRequest,
-  mergeStatusCodes,
   makeParamLocator,
   type ParamRecognizer,
   type BrandHandling,
@@ -46,6 +45,7 @@ import {
 } from "./documentation-helpers";
 import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
+import { mergeStatusCodes } from "./wildcards";
 import { z } from "zod";
 
 export { DocumentationError };
