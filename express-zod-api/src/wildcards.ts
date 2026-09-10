@@ -2,15 +2,17 @@ import * as R from "ramda";
 import { z } from "zod";
 import type { NormalizedResponse } from "./api-response";
 
+export type Wildcard = `${number}XX`;
+
 /** @internal Similar to NormalizedResponse but with a single item in the statusCodes that can be a wildcard */
 export interface MergedResponse extends Omit<
   NormalizedResponse,
   "statusCodes"
 > {
-  statusCodes: [string | number];
+  statusCodes: [Wildcard | number];
 }
 
-const makeWildcard = (statusCode: number): `${number}XX` =>
+const makeWildcard = (statusCode: number): Wildcard =>
   `${Math.floor(statusCode / 100)}XX`;
 
 /** @internal Responses grouped by their schema and MIME types. */
@@ -46,7 +48,7 @@ const processBucket = (
   allCodes: readonly number[],
 ): MergedResponse[] => {
   const result: MergedResponse[] = [];
-  const byRange = new Map<string, number[]>();
+  const byRange = new Map<Wildcard, number[]>();
   for (const statusCode of statusCodes) {
     const range = makeWildcard(statusCode);
     byRange.set(range, [...(byRange.get(range) || []), statusCode]);
