@@ -11,6 +11,7 @@ await writeFile(
     config,
     info: { title: "Example API", version: manifest.version },
     server: "https://example.com",
+    wildcardStatusCodes: true,
     tags: {
       users: "Everything about the users",
       files: "Everything about the files processing",
