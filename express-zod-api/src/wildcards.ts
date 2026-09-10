@@ -65,6 +65,9 @@ const processBucket = (
   return result;
 };
 
+const hasWildcard = ({ statusCodes }: MergedResponse) =>
+  typeof statusCodes[0] === "string";
+
 /**
  * @desc Collapses several status codes sharing the same schema and MIME types into wildcard ranges (2XX, 4XX).
  * @returns The original responses untouched when nothing has been collapsed.
@@ -77,7 +80,5 @@ export const mergeStatusCodes = (
     (bucket) => processBucket(bucket, allCodes),
     collectBuckets(responses),
   );
-  return merged.some(({ statusCodes }) => typeof statusCodes[0] === "string")
-    ? merged
-    : responses;
+  return merged.some(hasWildcard) ? merged : responses;
 };
