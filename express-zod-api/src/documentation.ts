@@ -113,7 +113,7 @@ interface DocumentationParams {
    * @example true — the responses for 200 and 204 with identical schemas are depicted as a single response for 2XX
    * @default false
    * */
-  wildcardStatusCodes?: boolean;
+  hasWildcardStatusCodes?: boolean;
   /**
    * @desc Handling rules for your own schemas branded with `x-brand` metadata.
    * @desc Keys: brands (recommended to use unique symbols).
@@ -259,7 +259,7 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     isHeader,
     isCookie,
-    wildcardStatusCodes = false,
+    hasWildcardStatusCodes = false,
     summarizer = defaultSummarizer,
     composition = "inline",
   }: DocumentationParams): OnEndpoint<ClientMethod> {
@@ -311,7 +311,7 @@ export class Documentation extends OpenApiBuilder {
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
         const apiResponses = endpoint.getResponses(variant);
-        const entries = wildcardStatusCodes
+        const entries = hasWildcardStatusCodes
           ? mergeStatusCodes(apiResponses)
           : apiResponses;
         for (const { mimeTypes, schema, statusCodes } of entries) {

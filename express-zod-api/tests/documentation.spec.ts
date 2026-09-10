@@ -1078,7 +1078,7 @@ describe("Documentation", () => {
               }),
             },
           },
-          wildcardStatusCodes: true,
+          hasWildcardStatusCodes: true,
         }).getSpecAsYaml(),
       ).toMatchSnapshot();
     });
