@@ -49,7 +49,7 @@ import { getSecurityNames, type Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import { getWellKnownCookies } from "./well-known-cookies";
 import { getWellKnownHeaders } from "./well-known-headers";
-import type { Wildcard } from "./wildcards.ts";
+import type { Wildcard } from "./wildcards";
 
 interface ReqResCommons {
   makeRef: (
