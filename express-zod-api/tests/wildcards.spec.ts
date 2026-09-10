@@ -8,7 +8,7 @@ const toCodes = (subject: readonly (NormalizedResponse | MergedResponse)[]) =>
 
 const json = [contentTypes.json] satisfies NormalizedResponse["mimeTypes"];
 
-describe("Wildcard status codes", () => {
+describe("mergeStatusCodes()", () => {
   test("should return the responses untouched when nothing is collapsible", () => {
     const responses: NormalizedResponse[] = [
       { schema: z.literal("ok"), mimeTypes: json, statusCodes: [200] },
@@ -43,7 +43,11 @@ describe("Wildcard status codes", () => {
   test("should merge positive and negative variants independently", () => {
     const responses: NormalizedResponse[] = [
       { schema: z.literal("ok"), mimeTypes: json, statusCodes: [200, 201] },
-      { schema: z.literal("error"), mimeTypes: json, statusCodes: [400, 404] },
+      {
+        schema: z.literal("error"),
+        mimeTypes: json,
+        statusCodes: [400, 404],
+      },
     ];
     expect(toCodes(mergeStatusCodes(responses))).toEqual(["2XX", "4XX"]);
   });
@@ -71,7 +75,11 @@ describe("Wildcard status codes", () => {
   test("should keep literal codes spanning multiple ranges", () => {
     const responses: NormalizedResponse[] = [
       { schema: z.literal("ok"), mimeTypes: json, statusCodes: [200] },
-      { schema: z.literal("error"), mimeTypes: json, statusCodes: [400, 500] },
+      {
+        schema: z.literal("error"),
+        mimeTypes: json,
+        statusCodes: [400, 500],
+      },
     ];
     expect(toCodes(mergeStatusCodes(responses))).toEqual([200, 400, 500]);
   });
