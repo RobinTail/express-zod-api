@@ -9,7 +9,13 @@ import { IntegrationBase, interfaces } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
-import { ensureTypeNode, printNode, ts } from "./typescript-api";
+import {
+  ensureTypeNode,
+  printNode,
+  type ts,
+  type PrintNodeOptions,
+  type DeferredCode,
+} from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
@@ -68,7 +74,7 @@ interface IntegrationParams {
 
 interface FormattedPrintingOptions {
   /** @desc Typescript printer options */
-  printerOptions?: ts.PrinterOptions;
+  printerOptions?: PrintNodeOptions;
   /**
    * @desc Typescript code formatter
    * @default prettier.format | oxfmt.format
@@ -77,8 +83,7 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
-    [];
+  readonly #program: Array<string | DeferredCode> = [];
   readonly #aliases = new Map<object, string>();
   #usage?: string;
 
@@ -205,7 +210,7 @@ export class Integration extends IntegrationBase {
     );
   }
 
-  public print(printerOptions?: ts.PrinterOptions) {
+  public print(printerOptions?: PrintNodeOptions) {
     const parts = this.#program.map((entry) =>
       typeof entry === "function" ? entry(printerOptions) : entry,
     );

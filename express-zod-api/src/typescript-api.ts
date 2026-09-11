@@ -1,9 +1,13 @@
+/* oxlint-disable allowed/dependencies -- experiment ⚠️*/
 import * as R from "ramda";
-import ts from "typescript"; // oxlint-disable-line allowed/dependencies -- opt-in export
+import * as f from "@typescript/native-preview/unstable/ast/factory";
+import * as ts from "@typescript/native-preview/unstable/ast";
+import {
+  API,
+  type PrintNodeOptions,
+} from "@typescript/native-preview/unstable/sync";
 
-export { ts };
-
-export const f = ts.factory;
+export { f, ts, type PrintNodeOptions };
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
@@ -26,13 +30,19 @@ export type Typeable =
   | ts.Identifier
   | string
   | ts.KeywordTypeSyntaxKind;
+export type DeferredCode = (opts?: PrintNodeOptions) => string;
 
 // oxfmt-ignore
-export const literally = <T extends string | null | boolean | number | bigint>(subj: T) => (
-  typeof subj === "number" ? f.createNumericLiteral(subj)
-    : typeof subj === "bigint" ? f.createBigIntLiteral(subj.toString())
-      : typeof subj === "boolean" ? subj ? f.createTrue() : f.createFalse()
-        : subj === null ? f.createNull() : f.createStringLiteral(subj)
+export const literally = <T extends string | null | boolean | number | bigint>(
+  subj: T,
+) => (
+  typeof subj === "number" ? f.createNumericLiteral(subj.toString(), ts.TokenFlags.None)
+  : typeof subj === "bigint" ? f.createBigIntLiteral(subj.toString(), ts.TokenFlags.None)
+  : typeof subj === "boolean" ? subj
+    ? f.createKeywordExpression(ts.SyntaxKind.TrueKeyword)
+    : f.createKeywordExpression(ts.SyntaxKind.FalseKeyword)
+  : subj === null ? f.createKeywordExpression(ts.SyntaxKind.NullKeyword)
+  : f.createStringLiteral(subj, ts.TokenFlags.None)
 ) as T extends string ? ts.StringLiteral : T extends number ? ts.NumericLiteral
   : T extends boolean ? ts.BooleanLiteral : T extends bigint ? ts.BigIntLiteral : ts.NullLiteral;
 
@@ -50,7 +60,10 @@ export const ensureTypeNode = (
   typeof subject === "number"
     ? f.createKeywordTypeNode(subject)
     : typeof subject === "string" || ts.isIdentifier(subject)
-      ? f.createTypeReferenceNode(subject, args && R.map(ensureTypeNode, args))
+      ? f.createTypeReferenceNode(
+          typeof subject === "string" ? makeId(subject) : subject,
+          args && R.map(ensureTypeNode, args),
+        )
       : subject;
 
 /**
@@ -67,32 +80,34 @@ export const makeUnion = (entries: ts.TypeNode[]) => {
 const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
   primitives.has(node.kind);
 
-const addJsDoc = <T extends ts.Node>(node: T, text: string) =>
-  ts.addSyntheticLeadingComment(
-    node,
-    ts.SyntaxKind.MultiLineCommentTrivia,
-    `* ${text} `,
-    true,
-  );
+/**
+ * @internal this entity exists to enable JSDoc injection due to the missing addSyntheticLeadingComment in tsgo API
+ * @todo remove if implemented in tsgo API
+ * */
+export const customizations = new WeakMap<ts.Node, DeferredCode>();
 
-export const printNode = (
-  node: ts.TypeNode,
-  printerOptions?: ts.PrinterOptions,
-) => {
-  const sourceFile = ts.createSourceFile(
-    "print.ts",
-    "",
-    ts.ScriptTarget.Latest,
-    false,
-    ts.ScriptKind.TS,
-  );
-  const printer = ts.createPrinter(printerOptions);
-  return printer.printNode(ts.EmitHint.Unspecified, node, sourceFile);
+let emitter: ReturnType<typeof getProject>["emitter"] | undefined;
+const getProject = () => {
+  const api = new API();
+  const snapshot = api.updateSnapshot({ openProjects: ["tsconfig.json"] });
+  return snapshot.getProject("tsconfig.json")!;
 };
 
-export const makeInterfaceProp = (
-  name: string | number,
-  value: Typeable,
+export const printNode = (node: ts.Node, opts?: PrintNodeOptions) =>
+  customizations.get(node)?.(opts) ??
+  (emitter ??= getProject().emitter).printNode(node, opts);
+
+const reindent = (text: string, offset: number): string =>
+  text
+    .split("\n")
+    .map((line, idx) =>
+      idx && line ? line.padStart(line.length + offset) : line,
+    )
+    .join("\n");
+
+export const makeInterfacePropText = (
+  key: string | number,
+  typeNode: ts.TypeNode,
   {
     isOptional,
     hasUndefined = isOptional,
@@ -104,21 +119,43 @@ export const makeInterfaceProp = (
     isDeprecated?: boolean;
     comment?: string;
   } = {},
+): DeferredCode => {
+  const opt = isOptional ? "?" : "";
+  const undef = hasUndefined ? " | undefined" : "";
+  const parts = [isDeprecated && "@deprecated", comment].filter(Boolean);
+  const jsdoc = parts.length ? `    /** ${parts.join(" ")} */\n` : "";
+  return (opts) => {
+    const keyText = printNode(makePropertyIdentifier(key), opts);
+    const rawTypeText =
+      customizations.get(typeNode)?.(opts) ?? printNode(typeNode, opts);
+    const typeText = rawTypeText.includes("\n")
+      ? reindent(rawTypeText, 4)
+      : rawTypeText;
+    return `${jsdoc}    ${keyText}${opt}: ${typeText}${undef};`;
+  };
+};
+
+export const makeInterfaceProp = (
+  name: string | number,
+  value: Typeable,
+  {
+    isOptional,
+    hasUndefined = isOptional,
+  }: {
+    isOptional?: boolean;
+    hasUndefined?: boolean;
+  } = {},
 ) => {
   const propType = ensureTypeNode(value);
-  const node = f.createPropertySignature(
+  return f.createPropertySignatureDeclaration(
     undefined,
     makePropertyIdentifier(name),
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     hasUndefined
       ? makeUnion([propType, ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)])
       : propType,
+    f.createKeywordExpression(ts.SyntaxKind.NullKeyword), // placeholder initializer, weird tsgo requirement
   );
-  const jsdoc = R.reject(R.isNil, [
-    isDeprecated ? "@deprecated" : undefined,
-    comment,
-  ]);
-  return jsdoc.length ? addJsDoc(node, jsdoc.join(" ")) : node;
 };
 
 export const makeLiteralType = (subj: Parameters<typeof literally>[0]) =>
