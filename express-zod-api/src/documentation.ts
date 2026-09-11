@@ -45,6 +45,7 @@ import {
 } from "./documentation-helpers";
 import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
+import { mergeStatusCodes } from "./ranges";
 import { z } from "zod";
 
 export { DocumentationError };
@@ -57,7 +58,7 @@ type Component =
 /** @desc user defined function that creates a component description from its properties */
 type Descriptor = (
   props: Record<"method" | "path" | "operationId", string> & {
-    statusCode?: number; // for response only
+    statusCode?: number | string; // for response only
   },
 ) => string;
 
@@ -106,6 +107,12 @@ interface DocumentationParams {
   hasHeadMethod?: boolean;
   /** @default inline */
   composition?: "inline" | "components";
+  /**
+   * @desc Collapses several status codes sharing the same schema (by reference) and MIME types into OpenAPI range.
+   * @example true — [200, 201] —> "2XX"
+   * @default false
+   * */
+  hasStatusCodeRanges?: boolean;
   /**
    * @desc Handling rules for your own schemas branded with `x-brand` metadata.
    * @desc Keys: brands (recommended to use unique symbols).
@@ -251,6 +258,7 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     isHeader,
     isCookie,
+    hasStatusCodeRanges = false,
     summarizer = defaultSummarizer,
     composition = "inline",
   }: DocumentationParams): OnEndpoint<ClientMethod> {
@@ -302,7 +310,10 @@ export class Documentation extends OpenApiBuilder {
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
         const apiResponses = endpoint.getResponses(variant);
-        for (const { mimeTypes, schema, statusCodes } of apiResponses) {
+        const entries = hasStatusCodeRanges
+          ? mergeStatusCodes(apiResponses)
+          : apiResponses;
+        for (const { mimeTypes, schema, statusCodes } of entries) {
           for (const statusCode of statusCodes) {
             responses[statusCode] = depictResponse({
               ...commons,
@@ -311,7 +322,7 @@ export class Documentation extends OpenApiBuilder {
               mimeTypes,
               statusCode,
               hasMultipleStatusCodes:
-                apiResponses.length > 1 || statusCodes.length > 1,
+                entries.length > 1 || statusCodes.length > 1,
               description: descriptions?.[`${variant}Response`]?.({
                 method,
                 path,

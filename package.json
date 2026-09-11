@@ -24,8 +24,8 @@
     "oxfmt": "0.66.0",
     "oxlint": "^1.76.0",
     "oxlint-plugin-eslint": "^1.76.0",
-    "tsdown": "^0.22.4",
+    "tsdown": "^0.23.0",
     "vitest": "^5.0.0"
   },
-  "packageManager": "pnpm@12.2.1+sha512.f55ca68aacb9eb5ab69c66f828a98af89a32286703aef1f8da131ca7eab4d677f34bfa85e186467a919c0799df8b6f4aa240f7dc2919b33b3273190104162616"
+  "packageManager": "pnpm@12.3.3+sha512.4d0847314b85338f031f6613850e3e6140fc8e41154b7e33ae10bab44bbdc11b274883a965d9890a04e49ad387124555ebda049ec278fd9ef902daeadb5a83e2"
 }
