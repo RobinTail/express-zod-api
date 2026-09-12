@@ -47,10 +47,11 @@ const ids = {
   isBlob: "isBlob",
   source: "source",
   Method: "Method",
-  SomeOf: "SomeOf",
   Request: "Request",
   Pagination: "Pagination",
   override: "override",
+  discriminate: "discriminate",
+  discriminator: "discriminator",
 } satisfies Record<string, string>;
 
 export const interfaces: Record<IOKind, string> = {
@@ -65,6 +66,8 @@ const quot = (items: Iterable<string>) =>
   Array.from(items).map((s) => `"${s}"`);
 
 const propOf = <T>(name: keyof NoInfer<T>) => name as string;
+
+const discriminators = { success: "success", error: "error" };
 
 export abstract class IntegrationBase {
   /** @internal */
@@ -91,11 +94,18 @@ export abstract class IntegrationBase {
   protected makeOmit = (base: string, props: Iterable<string>, reason = "") =>
     `Omit<${base}, ${reason && `\n/** ${reason} */\n`}${quot(props).join(" | ")}>`;
 
-  /**
-   * @example type SomeOf<T> = T[keyof T];
-   * @internal
-   * */
-  protected makeSomeOfType = () => `type ${ids.SomeOf}<T> = T[keyof T];`;
+  protected makeDiscriminator = (
+    statusCodes: number[],
+    responseVariant: ResponseVariant,
+    dataRef: string,
+  ) => {
+    const props = [
+      `${propOf<Response>("status")}: ${statusCodes.join(" | ")}`,
+      `${ids.discriminator}: "${responseVariant === "positive" ? discriminators.success : discriminators.error}"`,
+      `${ids.data}: ${dataRef}`,
+    ];
+    return `{ ${props.join(", ")} }`;
+  };
 
   /**
    * @example export type Request = keyof Input;
@@ -103,12 +113,6 @@ export abstract class IntegrationBase {
    * */
   protected makeRequestType = () =>
     `export type ${ids.Request} = keyof ${interfaces.input};`;
-
-  /**
-   * @example SomeOf<_>
-   * @internal
-   **/
-  protected someOf = (name: string) => `${ids.SomeOf}<${name}>`;
 
   /**
    * @example export type Path = "/v1/user/retrieve" | ___;
@@ -147,7 +151,8 @@ export abstract class IntegrationBase {
 
   /**
    * @example export type Implementation<T extends Record<string, unknown>> =
-   *          (method: Method, path: string, params: Record<string, any>, ctx?: T) => Promise<any>;
+   *          (method: Method, path: string, params: Record<string, any>, ctx?: T) =>
+   *            Promise<{ status: number, data: any }>;
    * @internal
    * */
   protected makeImplementationType = () => {
@@ -157,7 +162,10 @@ export abstract class IntegrationBase {
       `${ids.params}: Record<string, any>`,
       `${ids.ctx}?: T`,
     ].join(",");
-    return `export type ${ids.Implementation}<T extends Record<string, unknown>> = (${args}) => Promise<any>;`;
+    return (
+      `export type ${ids.Implementation}<T extends Record<string, unknown>> = ` +
+      `(${args}) => Promise<{ ${propOf<Response>("status")}: number, ${ids.data}: any }>;`
+    );
   };
 
   /**
@@ -236,17 +244,22 @@ export abstract class IntegrationBase {
       `  public constructor(`,
       `    protected readonly ${ids.implementation}: ${ids.Implementation}<T> = ${ids.defaultImplementation},`,
       `  ) {}`,
-      `  public ${ids.provide}<K extends ${ids.Request}>(`,
+      `  public async ${ids.provide}<K extends ${ids.Request}>(`,
       `    ${ids.request}: K,`,
       `    ${ids.params}: ${interfaces.input}[K],`,
       `    ${ids.ctx}?: T,`,
-      `  ): Promise<${interfaces.response}[K]> {`,
+      `  ): Promise<${interfaces.encoded}[K]> {`,
       `    const [${ids.method}, ${ids.path}] = ${ids.parseRequest}(${ids.request});`,
-      `    return this.${ids.implementation}(${callArgs});`,
+      `    const { ${propOf<Response>("status")}, ${ids.data} } = await this.${ids.implementation}(${callArgs});`,
+      `    const ${ids.discriminator} = ${name}.${ids.discriminate}(${propOf<Response>("status")});`,
+      `    return { ${propOf<Response>("status")}, ${ids.data}, ${ids.discriminator} } as ${interfaces.encoded}[K];`,
       `  }`,
       `  public static hasMore(${ids.response}: ${ids.Pagination}): boolean {`,
       `    if ("${nextCursorProp}" in ${ids.response}) return ${ids.response}.${nextCursorProp} !== null;`,
       `    return ${ids.response}.${offsetProp} + ${ids.response}.${limitProp} < ${ids.response}.${totalProp};`,
+      `  }`,
+      `  public static ${ids.discriminate}(${propOf<Response>("status")}: number): ${quot(Object.values(discriminators)).join(" | ")} {`,
+      `    return ${propOf<Response>("status")} < 400 ? "${discriminators.success}" : "${discriminators.error}";`,
       `  }`,
       `}`,
     ].join("\n");
@@ -299,13 +312,15 @@ export abstract class IntegrationBase {
       `    new ${URL.name}(\`\${${ids.path}}\${${ids.searchParams}}\`, "${this.serverUrl}"),`,
       `    init,`,
       `  );`,
+      `  const { ${propOf<Response>("status")} } = ${ids.response};`,
       `  const ${ids.contentType} = ${contentType};`,
-      `  if (!${ids.contentType}) return;`,
-      `  if (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}")) ` +
-        `return ${ids.response}.${propOf<Response>("json")}();`,
-      `  if (${ids.contentType}.${propOf<string>("startsWith")}("text/")) ` +
-        `return ${ids.response}.${propOf<Response>("text")}();`,
-      `  return ${ids.response}.${propOf<Response>("blob")}();`,
+      `  if (!${ids.contentType}) return { ${propOf<Response>("status")}, data: undefined };`,
+      `  const ${ids.data} = await (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}") ?`,
+      `    ${ids.response}.${propOf<Response>("json")}() : `,
+      `    ${ids.contentType}.${propOf<string>("startsWith")}("text/") ? `,
+      `    ${ids.response}.${propOf<Response>("text")}() : `,
+      `    ${ids.response}.${propOf<Response>("blob")}());`,
+      `  return { ${propOf<Response>("status")}, ${ids.data} };`,
       `};`,
     ].join("\n");
   };
@@ -352,7 +367,11 @@ export abstract class IntegrationBase {
   ) =>
     [
       `const ${ids.client} = new ${clientClassName}();`,
-      `${ids.client}.${ids.provide}("get /v1/user/retrieve", { id: "10" });`,
+      `const { ${propOf<Response>("status")}, ${ids.discriminator}, ${ids.data} } = ` +
+        `await ${ids.client}.${ids.provide}("get /v1/user/retrieve", { id: "10" });`,
+      `if (${propOf<Response>("status")} === 200) console.log(${ids.data}.name); // success`,
+      `else if (${propOf<Response>("status")} === 400 || ${ids.discriminator} === "${discriminators.error}") ` +
+        `console.error(${ids.data}.message); // error`,
       `new ${subscriptionClassName}("get /v1/events/stream", {}).${ids.on}("time", (time) => {});`,
     ].join("\n");
 }

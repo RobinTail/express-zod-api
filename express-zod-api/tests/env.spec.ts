@@ -274,10 +274,27 @@ describe("Environment checks", () => {
       expect(c.toJSONSchema()).not.toHaveProperty("allOf"); // @since 4.5.0
     });
 
-    // @todo require zod 4.5 and use compiled schemas everywhere
-    test("compiled schemas have identical shape", () => {
+    test("z.compile() always return a new identical shape but with some distinguishable hidden props", () => {
       const schema = z.iso.date();
-      expect(Object.keys(z.compile(schema))).toEqual(Object.keys(schema));
+      const compiled = z.compile(schema);
+      expect(compiled).not.toBe(schema);
+      expect(Object.keys(compiled)).toEqual(Object.keys(schema));
+      expect(schema._zod.run).not.toHaveProperty("__originalRun");
+      expect(schema._zod.bag).not.toHaveProperty("validator");
+      expect(schema._zod.bag).not.toHaveProperty("fallbackRun");
+      expect(compiled._zod.run).toHaveProperty(
+        "__originalRun",
+        expect.any(Function),
+      );
+      expect(compiled._zod.bag).toHaveProperty(
+        "validator",
+        expect.any(Function),
+      );
+      expect(compiled._zod.bag).toHaveProperty(
+        "fallbackRun",
+        expect.any(Function),
+      );
+      expect(z.compile(compiled)).not.toBe(compiled); // second compile also makes new instance
     });
   });
 
