@@ -37,6 +37,8 @@ export const makeMessageSchema = (event: string, data: z.ZodType) =>
     retry: z.int().positive().optional(),
   });
 
+const invalidSSEChars = /[\r\n\0]/g;
+
 export const formatMessage = (
   events: EventsMap,
   event: string,
@@ -67,7 +69,8 @@ export const makeMiddleware = <E extends EventsMap>(
   let counter = 0;
   const getId =
     typeof eventIds === "function"
-      ? eventIds
+      ? (event: string, seq: number) =>
+          eventIds(event, seq).replace(invalidSSEChars, "")
       : eventIds
         ? (event: string, seq: number) => `${event}##${seq}`
         : undefined;
@@ -144,7 +147,8 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
 /** @desc The options of the `EventStreamFactory`. */
 export interface EventStreamFactoryOptions {
   /**
-   * @desc Enables or customizes assigning a unique id to every SSE event being produced.
+   * @desc Enables or customizes assigning a unique id to every SSE event being produced. The custom function's return
+   *   value must not contain line breaks or null characters (such characters are removed automatically).
    * @default undefined — the ids are not assigned
    * @example true — enables the default id using the shared per-factory `seq` counter
    * @example (event, seq) => `${event}##${seq}` — custom ids using the `seq` counter
@@ -158,6 +162,13 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
 > {
   /** @todo compile these schemas in v30 */
   constructor(events: E, options?: EventStreamFactoryOptions) {
+    for (const name of Object.keys(events)) {
+      if (name.match(invalidSSEChars)) {
+        throw new Error(
+          `Invalid SSE event name "${name}": must not contain line breaks or null characters.`,
+        );
+      }
+    }
     super(makeResultHandler(events));
     this.middlewares = [makeMiddleware(events, options)];
   }

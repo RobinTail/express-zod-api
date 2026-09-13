@@ -1533,7 +1533,8 @@ The constructor accepts the optional second argument `options` for enabling and 
 `event##seq` format. The ids set the `Last-Event-ID` header value reported by the reconnecting client on connection drop,
 and its value is available via the `lastEventId` property of the emitter within the handler. For custom ids, the
 `eventIds` option can be a function `(event, seq) => string` instead of `true`, where `seq` is the sequential number of
-the emitted event:
+the emitted event. The event names must not contain line breaks or null characters, and such characters are removed from
+the ids returned by the custom function:
 
 ```ts
 const subscriptionEndpoint = new EventStreamFactory(

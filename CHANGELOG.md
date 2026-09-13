@@ -9,7 +9,9 @@
   - It can be boolean or a function accepting event name and internal counter;
   - When set to `true`, the default format `${event}##${counter}` is used;
   - When enabled, `lastEventId` Context prop is assigned with `Last-Event-ID` header sent by the reconnecting client.
-- Made SSE message formatting about 2x faster by using simpler concatenations.
+- Ensured the integrity of the SSE message framing:
+  - The event names must not contain line breaks or null characters, otherwise an error is thrown on factory creation;
+  - Such characters are removed from the ids returned by the custom `eventIds` function.
 
 ### v29.7.0
 

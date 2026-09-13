@@ -166,6 +166,22 @@ describe("SSE", () => {
       );
     });
 
+    test.each(["\n", "\r", "\0", "\0\r\n"])(
+      "should strip the line breaks from the custom ids %#",
+      async (suffix) => {
+        const middleware = makeMiddleware(
+          { test: z.string() },
+          { eventIds: (event, seq) => `${event}:${seq}${suffix}` },
+        );
+        const { output, responseMock } = await testMiddleware({ middleware });
+        output.emit?.("test", "something");
+        responseMock.end();
+        expect(responseMock._getData()).toBe(
+          `event: test\nid: test:1\ndata: "something"\n\n`,
+        );
+      },
+    );
+
     test("should clear the stream timeout when request closes before timeout fires", async () => {
       using timers = useFakeTimers();
       const middleware = makeMiddleware({ test: z.string() });
@@ -271,5 +287,16 @@ describe("SSE", () => {
         `event: test\nid: test##1\ndata: "something"\n\n`,
       );
     });
+
+    test.each(["line\nbreak", "carriage\rreturn", "null\0char"])(
+      "should reject the events having invalid names %s",
+      (name) => {
+        expect(() => new EventStreamFactory({ [name]: z.string() })).toThrow(
+          new Error(
+            `Invalid SSE event name "${name}": must not contain line breaks or null characters.`,
+          ),
+        );
+      },
+    );
   });
 });
