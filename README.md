@@ -1535,12 +1535,13 @@ and its value is available via the `lastEventId` property of the emitter within 
 `eventIds` option can be a function `(event, seq) => string` instead of `true`, where `seq` is the sequential number of
 the emitted event. The event names must not contain line breaks or null characters, and such characters are removed from
 the ids returned by the custom function; an id reduced to the empty string yields an empty `id:` field, which clears the
-stored event id, per the SSE semantics:
+stored event id, per the SSE semantics. The `retry` option assigns the `retry:` field value in milliseconds to every
+emitted message, telling the client how long to wait before reconnecting on connection loss:
 
 ```ts
 const subscriptionEndpoint = new EventStreamFactory(
   { time: z.int().positive() },
-  { eventIds: true },
+  { eventIds: true, retry: 3e3 },
 ).buildVoid({
   input: z.object({}),
   handler: async ({ ctx: { emit, lastEventId } }) => {

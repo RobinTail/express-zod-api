@@ -39,17 +39,25 @@ export const makeMessageSchema = (event: string, data: z.ZodType) =>
 
 const invalidSSEChars = /[\r\n\0]/g;
 
-export const formatMessage = (
-  events: EventsMap,
-  event: string,
-  data: unknown,
-  id?: string,
-) => {
+export const formatMessage = ({
+  events,
+  event,
+  data,
+  id,
+  retry,
+}: {
+  events: EventsMap;
+  event: string;
+  data: unknown;
+  id?: string;
+  retry?: number;
+}) => {
   if (!Object.prototype.hasOwnProperty.call(events, event))
     throw new Error(`Unknown event: ${event}`);
   const payload = events[event]!.parse(data); // ensured by hasOwnProperty
   let message = `event: ${event}\n`;
   if (id !== undefined) message += `id: ${id}\n`;
+  if (retry !== undefined) message += `retry: ${retry}\n`;
   return message + `data: ${JSON.stringify(payload)}\n\n`;
 };
 
@@ -64,7 +72,7 @@ export const ensureStream = (response: Response) =>
 
 export const makeMiddleware = <E extends EventsMap>(
   events: E,
-  { eventIds = false }: EventStreamFactoryOptions = {},
+  { eventIds = false, retry }: EventStreamFactoryOptions = {},
 ) => {
   let counter = 0;
   const getId =
@@ -96,7 +104,13 @@ export const makeMiddleware = <E extends EventsMap>(
           ensureStream(response);
           const id = getId && getId(String(event), ++counter);
           response.write(
-            formatMessage(events, String(event), data, id),
+            formatMessage({
+              events,
+              event: String(event),
+              data,
+              id,
+              retry,
+            }),
             "utf-8",
           );
           /**
@@ -155,6 +169,13 @@ export interface EventStreamFactoryOptions {
    * @example (event, seq) => `${event}##${seq}` — custom ids using the `seq` counter
    * */
   eventIds?: boolean | ((event: string, seq: number) => string);
+  /**
+   * @desc Assigns the `retry:` field value in milliseconds to each emitted message, telling the client how long to wait
+   *   before reconnecting on connection loss.
+   * @default undefined — the `retry` field is not assigned
+   * @example 3e3 — the client waits 3 seconds before reconnecting
+   * */
+  retry?: number;
 }
 
 export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
@@ -162,7 +183,7 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   Emitter<E>
 > {
   /** @todo compile these schemas in v30 */
-  constructor(events: E, options?: EventStreamFactoryOptions) {
+  constructor(events: E, { eventIds, retry }: EventStreamFactoryOptions = {}) {
     for (const name of Object.keys(events)) {
       if (name.match(invalidSSEChars)) {
         throw new Error(
@@ -170,7 +191,12 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
         );
       }
     }
+    if (retry !== undefined && !(Number.isInteger(retry) && retry > 0)) {
+      throw new Error(
+        `Invalid SSE retry value "${retry}": must be a positive integer.`,
+      );
+    }
     super(makeResultHandler(events));
-    this.middlewares = [makeMiddleware(events, options)];
+    this.middlewares = [makeMiddleware(events, { eventIds, retry })];
   }
 }

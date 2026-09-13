@@ -40,32 +40,64 @@ describe("SSE", () => {
 
   describe("formatMessage()", () => {
     test("should format a valid event into string", () => {
-      expect(formatMessage({ test: z.string() }, "test", "something")).toBe(
-        `event: test\ndata: "something"\n\n`,
-      );
+      expect(
+        formatMessage({
+          events: { test: z.string() },
+          event: "test",
+          data: "something",
+        }),
+      ).toBe(`event: test\ndata: "something"\n\n`);
     });
     test("should place the assigned id into the message", () => {
       expect(
-        formatMessage({ test: z.string() }, "test", "something", "42"),
+        formatMessage({
+          events: { test: z.string() },
+          event: "test",
+          data: "something",
+          id: "42",
+        }),
       ).toBe(`event: test\nid: 42\ndata: "something"\n\n`);
     });
+    test("should place the retry value into the message", () => {
+      expect(
+        formatMessage({
+          events: { test: z.string() },
+          event: "test",
+          data: "something",
+          id: "42",
+          retry: 3e3,
+        }),
+      ).toBe(`event: test\nid: 42\nretry: 3000\ndata: "something"\n\n`);
+    });
     test("should withstand newlines", () => {
-      expect(formatMessage({ test: z.string() }, "test", "some\ntext")).toBe(
-        `event: test\ndata: "some\\ntext"\n\n`,
-      );
+      expect(
+        formatMessage({
+          events: { test: z.string() },
+          event: "test",
+          data: "some\ntext",
+        }),
+      ).toBe(`event: test\ndata: "some\\ntext"\n\n`);
     });
     test.each(["another", "toString", "hasOwnProperty"])(
       "should fail for unknown event %s",
       (event) => {
         expect(() =>
-          formatMessage({ test: z.string() }, event, "text"),
+          formatMessage({
+            events: { test: z.string() },
+            event,
+            data: "text",
+          }),
         ).toThrow(new Error(`Unknown event: ${event}`));
       },
     );
     test("should fail for invalid data", () => {
-      expect(() => formatMessage({ test: z.string() }, "test", 123)).toThrow(
-        z.ZodError,
-      );
+      expect(() =>
+        formatMessage({
+          events: { test: z.string() },
+          event: "test",
+          data: 123,
+        }),
+      ).toThrow(z.ZodError);
     });
   });
 
@@ -195,6 +227,16 @@ describe("SSE", () => {
       );
     });
 
+    test("should assign the retry value to every emitted message", async () => {
+      const middleware = makeMiddleware({ test: z.string() }, { retry: 3e3 });
+      const { output, responseMock } = await testMiddleware({ middleware });
+      output.emit?.("test", "something");
+      responseMock.end();
+      expect(responseMock._getData()).toBe(
+        `event: test\nretry: 3000\ndata: "something"\n\n`,
+      );
+    });
+
     test("should clear the stream timeout when request closes before timeout fires", async () => {
       using timers = useFakeTimers();
       const middleware = makeMiddleware({ test: z.string() });
@@ -307,6 +349,34 @@ describe("SSE", () => {
         expect(() => new EventStreamFactory({ [name]: z.string() })).toThrow(
           new Error(
             `Invalid SSE event name "${name}": must not contain line breaks or null characters.`,
+          ),
+        );
+      },
+    );
+
+    test("should apply the retry option to the emitted messages", async () => {
+      const endpoint = new EventStreamFactory(
+        { test: z.string() },
+        { retry: 3e3 },
+      ).buildVoid({
+        handler: async ({ ctx }) => {
+          ctx.emit("test", "something");
+        },
+      });
+      const { responseMock } = await testEndpoint({ endpoint });
+      expect(responseMock._getData()).toBe(
+        `event: test\nretry: 3000\ndata: "something"\n\n`,
+      );
+    });
+
+    test.each([0, -1, 1.5])(
+      "should reject the invalid retry value %#",
+      (retry) => {
+        expect(
+          () => new EventStreamFactory({ test: z.string() }, { retry }),
+        ).toThrow(
+          new Error(
+            `Invalid SSE retry value "${retry}": must be a positive integer.`,
           ),
         );
       },
