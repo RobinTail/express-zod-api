@@ -22,7 +22,7 @@ export interface Emitter<E extends EventsMap> extends FlatObject {
   signal: AbortSignal;
   /**
    * @desc The value of the `Last-Event-ID` request header when `eventId` is enabled.
-   * @default undefined — the header was not sent, has an invalid format, or `eventId` is disabled
+   * @see EventStreamFactoryOptions#eventId
    * */
   lastEventId?: string;
   /** @desc Sends an event to the stream according to the declared schema */
@@ -164,18 +164,14 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
 /** @desc The options of the `EventStreamFactory`. */
 export interface EventStreamFactoryOptions {
   /**
-   * @desc Enables or customizes assigning a unique id to every SSE event being produced. The custom function's return
-   *   value must not contain line breaks or null characters (such characters are removed automatically). An id that is
-   *   reduced to the empty string clears the stored event id, per the SSE semantics.
-   * @default undefined — the ids are not assigned
-   * @example true — enables the default id using the shared per-factory `seq` counter
-   * @example (event, seq) => `${event}##${seq}` — custom ids using the `seq` counter
+   * @desc Configures a unique id for every SSE message. Must not contain line breaks or null characters.
+   * @default false — the ids are not assigned
+   * @example true — enables the default ids: `${event}##${counter}`
+   * @example (event, seq) => `${event}.${seq}`
    * */
   eventId?: boolean | EventIdHook;
   /**
-   * @desc Assigns the `retry:` field value in milliseconds to each emitted message, telling the client how long to wait
-   *   before reconnecting on connection loss.
-   * @default undefined — the `retry` field is not assigned
+   * @desc Tells a client how long to wait before reconnecting on connection loss (milliseconds).
    * @example 3e3 — the client waits 3 seconds before reconnecting
    * */
   retry?: number;
