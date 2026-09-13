@@ -11,7 +11,8 @@
   - When enabled, `lastEventId` Context prop is assigned with `Last-Event-ID` header sent by the reconnecting client.
 - Ensured the integrity of the SSE message framing:
   - The event names must not contain line breaks or null characters, otherwise an error is thrown on factory creation;
-  - Such characters are removed from the ids returned by the custom `eventIds` function.
+  - Such characters are removed from the ids returned by the custom `eventIds` function, and an id reduced to the empty
+    string clears the stored event id, per the SSE semantics.
 
 ### v29.7.0
 

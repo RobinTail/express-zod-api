@@ -1534,7 +1534,8 @@ The constructor accepts the optional second argument `options` for enabling and 
 and its value is available via the `lastEventId` property of the emitter within the handler. For custom ids, the
 `eventIds` option can be a function `(event, seq) => string` instead of `true`, where `seq` is the sequential number of
 the emitted event. The event names must not contain line breaks or null characters, and such characters are removed from
-the ids returned by the custom function:
+the ids returned by the custom function; an id reduced to the empty string yields an empty `id:` field, which clears the
+stored event id, per the SSE semantics:
 
 ```ts
 const subscriptionEndpoint = new EventStreamFactory(

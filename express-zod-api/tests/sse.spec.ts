@@ -182,6 +182,19 @@ describe("SSE", () => {
       },
     );
 
+    test("should emit an empty id field when the custom hook returns only invalid characters", async () => {
+      const middleware = makeMiddleware(
+        { test: z.string() },
+        { eventIds: () => "\n" },
+      );
+      const { output, responseMock } = await testMiddleware({ middleware });
+      output.emit?.("test", "something");
+      responseMock.end();
+      expect(responseMock._getData()).toBe(
+        `event: test\nid: \ndata: "something"\n\n`,
+      );
+    });
+
     test("should clear the stream timeout when request closes before timeout fires", async () => {
       using timers = useFakeTimers();
       const middleware = makeMiddleware({ test: z.string() });

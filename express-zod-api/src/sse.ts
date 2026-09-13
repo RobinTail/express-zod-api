@@ -49,7 +49,7 @@ export const formatMessage = (
     throw new Error(`Unknown event: ${event}`);
   const payload = events[event]!.parse(data); // ensured by hasOwnProperty
   let message = `event: ${event}\n`;
-  if (id) message += `id: ${id}\n`;
+  if (id !== undefined) message += `id: ${id}\n`;
   return message + `data: ${JSON.stringify(payload)}\n\n`;
 };
 
@@ -148,7 +148,8 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
 export interface EventStreamFactoryOptions {
   /**
    * @desc Enables or customizes assigning a unique id to every SSE event being produced. The custom function's return
-   *   value must not contain line breaks or null characters (such characters are removed automatically).
+   *   value must not contain line breaks or null characters (such characters are removed automatically). An id that is
+   *   reduced to the empty string clears the stored event id, per the SSE semantics.
    * @default undefined — the ids are not assigned
    * @example true — enables the default id using the shared per-factory `seq` counter
    * @example (event, seq) => `${event}##${seq}` — custom ids using the `seq` counter
