@@ -73,7 +73,6 @@ export const ensureStream = (response: Response) =>
   });
 
 type EventIdHook = (event: string, seq: number) => string;
-const lastEventIdHeader = "last-event-id";
 
 export const makeMiddleware = <E extends EventsMap>(
   events: E,
@@ -104,10 +103,7 @@ export const makeMiddleware = <E extends EventsMap>(
       return {
         isClosed: () => response.writableEnded || response.closed,
         signal: controller.signal,
-        lastEventId:
-          getId && typeof request.headers[lastEventIdHeader] === "string"
-            ? request.headers[lastEventIdHeader]
-            : undefined,
+        lastEventId: getId && request.get("last-event-id"),
         emit: (event, data) => {
           ensureStream(response);
           const msg = formatMessage({
