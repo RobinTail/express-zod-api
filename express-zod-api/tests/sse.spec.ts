@@ -39,65 +39,40 @@ describe("SSE", () => {
   });
 
   describe("formatMessage()", () => {
+    const commons = { events: { test: z.string() }, event: "test" };
+
     test("should format a valid event into string", () => {
       expect(
-        formatMessage({
-          events: { test: z.string() },
-          event: "test",
-          data: "something",
-        }),
+        formatMessage({ ...commons, event: "test", data: "something" }),
       ).toBe(`event: test\ndata: "something"\n\n`);
     });
     test("should place the assigned id into the message", () => {
-      expect(
-        formatMessage({
-          events: { test: z.string() },
-          event: "test",
-          data: "something",
-          id: "42",
-        }),
-      ).toBe(`event: test\nid: 42\ndata: "something"\n\n`);
+      expect(formatMessage({ ...commons, data: "something", id: "42" })).toBe(
+        `event: test\nid: 42\ndata: "something"\n\n`,
+      );
     });
     test("should place the retry value into the message", () => {
       expect(
-        formatMessage({
-          events: { test: z.string() },
-          event: "test",
-          data: "something",
-          id: "42",
-          retry: 3e3,
-        }),
+        formatMessage({ ...commons, data: "something", id: "42", retry: 3e3 }),
       ).toBe(`event: test\nid: 42\nretry: 3000\ndata: "something"\n\n`);
     });
-    test("should withstand newlines", () => {
-      expect(
-        formatMessage({
-          events: { test: z.string() },
-          event: "test",
-          data: "some\ntext",
-        }),
-      ).toBe(`event: test\ndata: "some\\ntext"\n\n`);
+    test("should escape newlines in data", () => {
+      expect(formatMessage({ ...commons, data: "some\ntext" })).toBe(
+        `event: test\ndata: "some\\ntext"\n\n`,
+      );
     });
     test.each(["another", "toString", "hasOwnProperty"])(
       "should fail for unknown event %s",
       (event) => {
         expect(() =>
-          formatMessage({
-            events: { test: z.string() },
-            event,
-            data: "text",
-          }),
+          formatMessage({ ...commons, event, data: "text" }),
         ).toThrow(new Error(`Unknown event: ${event}`));
       },
     );
     test("should fail for invalid data", () => {
-      expect(() =>
-        formatMessage({
-          events: { test: z.string() },
-          event: "test",
-          data: 123,
-        }),
-      ).toThrow(z.ZodError);
+      expect(() => formatMessage({ ...commons, data: 123 })).toThrow(
+        z.ZodError,
+      );
     });
   });
 
