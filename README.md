@@ -278,7 +278,7 @@ curl -L -X GET 'localhost:8090/v1/hello?name=Rick'
 You should receive the following response:
 
 ```json
-{ "status": "success", "data": { "greetings": "Hello, Rick. Happy coding!" } }
+{ "greetings": "Hello, Rick. Happy coding!" }
 ```
 
 # Basic features
@@ -455,43 +455,15 @@ const factory = defaultEndpointsFactory.use(auth(), {
 
 ## Refinements
 
-You can implement additional validations within schemas using refinements.
-Validation errors are reported in a response with a status code `400`.
+[Refinements](https://zod.dev/api#refinements) provide additional validations for your schemas. Albeit those functions
+can be async, the framework attempts to parse the first request to an Endpoint synchronously, which will run such async
+functions twice. Therefore, refinements should avoid side effects sensitive to the number of calls.
 
 ```ts
-import { z } from "zod";
-import { Middleware } from "express-zod-api";
-
-const nicknameConstraintMiddleware = new Middleware({
-  input: z.object({
-    nickname: z
-      .string()
-      .min(1)
-      .refine(
-        (nick) => !/^\d.*$/.test(nick),
-        "Nickname cannot start with a digit",
-      ),
-  }),
-  // ...,
-});
-```
-
-By the way, you can also refine the whole I/O object, for example, in case you need a complex validation of its props.
-
-```ts
-const endpoint = endpointsFactory.build({
-  input: z
-    .object({
-      email: z.email().optional(),
-      id: z.string().optional(),
-      otherThing: z.string().optional(),
-    })
-    .refine(
-      (inputs) => Object.keys(inputs).length >= 1,
-      "Please provide at least one property",
-    ),
-  // ...,
-});
+const nickname = z
+  .string()
+  .min(1)
+  .refine((nick) => !/^\d.*$/.test(nick), "Nickname cannot start with a digit");
 ```
 
 ## Query string parser
@@ -904,11 +876,7 @@ Install `express-rate-limit`. Consider the `createRateLimitMiddleware()` to enab
 
 ```ts
 const endpoint = factory
-  .useRateLimit({
-    windowMs: 60000,
-    max: 100,
-    statusCode: 429, // when set explicitly, it will be reflected in the Documentation
-  }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
+  .useRateLimit({ windowMs: 60000, max: 100 }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
   .buildVoid({
     handler: async ({ ctx: { rateLimit, logger } }) => {
       logger.debug("Features", rateLimit); // { limit, used, remaining, resetTime, getKey, resetKey }
@@ -923,8 +891,8 @@ The `defaultResultHandler` sets the HTTP status code and ensures the following t
 
 ```ts
 type DefaultResponse<OUT> =
-  | { status: "success"; data: OUT } // Positive response
-  | { status: "error"; error: { message: string } }; // or Negative response
+  | OUT // Positive response
+  | { message: string }; // or Negative response
 ```
 
 You can create your own result handler by using this example as a template:
@@ -938,11 +906,11 @@ import {
 } from "express-zod-api";
 
 const yourResultHandler = new ResultHandler({
-  positive: (data) => ({
-    schema: z.object({ data }),
+  positive: (output) => ({
+    schema: output,
     mimeType: "application/json", // optinal or array
   }),
-  negative: z.object({ error: z.string() }),
+  negative: z.object({ message: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (error) {
       const { statusCode } = ensureHttpError(error);
@@ -1164,7 +1132,7 @@ test("should respond successfully", async () => {
   expect(loggerMock._getLogs().error).toHaveLength(0);
   expect(responseMock._getStatusCode()).toBe(200);
   expect(responseMock._getHeaders()).toHaveProperty("x-custom", "one"); // lower case!
-  expect(responseMock._getJSONData()).toEqual({ status: "success" });
+  expect(responseMock._getJSONData()).toEqual({ greetings: "Hello, World" });
 });
 ```
 
@@ -1397,18 +1365,18 @@ response schemas and their corresponding status codes.
 import { ResultHandler } from "express-zod-api";
 
 const resultHandler = new ResultHandler({
-  positive: (data) => ({
+  positive: (output) => ({
     statusCode: [201, 202], // created or will be created
-    schema: z.object({ status: z.literal("created"), data }),
+    schema: output,
   }),
   negative: [
     {
       statusCode: 409, // conflict: entity already exists
-      schema: z.object({ status: z.literal("exists"), id: z.int() }),
+      schema: z.object({ id: z.int().describe("id of the existing entity") }),
     },
     {
       statusCode: [400, 500], // validation or internal error
-      schema: z.object({ status: z.literal("error"), reason: z.string() }),
+      schema: z.object({ reason: z.string() }),
     },
   ],
 });

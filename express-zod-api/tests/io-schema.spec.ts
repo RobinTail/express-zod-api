@@ -136,7 +136,7 @@ describe("I/O Schema and related helpers", () => {
         four: z.boolean(),
       });
       const result = makeFinalInputSchema(undefined, buildSchema);
-      expect(result).toEqual(buildSchema);
+      expect(result.def).toEqual(buildSchema.def);
     });
 
     test("Should merge input object schemas", () => {

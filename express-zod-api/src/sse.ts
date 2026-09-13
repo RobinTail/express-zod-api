@@ -1,6 +1,6 @@
 import type { Response } from "express";
 import { z } from "zod";
-import type { FlatObject } from "./common-helpers";
+import { compileOnce, type FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { EndpointsFactory } from "./endpoints-factory";
 import { Middleware } from "./middleware";
@@ -178,15 +178,17 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   undefined,
   Emitter<E>
 > {
-  /** @todo compile these schemas in v30 */
-  constructor(events: E, options?: EventStreamFactoryOptions) {
-    for (const name of Object.keys(events)) {
-      if (name.match(invalidSSEChars)) {
-        throw new Error(
-          `Invalid SSE event name "${name}": must not contain line breaks or null characters.`,
-        );
-      }
-    }
+  constructor(_events: E, options?: EventStreamFactoryOptions) {
+    const events = Object.fromEntries(
+      Object.entries(_events).map(([event, schema]) => {
+        if (event.match(invalidSSEChars)) {
+          throw new Error(
+            `Invalid SSE event name "${event}": must not contain line breaks or null characters.`,
+          );
+        }
+        return [event, compileOnce(schema)];
+      }),
+    );
     super(makeResultHandler(events));
     this.middlewares = [makeMiddleware(events, options)];
   }

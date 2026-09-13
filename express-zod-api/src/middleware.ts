@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import {
+  compileOnce,
   emptySchema,
   parseMaybeAsync,
   type FlatObject,
@@ -43,7 +44,7 @@ export abstract class AbstractMiddleware {
     request: Request;
     response: Response;
     logger: ActualLogger;
-    config?: CommonConfig; // @todo either make it required in v30 or remove it from here
+    config: CommonConfig;
   }): Promise<FlatObject>;
 }
 
@@ -92,7 +93,7 @@ export class Middleware<
     handler: Handler<z.output<IN>, CTX, RET>;
   }) {
     super();
-    this.#schema = input as IN;
+    this.#schema = (input && compileOnce(input)) as IN;
     this.#security = security;
     this.#statusCode = new FrozenSet(
       typeof statusCode === "number" ? [statusCode] : statusCode,
@@ -126,13 +127,13 @@ export class Middleware<
     request: Request;
     response: Response;
     logger: ActualLogger;
-    config?: CommonConfig; // @todo either make it required in v30 or remove it from here
+    config: CommonConfig;
   }) {
     try {
       const validInput = await parseMaybeAsync(
         this.#schema || emptySchema,
         input,
-        config ?? {}, // @todo rm fallback in v30
+        config,
         this.#parsingState,
       );
       return this.#handler({ ...rest, input: validInput as z.output<IN> });
