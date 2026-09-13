@@ -81,6 +81,11 @@ export const makeMiddleware = <E extends EventsMap>(
 ) => {
   let counter = 0;
   let getId: EventIdHook | undefined;
+  if (retry !== undefined && !(Number.isInteger(retry) && retry > 0)) {
+    throw new Error(
+      `Invalid SSE retry value "${retry}": must be a positive integer.`,
+    );
+  }
   if (eventId) {
     if (typeof eventId === "function")
       getId = (event, seq) => eventId(event, seq).replace(invalidSSEChars, "");
@@ -178,7 +183,7 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   Emitter<E>
 > {
   /** @todo compile these schemas in v30 */
-  constructor(events: E, { eventId, retry }: EventStreamFactoryOptions = {}) {
+  constructor(events: E, options?: EventStreamFactoryOptions) {
     for (const name of Object.keys(events)) {
       if (name.match(invalidSSEChars)) {
         throw new Error(
@@ -186,12 +191,7 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
         );
       }
     }
-    if (retry !== undefined && !(Number.isInteger(retry) && retry > 0)) {
-      throw new Error(
-        `Invalid SSE retry value "${retry}": must be a positive integer.`,
-      );
-    }
     super(makeResultHandler(events));
-    this.middlewares = [makeMiddleware(events, { eventId, retry })];
+    this.middlewares = [makeMiddleware(events, options)];
   }
 }
