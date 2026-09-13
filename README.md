@@ -1516,9 +1516,7 @@ import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
 
 const subscriptionEndpoint = new EventStreamFactory(
-  {
-    time: z.int().positive(),
-  },
+  { time: z.int().positive() },
   {
     eventId: true, // optional unique ids, customizable
     retry: 3e3, // optional, delay before reconnecting (ms)
