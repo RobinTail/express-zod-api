@@ -77,13 +77,12 @@ export const makeMiddleware = <E extends EventsMap>(
   { eventIds = false, retry }: EventStreamFactoryOptions = {},
 ) => {
   let counter = 0;
-  const getId =
-    typeof eventIds === "function"
-      ? (event: string, seq: number) =>
-          eventIds(event, seq).replace(invalidSSEChars, "")
-      : eventIds
-        ? (event: string, seq: number) => `${event}##${seq}`
-        : undefined;
+  let getId: Exclude<EventStreamFactoryOptions["eventIds"], boolean>;
+  if (eventIds) {
+    if (typeof eventIds === "function")
+      getId = (event, seq) => eventIds(event, seq).replace(invalidSSEChars, "");
+    else getId = (event, seq) => `${event}##${seq}`;
+  }
   return new Middleware({
     handler: async ({ request, response }): Promise<Emitter<E>> => {
       const controller = new AbortController();
