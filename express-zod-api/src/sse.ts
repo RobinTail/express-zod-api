@@ -73,6 +73,7 @@ export const ensureStream = (response: Response) =>
   });
 
 type EventIdHook = (event: string, seq: number) => string;
+const lastEventIdHeader = "last-event-id";
 
 export const makeMiddleware = <E extends EventsMap>(
   events: E,
@@ -95,34 +96,29 @@ export const makeMiddleware = <E extends EventsMap>(
         controller.abort();
       });
 
-      const lastEventId =
-        getId && typeof request.headers["last-event-id"] === "string"
-          ? request.headers["last-event-id"]
-          : undefined;
-
       return {
         isClosed: () => response.writableEnded || response.closed,
         signal: controller.signal,
+        lastEventId:
+          getId && typeof request.headers[lastEventIdHeader] === "string"
+            ? request.headers[lastEventIdHeader]
+            : undefined,
         emit: (event, data) => {
           ensureStream(response);
-          const id = getId && getId(String(event), ++counter);
-          response.write(
-            formatMessage({
-              events,
-              event: String(event),
-              data,
-              id,
-              retry,
-            }),
-            "utf-8",
-          );
+          const msg = formatMessage({
+            events,
+            data,
+            retry,
+            id: getId && getId(String(event), ++counter),
+            event: String(event),
+          });
+          response.write(msg, "utf-8");
           /**
            * Issue 2347: flush is the method of compression, it must be called only when compression is enabled
            * @link https://github.com/RobinTail/express-zod-api/issues/2347
            * */
           response.flush?.();
         },
-        ...(lastEventId ? { lastEventId } : {}),
       };
     },
   });
