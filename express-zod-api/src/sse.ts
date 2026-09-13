@@ -46,10 +46,9 @@ export const formatMessage = (
   if (!Object.prototype.hasOwnProperty.call(events, event))
     throw new Error(`Unknown event: ${event}`);
   const payload = events[event]!.parse(data); // ensured by hasOwnProperty
-  const lines = [`event: ${event}`];
-  if (id) lines.push(`id: ${id}`);
-  lines.push(`data: ${JSON.stringify(payload)}`, "", "");
-  return lines.join("\n");
+  let message = `event: ${event}\n`;
+  if (id) message += `id: ${id}\n`;
+  return message + `data: ${JSON.stringify(payload)}\n\n`;
 };
 
 const headersTimeout = 1e4; // 10s to respond with a status code other than 200

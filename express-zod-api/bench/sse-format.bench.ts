@@ -1,12 +1,11 @@
-import { formatMessage, makeMessageSchema } from "../src/sse";
+import { makeMessageSchema } from "../src/sse";
 import { z } from "zod";
 
-const formatMessageRef = formatMessage; // avoid module export getter overhead per iteration
 const makeMessageSchemaRef = makeMessageSchema;
 
 test("Experiment for SSE event formatting", async ({ bench }) => {
   const events = { message: z.string() } as const;
-  const current = () =>
+  const prev = () =>
     makeMessageSchemaRef("message", events.message)
       .transform((props) =>
         [
@@ -21,14 +20,24 @@ test("Experiment for SSE event formatting", async ({ bench }) => {
         data: "hello",
       });
 
-  const featured = () => formatMessageRef(events, "message", "hello");
+  const useJoin = (id?: string) => {
+    const payload = events.message.parse("hello");
+    const lines = ["event: message"];
+    if (id) lines.push(`id: ${id}`);
+    lines.push(`data: ${JSON.stringify(payload)}`, "", "");
+    return lines.join("\n");
+  };
 
-  const featuredId = () =>
-    formatMessageRef(events, "message", "hello", "message##1");
+  const useConcat = (id?: string) => {
+    const payload = events.message.parse("hello");
+    let message = "event: message\n";
+    if (id) message += `id: ${id}\n`;
+    return message + `data: ${JSON.stringify(payload)}\n\n`;
+  };
 
   await bench.compare(
-    bench("current", () => current()),
-    bench("featured", () => featured()),
-    bench("featured-id", () => featuredId()),
+    bench("previous", () => prev()),
+    bench("join with id", () => useJoin("message##1")),
+    bench("concat with id", () => useConcat("message##1")),
   );
 });
