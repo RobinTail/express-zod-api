@@ -225,6 +225,17 @@ describe("SSE", () => {
       timers.shift(1e4);
       expect(responseMock.headersSent).toBeFalsy();
     });
+
+    test.each([0, -1, 1.5])(
+      "should reject the invalid retry value %#",
+      (retry) => {
+        expect(() => makeMiddleware({ test: z.string() }, { retry })).toThrow(
+          new Error(
+            `Invalid SSE retry value "${retry}": must be a positive integer.`,
+          ),
+        );
+      },
+    );
   });
 
   describe("makeResultHandler()", () => {
@@ -301,7 +312,7 @@ describe("SSE", () => {
     test("should apply the options to the SSE middleware", async () => {
       const endpoint = new EventStreamFactory(
         { test: z.string() },
-        { eventId: true },
+        { eventId: true, retry: 3e3 },
       ).buildVoid({
         handler: async ({ ctx }) => {
           expectTypeOf(ctx.lastEventId).toEqualTypeOf<string | undefined>();
@@ -314,7 +325,7 @@ describe("SSE", () => {
       });
       expect(requestMock.headers["last-event-id"]).toBe("resume");
       expect(responseMock._getData()).toBe(
-        `event: test\nid: test##1\ndata: "something"\n\n`,
+        `event: test\nid: test##1\nretry: 3000\ndata: "something"\n\n`,
       );
     });
 
@@ -324,34 +335,6 @@ describe("SSE", () => {
         expect(() => new EventStreamFactory({ [name]: z.string() })).toThrow(
           new Error(
             `Invalid SSE event name "${name}": must not contain line breaks or null characters.`,
-          ),
-        );
-      },
-    );
-
-    test("should apply the retry option to the emitted messages", async () => {
-      const endpoint = new EventStreamFactory(
-        { test: z.string() },
-        { retry: 3e3 },
-      ).buildVoid({
-        handler: async ({ ctx }) => {
-          ctx.emit("test", "something");
-        },
-      });
-      const { responseMock } = await testEndpoint({ endpoint });
-      expect(responseMock._getData()).toBe(
-        `event: test\nretry: 3000\ndata: "something"\n\n`,
-      );
-    });
-
-    test.each([0, -1, 1.5])(
-      "should reject the invalid retry value %#",
-      (retry) => {
-        expect(
-          () => new EventStreamFactory({ test: z.string() }, { retry }),
-        ).toThrow(
-          new Error(
-            `Invalid SSE retry value "${retry}": must be a positive integer.`,
           ),
         );
       },
