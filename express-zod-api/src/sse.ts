@@ -167,7 +167,7 @@ export interface EventStreamFactoryOptions {
    * @desc Configures a unique id for every SSE message. Must not contain line breaks or null characters.
    * @default false — the ids are not assigned
    * @example true — enables the default ids: `${event}##${counter}`
-   * @example (event, seq) => `${event}.${seq}`
+   * @example (event, seq) => `${event}.${seq}@${Date.now()}`
    * */
   eventId?: boolean | EventIdHook;
   /**
