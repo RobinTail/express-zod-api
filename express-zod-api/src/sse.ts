@@ -148,7 +148,7 @@ export interface EventStreamFactoryOptions {
    * @desc Enables or customizes assigning a unique id to every SSE event being produced.
    * @default undefined — the ids are not assigned
    * @example true — enables the default id using the shared per-factory `seq` counter
-   * @example (event, seq) => `${event}:${seq}` — custom ids using the `seq` counter
+   * @example (event, seq) => `${event}##${seq}` — custom ids using the `seq` counter
    * */
   eventIds?: boolean | ((event: string, seq: number) => string);
 }

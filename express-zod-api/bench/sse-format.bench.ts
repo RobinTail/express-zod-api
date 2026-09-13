@@ -24,7 +24,7 @@ test("Experiment for SSE event formatting", async ({ bench }) => {
   const featured = () => formatMessageRef(events, "message", "hello");
 
   const featuredId = () =>
-    formatMessageRef(events, "message", "hello", "message::1");
+    formatMessageRef(events, "message", "hello", "message##1");
 
   await bench.compare(
     bench("current", () => current()),

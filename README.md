@@ -1529,15 +1529,16 @@ const subscriptionEndpoint = new EventStreamFactory({
 ```
 
 The constructor accepts the optional second argument `options` for enabling and customizing the event ids. Setting
-`{ id: true }` assigns a unique id to every emitted event using the counter shared by the event stream. The ids set the
-`Last-Event-ID` header value reported by the reconnecting client on connection drop, and its value is available via the
-`lastEventId` property of the emitter within the handler. For custom ids, the `id` option can be a function
-`(event, seq) => string` instead of `true`, where `seq` is the sequential number of the emitted event:
+`{ eventIds: true }` assigns a unique id to every emitted event using the counter shared by the event stream, in the
+`event##seq` format. The ids set the `Last-Event-ID` header value reported by the reconnecting client on connection drop,
+and its value is available via the `lastEventId` property of the emitter within the handler. For custom ids, the
+`eventIds` option can be a function `(event, seq) => string` instead of `true`, where `seq` is the sequential number of
+the emitted event:
 
 ```ts
 const subscriptionEndpoint = new EventStreamFactory(
   { time: z.int().positive() },
-  { id: true },
+  { eventIds: true },
 ).buildVoid({
   input: z.object({}),
   handler: async ({ ctx: { emit, lastEventId } }) => {

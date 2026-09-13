@@ -4,11 +4,11 @@
 
 ### v29.8.0
 
-- Added the optional `options` argument to the `EventStreamFactory::constructor()`:
-  - The `id` property enables assigning a unique id to every emitted SSE event using the shared per-factory counter;
-  - The ids set the `Last-Event-ID` value reported by the reconnecting client, available via the `lastEventId` property
-    of the emitter;
-  - The `id` option can be `true` for the default `event##seq` format or a custom function `(event, seq) => string`.
+- Added the second argument to the `EventStreamFactory::constructor()` — the object of options:
+  - The `eventIds` prop enables assigning a unique id to every emitted SSE event using the shared per-factory counter;
+  - It can be boolean or a function accepting event name and internal counter;
+  - When set to `true`, the default format `${event}##${counter}` is used;
+  - When enabled, `lastEventId` Context prop is assigned with `Last-Event-ID` header sent by the reconnecting client.
 
 ### v29.7.0
 
