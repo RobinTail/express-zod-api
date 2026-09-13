@@ -1483,11 +1483,16 @@ import { z } from "zod";
 import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
 
-const subscriptionEndpoint = new EventStreamFactory({
-  time: z.int().positive(),
-}).buildVoid({
+const subscriptionEndpoint = new EventStreamFactory(
+  { time: z.int().positive() },
+  {
+    eventId: true, // optional unique ids, customizable
+    retry: 3e3, // optional, delay before reconnecting (ms)
+  },
+).buildVoid({
   input: z.object({}), // optional input schema
-  handler: async ({ ctx: { emit, isClosed, signal } }) => {
+  handler: async ({ ctx: { emit, isClosed, signal, lastEventId } }) => {
+    const shouldResume = Boolean(lastEventId); // the client reconnected with the last received id
     while (!isClosed()) {
       emit("time", Date.now());
       await setTimeout(1000);

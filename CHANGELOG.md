@@ -54,6 +54,18 @@ else if (status === 400 || discriminator === "error")
 
 ## Version 29
 
+### v29.8.0
+
+- Added the second argument to the `EventStreamFactory::constructor()` — the object of options:
+  - The `retry` prop informs an SSE client on a delay before attempting to reconnect due to connection loss;
+  - The `eventId` prop enables assigning a unique id to every emitted SSE event using the shared per-factory counter;
+  - It can be boolean or a function accepting event name and internal counter;
+  - When set to `true`, the default format `${event}##${counter}` is used;
+  - When enabled, `lastEventId` Context prop is assigned with `Last-Event-ID` header sent by the reconnecting client;
+- Ensured the integrity of the SSE message framing:
+  - The event names must not contain line breaks or null characters, otherwise an error is thrown on factory creation;
+  - Such characters are also removed from the ids returned by the custom `eventId` function even if it remains empty.
+
 ### v29.7.0
 
 - Added the `hasStatusCodeRanges` option to the Documentation generator for collapsing multiple status codes sharing
