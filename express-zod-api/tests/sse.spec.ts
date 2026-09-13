@@ -44,6 +44,11 @@ describe("SSE", () => {
         `event: test\ndata: "something"\n\n`,
       );
     });
+    test("should place the assigned id into the message", () => {
+      expect(
+        formatMessage({ test: z.string() }, "test", "something", "42"),
+      ).toBe(`event: test\nid: 42\ndata: "something"\n\n`);
+    });
     test("should withstand newlines", () => {
       expect(formatMessage({ test: z.string() }, "test", "some\ntext")).toBe(
         `event: test\ndata: "some\\ntext"\n\n`,
@@ -120,6 +125,45 @@ describe("SSE", () => {
       expect(signal?.aborted).toBeFalsy();
       requestMock.emit("close");
       expect(signal?.aborted).toBeTruthy();
+    });
+
+    test("should assign default ids shared across connections", async () => {
+      const middleware = makeMiddleware(
+        { test: z.string() },
+        { eventIds: true },
+      );
+      const { output: first, responseMock: firstResponse } =
+        await testMiddleware({
+          middleware,
+          requestProps: { headers: { "last-event-id": "previous" } },
+        });
+      expect(first.lastEventId).toBe("previous");
+      first.emit?.("test", "something");
+      firstResponse.end();
+      expect(firstResponse._getData()).toBe(
+        `event: test\nid: test##1\ndata: "something"\n\n`,
+      );
+      const { output: second, responseMock: secondResponse } =
+        await testMiddleware({ middleware });
+      expect(second.lastEventId).toBeUndefined();
+      second.emit?.("test", "something");
+      secondResponse.end();
+      expect(secondResponse._getData()).toBe(
+        `event: test\nid: test##2\ndata: "something"\n\n`,
+      );
+    });
+
+    test("should use the custom eventIds hook with the event name and the seq counter", async () => {
+      const middleware = makeMiddleware(
+        { test: z.string() },
+        { eventIds: (event, seq) => `${event}:${seq}` },
+      );
+      const { output, responseMock } = await testMiddleware({ middleware });
+      output.emit?.("test", "something");
+      responseMock.end();
+      expect(responseMock._getData()).toBe(
+        `event: test\nid: test:1\ndata: "something"\n\n`,
+      );
     });
 
     test("should clear the stream timeout when request closes before timeout fires", async () => {
@@ -206,6 +250,26 @@ describe("SSE", () => {
       const { responseMock } = await testEndpoint({ endpoint });
       expect(responseMock.statusCode).toBe(200);
       expect(responseMock.writableEnded).toBeTruthy();
+    });
+
+    test("should apply the options to the SSE middleware", async () => {
+      const endpoint = new EventStreamFactory(
+        { test: z.string() },
+        { eventIds: true },
+      ).buildVoid({
+        handler: async ({ ctx }) => {
+          expectTypeOf(ctx.lastEventId).toEqualTypeOf<string | undefined>();
+          ctx.emit("test", "something");
+        },
+      });
+      const { requestMock, responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: { headers: { "last-event-id": "resume" } },
+      });
+      expect(requestMock.headers["last-event-id"]).toBe("resume");
+      expect(responseMock._getData()).toBe(
+        `event: test\nid: test##1\ndata: "something"\n\n`,
+      );
     });
   });
 });

@@ -20,6 +20,11 @@ export interface Emitter<E extends EventsMap> extends FlatObject {
   isClosed: () => boolean;
   /** @desc Abort signal bound to the client connection lifecycle */
   signal: AbortSignal;
+  /**
+   * @desc The value of the `Last-Event-ID` request header when eventIds are enabled.
+   * @default undefined — the header was not sent or the ids are disabled
+   * */
+  lastEventId?: string;
   /** @desc Sends an event to the stream according to the declared schema */
   emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
 }
@@ -36,17 +41,15 @@ export const formatMessage = (
   events: EventsMap,
   event: string,
   data: unknown,
+  id?: string,
 ) => {
   if (!Object.prototype.hasOwnProperty.call(events, event))
     throw new Error(`Unknown event: ${event}`);
-  const schema = events[event]!; // ensured by hasOwnProperty
-  const payload = schema.parse(data);
-  return [
-    `event: ${event}`,
-    `data: ${JSON.stringify(payload)}`,
-    "",
-    "", // empty line: events separator
-  ].join("\n");
+  const payload = events[event]!.parse(data); // ensured by hasOwnProperty
+  const lines = [`event: ${event}`];
+  if (id) lines.push(`id: ${id}`);
+  lines.push(`data: ${JSON.stringify(payload)}`, "", "");
+  return lines.join("\n");
 };
 
 const headersTimeout = 1e4; // 10s to respond with a status code other than 200
@@ -58,8 +61,18 @@ export const ensureStream = (response: Response) =>
     "cache-control": "no-cache",
   });
 
-export const makeMiddleware = <E extends EventsMap>(events: E) =>
-  new Middleware({
+export const makeMiddleware = <E extends EventsMap>(
+  events: E,
+  { eventIds = false }: EventStreamFactoryOptions = {},
+) => {
+  let counter = 0;
+  const getId =
+    typeof eventIds === "function"
+      ? eventIds
+      : eventIds
+        ? (event: string, seq: number) => `${event}##${seq}`
+        : undefined;
+  return new Middleware({
     handler: async ({ request, response }): Promise<Emitter<E>> => {
       const controller = new AbortController();
       const timer = setTimeout(() => ensureStream(response), headersTimeout);
@@ -69,21 +82,32 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
         controller.abort();
       });
 
+      const lastEventId =
+        getId && typeof request.headers["last-event-id"] === "string"
+          ? request.headers["last-event-id"]
+          : undefined;
+
       return {
         isClosed: () => response.writableEnded || response.closed,
         signal: controller.signal,
         emit: (event, data) => {
           ensureStream(response);
-          response.write(formatMessage(events, String(event), data), "utf-8");
+          const id = getId && getId(String(event), ++counter);
+          response.write(
+            formatMessage(events, String(event), data, id),
+            "utf-8",
+          );
           /**
            * Issue 2347: flush is the method of compression, it must be called only when compression is enabled
            * @link https://github.com/RobinTail/express-zod-api/issues/2347
            * */
           response.flush?.();
         },
+        ...(lastEventId ? { lastEventId } : {}),
       };
     },
   });
+};
 
 export const makeResultHandler = <E extends EventsMap>(events: E) =>
   new ResultHandler({
@@ -118,13 +142,24 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
     },
   });
 
+/** @desc The options of the `EventStreamFactory`. */
+export interface EventStreamFactoryOptions {
+  /**
+   * @desc Enables or customizes assigning a unique id to every SSE event being produced.
+   * @default undefined — the ids are not assigned
+   * @example true — enables the default id using the shared per-factory `seq` counter
+   * @example (event, seq) => `${event}:${seq}` — custom ids using the `seq` counter
+   * */
+  eventIds?: boolean | ((event: string, seq: number) => string);
+}
+
 export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   undefined,
   Emitter<E>
 > {
   /** @todo compile these schemas in v30 */
-  constructor(events: E) {
+  constructor(events: E, options?: EventStreamFactoryOptions) {
     super(makeResultHandler(events));
-    this.middlewares = [makeMiddleware(events)];
+    this.middlewares = [makeMiddleware(events, options)];
   }
 }

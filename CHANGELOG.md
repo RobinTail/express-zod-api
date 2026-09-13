@@ -2,6 +2,14 @@
 
 ## Version 29
 
+### v29.8.0
+
+- Added the optional `options` argument to the `EventStreamFactory::constructor()`:
+  - The `id` property enables assigning a unique id to every emitted SSE event using the shared per-factory counter;
+  - The ids set the `Last-Event-ID` value reported by the reconnecting client, available via the `lastEventId` property
+    of the emitter;
+  - The `id` option can be `true` for the default `event##seq` format or a custom function `(event, seq) => string`.
+
 ### v29.7.0
 
 - Added the `hasStatusCodeRanges` option to the Documentation generator for collapsing multiple status codes sharing

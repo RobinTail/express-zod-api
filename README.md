@@ -1528,6 +1528,25 @@ const subscriptionEndpoint = new EventStreamFactory({
 });
 ```
 
+The constructor accepts the optional second argument `options` for enabling and customizing the event ids. Setting
+`{ id: true }` assigns a unique id to every emitted event using the counter shared by the event stream. The ids set the
+`Last-Event-ID` header value reported by the reconnecting client on connection drop, and its value is available via the
+`lastEventId` property of the emitter within the handler. For custom ids, the `id` option can be a function
+`(event, seq) => string` instead of `true`, where `seq` is the sequential number of the emitted event:
+
+```ts
+const subscriptionEndpoint = new EventStreamFactory(
+  { time: z.int().positive() },
+  { id: true },
+).buildVoid({
+  input: z.object({}),
+  handler: async ({ ctx: { emit, lastEventId } }) => {
+    const resumed = Boolean(lastEventId); // the client reconnected with the last received id
+    emit("time", Date.now());
+  },
+});
+```
+
 If you need more capabilities, such as bidirectional event sending, I have developed an additional websocket operating
 framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and capabilities.
 
