@@ -72,12 +72,14 @@ export const ensureStream = (response: Response) =>
     "cache-control": "no-cache",
   });
 
+type EventIdHook = (event: string, seq: number) => string;
+
 export const makeMiddleware = <E extends EventsMap>(
   events: E,
   { eventId = false, retry }: EventStreamFactoryOptions = {},
 ) => {
   let counter = 0;
-  let getId: Exclude<EventStreamFactoryOptions["eventId"], boolean>;
+  let getId: EventIdHook | undefined;
   if (eventId) {
     if (typeof eventId === "function")
       getId = (event, seq) => eventId(event, seq).replace(invalidSSEChars, "");
@@ -169,7 +171,7 @@ export interface EventStreamFactoryOptions {
    * @example true — enables the default id using the shared per-factory `seq` counter
    * @example (event, seq) => `${event}##${seq}` — custom ids using the `seq` counter
    * */
-  eventId?: boolean | ((event: string, seq: number) => string);
+  eventId?: boolean | EventIdHook;
   /**
    * @desc Assigns the `retry:` field value in milliseconds to each emitted message, telling the client how long to wait
    *   before reconnecting on connection loss.
