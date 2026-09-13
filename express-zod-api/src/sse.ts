@@ -21,8 +21,8 @@ export interface Emitter<E extends EventsMap> extends FlatObject {
   /** @desc Abort signal bound to the client connection lifecycle */
   signal: AbortSignal;
   /**
-   * @desc The value of the `Last-Event-ID` request header when eventIds are enabled.
-   * @default undefined — the header was not sent or the ids are disabled
+   * @desc The value of the `Last-Event-ID` request header when `eventIds` are enabled.
+   * @default undefined — the header was not sent, has an invalid format, or `eventIds` are disabled
    * */
   lastEventId?: string;
   /** @desc Sends an event to the stream according to the declared schema */
@@ -39,19 +39,21 @@ export const makeMessageSchema = (event: string, data: z.ZodType) =>
 
 const invalidSSEChars = /[\r\n\0]/g;
 
+interface MessageProps {
+  events: EventsMap;
+  event: string;
+  data: unknown;
+  id?: string;
+  retry?: number;
+}
+
 export const formatMessage = ({
   events,
   event,
   data,
   id,
   retry,
-}: {
-  events: EventsMap;
-  event: string;
-  data: unknown;
-  id?: string;
-  retry?: number;
-}) => {
+}: MessageProps) => {
   if (!Object.prototype.hasOwnProperty.call(events, event))
     throw new Error(`Unknown event: ${event}`);
   const payload = events[event]!.parse(data); // ensured by hasOwnProperty
