@@ -21,8 +21,8 @@ export interface Emitter<E extends EventsMap> extends FlatObject {
   /** @desc Abort signal bound to the client connection lifecycle */
   signal: AbortSignal;
   /**
-   * @desc The value of the `Last-Event-ID` request header when `eventId` are enabled.
-   * @default undefined — the header was not sent, has an invalid format, or `eventId` are disabled
+   * @desc The value of the `Last-Event-ID` request header when `eventId` is enabled.
+   * @default undefined — the header was not sent, has an invalid format, or `eventId` is disabled
    * */
   lastEventId?: string;
   /** @desc Sends an event to the stream according to the declared schema */
