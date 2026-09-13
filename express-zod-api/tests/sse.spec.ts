@@ -39,13 +39,25 @@ describe("SSE", () => {
   });
 
   describe("formatMessage()", () => {
+    const commons = { events: { test: z.string() }, event: "test" };
+
     test("should format a valid event into string", () => {
-      expect(formatMessage({ test: z.string() }, "test", "something")).toBe(
-        `event: test\ndata: "something"\n\n`,
+      expect(
+        formatMessage({ ...commons, event: "test", data: "something" }),
+      ).toBe(`event: test\ndata: "something"\n\n`);
+    });
+    test("should place the assigned id into the message", () => {
+      expect(formatMessage({ ...commons, data: "something", id: "42" })).toBe(
+        `event: test\nid: 42\ndata: "something"\n\n`,
       );
     });
-    test("should withstand newlines", () => {
-      expect(formatMessage({ test: z.string() }, "test", "some\ntext")).toBe(
+    test("should place the retry value into the message", () => {
+      expect(
+        formatMessage({ ...commons, data: "something", id: "42", retry: 3e3 }),
+      ).toBe(`event: test\nid: 42\nretry: 3000\ndata: "something"\n\n`);
+    });
+    test("should escape newlines in data", () => {
+      expect(formatMessage({ ...commons, data: "some\ntext" })).toBe(
         `event: test\ndata: "some\\ntext"\n\n`,
       );
     });
@@ -53,12 +65,12 @@ describe("SSE", () => {
       "should fail for unknown event %s",
       (event) => {
         expect(() =>
-          formatMessage({ test: z.string() }, event, "text"),
+          formatMessage({ ...commons, event, data: "text" }),
         ).toThrow(new Error(`Unknown event: ${event}`));
       },
     );
     test("should fail for invalid data", () => {
-      expect(() => formatMessage({ test: z.string() }, "test", 123)).toThrow(
+      expect(() => formatMessage({ ...commons, data: 123 })).toThrow(
         z.ZodError,
       );
     });
@@ -122,6 +134,84 @@ describe("SSE", () => {
       expect(signal?.aborted).toBeTruthy();
     });
 
+    test("should assign default ids shared across connections", async () => {
+      const middleware = makeMiddleware(
+        { test: z.string() },
+        { eventId: true },
+      );
+      const { output: first, responseMock: firstResponse } =
+        await testMiddleware({
+          middleware,
+          requestProps: { headers: { "last-event-id": "previous" } },
+        });
+      expect(first.lastEventId).toBe("previous");
+      first.emit?.("test", "something");
+      firstResponse.end();
+      expect(firstResponse._getData()).toBe(
+        `event: test\nid: test##1\ndata: "something"\n\n`,
+      );
+      const { output: second, responseMock: secondResponse } =
+        await testMiddleware({ middleware });
+      expect(second.lastEventId).toBeUndefined();
+      second.emit?.("test", "something");
+      secondResponse.end();
+      expect(secondResponse._getData()).toBe(
+        `event: test\nid: test##2\ndata: "something"\n\n`,
+      );
+    });
+
+    test("should use the custom eventId hook with the event name and the seq counter", async () => {
+      const middleware = makeMiddleware(
+        { test: z.string() },
+        { eventId: (event, seq) => `${event}:${seq}` },
+      );
+      const { output, responseMock } = await testMiddleware({ middleware });
+      output.emit?.("test", "something");
+      responseMock.end();
+      expect(responseMock._getData()).toBe(
+        `event: test\nid: test:1\ndata: "something"\n\n`,
+      );
+    });
+
+    test.each(["\n", "\r", "\0", "\0\r\n"])(
+      "should strip the line breaks from the custom ids %#",
+      async (suffix) => {
+        const middleware = makeMiddleware(
+          { test: z.string() },
+          { eventId: (event, seq) => `${event}:${seq}${suffix}` },
+        );
+        const { output, responseMock } = await testMiddleware({ middleware });
+        output.emit?.("test", "something");
+        responseMock.end();
+        expect(responseMock._getData()).toBe(
+          `event: test\nid: test:1\ndata: "something"\n\n`,
+        );
+      },
+    );
+
+    test("should emit an empty id field when the custom hook returns only invalid characters", async () => {
+      const middleware = makeMiddleware(
+        { test: z.string() },
+        { eventId: () => "\n" },
+      );
+      const { output, responseMock } = await testMiddleware({ middleware });
+      output.emit?.("test", "something");
+      responseMock.end();
+      expect(responseMock._getData()).toBe(
+        `event: test\nid: \ndata: "something"\n\n`,
+      );
+    });
+
+    test("should assign the retry value to every emitted message", async () => {
+      const middleware = makeMiddleware({ test: z.string() }, { retry: 3e3 });
+      const { output, responseMock } = await testMiddleware({ middleware });
+      output.emit?.("test", "something");
+      responseMock.end();
+      expect(responseMock._getData()).toBe(
+        `event: test\nretry: 3000\ndata: "something"\n\n`,
+      );
+    });
+
     test("should clear the stream timeout when request closes before timeout fires", async () => {
       using timers = useFakeTimers();
       const middleware = makeMiddleware({ test: z.string() });
@@ -135,6 +225,17 @@ describe("SSE", () => {
       timers.shift(1e4);
       expect(responseMock.headersSent).toBeFalsy();
     });
+
+    test.each([0, -1, 1.5])(
+      "should reject the invalid retry value %#",
+      (retry) => {
+        expect(() => makeMiddleware({ test: z.string() }, { retry })).toThrow(
+          new Error(
+            `Invalid SSE retry value "${retry}": must be a positive integer.`,
+          ),
+        );
+      },
+    );
   });
 
   describe("makeResultHandler()", () => {
@@ -207,5 +308,36 @@ describe("SSE", () => {
       expect(responseMock.statusCode).toBe(200);
       expect(responseMock.writableEnded).toBeTruthy();
     });
+
+    test("should apply the options to the SSE middleware", async () => {
+      const endpoint = new EventStreamFactory(
+        { test: z.string() },
+        { eventId: true, retry: 3e3 },
+      ).buildVoid({
+        handler: async ({ ctx }) => {
+          expectTypeOf(ctx.lastEventId).toEqualTypeOf<string | undefined>();
+          ctx.emit("test", "something");
+        },
+      });
+      const { requestMock, responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: { headers: { "last-event-id": "resume" } },
+      });
+      expect(requestMock.headers["last-event-id"]).toBe("resume");
+      expect(responseMock._getData()).toBe(
+        `event: test\nid: test##1\nretry: 3000\ndata: "something"\n\n`,
+      );
+    });
+
+    test.each(["line\nbreak", "carriage\rreturn", "null\0char"])(
+      "should reject the events having invalid names %s",
+      (name) => {
+        expect(() => new EventStreamFactory({ [name]: z.string() })).toThrow(
+          new Error(
+            `Invalid SSE event name "${name}": must not contain line breaks or null characters.`,
+          ),
+        );
+      },
+    );
   });
 });
