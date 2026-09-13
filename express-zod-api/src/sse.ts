@@ -21,8 +21,8 @@ export interface Emitter<E extends EventsMap> extends FlatObject {
   /** @desc Abort signal bound to the client connection lifecycle */
   signal: AbortSignal;
   /**
-   * @desc The value of the `Last-Event-ID` request header when `eventIds` are enabled.
-   * @default undefined — the header was not sent, has an invalid format, or `eventIds` are disabled
+   * @desc The value of the `Last-Event-ID` request header when `eventId` are enabled.
+   * @default undefined — the header was not sent, has an invalid format, or `eventId` are disabled
    * */
   lastEventId?: string;
   /** @desc Sends an event to the stream according to the declared schema */
@@ -74,13 +74,13 @@ export const ensureStream = (response: Response) =>
 
 export const makeMiddleware = <E extends EventsMap>(
   events: E,
-  { eventIds = false, retry }: EventStreamFactoryOptions = {},
+  { eventId = false, retry }: EventStreamFactoryOptions = {},
 ) => {
   let counter = 0;
-  let getId: Exclude<EventStreamFactoryOptions["eventIds"], boolean>;
-  if (eventIds) {
-    if (typeof eventIds === "function")
-      getId = (event, seq) => eventIds(event, seq).replace(invalidSSEChars, "");
+  let getId: Exclude<EventStreamFactoryOptions["eventId"], boolean>;
+  if (eventId) {
+    if (typeof eventId === "function")
+      getId = (event, seq) => eventId(event, seq).replace(invalidSSEChars, "");
     else getId = (event, seq) => `${event}##${seq}`;
   }
   return new Middleware({
@@ -169,7 +169,7 @@ export interface EventStreamFactoryOptions {
    * @example true — enables the default id using the shared per-factory `seq` counter
    * @example (event, seq) => `${event}##${seq}` — custom ids using the `seq` counter
    * */
-  eventIds?: boolean | ((event: string, seq: number) => string);
+  eventId?: boolean | ((event: string, seq: number) => string);
   /**
    * @desc Assigns the `retry:` field value in milliseconds to each emitted message, telling the client how long to wait
    *   before reconnecting on connection loss.
@@ -184,7 +184,7 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   Emitter<E>
 > {
   /** @todo compile these schemas in v30 */
-  constructor(events: E, { eventIds, retry }: EventStreamFactoryOptions = {}) {
+  constructor(events: E, { eventId, retry }: EventStreamFactoryOptions = {}) {
     for (const name of Object.keys(events)) {
       if (name.match(invalidSSEChars)) {
         throw new Error(
@@ -198,6 +198,6 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
       );
     }
     super(makeResultHandler(events));
-    this.middlewares = [makeMiddleware(events, { eventIds, retry })];
+    this.middlewares = [makeMiddleware(events, { eventId, retry })];
   }
 }

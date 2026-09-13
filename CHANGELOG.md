@@ -6,13 +6,13 @@
 
 - Added the second argument to the `EventStreamFactory::constructor()` — the object of options:
   - The `retry` prop informs an SSE client on a delay before attempting to reconnect due to connection loss;
-  - The `eventIds` prop enables assigning a unique id to every emitted SSE event using the shared per-factory counter;
+  - The `eventId` prop enables assigning a unique id to every emitted SSE event using the shared per-factory counter;
   - It can be boolean or a function accepting event name and internal counter;
   - When set to `true`, the default format `${event}##${counter}` is used;
   - When enabled, `lastEventId` Context prop is assigned with `Last-Event-ID` header sent by the reconnecting client;
 - Ensured the integrity of the SSE message framing:
   - The event names must not contain line breaks or null characters, otherwise an error is thrown on factory creation;
-  - Such characters are removed from the ids returned by the custom `eventIds` function, and an id reduced to the empty
+  - Such characters are removed from the ids returned by the custom `eventId` function, and an id reduced to the empty
     string clears the stored event id, per the SSE semantics.
 
 ### v29.7.0

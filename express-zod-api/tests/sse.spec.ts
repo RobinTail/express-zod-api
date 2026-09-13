@@ -162,7 +162,7 @@ describe("SSE", () => {
     test("should assign default ids shared across connections", async () => {
       const middleware = makeMiddleware(
         { test: z.string() },
-        { eventIds: true },
+        { eventId: true },
       );
       const { output: first, responseMock: firstResponse } =
         await testMiddleware({
@@ -185,10 +185,10 @@ describe("SSE", () => {
       );
     });
 
-    test("should use the custom eventIds hook with the event name and the seq counter", async () => {
+    test("should use the custom eventId hook with the event name and the seq counter", async () => {
       const middleware = makeMiddleware(
         { test: z.string() },
-        { eventIds: (event, seq) => `${event}:${seq}` },
+        { eventId: (event, seq) => `${event}:${seq}` },
       );
       const { output, responseMock } = await testMiddleware({ middleware });
       output.emit?.("test", "something");
@@ -203,7 +203,7 @@ describe("SSE", () => {
       async (suffix) => {
         const middleware = makeMiddleware(
           { test: z.string() },
-          { eventIds: (event, seq) => `${event}:${seq}${suffix}` },
+          { eventId: (event, seq) => `${event}:${seq}${suffix}` },
         );
         const { output, responseMock } = await testMiddleware({ middleware });
         output.emit?.("test", "something");
@@ -217,7 +217,7 @@ describe("SSE", () => {
     test("should emit an empty id field when the custom hook returns only invalid characters", async () => {
       const middleware = makeMiddleware(
         { test: z.string() },
-        { eventIds: () => "\n" },
+        { eventId: () => "\n" },
       );
       const { output, responseMock } = await testMiddleware({ middleware });
       output.emit?.("test", "something");
@@ -326,7 +326,7 @@ describe("SSE", () => {
     test("should apply the options to the SSE middleware", async () => {
       const endpoint = new EventStreamFactory(
         { test: z.string() },
-        { eventIds: true },
+        { eventId: true },
       ).buildVoid({
         handler: async ({ ctx }) => {
           expectTypeOf(ctx.lastEventId).toEqualTypeOf<string | undefined>();
