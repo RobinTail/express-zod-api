@@ -220,6 +220,11 @@ export const responseOnlyHeaders: Record<
     reason:
       "Used by the server to provide information about proxy authentication.",
   },
+  "proxy-public-address": {
+    proof: "Section 7 (response)",
+    reason:
+      "Defined in Section 7 as a response header (e.g., `Proxy-Public-Address: <IP>`). No evidence of use in request headers.",
+  },
   "proxy-status": {
     proof: "RFC 9209, Section 2.",
     reason:
