@@ -70,8 +70,6 @@ jobs:
 
       - name: Check for new headers on IANA.ORG
         run: pnpm node tools/headers.ts
-        env:
-          OLLAMA_BASE_URL: http://localhost:11434/v1
 
       - name: Check for changes
         id: git-state
