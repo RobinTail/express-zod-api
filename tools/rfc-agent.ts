@@ -120,7 +120,7 @@ export const classifyHeaders = async (
   const agentConfig: ChatCompletionCreateParamsNonStreaming = {
     tools,
     messages,
-    model: "mistral", // "qwen3:8b"
+    model: "qwen3:8b",
     tool_choice: "auto",
     temperature: 0,
     top_p: 1.0,

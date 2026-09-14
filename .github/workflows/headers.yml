@@ -36,17 +36,17 @@ jobs:
             sleep 2
           done
           
-          echo "Pulling Mistral model..."
+          echo "Pulling model..."
           timeout 600 curl -X POST http://localhost:11434/api/pull \
             -H "Content-Type: application/json" \
-            -d '{"name": "mistral"}' \
+            -d '{"name": "qwen3:8b"}' \
             || echo "Model pull initiated or timed out"
           
           echo "Verifying model is available..."
           for i in {1..30}; do
             TAGS=$(curl -s http://localhost:11434/api/tags)
-            if echo "$TAGS" | grep -q "mistral"; then
-              echo "✓ Mistral model is ready"
+            if echo "$TAGS" | grep -q "qwen3:8b"; then
+              echo "✓ Model is ready"
               exit 0
             fi
             echo "Attempt $i/30: Waiting for model to load..."
@@ -97,5 +97,5 @@ jobs:
           branch: ${{ steps.create-branch.outputs.branch-name }}
           commit-message: "Changed well-known headers"
           title: "Well-known headers update"
-          body: "Automated updates to well-known HTTP headers. New headers classified via local Ollama inference (Mistral 7B). Response-only headers moved to `tools/response-only-headers.ts`."
+          body: "Automated updates to well-known HTTP headers. New headers classified via local Ollama inference. Response-only headers moved to `tools/response-only-headers.ts`."
           delete-branch: false
