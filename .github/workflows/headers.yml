@@ -36,21 +36,26 @@ jobs:
             sleep 2
           done
           
-          echo "Pulling Mistral model..."
+          echo "Pulling Qwen 2:8B model..."
           timeout 600 curl -X POST http://localhost:11434/api/pull \
             -H "Content-Type: application/json" \
-            -d '{"name": "mistral"}' \
+            -d '{"name": "qwen2:8b"}' \
             || echo "Model pull initiated or timed out"
           
           echo "Verifying model is available..."
           for i in {1..30}; do
-            if curl -s http://localhost:11434/api/tags | grep -q '"name":"mistral"'; then
-              echo "Mistral model is ready"
-              break
+            TAGS=$(curl -s http://localhost:11434/api/tags)
+            if echo "$TAGS" | grep -q "qwen2"; then
+              echo "✓ Qwen2:8B model is ready"
+              exit 0
             fi
             echo "Attempt $i/30: Waiting for model to load..."
-            sleep 5
+            sleep 2
           done
+          
+          echo "✗ Model failed to load after 60 seconds"
+          echo "Tags response: $TAGS"
+          exit 1
 
       - uses: fregante/setup-git-user@v2
       - uses: pnpm/action-setup@v6
@@ -67,6 +72,7 @@ jobs:
         run: pnpm node tools/headers.ts
         env:
           OLLAMA_BASE_URL: http://localhost:11434/v1
+          OLLAMA_MODEL: qwen2:8b
 
       - name: Check for changes
         id: git-state
@@ -92,5 +98,5 @@ jobs:
           branch: ${{ steps.create-branch.outputs.branch-name }}
           commit-message: "Changed well-known headers"
           title: "Well-known headers update"
-          body: "Automated updates to well-known HTTP headers. New headers classified via local Ollama inference (Mistral 7B). Response-only headers moved to `tools/response-only-headers.ts`."
+          body: "Automated updates to well-known HTTP headers. New headers classified via local Ollama inference (Qwen 2:8B). Response-only headers moved to `tools/response-only-headers.ts`."
           delete-branch: false
