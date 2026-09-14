@@ -1907,7 +1907,7 @@ paths:
                 email:
                   type: string
                   format: email
-                  pattern: ^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$
+                  pattern: ^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$
                 uuid:
                   type: string
                   format: uuid
@@ -1931,7 +1931,7 @@ paths:
                 emoji:
                   type: string
                   format: emoji
-                  pattern: ^[\\p{Extended_Pictographic}\\p{Emoji_Component}]+$
+                  pattern: ^(?=[\\s\\S]*[\\p{Extended_Pictographic}\\p{Regional_Indicator}\\u20E3])[\\p{Extended_Pictographic}\\p{Emoji_Component}]+$
                 url:
                   type: string
                   format: uri
@@ -1943,7 +1943,7 @@ paths:
                   minLength: 1
                   maxLength: 90
                   allOf:
-                    - pattern: ^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$
+                    - pattern: ^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$
                     - pattern: .*@example\\.com
               required:
                 - regular

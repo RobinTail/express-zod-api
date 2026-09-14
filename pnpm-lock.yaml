@@ -145,8 +145,8 @@ catalogs:
       specifier: npm:@typescript/typescript6@^6.0.2
       version: 6.0.2
     zod:
-      specifier: ^4.5.0
-      version: 4.5.4
+      specifier: ^4.6.0
+      version: 4.6.0
   prod:
     ramda:
       specifier: ^0.32.0
@@ -207,7 +207,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.5.4
+        version: 4.6.0
 
   compat-test:
     devDependencies:
@@ -237,7 +237,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.5.4
+        version: 4.6.0
 
   example:
     devDependencies:
@@ -270,7 +270,7 @@ importers:
         version: '@typescript/typescript6@6.0.2'
       zod:
         specifier: catalog:dev
-        version: 4.5.4
+        version: 4.6.0
 
   express-zod-api:
     dependencies:
@@ -361,7 +361,7 @@ importers:
         version: 8.10.0
       zod:
         specifier: catalog:dev
-        version: 4.5.4
+        version: 4.6.0
 
   issue952-test:
     dependencies:
@@ -379,7 +379,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.5.4
+        version: 4.6.0
 
   migration:
     dependencies:
@@ -408,7 +408,7 @@ importers:
         version: 3.0.0
       zod:
         specifier: catalog:dev
-        version: 4.5.4
+        version: 4.6.0
 
 packages:
 
@@ -2043,6 +2043,9 @@ packages:
   zod@4.5.4:
     resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
 
+  zod@4.6.0:
+    resolution: {integrity: sha512-iIvwyDnebKYpww2ta0DjaNOL8RnVLmPMhgWyOzlW9y0EIIxv5gl+H6Y0ONpt83HqjGqkk78uWp6xWtpxzZdPbw==}
+
 snapshots:
 
   '@andrewbranch/untar.js@1.0.3': {}
@@ -3345,4 +3348,7 @@ snapshots:
 
   zod@4.3.4: {}
 
-  zod@4.5.4: {}
+  zod@4.5.4:
+    optional: true
+
+  zod@4.6.0: {}
