@@ -97,7 +97,7 @@ export const classifyHeaders = async (
         "WebSocket (RFC 6455), WebDAV (RFC 4918), EDIINT/AS2 (RFC 6017, RFC 4130), Server-Sent Events, CORS (Fetch " +
         "API), caching (RFC 9111), Compression Dictionary Transport (RFC 9842), content negotiation, range requests, " +
         "authentication, WebSub, SCIM, CalDAV, Link Protocol, and all other protocols that extend or use HTTP as a " +
-        "transport. CRITICAL: use the lookup_info tool to read to latest information about the headers.",
+        "transport. When your knowledge is uncertain — use the lookup_info tool that can fetch the latest information.",
     },
     {
       role: "user",
@@ -113,7 +113,6 @@ export const classifyHeaders = async (
     },
   ];
 
-  console.log(messages);
 
   const agentConfig: ChatRequest & { stream: false } = {
     tools,
@@ -122,19 +121,17 @@ export const classifyHeaders = async (
     stream: false,
     options: {
       temperature: 0,
-      top_p: 1,
+      top_p: 1.0,
     },
   };
 
   let completion = await ollama.chat(agentConfig);
-  console.log(completion);
   let toolCallCount = 0;
 
   while (completion.message.tool_calls?.length) {
     messages.push(completion.message);
     for (const toolCall of completion.message.tool_calls ?? []) {
       if (!("function" in toolCall)) continue;
-      console.log("calling with", toolCall.function.arguments);
       const content = await lookup(
         toolCall.function.arguments as { subject: string },
       );
