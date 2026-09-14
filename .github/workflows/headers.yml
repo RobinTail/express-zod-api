@@ -44,13 +44,18 @@ jobs:
           
           echo "Verifying model is available..."
           for i in {1..30}; do
-            if curl -s http://localhost:11434/api/tags | grep -q '"name":"mistral"'; then
-              echo "Mistral model is ready"
-              break
+            TAGS=$(curl -s http://localhost:11434/api/tags)
+            if echo "$TAGS" | grep -q "mistral"; then
+              echo "✓ Mistral model is ready"
+              exit 0
             fi
             echo "Attempt $i/30: Waiting for model to load..."
-            sleep 5
+            sleep 2
           done
+          
+          echo "✗ Model failed to load after 60 seconds"
+          echo "Tags response: $TAGS"
+          exit 1
 
       - uses: fregante/setup-git-user@v2
       - uses: pnpm/action-setup@v6
