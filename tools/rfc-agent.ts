@@ -14,7 +14,7 @@ const makeResponseSchema = (names: string[]) =>
       z.object({
         name: z.literal(names).describe("the header name"),
         location: z
-          .enum(["request", "response", "both"])
+          .enum(["request", "response", "both", "unknown"])
           .describe("classification"),
         reason: z.string().describe("why this header is classified this way"),
         proof: z
@@ -49,14 +49,18 @@ const tools: ChatCompletionTool[] = [
 export const classifyHeaders = async (
   headers: string[],
 ): Promise<z.infer<ReturnType<typeof makeResponseSchema>>> => {
-  const apiKey = process.env["GITHUB_TOKEN"];
-  if (!apiKey) throw new Error("GITHUB_TOKEN environment variable is required");
+  const baseURL = process.env["OLLAMA_BASE_URL"] || "http://localhost:11434/v1";
+  const apiKey = process.env["OLLAMA_API_KEY"] || "ollama";
+  if (!baseURL)
+    throw new Error("OLLAMA_BASE_URL environment variable is required");
+
   const client = new OpenAI({
     apiKey,
-    baseURL: "https://models.github.ai/inference",
-    timeout: 30000,
-    maxRetries: 0,
+    baseURL,
+    timeout: 60000,
+    maxRetries: 1,
   });
+
   const ResponseSchema = makeResponseSchema(headers);
   const headerPattern = headers.filter((h) => /^[\w-]+$/.test(h)).join("|");
   const rfcLookupRegex = new RegExp(`\\b(${headerPattern})\\b`, "gi");
@@ -108,8 +112,7 @@ export const classifyHeaders = async (
         `(WebSocket, WebDAV, EDIINT, file transfer, W3C specifications, etc.). When classifying a header, consider ` +
         `its definition across ALL relevant RFCs and specifications, not just one. A header that appears ` +
         `in both requests and responses in any specification should be classified as 'both', even if ` +
-        `it is most commonly seen in one direction. Provide a reason and a proof. Respond according to the schema:\n` +
-        `${JSON.stringify(z.toJSONSchema(ResponseSchema))}\n\n` +
+        `it is most commonly seen in one direction. Provide a reason and a proof.` +
         `The list of headers: ${headers.join(", ")}.`,
     },
   ];
@@ -117,10 +120,18 @@ export const classifyHeaders = async (
   const agentConfig: ChatCompletionCreateParamsNonStreaming = {
     tools,
     messages,
-    model: "openai/gpt-4.1",
+    model: "mistral", // "qwen3:8b"
     tool_choice: "auto",
     temperature: 0,
     top_p: 1.0,
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "classification",
+        schema: z.toJSONSchema(ResponseSchema),
+        strict: true,
+      },
+    },
   };
 
   let completion = await client.chat.completions.create(agentConfig);

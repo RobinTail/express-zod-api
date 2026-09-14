@@ -1,11 +1,12 @@
 import { writeFile } from "node:fs/promises";
-import { format } from "oxfmt";
+import { format, type FormatConfig } from "oxfmt";
 import {
   getWellKnownHeaders,
   wellKnownHeadersLastUpdated,
 } from "../express-zod-api/src/well-known-headers.ts";
 import { responseOnlyHeaders } from "./response-only-headers.ts";
 import { classifyHeaders } from "./rfc-agent.ts";
+import oxConfig from "../.oxfmtrc.json" with { type: "json" };
 
 const dest = "express-zod-api/src/well-known-headers.ts";
 const exceptionsDest = "tools/response-only-headers.ts";
@@ -23,6 +24,7 @@ const writeDest = async (at: Date) => {
         `export const wellKnownHeadersLastUpdated = "${at.toISOString()}";\n\n` +
         `export const getWellKnownHeaders = () =>\n` +
         `  (cache ??= new Set(${JSON.stringify(Array.from(existingNames).sort(), undefined, 2)}));\n`,
+      oxConfig as FormatConfig,
     )
   ).code;
   await writeFile(dest, tsCode, "utf-8");
@@ -42,6 +44,7 @@ const writeExceptions = async () => {
         "Record<string, { proof: string; reason: string }> = {\n" +
         entries.join("\n") +
         "\n};\n",
+      oxConfig as FormatConfig,
     )
   ).code;
   await writeFile(exceptionsDest, tsCode, "utf-8");
@@ -100,6 +103,7 @@ for (let i = 0; i < newHeaders.length; i += batchSize) {
   const classified = await classifyHeaders(chunk);
   console.info(classified);
   for (const { name, location, proof, reason } of classified) {
+    if (location === "unknown") continue;
     if (location === "response") responseOnlyHeaders[name] = { proof, reason };
     else existingNames.add(name);
   }
