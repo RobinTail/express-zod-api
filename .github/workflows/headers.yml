@@ -17,11 +17,6 @@ jobs:
     services:
       ollama:
         image: ollama/ollama:latest
-        options: >
-          --health-cmd "curl -f http://localhost:11434/api/tags || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
         ports:
           - 11434:11434
 
@@ -32,26 +27,28 @@ jobs:
       - name: Wait for Ollama and pull model
         run: |
           echo "Waiting for Ollama to be ready..."
-          for i in {1..60}; do
-            if curl -f http://localhost:11434/api/tags > /dev/null 2>&1; then
+          for i in {1..120}; do
+            if curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
               echo "Ollama is ready"
               break
             fi
-            echo "Attempt $i/60: Waiting for Ollama..."
+            echo "Attempt $i/120: Waiting for Ollama..."
             sleep 2
           done
           
           echo "Pulling Mistral model..."
-          curl -X POST http://localhost:11434/api/pull -d '{"name": "mistral"}' \
-            -H "Content-Type: application/json" || echo "Model pull initiated"
+          timeout 600 curl -X POST http://localhost:11434/api/pull \
+            -H "Content-Type: application/json" \
+            -d '{"name": "mistral"}' \
+            || echo "Model pull initiated or timed out"
           
-          echo "Waiting for model to be available..."
-          for i in {1..120}; do
-            if curl -s http://localhost:11434/api/tags | grep -q mistral; then
+          echo "Verifying model is available..."
+          for i in {1..30}; do
+            if curl -s http://localhost:11434/api/tags | grep -q '"name":"mistral"'; then
               echo "Mistral model is ready"
               break
             fi
-            echo "Attempt $i/120: Waiting for model..."
+            echo "Attempt $i/30: Waiting for model to load..."
             sleep 5
           done
 
