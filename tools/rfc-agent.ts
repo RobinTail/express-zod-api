@@ -113,7 +113,6 @@ export const classifyHeaders = async (
     },
   ];
 
-
   const agentConfig: ChatRequest & { stream: false } = {
     tools,
     messages,
