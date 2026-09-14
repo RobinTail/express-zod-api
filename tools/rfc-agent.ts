@@ -57,7 +57,7 @@ export const classifyHeaders = async (
   const client = new OpenAI({
     apiKey,
     baseURL,
-    timeout: 60000,
+    timeout: 3e5, // 5 minutes
     maxRetries: 1,
   });
 
