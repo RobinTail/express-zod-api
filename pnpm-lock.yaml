@@ -180,7 +180,7 @@ importers:
         version: 9.1.7
       openai:
         specifier: ^7.0.0
-        version: 7.8.0(undici@8.10.0)(zod@4.5.4)
+        version: 7.8.0(undici@8.10.0)
       oxfmt:
         specifier: 0.66.0
         version: 0.66.0
@@ -2040,9 +2040,6 @@ packages:
   zod@4.3.4:
     resolution: {integrity: sha512-Zw/uYiiyF6pUT1qmKbZziChgNPRu+ZRneAsMUDU6IwmXdWt5JwcUfy2bvLOCUtz5UniaN/Zx5aFttZYbYc7O/A==}
 
-  zod@4.5.4:
-    resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
-
   zod@4.6.0:
     resolution: {integrity: sha512-iIvwyDnebKYpww2ta0DjaNOL8RnVLmPMhgWyOzlW9y0EIIxv5gl+H6Y0ONpt83HqjGqkk78uWp6xWtpxzZdPbw==}
 
@@ -2928,10 +2925,9 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@7.8.0(undici@8.10.0)(zod@4.5.4):
+  openai@7.8.0(undici@8.10.0):
     optionalDependencies:
       undici: 8.10.0
-      zod: 4.5.4
 
   openapi3-ts@4.6.1:
     dependencies:
@@ -3347,8 +3343,5 @@ snapshots:
       '@yuku-parser/binding-win32-x64': 0.9.3
 
   zod@4.3.4: {}
-
-  zod@4.5.4:
-    optional: true
 
   zod@4.6.0: {}
