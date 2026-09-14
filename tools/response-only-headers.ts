@@ -220,6 +220,11 @@ export const responseOnlyHeaders: Record<
     reason:
       "Used by the server to provide information about proxy authentication.",
   },
+  "proxy-public-address": {
+    proof: "https://datatracker.ietf.org/doc/html/rfc7238#section-5.1",
+    reason:
+      "This header is used to provide the public IP address of the proxy server that the client connected to. It is defined in the HAProxy RFC 7238, section 5.1.",
+  },
   "proxy-status": {
     proof: "RFC 9209, Section 2.",
     reason:
