@@ -20,7 +20,7 @@
     "@vitest/coverage-v8": "^5.0.0",
     "eslint-plugin-allowed-dependencies": "^3.1.0",
     "husky": "^9.1.7",
-    "openai": "^7.0.0",
+    "ollama": "^0.6.3",
     "oxfmt": "0.67.0",
     "oxlint": "^1.76.0",
     "oxlint-plugin-eslint": "^1.76.0",

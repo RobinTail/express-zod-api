@@ -74,18 +74,32 @@ const categories = ["permanent", "deprecated", "provisional", "obsoleted"];
 const lines = csv.split("\n").slice(1, -1);
 const allHeaders = lines
   .map((line) => {
-    const [name, category] = line.split(",").slice(0, 2);
-    return { name, category };
+    const [name, category, ...rest] = line.split(",");
+    const info = rest
+      .slice(1)
+      .join(" ")
+      .replaceAll(/[\][\r\n]/g, "");
+    const doc = info.match(/RFC[\s-]?([\w-]+)/)?.[1];
+    return {
+      name,
+      category,
+      info: doc
+        ? `${/^\d+$/.test(doc) ? `RFC ${doc}` : `see document '${doc}'`}`
+        : "",
+    };
   })
   .filter(
     ({ name, category }) =>
       /^[\w-]+$/.test(name!) && categories.includes(category ?? ""),
   )
-  .map(({ name }) => name!.toLowerCase());
+  .map(({ name, info }) => ({
+    name: name!.toLowerCase(),
+    info,
+  }));
 
 const exceptionNames = new Set(Object.keys(responseOnlyHeaders));
 const newHeaders = allHeaders.filter(
-  (name) => !existingNames.has(name) && !exceptionNames.has(name),
+  ({ name }) => !existingNames.has(name) && !exceptionNames.has(name),
 );
 
 if (newHeaders.length === 0) {
@@ -94,16 +108,17 @@ if (newHeaders.length === 0) {
 }
 
 console.info(
-  `Found ${newHeaders.length} new headers: ${newHeaders.join(", ")}`,
+  `Found ${newHeaders.length} new headers: ${newHeaders.map(({ name }) => name).join(", ")}`,
 );
 
 for (let i = 0; i < newHeaders.length; i += batchSize) {
   const chunk = newHeaders.slice(i, i + batchSize);
-  console.info(`Batch ${Math.floor(i / batchSize) + 1}: ${chunk.join(", ")}`);
+  console.info(
+    `Batch ${Math.floor(i / batchSize) + 1}: ${chunk.map(({ name }) => name).join(", ")}`,
+  );
   const classified = await classifyHeaders(chunk);
   console.info(classified);
   for (const { name, location, proof, reason } of classified) {
-    if (location === "unknown") continue;
     if (location === "response") responseOnlyHeaders[name] = { proof, reason };
     else existingNames.add(name);
   }
