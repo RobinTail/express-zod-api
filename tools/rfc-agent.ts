@@ -60,7 +60,7 @@ export const classifyHeaders = async (
   const lookup = lookupInfo.implementAsync(async ({ subject }) => {
     console.info(`Looking up ${subject}...`);
     const url =
-      typeof subject === "number"
+      typeof subject === "number" || /^\d+$/.test(subject)
         ? `https://www.rfc-editor.org/rfc/rfc${subject}.txt`
         : `https://www.ietf.org/archive/id/draft-${subject}.txt`;
     let text: string;
