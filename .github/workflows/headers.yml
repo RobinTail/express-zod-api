@@ -9,15 +9,53 @@ permissions:
   id-token: none
   contents: write # Grants write access to push changes
   pull-requests: write # and create PRs
-  models: read # Access to GitHub Models API for header classification
 
 jobs:
   run-bash-and-pr:
     runs-on: ubuntu-latest
 
+    services:
+      ollama:
+        image: ollama/ollama@sha256:684d8674b4315fa18f4f0e973a118ec2652ed96f67563277839985175858e0ba
+        ports:
+          - 11434:11434
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+
+      - name: Wait for Ollama and pull model
+        run: |
+          echo "Waiting for Ollama to be ready..."
+          for i in {1..120}; do
+            if curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+              echo "Ollama is ready"
+              break
+            fi
+            echo "Attempt $i/120: Waiting for Ollama..."
+            sleep 2
+          done
+          
+          echo "Pulling model..."
+          timeout 600 curl -X POST http://localhost:11434/api/pull \
+            -H "Content-Type: application/json" \
+            -d '{"name": "qwen3:8b"}' \
+            || echo "Model pull initiated or timed out"
+          
+          echo "Verifying model is available..."
+          for i in {1..30}; do
+            TAGS=$(curl -s http://localhost:11434/api/tags)
+            if echo "$TAGS" | grep -q "qwen3:8b"; then
+              echo "✓ Model is ready"
+              exit 0
+            fi
+            echo "Attempt $i/30: Waiting for model to load..."
+            sleep 2
+          done
+          
+          echo "✗ Model failed to load after 60 seconds"
+          echo "Tags response: $TAGS"
+          exit 1
 
       - uses: fregante/setup-git-user@v2
       - uses: pnpm/action-setup@v6
@@ -32,8 +70,6 @@ jobs:
 
       - name: Check for new headers on IANA.ORG
         run: pnpm node tools/headers.ts
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for changes
         id: git-state
@@ -59,5 +95,5 @@ jobs:
           branch: ${{ steps.create-branch.outputs.branch-name }}
           commit-message: "Changed well-known headers"
           title: "Well-known headers update"
-          body: "Automated updates to well-known HTTP headers. New headers classified via GitHub Models API (GPT-4.1). Response-only headers moved to `tools/response-only-headers.ts`."
+          body: "Automated updates to well-known HTTP headers. New headers classified via local Ollama inference. Response-only headers moved to `tools/response-only-headers.ts`."
           delete-branch: false
