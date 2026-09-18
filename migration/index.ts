@@ -4,6 +4,7 @@ import {
   type Rule,
   type Visitor,
 } from "@oxlint/plugins";
+import { getPropName, isNamedProp } from "./helpers.ts";
 
 interface Queries {
   expressZodApiImport: ESTree.ImportDeclaration;
@@ -125,9 +126,8 @@ const theRule: Rule = {
       createConfigCall: (node) => {
         const hasTrySyncValidation = node.properties.some(
           (property) =>
-            property.type === "Property" &&
-            property.key.type === "Identifier" &&
-            property.key.name === "trySyncValidation",
+            isNamedProp(property) &&
+            getPropName(property) === "trySyncValidation",
         );
         if (hasTrySyncValidation) return;
         ctx.report({
