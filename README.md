@@ -915,9 +915,9 @@ const yourResultHandler = new ResultHandler({
     if (error) {
       const { statusCode } = ensureHttpError(error);
       const message = getMessageFromError(error);
-      return void response.status(statusCode).json({ error: message });
+      return void response.status(statusCode).json({ message });
     }
-    response.status(200).json({ data: output });
+    response.status(200).json(output);
   },
 });
 ```
