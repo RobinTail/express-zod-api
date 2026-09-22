@@ -707,6 +707,14 @@ describe("Example", async () => {
       expectTypeOf(response).toBeUndefined();
     });
 
+    test("should avoid parsing HEAD response", async () => {
+      const response = await client.provide("head /v1/avatar/stream", {
+        userId: "10",
+      });
+      expect(response).toBeUndefined();
+      expectTypeOf(response).toBeUndefined();
+    });
+
     test("can send Blob body", async () => {
       const response = await client.provide(
         "post /v1/avatar/raw",
@@ -720,13 +728,6 @@ describe("Example", async () => {
         userId: "10",
       });
       expect(response instanceof Blob).toBe(true);
-    });
-
-    test("should avoid parsing HEAD response", async () => {
-      const response = await client.provide("head /v1/avatar/stream", {
-        userId: "10",
-      });
-      expect(response).toBeUndefined();
     });
 
     test("can upload a file", async () => {
