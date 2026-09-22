@@ -940,7 +940,7 @@ import {
 const yourResultHandler = new ResultHandler({
   positive: (data) => ({
     schema: z.object({ data }),
-    mimeType: "application/json", // optinal or array
+    mimeType: "application/json", // optional or array
   }),
   negative: z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
