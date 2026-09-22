@@ -4,7 +4,7 @@
 
 ### v29.8.1
 
-- Fixed the `head` method of the generated client to avoid parsing the response body.
+- Fixed the `HEAD` method of the generated client to avoid parsing the response body by the default implementation.
 
 ### v29.8.0
 
