@@ -54,6 +54,10 @@ else if (status === 400 || discriminator === "error")
 
 ## Version 29
 
+### v29.8.1
+
+- Fixed the `HEAD` method of the generated client to avoid parsing the response body by the default implementation.
+
 ### v29.8.0
 
 - Added the second argument to the `EventStreamFactory::constructor()` — the object of options:

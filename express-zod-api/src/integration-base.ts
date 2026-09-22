@@ -314,7 +314,7 @@ export abstract class IntegrationBase {
       `  );`,
       `  const { ${propOf<Response>("status")} } = ${ids.response};`,
       `  const ${ids.contentType} = ${contentType};`,
-      `  if (!${ids.contentType}) return { ${propOf<Response>("status")}, data: undefined };`,
+      `  if (${ids.method} === "${"head" satisfies ClientMethod}" || !${ids.contentType}) return { ${propOf<Response>("status")}, data: undefined };`,
       `  const ${ids.data} = await (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}") ?`,
       `    ${ids.response}.${propOf<Response>("json")}() : `,
       `    ${ids.contentType}.${propOf<string>("startsWith")}("text/") ? `,

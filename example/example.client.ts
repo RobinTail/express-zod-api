@@ -547,7 +547,7 @@ const defaultImplementation: Implementation<DefaultContext> = async (method, pat
   const response = await fetch(new URL(`${path}${searchParams}`, "http://localhost:8090"), init);
   const { status } = response;
   const contentType = response.headers.get("content-type");
-  if (!contentType) return { status, data: undefined };
+  if (method === "head" || !contentType) return { status, data: undefined };
   const data = await (contentType.startsWith("application/json")
     ? response.json()
     : contentType.startsWith("text/")
