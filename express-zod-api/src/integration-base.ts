@@ -300,7 +300,7 @@ export abstract class IntegrationBase {
       `    init,`,
       `  );`,
       `  const ${ids.contentType} = ${contentType};`,
-      `  if (!${ids.contentType}) return;`,
+      `  if (${ids.method} === "${"head" satisfies ClientMethod}" || !${ids.contentType}) return;`,
       `  if (${ids.contentType}.${propOf<string>("startsWith")}("${contentTypes.json}")) ` +
         `return ${ids.response}.${propOf<Response>("json")}();`,
       `  if (${ids.contentType}.${propOf<string>("startsWith")}("text/")) ` +

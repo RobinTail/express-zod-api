@@ -2,6 +2,10 @@
 
 ## Version 29
 
+### v29.8.1
+
+- Fixed the `head` method of the generated client to avoid parsing the response body.
+
 ### v29.8.0
 
 - Added the second argument to the `EventStreamFactory::constructor()` — the object of options:

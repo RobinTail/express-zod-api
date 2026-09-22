@@ -789,7 +789,7 @@ const defaultImplementation: Implementation<DefaultContext> = async (method, pat
   if (ctx?.override) init = ctx.override(init);
   const response = await fetch(new URL(`${path}${searchParams}`, "http://localhost:8090"), init);
   const contentType = response.headers.get("content-type");
-  if (!contentType) return;
+  if (method === "head" || !contentType) return;
   if (contentType.startsWith("application/json")) return response.json();
   if (contentType.startsWith("text/")) return response.text();
   return response.blob();

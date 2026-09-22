@@ -207,6 +207,7 @@ describe("Example", async () => {
       );
       expect(response.headers.has("Content-Length")).toBeTruthy();
       expect(response.headers.get("Content-Length")).toBe("48687");
+      expect(response.body).toBeNull();
     });
 
     test("Should stream an image with a correct header", async ({ signal }) => {
@@ -248,6 +249,7 @@ describe("Example", async () => {
       );
       expect(response.headers.has("Content-Length")).toBeTruthy();
       expect(response.headers.get("Content-Length")).toBe("48687");
+      expect(response.body).toBeNull();
     });
 
     test("Should serve static files", async ({ signal }) => {
@@ -718,6 +720,13 @@ describe("Example", async () => {
         userId: "10",
       });
       expect(response instanceof Blob).toBe(true);
+    });
+
+    test("should avoid parsing HEAD response", async () => {
+      const response = await client.provide("head /v1/avatar/stream", {
+        userId: "10",
+      });
+      expect(response).toBeUndefined();
     });
 
     test("can upload a file", async () => {
