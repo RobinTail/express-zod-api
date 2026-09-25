@@ -181,8 +181,8 @@ catalogs:
       specifier: ^0.32.0
       version: 0.32.0
     '@typescript/native-preview':
-      specifier: npm:typescript@^7.1.0-dev.20260812.1
-      version: 7.1.0-dev.20261011.1
+      specifier: npm:typescript@7.1.0-dev.20260812.1
+      version: 7.1.0-dev.20260812.1
     camelize-ts:
       specifier: ^3.0.0
       version: 3.0.0
@@ -261,7 +261,7 @@ importers:
     devDependencies:
       '@typescript/native-preview':
         specifier: catalog:dev
-        version: typescript@7.1.0-dev.20261011.1
+        version: typescript@7.1.0-dev.20260812.1
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
@@ -312,7 +312,7 @@ importers:
         version: 4.1.8
       '@typescript/native-preview':
         specifier: catalog:dev
-        version: typescript@7.1.0-dev.20261011.1
+        version: typescript@7.1.0-dev.20260812.1
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
@@ -379,7 +379,7 @@ importers:
         version: 0.32.0
       '@typescript/native-preview':
         specifier: catalog:dev
-        version: typescript@7.1.0-dev.20261011.1
+        version: typescript@7.1.0-dev.20260812.1
       camelize-ts:
         specifier: catalog:dev
         version: 3.0.0
@@ -433,7 +433,7 @@ importers:
         version: 1.5.1
       '@typescript/native-preview':
         specifier: catalog:dev
-        version: typescript@7.1.0-dev.20261011.1
+        version: typescript@7.1.0-dev.20260812.1
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
@@ -449,7 +449,7 @@ importers:
     devDependencies:
       '@typescript/native-preview':
         specifier: catalog:dev
-        version: typescript@7.1.0-dev.20261011.1
+        version: typescript@7.1.0-dev.20260812.1
 
   zod-plugin:
     dependencies:
@@ -462,7 +462,7 @@ importers:
         version: 0.32.0
       '@typescript/native-preview':
         specifier: catalog:dev
-        version: typescript@7.1.0-dev.20261011.1
+        version: typescript@7.1.0-dev.20260812.1
       camelize-ts:
         specifier: catalog:dev
         version: 3.0.0
@@ -940,44 +940,44 @@ packages:
   '@types/swagger-ui-express@4.1.8':
     resolution: {integrity: sha512-AhZV8/EIreHFmBV5wAs0gzJUNq9JbbSXgJLQubCC0jtIo6prnI9MIRRxnU4MZX9RB9yXxF1V4R7jtLl/Wcj31g==}
 
-  '@typescript/typescript-darwin-arm64@7.1.0-dev.20261011.1':
-    resolution: {integrity: sha512-Kj6wL95dLXjtx7um9LaF61YPaMSKlmTh6IffZUCwQlJntRh613hVKfWtbj3k7odmRe/K5hghQox8cvyKkFotjA==}
+  '@typescript/typescript-darwin-arm64@7.1.0-dev.20260812.1':
+    resolution: {integrity: sha512-jA5eqPhO1tq9nbXTN/n+cwScpponvQsy6qoWnDodKWC/ngquA01z7TCaXdIffMwq0L510b8qRUis2x+fhmxuoQ==}
     engines: {node: '>=16.20.0'}
     cpu: [arm64]
     os: [darwin]
 
-  '@typescript/typescript-darwin-x64@7.1.0-dev.20261011.1':
-    resolution: {integrity: sha512-ng8qcExjcmG2HG5Z22OcL07BntZQX7MwBlN9DmTwZX7+TMe1h9UitAiWPxCtmltcc5ObE+5YSF6AGyKMVgfMKg==}
+  '@typescript/typescript-darwin-x64@7.1.0-dev.20260812.1':
+    resolution: {integrity: sha512-DoCglqEhy6Ed6eVXdRsHhzlRrtCw30Bn06EB08+JfPlP++NZuL2QOISS7+AzG60DYiACBg2gWbWlqSagM1cFfw==}
     engines: {node: '>=16.20.0'}
     cpu: [x64]
     os: [darwin]
 
-  '@typescript/typescript-linux-arm64@7.1.0-dev.20261011.1':
-    resolution: {integrity: sha512-cX7seCo65VvUeQOvI2Ho4kVszrTMj+FMAJHDtJ6X4PBE2Dqv48OG+tNncPF1Z8VDNCCdJGr5FRjzxiHbUDzYLQ==}
+  '@typescript/typescript-linux-arm64@7.1.0-dev.20260812.1':
+    resolution: {integrity: sha512-89FGmpJTWO4Sf49DX5aZcu7EDmM9Oo5/7h5VLUMNbipAZByie697p8AGVnI05TDqp5v0nrjfHCM/Klg1qGPAaw==}
     engines: {node: '>=16.20.0'}
     cpu: [arm64]
     os: [linux]
 
-  '@typescript/typescript-linux-arm@7.1.0-dev.20261011.1':
-    resolution: {integrity: sha512-TbBRba9ft28ME4JfCPkQ1zSTkNle1+dmKrSBCu9LFP2e/SgvTbt4mX8LgCwzg9EPe0CH8k6Zd+i/xxZys65qgQ==}
+  '@typescript/typescript-linux-arm@7.1.0-dev.20260812.1':
+    resolution: {integrity: sha512-rCleB0+tUqWrlz0gyEjNR3JyQfco9R45Y6svaE2agh7LpfihuINNTEsy7gEY4JGz4JQ6ygA6AgUXMucyQ2G9UQ==}
     engines: {node: '>=16.20.0'}
     cpu: [arm]
     os: [linux]
 
-  '@typescript/typescript-linux-x64@7.1.0-dev.20261011.1':
-    resolution: {integrity: sha512-0pt6E6fRcffVEUaHYIYGVYBghfeJL2E+JNz91dJf/UidoIU8kmj6qBd27xhsDzKe2aoxolt0t48ipRc+a2NjBA==}
+  '@typescript/typescript-linux-x64@7.1.0-dev.20260812.1':
+    resolution: {integrity: sha512-lkZgaqFV278XoLW3w+lRvKKPxKo7NXPNbcENny14R86BYKOHDx3cfrnkHBISGmm3uIbKYjkmQk3OJPJgMOsHYQ==}
     engines: {node: '>=16.20.0'}
     cpu: [x64]
     os: [linux]
 
-  '@typescript/typescript-win32-arm64@7.1.0-dev.20261011.1':
-    resolution: {integrity: sha512-8UkixI8b4a12rZXr1RZk8oyx8yPZg8QNiJhbe3vTSA45o43YViVPoAll8bA5oTzi9UjetFT2iPDSpAPCZENVug==}
+  '@typescript/typescript-win32-arm64@7.1.0-dev.20260812.1':
+    resolution: {integrity: sha512-LlYsDBl+eLqG8VhdwqVyUG9uyLDhMrIf8ulXrKl4yLcJW7X8vpI2OaBqNHoCTH0RLYpWNkgHJHy7GTvj4fQPtw==}
     engines: {node: '>=16.20.0'}
     cpu: [arm64]
     os: [win32]
 
-  '@typescript/typescript-win32-x64@7.1.0-dev.20261011.1':
-    resolution: {integrity: sha512-gw2jMUgKpICqDRFhpe1Cx/ol/xv2+/80y4dAf3CKnkG5GdSVZvULYL1MRXlHdZIi0WA27t8T+TKtqzi4WJ3WOw==}
+  '@typescript/typescript-win32-x64@7.1.0-dev.20260812.1':
+    resolution: {integrity: sha512-KNhEWkKLKLw093wyWHKSUR54TUBfzcgWt8RF7No3DImjMDaK4e6+eC67SxmnWl7K4eCuAmWzIGcK9TqHiEk/Cg==}
     engines: {node: '>=16.20.0'}
     cpu: [x64]
     os: [win32]
@@ -1791,8 +1791,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typescript@7.1.0-dev.20261011.1:
-    resolution: {integrity: sha512-Oestzc61TT5cqxAyVxRsbL+pmMF8pzPlsnLcbCqAWqvC0eYQcp8EJrLWatIgjdUh4RiL79avUCHfM8hdkv07xg==}
+  typescript@7.1.0-dev.20260812.1:
+    resolution: {integrity: sha512-kE22FLvE+QCnfI0nedHm7JwU+465Mf9SsRSEpl9c0GIrJ7ikcJINI7FvEMDOfa26iMbC7NaYlZdI0rs1pkc1iA==}
     engines: {node: '>=16.20.0'}
     hasBin: true
 
@@ -2249,25 +2249,25 @@ snapshots:
       '@types/express': 5.0.6
       '@types/serve-static': 2.2.0
 
-  '@typescript/typescript-darwin-arm64@7.1.0-dev.20261011.1':
+  '@typescript/typescript-darwin-arm64@7.1.0-dev.20260812.1':
     optional: true
 
-  '@typescript/typescript-darwin-x64@7.1.0-dev.20261011.1':
+  '@typescript/typescript-darwin-x64@7.1.0-dev.20260812.1':
     optional: true
 
-  '@typescript/typescript-linux-arm64@7.1.0-dev.20261011.1':
+  '@typescript/typescript-linux-arm64@7.1.0-dev.20260812.1':
     optional: true
 
-  '@typescript/typescript-linux-arm@7.1.0-dev.20261011.1':
+  '@typescript/typescript-linux-arm@7.1.0-dev.20260812.1':
     optional: true
 
-  '@typescript/typescript-linux-x64@7.1.0-dev.20261011.1':
+  '@typescript/typescript-linux-x64@7.1.0-dev.20260812.1':
     optional: true
 
-  '@typescript/typescript-win32-arm64@7.1.0-dev.20261011.1':
+  '@typescript/typescript-win32-arm64@7.1.0-dev.20260812.1':
     optional: true
 
-  '@typescript/typescript-win32-x64@7.1.0-dev.20261011.1':
+  '@typescript/typescript-win32-x64@7.1.0-dev.20260812.1':
     optional: true
 
   '@typescript/typescript6@6.0.2':
@@ -3037,15 +3037,15 @@ snapshots:
 
   typescript@6.0.3: {}
 
-  typescript@7.1.0-dev.20261011.1:
+  typescript@7.1.0-dev.20260812.1:
     optionalDependencies:
-      '@typescript/typescript-darwin-arm64': 7.1.0-dev.20261011.1
-      '@typescript/typescript-darwin-x64': 7.1.0-dev.20261011.1
-      '@typescript/typescript-linux-arm': 7.1.0-dev.20261011.1
-      '@typescript/typescript-linux-arm64': 7.1.0-dev.20261011.1
-      '@typescript/typescript-linux-x64': 7.1.0-dev.20261011.1
-      '@typescript/typescript-win32-arm64': 7.1.0-dev.20261011.1
-      '@typescript/typescript-win32-x64': 7.1.0-dev.20261011.1
+      '@typescript/typescript-darwin-arm64': 7.1.0-dev.20260812.1
+      '@typescript/typescript-darwin-x64': 7.1.0-dev.20260812.1
+      '@typescript/typescript-linux-arm': 7.1.0-dev.20260812.1
+      '@typescript/typescript-linux-arm64': 7.1.0-dev.20260812.1
+      '@typescript/typescript-linux-x64': 7.1.0-dev.20260812.1
+      '@typescript/typescript-win32-arm64': 7.1.0-dev.20260812.1
+      '@typescript/typescript-win32-x64': 7.1.0-dev.20260812.1
 
   unconfig-core@7.5.0:
     dependencies:
