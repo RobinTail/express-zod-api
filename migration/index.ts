@@ -116,6 +116,17 @@ const theRule: Rule = {
       defaultId: (node) => {
         const replacement = renameTargets.get(node.name);
         if (!replacement) return;
+        const scope = ctx.sourceCode.getScope(node);
+        if (scope.block.type !== "Program") return;
+        const importDeclarations = scope.block.body.filter(
+          (one) => one.type === "ImportDeclaration",
+        );
+        const importDeclaration = importDeclarations.find(
+          (one) =>
+            one.source.value === "express-zod-api" &&
+            one.specifiers.some((name) => name.local.name === node.name),
+        );
+        if (!importDeclaration) return;
         ctx.report({
           node,
           messageId: "change",

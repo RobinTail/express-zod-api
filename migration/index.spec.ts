@@ -28,6 +28,7 @@ describe("Migration", async () => {
       `import { legacyResultHandler, legacyEndpointsFactory } from "express-zod-api"`,
       `const foo = new EndpointsFactory(legacyResultHandler)`,
       `const bar = legacyEndpointsFactory.build({})`,
+      `const foo = new EndpointsFactory(defaultResultHandler)`, // no import
       // createConfigCall
       `createConfig({ trySyncValidation: false })`,
       `createConfig({ trySyncValidation: true, cors: true })`,
