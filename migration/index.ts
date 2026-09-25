@@ -2,6 +2,8 @@ import {
   type ESTree,
   eslintCompatPlugin,
   type Rule,
+  type Scope,
+  type Variable,
   type Visitor,
 } from "@oxlint/plugins";
 import { getPropName, isNamedProp } from "./helpers.ts";
@@ -39,6 +41,13 @@ const renameTargets = new Map([
   ["defaultResultHandler", "legacyResultHandler"],
   ["defaultEndpointsFactory", "legacyEndpointsFactory"],
 ]);
+
+const findVariable = (scope: Scope, name: string): Variable | undefined => {
+  for (let current: Scope | null = scope; current; current = current.upper) {
+    const variable = current.set.get(name);
+    if (variable) return variable;
+  }
+};
 
 const ruleName = `v${import.meta.TSDOWN_VERSION.split(".")[0]}`;
 
@@ -116,17 +125,20 @@ const theRule: Rule = {
       defaultId: (node) => {
         const replacement = renameTargets.get(node.name);
         if (!replacement) return;
-        const scope = ctx.sourceCode.getScope(node);
-        if (scope.block.type !== "Program") return;
-        const importDeclarations = scope.block.body.filter(
-          (one) => one.type === "ImportDeclaration",
+        const variable = findVariable(ctx.sourceCode.getScope(node), node.name);
+        const definition = variable?.defs[0];
+        if (
+          !variable ||
+          definition?.type !== "ImportBinding" ||
+          definition.parent?.type !== "ImportDeclaration" ||
+          definition.parent.source.value !== "express-zod-api"
+        )
+          return;
+        const isSpecifier = definition.node === node.parent;
+        const isReference = variable.references.some(
+          (ref) => ref.identifier === node,
         );
-        const importDeclaration = importDeclarations.find(
-          (one) =>
-            one.source.value === "express-zod-api" &&
-            one.specifiers.some((name) => name.local.name === node.name),
-        );
-        if (!importDeclaration) return;
+        if (!isSpecifier && !isReference) return;
         ctx.report({
           node,
           messageId: "change",

@@ -29,6 +29,8 @@ describe("Migration", async () => {
       `const foo = new EndpointsFactory(legacyResultHandler)`,
       `const bar = legacyEndpointsFactory.build({})`,
       `const foo = new EndpointsFactory(defaultResultHandler)`, // no import
+      `const defaultResultHandler = 1; defaultResultHandler`, // local variable
+      `import { defaultResultHandler } from "other-module"; const f = new EndpointsFactory(defaultResultHandler)`,
       // createConfigCall
       `createConfig({ trySyncValidation: false })`,
       `createConfig({ trySyncValidation: true, cors: true })`,
@@ -160,6 +162,60 @@ describe("Migration", async () => {
               to: "legacyResultHandler",
             },
           },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+        ],
+      },
+      {
+        name: "change defaultResultHandler in nested code usage",
+        code: `import { defaultResultHandler } from "express-zod-api"; function f() { return new EndpointsFactory(defaultResultHandler) }`,
+        output: `import { legacyResultHandler } from "express-zod-api"; function f() { return new EndpointsFactory(legacyResultHandler) }`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
+          },
+        ],
+      },
+      {
+        name: "do not change non-reference identifiers",
+        code: `import { defaultResultHandler } from "express-zod-api"; const obj = { defaultResultHandler: 1 }; obj.defaultResultHandler`,
+        output: `import { legacyResultHandler } from "express-zod-api"; const obj = { defaultResultHandler: 1 }; obj.defaultResultHandler`,
+        errors: [
           {
             messageId: "change",
             data: {
