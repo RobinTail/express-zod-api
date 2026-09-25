@@ -5,6 +5,7 @@ import * as ts from "@typescript/native-preview/unstable/ast";
 import {
   API,
   type PrintNodeOptions,
+  type Printer,
 } from "@typescript/native-preview/unstable/sync";
 
 export { f, ts, type PrintNodeOptions };
@@ -86,16 +87,12 @@ const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
  * */
 export const customizations = new WeakMap<ts.Node, DeferredCode>();
 
-let emitter: ReturnType<typeof getProject>["emitter"] | undefined;
-const getProject = () => {
-  const api = new API();
-  const snapshot = api.updateSnapshot({ openProjects: ["tsconfig.json"] });
-  return snapshot.getProject("tsconfig.json")!;
-};
+let printer: Printer | undefined;
+const getPrinter = () => new API().printer;
 
 export const printNode = (node: ts.Node, opts?: PrintNodeOptions) =>
   customizations.get(node)?.(opts) ??
-  (emitter ??= getProject().emitter).printNode(node, opts);
+  (printer ??= getPrinter()).printNode(node, opts);
 
 const reindent = (text: string, offset: number): string =>
   text
