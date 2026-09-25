@@ -37,10 +37,17 @@ const moveTargets = new Map<string, string[]>([
   ["express-zod-api/documentation", ["DocumentationError"]],
 ]);
 
+const moveNames = new Set([...moveTargets.values()].flat());
+
 const renameTargets = new Map([
   ["defaultResultHandler", "legacyResultHandler"],
   ["defaultEndpointsFactory", "legacyEndpointsFactory"],
 ]);
+
+const importedName = (spec: ESTree.ImportSpecifier): string =>
+  spec.imported.type === "Identifier"
+    ? spec.imported.name
+    : spec.imported.value;
 
 const findVariable = (scope: Scope, name: string): Variable | undefined => {
   for (let current: Scope | null = scope; current; current = current.upper) {
@@ -75,10 +82,7 @@ const theRule: Rule = {
             nonNamed.push(spec);
             continue;
           }
-          const name =
-            spec.imported.type === "Identifier"
-              ? spec.imported.name
-              : spec.imported.value;
+          const name = importedName(spec);
           let found = false;
           for (const [target, names] of moveTargets) {
             if (names.includes(name)) {
@@ -93,10 +97,19 @@ const theRule: Rule = {
         if (groups.size === 0) return;
         const importKind = node.importKind === "type" ? "type " : "";
         const first = groups.entries().next().value!;
-        const firstName =
-          first[1][0]!.imported.type === "Identifier"
-            ? first[1][0]!.imported.name
-            : first[1][0]!.imported.value;
+        const firstName = importedName(first[1][0]!);
+        const getSpecText = (spec: ESTree.ImportSpecifier): string => {
+          const name = importedName(spec);
+          const replacement = renameTargets.get(name);
+          if (!replacement) return ctx.sourceCode.getText(spec);
+          const importedText =
+            spec.imported.type === "Identifier"
+              ? replacement
+              : JSON.stringify(replacement);
+          return spec.local.name === name
+            ? importedText
+            : `${importedText} as ${spec.local.name}`;
+        };
         ctx.report({
           node,
           messageId: "move",
@@ -106,7 +119,11 @@ const theRule: Rule = {
             const allMain = [...nonNamed, ...remaining];
             if (allMain.length > 0) {
               const text = allMain
-                .map((s) => ctx.sourceCode.getText(s))
+                .map((s) =>
+                  s.type === "ImportSpecifier"
+                    ? getSpecText(s)
+                    : ctx.sourceCode.getText(s),
+                )
                 .join(", ");
               parts.push(
                 `import ${importKind}{ ${text} } from "express-zod-api"`,
@@ -118,7 +135,10 @@ const theRule: Rule = {
                 .join(", ");
               parts.push(`import ${importKind}{ ${text} } from "${target}"`);
             }
-            return fixer.replaceText(node, parts.join("\n"));
+            const semicolon = /;\s*$/.test(ctx.sourceCode.getText(node))
+              ? ";"
+              : "";
+            return fixer.replaceText(node, parts.join("\n") + semicolon);
           },
         });
       },
@@ -134,7 +154,14 @@ const theRule: Rule = {
           definition.parent.source.value !== "express-zod-api"
         )
           return;
+        const declaration = definition.parent;
         const isSpecifier = definition.node === node.parent;
+        const declarationHasMove = declaration.specifiers.some(
+          (spec) =>
+            spec.type === "ImportSpecifier" &&
+            moveNames.has(importedName(spec)),
+        );
+        if (isSpecifier && declarationHasMove) return;
         const isReference = variable.references.some(
           (ref) => ref.identifier === node,
         );

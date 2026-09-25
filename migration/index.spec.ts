@@ -150,6 +150,28 @@ describe("Migration", async () => {
         ],
       },
       {
+        name: "change renamed entity and move in the same import",
+        code: `import { defaultEndpointsFactory, DocumentationError } from "express-zod-api"; const f = defaultEndpointsFactory;`,
+        output: `import { legacyEndpointsFactory } from "express-zod-api"\nimport { DocumentationError } from "express-zod-api/documentation"; const f = legacyEndpointsFactory;`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "DocumentationError",
+              to: "express-zod-api/documentation",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "entity",
+              from: "defaultEndpointsFactory",
+              to: "legacyEndpointsFactory",
+            },
+          },
+        ],
+      },
+      {
         name: "change defaultResultHandler in code usage",
         code: `import { defaultResultHandler } from "express-zod-api"; const f = new EndpointsFactory(defaultResultHandler)`,
         output: `import { legacyResultHandler } from "express-zod-api"; const f = new EndpointsFactory(legacyResultHandler)`,
