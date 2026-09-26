@@ -939,6 +939,8 @@ paths:
         - name: roles
           in: query
           required: false
+          style: form
+          explode: false
           description: Filter by roles; omit for all
           schema:
             description: Filter by roles; omit for all
@@ -1065,6 +1067,8 @@ paths:
         - name: roles
           in: query
           required: false
+          style: form
+          explode: false
           description: Filter by roles; omit for all
           schema:
             description: Filter by roles; omit for all
