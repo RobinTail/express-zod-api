@@ -34,6 +34,7 @@
   - When the input or response schema of an Endpoint has an `id`, the public interfaces refer to its type directly;
   - The `id` is not used when it's an invalid or reserved name, shared by different schemas, or when the schema has
     different types for request and response (defaults, transformations): such types are named `Type1`, `Type2`, etc.;
+  - All the types of the generated code are now exported;
   - Fixed: recursive schemas having different types for request and response are now declared for each direction.
 
 ```ts

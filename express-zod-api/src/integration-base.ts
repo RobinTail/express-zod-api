@@ -237,7 +237,7 @@ export abstract class IntegrationBase {
       propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
     const cursorVariant = `{ ${nextCursorProp}: string | null }`;
     const offsetVariant = `{ ${totalProp}: number; ${limitProp}: number; ${offsetProp}: number }`;
-    return `type ${ids.Pagination} = ${cursorVariant} | ${offsetVariant}`;
+    return `export type ${ids.Pagination} = ${cursorVariant} | ${offsetVariant}`;
   };
 
   /**

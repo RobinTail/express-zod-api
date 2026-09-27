@@ -143,9 +143,8 @@ export class Integration extends IntegrationBase {
     const directions = this.#directional.has(key) ? [io] : ioKinds;
     for (const one of directions) this.#aliases[one].set(key, name);
     const node = produce();
-    const exported = this.#named.has(key) ? "export " : "";
     this.#program.push(
-      (opts) => `${exported}type ${name} = ${printNode(node, opts)};`,
+      (opts) => `export type ${name} = ${printNode(node, opts)};`,
     );
     return ensureTypeNode(name);
   }
@@ -270,7 +269,7 @@ export class Integration extends IntegrationBase {
           const type = cookies.size
             ? this.makeOmit(printed, cookies, "security cookies")
             : printed;
-          return `/** ${request} */\ntype ${inputTypeName} = ${type};`;
+          return `/** ${request} */\nexport type ${inputTypeName} = ${type};`;
         });
       }
       const names: Record<ResponseVariant | "encoded", Set<string>> = {
@@ -294,7 +293,7 @@ export class Integration extends IntegrationBase {
           if (!namedVariant) {
             this.#program.push(
               (opts) =>
-                `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
+                `/** ${request} */\nexport type ${variantName} = ${printNode(variantTypeNode, opts)};`,
             );
           }
           names[responseVariant].add(variantName);
