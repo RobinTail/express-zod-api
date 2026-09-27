@@ -25,7 +25,14 @@ export const getExamples = (subject: z.core.$ZodType): unknown[] => {
 export const findIdentified = (
   subject: z.core.$ZodType,
 ): { id: string; schema: z.core.$ZodType } | undefined => {
-  const { id } = globalRegistry.get(subject) || {};
-  if (id) return { id, schema: subject };
-  return subject._zod.parent && findIdentified(subject._zod.parent);
+  for (
+    let schema: z.core.$ZodType | undefined = subject;
+    schema;
+    schema = schema._zod.parent
+  ) {
+    if (!globalRegistry.has(schema)) continue; // get() walks the parents on its own
+    const { id } = globalRegistry.get(schema) || {};
+    if (id) return { id, schema };
+  }
+  return undefined;
 };

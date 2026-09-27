@@ -51,15 +51,17 @@ describe("Metadata helpers", () => {
   describe("findIdentified()", () => {
     const origin = z.object({ name: z.string() }).meta({ id: "Origin" });
 
-    test.each([origin, origin.describe("clone"), z.compile(origin)])(
-      "should find the schema or its origin having the id %#",
-      (subject) => {
-        expect(findIdentified(subject)).toEqual({
-          id: "Origin",
-          schema: origin,
-        });
-      },
-    );
+    test.each([
+      origin,
+      origin.describe("clone"),
+      z.compile(origin),
+      z.compile(origin.describe("clone")), // two levels: compiled, described, origin
+    ])("should find the schema or its origin having the id %#", (subject) => {
+      expect(findIdentified(subject)).toEqual({
+        id: "Origin",
+        schema: origin,
+      });
+    });
 
     test.each([origin.optional(), origin.extend({}), z.object({})])(
       "should not find it for the derived or other schemas %#",
