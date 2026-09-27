@@ -38,6 +38,11 @@ export const literally = <T extends string | null | boolean | number | bigint>(s
 
 export const makeId = (name: string) => f.createIdentifier(name);
 
+/** @desc Checks the name to be a valid identifier that is not a keyword (such as "string" or "type") */
+export const isTypeName = (name: string) =>
+  safePropRegex.test(name) &&
+  ts.identifierToKeywordKind(makeId(name)) === undefined;
+
 export const makePropertyIdentifier = (name: string | number) =>
   typeof name === "string" && safePropRegex.test(name)
     ? makeId(name)

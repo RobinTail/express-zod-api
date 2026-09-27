@@ -3,13 +3,14 @@
  * @requires typescript
  * */
 export type { Producer } from "./zts-helpers";
+import * as R from "ramda";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
 import { IntegrationBase, interfaces } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
-import { ensureTypeNode, printNode, ts } from "./typescript-api";
+import { ensureTypeNode, isTypeName, printNode, ts } from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
@@ -18,6 +19,7 @@ import type * as OxFmt from "oxfmt";
 import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 import { getSecurityNames } from "./security";
+import { findIdentified } from "./metadata";
 
 interface IntegrationParams {
   routing: Routing;
@@ -76,21 +78,148 @@ interface FormattedPrintingOptions {
   format?: (program: string) => Promise<string>;
 }
 
+type IO = "input" | "output";
+const ioKinds: IO[] = ["input", "output"];
+const getIO = (isResponse: boolean): IO => (isResponse ? "output" : "input");
+
+interface AliasProbe {
+  proposedName?: string;
+  /** @desc Stands for the alias within the bodies */
+  token: string;
+  /** @desc Printed types of the alias for each direction it's used in */
+  bodies: Partial<Record<IO, string>>;
+  /** @desc The aliases referred from the bodies */
+  nested: Set<object>;
+}
+
+/** @desc The aliases having different types for request and response, including the ones referring to them */
+const findDirectional = (probes: Map<object, AliasProbe>) => {
+  const isBidirectional = (key: object) => {
+    const { input, output } = probes.get(key)!.bodies; // ensured by probing
+    return input !== undefined && output !== undefined;
+  };
+  const parents = new Map<object, object[]>();
+  const directional = new Set<object>();
+  for (const [key, { nested, bodies }] of probes) {
+    for (const child of nested)
+      parents.set(child, (parents.get(child) || []).concat(key));
+    if (isBidirectional(key) && bodies.input !== bodies.output)
+      directional.add(key);
+  }
+  for (const key of directional) {
+    for (const parent of parents.get(key) || [])
+      if (isBidirectional(parent)) directional.add(parent);
+  }
+  return directional;
+};
+
 export class Integration extends IntegrationBase {
   readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
     [];
-  readonly #aliases = new Map<object, string>();
+  /** @desc The names of declared aliases by their keys for each direction */
+  readonly #aliases: Record<IO, Map<object, string>> = {
+    input: new Map(),
+    output: new Map(),
+  };
+  /** @desc The names assigned to the keys of aliases after their ids */
+  readonly #named = new Map<object, string>();
+  #directional = new Set<object>();
+  readonly #taken = new Set<string>();
+  #lastIndex = 0;
   #usage?: string;
 
-  #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
-    let name = this.#aliases.get(key);
-    if (!name) {
-      name = `Type${this.#aliases.size + 1}`;
-      this.#aliases.set(key, name);
-      const node = produce();
-      this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
-    }
+  #makeName() {
+    let name: string;
+    do name = `Type${++this.#lastIndex}`;
+    while (this.#taken.has(name));
+    this.#taken.add(name);
+    return name;
+  }
+
+  #makeAlias(key: object, produce: () => ts.TypeNode, io: IO): ts.TypeNode {
+    const declared = this.#aliases[io].get(key);
+    if (declared) return ensureTypeNode(declared);
+    const name = this.#named.get(key) || this.#makeName();
+    const directions = this.#directional.has(key) ? [io] : ioKinds;
+    for (const one of directions) this.#aliases[one].set(key, name);
+    const node = produce();
+    const exported = this.#named.has(key) ? "export " : "";
+    this.#program.push(
+      (opts) => `${exported}type ${name} = ${printNode(node, opts)};`,
+    );
     return ensureTypeNode(name);
+  }
+
+  /** @desc Returns the name assigned to the schema after its id */
+  #getNamed(schema: z.core.$ZodType) {
+    const identified = findIdentified(schema);
+    return identified && this.#named.get(identified.schema);
+  }
+
+  /** @desc The first pass: learns the aliases and their types for each direction, reserves the Endpoint type names */
+  #probe(
+    walk: (onEndpoint: OnEndpoint<ClientMethod>) => void,
+    brandHandling: IntegrationParams["brandHandling"],
+    noBodySchema: z.ZodType,
+  ) {
+    const probes = new Map<object, AliasProbe>();
+    const stack: AliasProbe[] = [];
+    const makeCtx = (isResponse: boolean): ZTSContext => ({
+      isResponse,
+      makeAlias: (key, produce, proposedName) => {
+        const io = getIO(isResponse);
+        let probe = probes.get(key);
+        if (!probe) {
+          const token = `T${probes.size}`;
+          probe = { proposedName, token, bodies: {}, nested: new Set() };
+          probes.set(key, probe);
+        }
+        stack.at(-1)?.nested.add(key);
+        if (probe.bodies[io] === undefined) {
+          probe.bodies[io] = ""; // pending: cyclic references get the token
+          stack.push(probe);
+          probe.bodies[io] = printNode(produce());
+          stack.pop();
+        }
+        return ensureTypeNode(probe.token);
+      },
+    });
+    const ctxIn = { brandHandling, ctx: makeCtx(false) };
+    const ctxOut = { brandHandling, ctx: makeCtx(true) };
+    walk((method, path, endpoint) => {
+      const entitle = makeCleanId.bind(null, method, path);
+      this.#taken.add(entitle("input"));
+      zodToTs(endpoint.inputSchema, ctxIn);
+      for (const variant of responseVariants) {
+        const responses = endpoint.getResponses(variant);
+        for (const [idx, { schema, mimeTypes }] of responses.entries()) {
+          this.#taken.add(entitle(variant, "variant", `${idx + 1}`));
+          const hasBody = shouldHaveContent(method, mimeTypes);
+          zodToTs(hasBody ? schema : noBodySchema, ctxOut);
+        }
+      }
+    });
+    return probes;
+  }
+
+  /**
+   * @desc Names the aliases after their ids when possible, the rest are named Type1, Type2, etc. when declared.
+   * @desc The alias having different types for request and response is declared separately for each direction.
+   * */
+  #assignNames(probes: Map<object, AliasProbe>) {
+    this.#directional = findDirectional(probes);
+    const proposals = R.countBy(
+      (name: string) => name,
+      Array.from(probes.values())
+        .map(R.prop("proposedName"))
+        .filter(R.isNotNil),
+    );
+    for (const [key, { proposedName: name }] of probes) {
+      if (!name || proposals[name] !== 1 || this.#taken.has(name)) continue; // duplicate or reserved
+      if (!isTypeName(name) || this.#directional.has(key)) continue;
+      this.#named.set(key, name);
+      this.#taken.add(name);
+    }
   }
 
   public constructor({
@@ -106,25 +235,44 @@ export class Integration extends IntegrationBase {
     hasCredentials = false,
   }: IntegrationParams) {
     super(serverUrl);
-    const commons = { makeAlias: this.#makeAlias.bind(this) };
-    const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
-    const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
+    const reserved = [clientClassName, subscriptionClassName];
+    for (const name of this.makeReservedNames(...reserved))
+      this.#taken.add(name);
+    const walk = (onEndpoint: OnEndpoint<ClientMethod>) =>
+      walkRouting({
+        routing,
+        config,
+        onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
+      });
+    this.#assignNames(this.#probe(walk, brandHandling, noBodySchema));
+    const makeCtx = (isResponse: boolean): ZTSContext => ({
+      isResponse,
+      makeAlias: (key, produce) =>
+        this.#makeAlias(key, produce, getIO(isResponse)),
+    });
+    const ctxIn = { brandHandling, ctx: makeCtx(false) };
+    const ctxOut = { brandHandling, ctx: makeCtx(true) };
     let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path);
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const inputTypeName = entitle("input");
       const cookies = getSecurityNames(endpoint.security, "cookie");
       if (cookies.size) hasCookies = true;
       const inputTypeNode = zodToTs(inputSchema, ctxIn);
-      this.#program.push((opts) => {
-        const printed = printNode(inputTypeNode, opts);
-        return [
-          `/** ${request} */`,
-          `type ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies, "security cookies") : printed};`,
-        ].join("\n");
-      });
+      const namedInput = cookies.size
+        ? undefined // requires Omit
+        : this.#getNamed(inputSchema);
+      const inputTypeName = namedInput ?? entitle("input");
+      if (!namedInput) {
+        this.#program.push((opts) => {
+          const printed = printNode(inputTypeNode, opts);
+          const type = cookies.size
+            ? this.makeOmit(printed, cookies, "security cookies")
+            : printed;
+          return `/** ${request} */\ntype ${inputTypeName} = ${type};`;
+        });
+      }
       const names: Record<ResponseVariant | "encoded", Set<string>> = {
         positive: new Set(),
         negative: new Set(),
@@ -136,16 +284,19 @@ export class Integration extends IntegrationBase {
           idx,
           { schema, mimeTypes, statusCodes },
         ] of responses.entries()) {
-          const hasBody = shouldHaveContent(method, mimeTypes);
-          const variantName = entitle(responseVariant, "variant", `${idx + 1}`);
-          const variantTypeNode = zodToTs(
-            hasBody ? schema : noBodySchema,
-            ctxOut,
-          );
-          this.#program.push(
-            (opts) =>
-              `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
-          );
+          const subject = shouldHaveContent(method, mimeTypes)
+            ? schema
+            : noBodySchema;
+          const variantTypeNode = zodToTs(subject, ctxOut);
+          const namedVariant = this.#getNamed(subject);
+          const variantName =
+            namedVariant ?? entitle(responseVariant, "variant", `${idx + 1}`);
+          if (!namedVariant) {
+            this.#program.push(
+              (opts) =>
+                `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
+            );
+          }
           names[responseVariant].add(variantName);
           names.encoded.add(
             this.makeDiscriminator(statusCodes, responseVariant, variantName),
@@ -163,11 +314,7 @@ export class Integration extends IntegrationBase {
       this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, tags);
     };
-    walkRouting({
-      routing,
-      config,
-      onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
-    });
+    walk(onEndpoint);
     this.#program.push(
       this.makePathType(),
       this.makeMethodType(),

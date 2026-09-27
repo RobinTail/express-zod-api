@@ -1205,6 +1205,9 @@ Alternatively, you can supply your own `format` function into that method or use
 The generated client is flexibly configurable on the frontend side for using a custom implementation function that
 makes requests using the libraries and methods of your choice. The default implementation uses `fetch`. The client
 asserts the type of request parameters and response. Consuming the generated client requires TypeScript version 4.1+.
+The schemas having an `id` in metadata, such as `.meta({ id: "Booking" })`, become the exported types named after it,
+shared by all the endpoints: `import type { Booking } from "./client.ts"`. The schema having different types for
+request and response (because of defaults or transformations) requires distinct ids for each direction for that.
 
 ```ts
 import { Client, Implementation, Subscription } from "./client.ts"; // the generated file

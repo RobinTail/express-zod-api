@@ -1,5 +1,11 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`zod-to-ts > Aliases > should delegate producing the type of the alias 1`] = `
+"{
+    name: string;
+}"
+`;
+
 exports[`zod-to-ts > Example > should produce the expected results 1`] = `
 "{
     string: string;
