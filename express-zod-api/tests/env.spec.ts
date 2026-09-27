@@ -172,10 +172,12 @@ describe("Environment checks", () => {
         expect(schema.meta()).toMatchSnapshot();
       });
 
-      test("is inheritable since zod 4.3.0", () => {
-        const parent = z.string().meta({ one: "test" });
+      /** @since zod 4.3.0 */
+      test("is inheritable except the id", () => {
+        const parent = z.string().meta({ id: "PARENT", one: "test" });
         const subject = parent.min(1).meta({ two: "another" });
         expect(subject.meta()).toHaveProperty("one", "test");
+        expect(subject.meta()).not.toHaveProperty("id");
       });
 
       test("id does NOT go into depiction", () => {
