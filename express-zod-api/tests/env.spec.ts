@@ -203,6 +203,13 @@ describe("Environment checks", () => {
       });
     });
 
+    test("parent prop exists on cloned and compiled schemas", () => {
+      const subject = z.string();
+      const cloned = subject.clone();
+      const compiled = z.compile(cloned);
+      expect(compiled._zod.parent?._zod.parent).toBe(subject);
+    });
+
     test("object shape conveys the keys optionality", () => {
       const schema = z.object({
         one: z.boolean(),
