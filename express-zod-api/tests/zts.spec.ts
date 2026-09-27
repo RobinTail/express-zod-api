@@ -437,4 +437,42 @@ describe("zod-to-ts", () => {
       });
     });
   });
+
+  describe("Aliases", () => {
+    const named = z.object({ name: z.string() }).meta({ id: "Named" });
+
+    test.each([named, named.describe("clone"), z.compile(named)])(
+      "should alias the origin having id and propose it as the name %#",
+      (schema) => {
+        expect(printNode(zodToTs(schema, { ctx }))).toBe("SomeType");
+        expect(ctx.makeAlias).toHaveBeenLastCalledWith(
+          named,
+          expect.any(Function),
+          "Named",
+        );
+      },
+    );
+
+    test("should delegate producing the type of the alias", () => {
+      zodToTs(z.array(named), { ctx });
+      const [, produce] = vi.mocked(ctx.makeAlias).mock.lastCall!;
+      expect(printNode(produce())).toMatchSnapshot();
+    });
+
+    test.each([false, true])(
+      "should alias the objects having cycles without proposing a name %s",
+      (isResponse) => {
+        const schema = z.object({
+          get items() {
+            return z.array(schema);
+          },
+        });
+        zodToTs(schema, { ctx: { ...ctx, isResponse } });
+        expect(ctx.makeAlias).toHaveBeenLastCalledWith(
+          schema,
+          expect.any(Function),
+        );
+      },
+    );
+  });
 });

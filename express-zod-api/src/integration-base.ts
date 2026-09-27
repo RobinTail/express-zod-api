@@ -83,6 +83,19 @@ export abstract class IntegrationBase {
   protected constructor(protected readonly serverUrl: string) {}
 
   /**
+   * @desc The type names declared by the generated code or referred by it globally, unavailable for the schemas
+   * @internal
+   * */
+  protected makeReservedNames = (...classNames: string[]) =>
+    Object.values(interfaces).concat(
+      [ids.Path, ids.Implementation, ids.DefaultContext, ids.Method],
+      [ids.Request, ids.Pagination, ids.File, ids.FormData, Blob.name],
+      [MessageEvent.name, "RequestInit", "EventSource", "Promise"],
+      ["URL", "URLSearchParams", "Record", "Extract", "Omit"],
+      classNames,
+    );
+
+  /**
    * @example export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
    * @internal
    * */
@@ -224,7 +237,7 @@ export abstract class IntegrationBase {
       propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
     const cursorVariant = `{ ${nextCursorProp}: string | null }`;
     const offsetVariant = `{ ${totalProp}: number; ${limitProp}: number; ${offsetProp}: number }`;
-    return `type ${ids.Pagination} = ${cursorVariant} | ${offsetVariant}`;
+    return `export type ${ids.Pagination} = ${cursorVariant} | ${offsetVariant}`;
   };
 
   /**

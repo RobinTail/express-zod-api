@@ -20,3 +20,19 @@ export const getExamples = (subject: z.core.$ZodType): unknown[] => {
   if (Array.isArray(examples)) return examples;
   return [];
 };
+
+/** @desc Finds the schema having the id metadata: the given one or its origin (clones and compiled ones omit it) */
+export const findIdentified = (
+  subject: z.core.$ZodType,
+): { id: string; schema: z.core.$ZodType } | undefined => {
+  for (
+    let schema: z.core.$ZodType | undefined = subject;
+    schema;
+    schema = schema._zod.parent
+  ) {
+    if (!globalRegistry.has(schema)) continue; // get() walks the parents on its own
+    const { id } = globalRegistry.get(schema) || {};
+    if (id) return { id, schema };
+  }
+  return undefined;
+};

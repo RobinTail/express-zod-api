@@ -2,18 +2,18 @@
 
 exports[`Integration > Feature #1470: Custom brands > should by handled accordingly 1`] = `
 "/** post /v1/custom */
-type PostV1CustomInput = {
+export type PostV1CustomInput = {
   string: boolean;
   regular: string;
 };
 
 /** post /v1/custom */
-type PostV1CustomPositiveVariant1 = {
+export type PostV1CustomPositiveVariant1 = {
   number: boolean;
 };
 
 /** post /v1/custom */
-type PostV1CustomNegativeVariant1 = {
+export type PostV1CustomNegativeVariant1 = {
   message: string;
 };
 
@@ -47,9 +47,285 @@ export type Request = keyof Input;
 "
 `;
 
+exports[`Integration > Named types > should declare the recursive type for each direction when it differs 1`] = `
+"export type Type1 = {
+  label?: string | undefined;
+  children?: Type1[] | undefined;
+};
+
+/** post /v1/tree */
+export type PostV1TreeInput = {
+  node: Type1;
+};
+
+export type Type2 = {
+  label: string;
+  children?: Type2[] | undefined;
+};
+
+/** post /v1/tree */
+export type PostV1TreePositiveVariant1 = {
+  node: Type2;
+};
+
+/** post /v1/tree */
+export type PostV1TreeNegativeVariant1 = {
+  message: string;
+};
+
+export type Path = "/v1/tree";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
+
+export interface Input {
+  "post /v1/tree": PostV1TreeInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/tree": PostV1TreePositiveVariant1;
+}
+
+export interface NegativeResponse {
+  "post /v1/tree": PostV1TreeNegativeVariant1;
+}
+
+export interface EncodedResponse {
+  "post /v1/tree":
+    | { status: 200; discriminator: "success"; data: PostV1TreePositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: PostV1TreeNegativeVariant1 };
+}
+
+export interface Response {
+  "post /v1/tree": EncodedResponse["post /v1/tree"]["data"];
+}
+
+export type Request = keyof Input;
+"
+`;
+
+exports[`Integration > Named types > should declare the schemas having id once and refer them 1`] = `
+"/** get /v1/list */
+export type GetV1ListInput = {};
+
+export type Customer = {
+  name: string;
+};
+
+export type Booking = {
+  id: string;
+  customer: Customer;
+  notes?: string | undefined;
+};
+
+/** get /v1/list */
+export type GetV1ListPositiveVariant1 = {
+  items: Booking[];
+};
+
+/** get /v1/list */
+export type GetV1ListNegativeVariant1 = {
+  message: string;
+};
+
+export type SaveBookingRequest = {
+  customer: Customer;
+};
+
+/** post /v1/save */
+export type PostV1SaveNegativeVariant1 = {
+  message: string;
+};
+
+export type Path = "/v1/list" | "/v1/save";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
+
+export interface Input {
+  "get /v1/list": GetV1ListInput;
+  "post /v1/save": SaveBookingRequest;
+}
+
+export interface PositiveResponse {
+  "get /v1/list": GetV1ListPositiveVariant1;
+  "post /v1/save": Booking;
+}
+
+export interface NegativeResponse {
+  "get /v1/list": GetV1ListNegativeVariant1;
+  "post /v1/save": PostV1SaveNegativeVariant1;
+}
+
+export interface EncodedResponse {
+  "get /v1/list":
+    | { status: 200; discriminator: "success"; data: GetV1ListPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: GetV1ListNegativeVariant1 };
+  "post /v1/save":
+    | { status: 200; discriminator: "success"; data: Booking }
+    | { status: 400; discriminator: "error"; data: PostV1SaveNegativeVariant1 };
+}
+
+export interface Response {
+  "get /v1/list": EncodedResponse["get /v1/list"]["data"];
+  "post /v1/save": EncodedResponse["post /v1/save"]["data"];
+}
+
+export type Request = keyof Input;
+"
+`;
+
+exports[`Integration > Named types > should name the type unless it differs for request and response: both 1`] = `
+"export type Type1 = {
+  status?: string | undefined;
+};
+
+/** post /v1/draft */
+export type PostV1DraftInput = {
+  draft: Type1;
+};
+
+export type Type2 = {
+  status: string;
+};
+
+/** post /v1/draft */
+export type PostV1DraftPositiveVariant1 = {
+  draft: Type2;
+};
+
+/** post /v1/draft */
+export type PostV1DraftNegativeVariant1 = {
+  message: string;
+};
+
+export type Path = "/v1/draft";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
+
+export interface Input {
+  "post /v1/draft": PostV1DraftInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/draft": PostV1DraftPositiveVariant1;
+}
+
+export interface NegativeResponse {
+  "post /v1/draft": PostV1DraftNegativeVariant1;
+}
+
+export interface EncodedResponse {
+  "post /v1/draft":
+    | { status: 200; discriminator: "success"; data: PostV1DraftPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: PostV1DraftNegativeVariant1 };
+}
+
+export interface Response {
+  "post /v1/draft": EncodedResponse["post /v1/draft"]["data"];
+}
+
+export type Request = keyof Input;
+"
+`;
+
+exports[`Integration > Named types > should name the type unless it differs for request and response: input 1`] = `
+"export type Draft = {
+  status?: string | undefined;
+};
+
+/** post /v1/draft */
+export type PostV1DraftInput = {
+  draft: Draft;
+};
+
+/** post /v1/draft */
+export type PostV1DraftPositiveVariant1 = {};
+
+/** post /v1/draft */
+export type PostV1DraftNegativeVariant1 = {
+  message: string;
+};
+
+export type Path = "/v1/draft";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
+
+export interface Input {
+  "post /v1/draft": PostV1DraftInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/draft": PostV1DraftPositiveVariant1;
+}
+
+export interface NegativeResponse {
+  "post /v1/draft": PostV1DraftNegativeVariant1;
+}
+
+export interface EncodedResponse {
+  "post /v1/draft":
+    | { status: 200; discriminator: "success"; data: PostV1DraftPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: PostV1DraftNegativeVariant1 };
+}
+
+export interface Response {
+  "post /v1/draft": EncodedResponse["post /v1/draft"]["data"];
+}
+
+export type Request = keyof Input;
+"
+`;
+
+exports[`Integration > Named types > should name the type unless it differs for request and response: output 1`] = `
+"/** post /v1/draft */
+export type PostV1DraftInput = {};
+
+export type Draft = {
+  status: string;
+};
+
+/** post /v1/draft */
+export type PostV1DraftPositiveVariant1 = {
+  draft: Draft;
+};
+
+/** post /v1/draft */
+export type PostV1DraftNegativeVariant1 = {
+  message: string;
+};
+
+export type Path = "/v1/draft";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
+
+export interface Input {
+  "post /v1/draft": PostV1DraftInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/draft": PostV1DraftPositiveVariant1;
+}
+
+export interface NegativeResponse {
+  "post /v1/draft": PostV1DraftNegativeVariant1;
+}
+
+export interface EncodedResponse {
+  "post /v1/draft":
+    | { status: 200; discriminator: "success"; data: PostV1DraftPositiveVariant1 }
+    | { status: 400; discriminator: "error"; data: PostV1DraftNegativeVariant1 };
+}
+
+export interface Response {
+  "post /v1/draft": EncodedResponse["post /v1/draft"]["data"];
+}
+
+export type Request = keyof Input;
+"
+`;
+
 exports[`Integration > Should support HEAD method by default 0 1`] = `
 "/** get /v1/path */
-type GetV1PathInput = Omit<
+export type GetV1PathInput = Omit<
   {
     session: {};
     some: string;
@@ -59,15 +335,15 @@ type GetV1PathInput = Omit<
 >;
 
 /** get /v1/path */
-type GetV1PathPositiveVariant1 = {};
+export type GetV1PathPositiveVariant1 = {};
 
 /** get /v1/path */
-type GetV1PathNegativeVariant1 = {
+export type GetV1PathNegativeVariant1 = {
   message: string;
 };
 
 /** head /v1/path */
-type HeadV1PathInput = Omit<
+export type HeadV1PathInput = Omit<
   {
     session: {};
     some: string;
@@ -77,10 +353,10 @@ type HeadV1PathInput = Omit<
 >;
 
 /** head /v1/path */
-type HeadV1PathPositiveVariant1 = undefined;
+export type HeadV1PathPositiveVariant1 = undefined;
 
 /** head /v1/path */
-type HeadV1PathNegativeVariant1 = undefined;
+export type HeadV1PathNegativeVariant1 = undefined;
 
 export type Path = "/v1/path";
 
@@ -121,7 +397,7 @@ export type Request = keyof Input;
 
 exports[`Integration > Should support HEAD method by default 1 1`] = `
 "/** get /v1/path */
-type GetV1PathInput = Omit<
+export type GetV1PathInput = Omit<
   {
     session: {};
     some: string;
@@ -131,10 +407,10 @@ type GetV1PathInput = Omit<
 >;
 
 /** get /v1/path */
-type GetV1PathPositiveVariant1 = {};
+export type GetV1PathPositiveVariant1 = {};
 
 /** get /v1/path */
-type GetV1PathNegativeVariant1 = {
+export type GetV1PathNegativeVariant1 = {
   message: string;
 };
 
@@ -170,12 +446,12 @@ export type Request = keyof Input;
 
 exports[`Integration > Should support multiple response schemas depending on status code 1`] = `
 "/** post /v1/mtpl */
-type PostV1MtplInput = {
+export type PostV1MtplInput = {
   test: number;
 };
 
 /** post /v1/mtpl */
-type PostV1MtplPositiveVariant1 = {
+export type PostV1MtplPositiveVariant1 = {
   status: "ok";
   data: {
     payload: string;
@@ -183,7 +459,7 @@ type PostV1MtplPositiveVariant1 = {
 };
 
 /** post /v1/mtpl */
-type PostV1MtplPositiveVariant2 = {
+export type PostV1MtplPositiveVariant2 = {
   status: "kinda";
   data: {
     payload: string;
@@ -191,10 +467,10 @@ type PostV1MtplPositiveVariant2 = {
 };
 
 /** post /v1/mtpl */
-type PostV1MtplNegativeVariant1 = "error";
+export type PostV1MtplNegativeVariant1 = "error";
 
 /** post /v1/mtpl */
-type PostV1MtplNegativeVariant2 = "failure";
+export type PostV1MtplNegativeVariant2 = "failure";
 
 export type Path = "/v1/mtpl";
 
@@ -229,21 +505,21 @@ export type Request = keyof Input;
 `;
 
 exports[`Integration > Should support types variant and handle recursive schemas 0 1`] = `
-"type Type1 = {
+"export type Type1 = {
     name: string;
     features: Type1;
 };
 
 /** query /v1/test */
-type QueryV1TestInput = {
+export type QueryV1TestInput = {
     features: Type1;
 };
 
 /** query /v1/test */
-type QueryV1TestPositiveVariant1 = {};
+export type QueryV1TestPositiveVariant1 = {};
 
 /** query /v1/test */
-type QueryV1TestNegativeVariant1 = {
+export type QueryV1TestNegativeVariant1 = {
     message: string;
 };
 
@@ -280,21 +556,21 @@ export type Request = keyof Input;"
 `;
 
 exports[`Integration > Should support types variant and handle recursive schemas 1 1`] = `
-"type Type1 = {
+"export type Type1 = {
     name: string;
     features: Type1;
 };
 
 /** query /v1/test */
-type QueryV1TestInput = {
+export type QueryV1TestInput = {
     features: Type1;
 };
 
 /** query /v1/test */
-type QueryV1TestPositiveVariant1 = {};
+export type QueryV1TestPositiveVariant1 = {};
 
 /** query /v1/test */
-type QueryV1TestNegativeVariant1 = {
+export type QueryV1TestNegativeVariant1 = {
     message: string;
 };
 
@@ -332,17 +608,17 @@ export type Request = keyof Input;"
 
 exports[`Integration > Should treat optionals the same way as z.infer() by default 1`] = `
 "/** post /v1/test-with-dashes */
-type PostV1TestWithDashesInput = {
+export type PostV1TestWithDashesInput = {
   opt?: string | undefined;
 };
 
 /** post /v1/test-with-dashes */
-type PostV1TestWithDashesPositiveVariant1 = {
+export type PostV1TestWithDashesPositiveVariant1 = {
   similar?: number | undefined;
 };
 
 /** post /v1/test-with-dashes */
-type PostV1TestWithDashesNegativeVariant1 = {
+export type PostV1TestWithDashesNegativeVariant1 = {
   message: string;
 };
 
@@ -399,7 +675,9 @@ export type Implementation<T extends Record<string, unknown>> = (
   ctx?: T,
 ) => Promise<{ status: number; data: any }>;
 
-type Pagination = { nextCursor: string | null } | { total: number; limit: number; offset: number };
+export type Pagination =
+  | { nextCursor: string | null }
+  | { total: number; limit: number; offset: number };
 
 export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
 

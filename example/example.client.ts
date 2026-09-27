@@ -1,52 +1,52 @@
 /** get /v1/user/retrieve */
-type GetV1UserRetrieveInput = {
+export type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
 
-type Type1 = {
+export type Feature = {
   title: string;
-  features?: Type1[] | undefined;
+  features?: Feature[] | undefined;
 };
 
 /** get /v1/user/retrieve */
-type GetV1UserRetrievePositiveVariant1 = {
+export type GetV1UserRetrievePositiveVariant1 = {
   id: number;
   name: string;
-  features: Type1[];
+  features: Feature[];
 };
 
 /** get /v1/user/retrieve */
-type GetV1UserRetrieveNegativeVariant1 = {
+export type GetV1UserRetrieveNegativeVariant1 = {
   message: string;
 };
 
 /** head /v1/user/retrieve */
-type HeadV1UserRetrieveInput = {
+export type HeadV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
 
 /** head /v1/user/retrieve */
-type HeadV1UserRetrievePositiveVariant1 = undefined;
+export type HeadV1UserRetrievePositiveVariant1 = undefined;
 
 /** head /v1/user/retrieve */
-type HeadV1UserRetrieveNegativeVariant1 = undefined;
+export type HeadV1UserRetrieveNegativeVariant1 = undefined;
 
 /** delete /v1/user/:id/remove */
-type DeleteV1UserIdRemoveInput = {
+export type DeleteV1UserIdRemoveInput = {
   /** numeric string */
   id: string;
 };
 
 /** delete /v1/user/:id/remove */
-type DeleteV1UserIdRemovePositiveVariant1 = undefined;
+export type DeleteV1UserIdRemovePositiveVariant1 = undefined;
 
 /** delete /v1/user/:id/remove */
-type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
+export type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
 
 /** patch /v1/user/:id */
-type PatchV1UserIdInput = {
+export type PatchV1UserIdInput = {
   key: string;
   token: string;
   id: string;
@@ -56,115 +56,115 @@ type PatchV1UserIdInput = {
 };
 
 /** patch /v1/user/:id */
-type PatchV1UserIdPositiveVariant1 = {
+export type PatchV1UserIdPositiveVariant1 = {
   name: string;
   /** account creation date */
   createdAt: string;
 };
 
 /** patch /v1/user/:id */
-type PatchV1UserIdNegativeVariant1 = {
+export type PatchV1UserIdNegativeVariant1 = {
   message: string;
 };
 
 /** post /v1/user/create */
-type PostV1UserCreateInput = {
+export type PostV1UserCreateInput = {
   /** first name and last name */
   name: `${string} ${string}`;
 };
 
 /** post /v1/user/create */
-type PostV1UserCreatePositiveVariant1 = {
+export type PostV1UserCreatePositiveVariant1 = {
   id: number;
 };
 
 /** post /v1/user/create */
-type PostV1UserCreateNegativeVariant1 = {
+export type PostV1UserCreateNegativeVariant1 = {
   /** id of the existing entity */
   id: number;
 };
 
 /** post /v1/user/create */
-type PostV1UserCreateNegativeVariant2 = {
+export type PostV1UserCreateNegativeVariant2 = {
   reason: string;
 };
 
 /** query /v1/user/list */
-type QueryV1UserListInput = {
+export type QueryV1UserListInput = {
   roles?: ("manager" | "operator" | "admin")[] | undefined;
 };
 
 /** query /v1/user/list */
-type QueryV1UserListPositiveVariant1 = {
+export type QueryV1UserListPositiveVariant1 = {
   name: string;
   role: "manager" | "operator" | "admin";
 }[];
 
 /** query /v1/user/list */
-type QueryV1UserListNegativeVariant1 = string;
+export type QueryV1UserListNegativeVariant1 = string;
 
 /** post /v1/login */
-type PostV1LoginInput = {
+export type PostV1LoginInput = {
   username: string;
   password: string;
 };
 
 /** post /v1/login */
-type PostV1LoginPositiveVariant1 = {
+export type PostV1LoginPositiveVariant1 = {
   message: string;
 };
 
 /** post /v1/login */
-type PostV1LoginNegativeVariant1 = {
+export type PostV1LoginNegativeVariant1 = {
   message: string;
 };
 
 /** get /v1/avatar/send */
-type GetV1AvatarSendInput = {
+export type GetV1AvatarSendInput = {
   userId: string;
 };
 
 /** get /v1/avatar/send */
-type GetV1AvatarSendPositiveVariant1 = string;
+export type GetV1AvatarSendPositiveVariant1 = string;
 
 /** get /v1/avatar/send */
-type GetV1AvatarSendNegativeVariant1 = string;
+export type GetV1AvatarSendNegativeVariant1 = string;
 
 /** head /v1/avatar/send */
-type HeadV1AvatarSendInput = {
+export type HeadV1AvatarSendInput = {
   userId: string;
 };
 
 /** head /v1/avatar/send */
-type HeadV1AvatarSendPositiveVariant1 = undefined;
+export type HeadV1AvatarSendPositiveVariant1 = undefined;
 
 /** head /v1/avatar/send */
-type HeadV1AvatarSendNegativeVariant1 = undefined;
+export type HeadV1AvatarSendNegativeVariant1 = undefined;
 
 /** get /v1/avatar/stream */
-type GetV1AvatarStreamInput = {
+export type GetV1AvatarStreamInput = {
   userId: string;
 };
 
 /** get /v1/avatar/stream */
-type GetV1AvatarStreamPositiveVariant1 = Blob;
+export type GetV1AvatarStreamPositiveVariant1 = Blob;
 
 /** get /v1/avatar/stream */
-type GetV1AvatarStreamNegativeVariant1 = string;
+export type GetV1AvatarStreamNegativeVariant1 = string;
 
 /** head /v1/avatar/stream */
-type HeadV1AvatarStreamInput = {
+export type HeadV1AvatarStreamInput = {
   userId: string;
 };
 
 /** head /v1/avatar/stream */
-type HeadV1AvatarStreamPositiveVariant1 = undefined;
+export type HeadV1AvatarStreamPositiveVariant1 = undefined;
 
 /** head /v1/avatar/stream */
-type HeadV1AvatarStreamNegativeVariant1 = undefined;
+export type HeadV1AvatarStreamNegativeVariant1 = undefined;
 
 /** post /v1/avatar/upload */
-type PostV1AvatarUploadInput = Omit<
+export type PostV1AvatarUploadInput = Omit<
   {
     session: {
       token: string;
@@ -176,7 +176,7 @@ type PostV1AvatarUploadInput = Omit<
 >;
 
 /** post /v1/avatar/upload */
-type PostV1AvatarUploadPositiveVariant1 = {
+export type PostV1AvatarUploadPositiveVariant1 = {
   name: string;
   size: number;
   mime: string;
@@ -185,31 +185,31 @@ type PostV1AvatarUploadPositiveVariant1 = {
 };
 
 /** post /v1/avatar/upload */
-type PostV1AvatarUploadNegativeVariant1 = {
+export type PostV1AvatarUploadNegativeVariant1 = {
   message: string;
 };
 
 /** post /v1/avatar/raw */
-type PostV1AvatarRawInput = Blob;
+export type PostV1AvatarRawInput = Blob;
 
 /** post /v1/avatar/raw */
-type PostV1AvatarRawPositiveVariant1 = {
+export type PostV1AvatarRawPositiveVariant1 = {
   length: number;
 };
 
 /** post /v1/avatar/raw */
-type PostV1AvatarRawNegativeVariant1 = {
+export type PostV1AvatarRawNegativeVariant1 = {
   message: string;
 };
 
 /** get /v1/events/stream */
-type GetV1EventsStreamInput = {
+export type GetV1EventsStreamInput = {
   /** @deprecated for testing error response */
   trigger?: string | undefined;
 };
 
 /** get /v1/events/stream */
-type GetV1EventsStreamPositiveVariant1 = {
+export type GetV1EventsStreamPositiveVariant1 = {
   data: number;
   event: "time";
   id?: string | undefined;
@@ -217,39 +217,39 @@ type GetV1EventsStreamPositiveVariant1 = {
 };
 
 /** get /v1/events/stream */
-type GetV1EventsStreamNegativeVariant1 = string;
+export type GetV1EventsStreamNegativeVariant1 = string;
 
 /** head /v1/events/stream */
-type HeadV1EventsStreamInput = {
+export type HeadV1EventsStreamInput = {
   /** @deprecated for testing error response */
   trigger?: string | undefined;
 };
 
 /** head /v1/events/stream */
-type HeadV1EventsStreamPositiveVariant1 = undefined;
+export type HeadV1EventsStreamPositiveVariant1 = undefined;
 
 /** head /v1/events/stream */
-type HeadV1EventsStreamNegativeVariant1 = undefined;
+export type HeadV1EventsStreamNegativeVariant1 = undefined;
 
 /** post /v1/forms/feedback */
-type PostV1FormsFeedbackInput = {
+export type PostV1FormsFeedbackInput = {
   name: string;
   email: string;
   message: string;
 };
 
 /** post /v1/forms/feedback */
-type PostV1FormsFeedbackPositiveVariant1 = {
+export type PostV1FormsFeedbackPositiveVariant1 = {
   crc: number;
 };
 
 /** post /v1/forms/feedback */
-type PostV1FormsFeedbackNegativeVariant1 = {
+export type PostV1FormsFeedbackNegativeVariant1 = {
   message: string;
 };
 
 /** get /v2/users/list */
-type GetV2UsersListInput = {
+export type GetV2UsersListInput = {
   /** Page size (number of users per page) */
   limit?: number | undefined;
   /** Number of users to skip */
@@ -259,7 +259,7 @@ type GetV2UsersListInput = {
 };
 
 /** get /v2/users/list */
-type GetV2UsersListPositiveVariant1 = {
+export type GetV2UsersListPositiveVariant1 = {
   /** Page of users */
   users: {
     name: string;
@@ -274,12 +274,12 @@ type GetV2UsersListPositiveVariant1 = {
 };
 
 /** get /v2/users/list */
-type GetV2UsersListNegativeVariant1 = {
+export type GetV2UsersListNegativeVariant1 = {
   message: string;
 };
 
 /** head /v2/users/list */
-type HeadV2UsersListInput = {
+export type HeadV2UsersListInput = {
   /** Page size (number of users per page) */
   limit?: number | undefined;
   /** Number of users to skip */
@@ -289,10 +289,10 @@ type HeadV2UsersListInput = {
 };
 
 /** head /v2/users/list */
-type HeadV2UsersListPositiveVariant1 = undefined;
+export type HeadV2UsersListPositiveVariant1 = undefined;
 
 /** head /v2/users/list */
-type HeadV2UsersListNegativeVariant1 = undefined;
+export type HeadV2UsersListNegativeVariant1 = undefined;
 
 export type Path =
   | "/v1/user/retrieve"
@@ -511,7 +511,9 @@ export type Implementation<T extends Record<string, unknown>> = (
   ctx?: T,
 ) => Promise<{ status: number; data: any }>;
 
-type Pagination = { nextCursor: string | null } | { total: number; limit: number; offset: number };
+export type Pagination =
+  | { nextCursor: string | null }
+  | { total: number; limit: number; offset: number };
 
 export type DefaultContext = { override?: (init: RequestInit) => RequestInit };
 

@@ -28,7 +28,14 @@
   - The `Client::provide()` method now returns `Promise<{ status, discriminator, data }>` for further discrimination;
   - The basic approach is to discriminate by `status` (the actual `Response.status`);
   - In case of receiving an unlisted status, use the `discriminator` ("success" or "error" fallback);
-  - Unlike previous versions, the `data` property always relays the original payload, including the error `{ message }`.
+  - Unlike previous versions, the `data` property always relays the original payload, including the error `{ message }`;
+- The `Integration` generator declares the schemas having an `id` in metadata as named types shared by all Endpoints:
+  - For example, the schema having `.meta({ id: "Booking" })` becomes `export type Booking` used wherever it appears;
+  - When the input or response schema of an Endpoint has an `id`, the public interfaces refer to its type directly;
+  - The `id` is not used when it's an invalid or reserved name, shared by different schemas, or when the schema has
+    different types for request and response (defaults, transformations): such types are named `Type1`, `Type2`, etc.;
+  - All the types of the generated code are now exported;
+  - Fixed: recursive schemas having different types for request and response are now declared for each direction.
 
 ```ts
 const client = new Client();

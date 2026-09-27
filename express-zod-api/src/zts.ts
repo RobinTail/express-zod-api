@@ -5,6 +5,7 @@ import { getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { hasCycle } from "./deep-checks";
+import { findIdentified } from "./metadata";
 import type { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, type RawSchema } from "./raw-schema";
 import {
@@ -73,32 +74,24 @@ const onTemplateLiteral: Producer = (
   return f.createTemplateLiteralType(head, spans);
 };
 
-const onObject: Producer = (
-  obj: z.core.$ZodObject,
-  { isResponse, next, makeAlias },
-) => {
-  const produce = () => {
-    const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
-      ([key, value]) => {
-        const { description: comment, deprecated: isDeprecated } =
-          globalRegistry.get(value) || {};
-        const isOptional =
-          (isResponse ? value._zod.optout : value._zod.optin) !== undefined;
-        const hasUndefined =
-          isOptional && !(value instanceof z.core.$ZodExactOptional);
-        return makeInterfaceProp(key, next(value), {
-          comment,
-          isDeprecated,
-          isOptional,
-          hasUndefined,
-        });
-      },
-    );
-    return f.createTypeLiteralNode(members);
-  };
-  return hasCycle(obj, { io: isResponse ? "output" : "input" })
-    ? makeAlias(obj, produce)
-    : produce();
+const onObject: Producer = (obj: z.core.$ZodObject, { isResponse, next }) => {
+  const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
+    ([key, value]) => {
+      const { description: comment, deprecated: isDeprecated } =
+        globalRegistry.get(value) || {};
+      const isOptional =
+        (isResponse ? value._zod.optout : value._zod.optin) !== undefined;
+      const hasUndefined =
+        isOptional && !(value instanceof z.core.$ZodExactOptional);
+      return makeInterfaceProp(key, next(value), {
+        comment,
+        isDeprecated,
+        isOptional,
+        hasUndefined,
+      });
+    },
+  );
+  return f.createTypeLiteralNode(members);
 };
 
 const onArray: Producer = ({ _zod: { def } }: z.core.$ZodArray, { next }) =>
@@ -214,10 +207,8 @@ const onPipeline: Producer = (
 
 const onNull: Producer = () => makeLiteralType(null);
 
-const onLazy: Producer = (
-  { _zod: { def } }: z.core.$ZodLazy,
-  { makeAlias, next },
-) => makeAlias(def.getter, () => next(def.getter()));
+const onLazy: Producer = ({ _zod: { def } }: z.core.$ZodLazy, { next }) =>
+  next(def.getter());
 
 const onBuffer: Producer = () => ensureTypeNode("Blob");
 
@@ -262,6 +253,25 @@ const producers: HandlingRules<
   [ezRawBrand]: onRaw,
 };
 
+/** Declares aliases for the schemas having the id metadata (named after it), the lazy ones and objects having cycles */
+const withAliases =
+  (handler: Producer): Producer =>
+  (schema: z.core.$ZodType, ctx) => {
+    const produce = () => handler(schema, ctx);
+    const identified = findIdentified(schema); // origin is the key for clones
+    if (identified)
+      return ctx.makeAlias(identified.schema, produce, identified.id);
+    if (isSchema<z.core.$ZodLazy>(schema, "lazy"))
+      return ctx.makeAlias(schema._zod.def.getter, produce);
+    const io = ctx.isResponse ? "output" : "input";
+    if (
+      isSchema<z.core.$ZodObject>(schema, "object") &&
+      hasCycle(schema, { io })
+    )
+      return ctx.makeAlias(schema, produce);
+    return produce();
+  };
+
 export const zodToTs = (
   schema: z.ZodType,
   {
@@ -271,9 +281,16 @@ export const zodToTs = (
     brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
     ctx: ZTSContext;
   },
-) =>
-  walkSchema(schema, {
-    rules: { ...brandHandling, ...producers },
+) => {
+  const rules: HandlingRules<ts.TypeNode, ZTSContext> = {
+    ...brandHandling,
+    ...producers,
+  };
+  for (const key of Reflect.ownKeys(rules))
+    rules[key] = withAliases(rules[key]!); // brands are symbols
+  return walkSchema(schema, {
+    rules,
     onMissing: ({}, { isResponse }) => getFallback(isResponse),
     ctx,
   });
+};
