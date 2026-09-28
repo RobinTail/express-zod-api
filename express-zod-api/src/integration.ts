@@ -97,7 +97,10 @@ export class Integration extends IntegrationBase {
       name = `Type${++this.#lastIndex}`;
       this.#aliases[io].set(key, name);
       const node = produce();
-      const snapshot = printNode(node).replaceAll(name, ""); // rm self-references
+      const snapshot = printNode(node).replaceAll(
+        new RegExp(`\\b${name}\\b`, "g"), // rm self-references
+        "",
+      );
       const opposite = this.#aliases[io === "in" ? "out" : "in"].get(key);
       if (opposite) {
         const oppositeSnapshot = this.#snapshots.get(opposite);
