@@ -66,8 +66,8 @@ describe("Integration", () => {
         v1: {
           tree: defaultEndpointsFactory.build({
             method: "post",
-            input: z.object({ node, lazy }),
-            output: z.object({ node, lazy }),
+            input: z.object({ lazy, node }),
+            output: z.object({ lazy, node }),
             handler: vi.fn(),
           }),
         },
