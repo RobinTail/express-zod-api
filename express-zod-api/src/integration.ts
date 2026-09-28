@@ -100,9 +100,7 @@ export class Integration extends IntegrationBase {
       const snapshot = printNode(node).replaceAll(name, ""); // rm self-references
       const opposite = this.#aliases[io === "in" ? "out" : "in"].get(key);
       if (opposite) {
-        const oppositeSnapshot = this.#snapshots
-          .get(opposite)
-          ?.replaceAll(opposite, "");
+        const oppositeSnapshot = this.#snapshots.get(opposite);
         if (oppositeSnapshot === snapshot) {
           this.#lastIndex--; // undo increment, override with name from the opposite direction
           this.#aliases[io].set(key, opposite);
