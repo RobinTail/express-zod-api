@@ -2,6 +2,14 @@
 
 ## Version 29
 
+### v29.8.2
+
+- Fixed alias production for Integration generator:
+  - Recursive and lazy schemas that are reused both for input and output used to get the same alias;
+  - In certain cases the direction affects the generated type, for example for schemas having `.default()`;
+  - This version compares the generated types to decide whether to use the same alias or make a new one;
+  - The issue was found and reported by [@giovio](https://github.com/giovio).
+
 ### v29.8.1
 
 - Fixed the `HEAD` method of the generated client to avoid parsing the response body by the default implementation.

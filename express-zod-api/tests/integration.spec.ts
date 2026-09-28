@@ -45,6 +45,39 @@ describe("Integration", () => {
     },
   );
 
+  test.each([
+    {
+      name: "for each direction when it differs",
+      label: z.string().default("untitled"),
+    },
+    { name: "once when it's bidirectional", label: z.string() },
+  ])("should declare alias $name", ({ label }) => {
+    const node = z.object({
+      label,
+      get children() {
+        return z.array(node).optional();
+      },
+    });
+    const client = new Integration({
+      config: configMock,
+      variant: "types",
+      routing: {
+        v1: {
+          tree: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({ node }),
+            output: z.object({ node }),
+            handler: vi.fn(),
+          }),
+        },
+      },
+    });
+    const result = client.print();
+    expect(result).toContain("type Type1 ="); // input, optional
+    if (label instanceof z.ZodDefault) expect(result).toContain("type Type2 ="); // output, required
+    else expect(result).not.toContain("Type2"); // same snapshot
+  });
+
   test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
       config: configMock,

@@ -79,15 +79,37 @@ interface FormattedPrintingOptions {
 export class Integration extends IntegrationBase {
   readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
     [];
-  readonly #aliases = new Map<object, string>();
+  readonly #aliases = {
+    in: new Map<object, string>(),
+    out: new Map<object, string>(),
+  };
+  readonly #snapshots = new Map<string, string>();
+  #lastIndex = 0;
   #usage?: string;
 
-  #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
-    let name = this.#aliases.get(key);
+  #makeAlias(
+    io: "in" | "out", // bound
+    key: object,
+    produce: () => ts.TypeNode,
+  ): ts.TypeNode {
+    let name = this.#aliases[io].get(key);
     if (!name) {
-      name = `Type${this.#aliases.size + 1}`;
-      this.#aliases.set(key, name);
+      name = `Type${++this.#lastIndex}`;
+      this.#aliases[io].set(key, name);
       const node = produce();
+      const snapshot = printNode(node).replaceAll(name, ""); // rm self-references
+      const opposite = this.#aliases[io === "in" ? "out" : "in"].get(key);
+      if (opposite) {
+        const oppositeSnapshot = this.#snapshots
+          .get(opposite)
+          ?.replaceAll(opposite, "");
+        if (oppositeSnapshot === snapshot) {
+          this.#lastIndex--; // undo increment, override with name from the opposite direction
+          this.#aliases[io].set(key, opposite);
+          return ensureTypeNode(opposite);
+        }
+      }
+      this.#snapshots.set(name, snapshot);
       this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
     }
     return ensureTypeNode(name);
@@ -106,9 +128,14 @@ export class Integration extends IntegrationBase {
     hasCredentials = false,
   }: IntegrationParams) {
     super(serverUrl);
-    const commons = { makeAlias: this.#makeAlias.bind(this) };
-    const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
-    const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
+    const ctxIn = {
+      brandHandling,
+      ctx: { isResponse: false, makeAlias: this.#makeAlias.bind(this, "in") },
+    };
+    const ctxOut = {
+      brandHandling,
+      ctx: { isResponse: true, makeAlias: this.#makeAlias.bind(this, "out") },
+    };
     let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path);
