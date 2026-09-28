@@ -58,6 +58,7 @@ describe("Integration", () => {
         return z.array(node).optional();
       },
     });
+    const lazy = z.lazy(() => z.string()); // ensures the lastIndex increments correctly
     const client = new Integration({
       config: configMock,
       variant: "types",
@@ -65,17 +66,18 @@ describe("Integration", () => {
         v1: {
           tree: defaultEndpointsFactory.build({
             method: "post",
-            input: z.object({ node }),
-            output: z.object({ node }),
+            input: z.object({ node, lazy }),
+            output: z.object({ node, lazy }),
             handler: vi.fn(),
           }),
         },
       },
     });
     const result = client.print();
-    expect(result).toContain("type Type1 ="); // input, optional
-    if (label instanceof z.ZodDefault) expect(result).toContain("type Type2 ="); // output, required
-    else expect(result).not.toContain("Type2"); // same snapshot
+    const aliases = result.match(/type Type\d\s?=/g);
+    const aliasCount = aliases?.length;
+    expect(aliasCount).toBe(label instanceof z.ZodDefault ? 3 : 2);
+    expect(aliases).toMatchSnapshot();
   });
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
