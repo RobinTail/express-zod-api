@@ -5,7 +5,7 @@
 ### v29.9.0
 
 - Integration generator improvement:
-  - Consolidated the production of aliases for traversing lazy and recursive schemas included custom `brandHandling`;
+  - Consolidated the production of aliases for traversing lazy and recursive schemas, including custom `brandHandling`;
   - If your branded schema is `z.lazy()` or a recursive object, then the generator will make an alias for it, so you
     no longer need to call `makeAlias()` from the `brandHandling` context in such cases;
   - Suggested and implemented by [@giovio](https://github.com/giovio).
