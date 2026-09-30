@@ -50,7 +50,7 @@ describe("Integration", () => {
       name: "for each direction when it differs",
       label: z.string().default("untitled"),
     },
-    { name: "once when it's bidirectional", label: z.string() },
+    { name: "even when it's bidirectional", label: z.string() },
   ])("should declare alias $name", ({ label }) => {
     const node = z.object({
       label,
@@ -75,9 +75,7 @@ describe("Integration", () => {
     });
     const result = client.print();
     const aliases = result.match(/type Type\d\s?=/g);
-    const aliasCount = aliases?.length;
-    expect(aliasCount).toBe(label instanceof z.ZodDefault ? 3 : 2);
-    expect(aliases).toMatchSnapshot();
+    expect(aliases?.length).toBe(4);
   });
 
   test("Should treat optionals the same way as z.infer() by default", async () => {

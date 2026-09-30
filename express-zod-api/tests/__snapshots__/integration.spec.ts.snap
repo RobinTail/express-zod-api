@@ -604,18 +604,3 @@ new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
 */
 "
 `;
-
-exports[`Integration > should declare alias for each direction when it differs 1`] = `
-[
-  "type Type1 =",
-  "type Type2 =",
-  "type Type3 =",
-]
-`;
-
-exports[`Integration > should declare alias once when it's bidirectional 1`] = `
-[
-  "type Type1 =",
-  "type Type2 =",
-]
-`;

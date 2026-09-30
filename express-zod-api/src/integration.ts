@@ -83,7 +83,6 @@ export class Integration extends IntegrationBase {
     in: new Map<object, string>(),
     out: new Map<object, string>(),
   };
-  readonly #snapshots = new Map<string, string>();
   #lastIndex = 0;
   #usage?: string;
 
@@ -97,20 +96,6 @@ export class Integration extends IntegrationBase {
       name = `Type${++this.#lastIndex}`;
       this.#aliases[io].set(key, name);
       const node = produce();
-      const snapshot = printNode(node).replaceAll(
-        new RegExp(`\\b${name}\\b`, "g"), // rm self-references
-        "",
-      );
-      const opposite = this.#aliases[io === "in" ? "out" : "in"].get(key);
-      if (opposite) {
-        const oppositeSnapshot = this.#snapshots.get(opposite);
-        if (oppositeSnapshot === snapshot) {
-          this.#lastIndex--; // undo increment, override with name from the opposite direction
-          this.#aliases[io].set(key, opposite);
-          return ensureTypeNode(opposite);
-        }
-      }
-      this.#snapshots.set(name, snapshot);
       this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
     }
     return ensureTypeNode(name);
