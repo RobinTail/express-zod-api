@@ -76,25 +76,25 @@ interface FormattedPrintingOptions {
   format?: (program: string) => Promise<string>;
 }
 
+type DirectionalDict = Map<boolean, string>; // isResponse:name
+
 export class Integration extends IntegrationBase {
   readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
     [];
-  readonly #aliases = {
-    in: new Map<object, string>(),
-    out: new Map<object, string>(),
-  };
-  #lastIndex = 0;
+  readonly #aliases = new Map<object, DirectionalDict>();
   #usage?: string;
 
   #makeAlias(
-    io: "in" | "out", // bound
+    isResponse: boolean, // bound
     key: object,
     produce: () => ts.TypeNode,
   ): ts.TypeNode {
-    let name = this.#aliases[io].get(key);
+    const dict: DirectionalDict = this.#aliases.get(key) ?? new Map();
+    let name = dict.get(isResponse);
     if (!name) {
-      name = `Type${++this.#lastIndex}`;
-      this.#aliases[io].set(key, name);
+      name = `Type${this.#aliases.size + 1}`;
+      dict.set(isResponse, name);
+      this.#aliases.set(key, dict);
       const node = produce();
       this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
     }
@@ -116,11 +116,11 @@ export class Integration extends IntegrationBase {
     super(serverUrl);
     const ctxIn = {
       brandHandling,
-      ctx: { isResponse: false, makeAlias: this.#makeAlias.bind(this, "in") },
+      ctx: { isResponse: false, makeAlias: this.#makeAlias.bind(this, false) },
     };
     const ctxOut = {
       brandHandling,
-      ctx: { isResponse: true, makeAlias: this.#makeAlias.bind(this, "out") },
+      ctx: { isResponse: true, makeAlias: this.#makeAlias.bind(this, true) },
     };
     let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
