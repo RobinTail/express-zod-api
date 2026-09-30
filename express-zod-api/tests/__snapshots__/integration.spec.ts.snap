@@ -229,14 +229,14 @@ export type Request = keyof Input;
 `;
 
 exports[`Integration > Should support types variant and handle recursive schemas 0 1`] = `
-"type Type1 = {
+"type InputType1 = {
     name: string;
-    features: Type1;
+    features: InputType1;
 };
 
 /** query /v1/test */
 type QueryV1TestInput = {
-    features: Type1;
+    features: InputType1;
 };
 
 /** query /v1/test */
@@ -280,14 +280,14 @@ export type Request = keyof Input;"
 `;
 
 exports[`Integration > Should support types variant and handle recursive schemas 1 1`] = `
-"type Type1 = {
+"type InputType1 = {
     name: string;
-    features: Type1;
+    features: InputType1;
 };
 
 /** query /v1/test */
 type QueryV1TestInput = {
-    features: Type1;
+    features: InputType1;
 };
 
 /** query /v1/test */
@@ -497,4 +497,122 @@ else if (status === 400 || discriminator === "error") console.error(data.message
 new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
 */
 "
+`;
+
+exports[`Integration > should declare directional aliases 1`] = `
+"type InputType1 = string;
+
+type InputType2 = {
+    label?: string | undefined;
+    children?: InputType2[] | undefined;
+};
+
+/** post /v1/tree */
+type PostV1TreeInput = {
+    lazy: InputType1;
+    node: InputType2;
+};
+
+type ResponseType1 = string;
+
+type ResponseType2 = {
+    label: string;
+    children?: ResponseType2[] | undefined;
+};
+
+/** post /v1/tree */
+type PostV1TreePositiveVariant1 = {
+    lazy: ResponseType1;
+    node: ResponseType2;
+};
+
+/** post /v1/tree */
+type PostV1TreeNegativeVariant1 = {
+    message: string;
+};
+
+export type Path = "/v1/tree";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
+
+export interface Input {
+  "post /v1/tree": PostV1TreeInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/tree": PostV1TreePositiveVariant1;
+}
+
+export interface NegativeResponse {
+  "post /v1/tree": PostV1TreeNegativeVariant1;
+}
+
+export interface EncodedResponse {
+  "post /v1/tree": { status: 200, discriminator: "success", data: PostV1TreePositiveVariant1 } | { status: 400, discriminator: "error", data: PostV1TreeNegativeVariant1 };
+}
+
+export interface Response {
+  "post /v1/tree": EncodedResponse["post /v1/tree"]["data"];
+}
+
+export type Request = keyof Input;"
+`;
+
+exports[`Integration > should declare directional aliases 2`] = `
+"type InputType1 = string;
+
+type InputType2 = {
+    label: string;
+    children?: InputType2[] | undefined;
+};
+
+/** post /v1/tree */
+type PostV1TreeInput = {
+    lazy: InputType1;
+    node: InputType2;
+};
+
+type ResponseType1 = string;
+
+type ResponseType2 = {
+    label: string;
+    children?: ResponseType2[] | undefined;
+};
+
+/** post /v1/tree */
+type PostV1TreePositiveVariant1 = {
+    lazy: ResponseType1;
+    node: ResponseType2;
+};
+
+/** post /v1/tree */
+type PostV1TreeNegativeVariant1 = {
+    message: string;
+};
+
+export type Path = "/v1/tree";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
+
+export interface Input {
+  "post /v1/tree": PostV1TreeInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/tree": PostV1TreePositiveVariant1;
+}
+
+export interface NegativeResponse {
+  "post /v1/tree": PostV1TreeNegativeVariant1;
+}
+
+export interface EncodedResponse {
+  "post /v1/tree": { status: 200, discriminator: "success", data: PostV1TreePositiveVariant1 } | { status: 400, discriminator: "error", data: PostV1TreeNegativeVariant1 };
+}
+
+export interface Response {
+  "post /v1/tree": EncodedResponse["post /v1/tree"]["data"];
+}
+
+export type Request = keyof Input;"
 `;

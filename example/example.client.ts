@@ -4,16 +4,16 @@ type GetV1UserRetrieveInput = {
   id: string;
 };
 
-type Type1 = {
+type ResponseType1 = {
   title: string;
-  features?: Type1[] | undefined;
+  features?: ResponseType1[] | undefined;
 };
 
 /** get /v1/user/retrieve */
 type GetV1UserRetrievePositiveVariant1 = {
   id: number;
   name: string;
-  features: Type1[];
+  features: ResponseType1[];
 };
 
 /** get /v1/user/retrieve */
