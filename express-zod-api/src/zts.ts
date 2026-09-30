@@ -254,7 +254,7 @@ const producers: HandlingRules<
   [ezRawBrand]: onRaw,
 };
 
-/** Declares aliases for lazy ones and objects having cycles */
+/** Declares aliases for lazy ones and objects having cycles, @todo - use it for custom names in v30 */
 const withAliases =
   (handler: Producer): Producer =>
   (schema: z.core.$ZodType, ctx) => {
