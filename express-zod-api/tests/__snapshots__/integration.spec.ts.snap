@@ -295,14 +295,14 @@ export type Request = keyof Input;
 `;
 
 exports[`Integration > Should support types variant and handle recursive schemas 0 1`] = `
-"type Type1 = {
+"type InputType1 = {
     name: string;
-    features: Type1;
+    features: InputType1;
 };
 
 /** query /v1/test */
 type QueryV1TestInput = {
-    features: Type1;
+    features: InputType1;
 };
 
 /** query /v1/test */
@@ -364,14 +364,14 @@ export type Request = keyof Input;"
 `;
 
 exports[`Integration > Should support types variant and handle recursive schemas 1 1`] = `
-"type Type1 = {
+"type InputType1 = {
     name: string;
-    features: Type1;
+    features: InputType1;
 };
 
 /** query /v1/test */
 type QueryV1TestInput = {
-    features: Type1;
+    features: InputType1;
 };
 
 /** query /v1/test */

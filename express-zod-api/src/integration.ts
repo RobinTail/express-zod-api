@@ -92,7 +92,7 @@ export class Integration extends IntegrationBase {
     const dict: DirectionalDict = this.#aliases.get(key) ?? new Map();
     let name = dict.get(isResponse);
     if (!name) {
-      name = `Type${this.#aliases.size + 1}`;
+      name = `${isResponse ? "Response" : "Input"}Type${this.#aliases.size + 1}`;
       dict.set(isResponse, name);
       this.#aliases.set(key, dict);
       const node = produce();

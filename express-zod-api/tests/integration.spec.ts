@@ -74,7 +74,7 @@ describe("Integration", () => {
       },
     });
     const result = client.print();
-    const aliases = result.match(/type Type\d\s?=/g);
+    const aliases = result.match(/type (Input|Response)Type\d\s?=/g);
     expect(aliases?.length).toBe(4);
   });
 
