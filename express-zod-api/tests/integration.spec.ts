@@ -45,38 +45,33 @@ describe("Integration", () => {
     },
   );
 
-  test.each([
-    {
-      name: "for each direction when it differs",
-      label: z.string().default("untitled"),
-    },
-    { name: "even when it's bidirectional", label: z.string() },
-  ])("should declare alias $name", ({ label }) => {
-    const node = z.object({
-      label,
-      get children() {
-        return z.array(node).optional();
-      },
-    });
-    const lazy = z.lazy(() => z.string()); // ensures the lastIndex increments correctly
-    const client = new Integration({
-      config: configMock,
-      variant: "types",
-      routing: {
-        v1: {
-          tree: defaultEndpointsFactory.build({
-            method: "post",
-            input: z.object({ lazy, node }),
-            output: z.object({ lazy, node }),
-            handler: vi.fn(),
-          }),
+  test.each([z.string().default("untitled"), z.string()])(
+    "should declare directional aliases",
+    (label) => {
+      const node = z.object({
+        label,
+        get children() {
+          return z.array(node).optional();
         },
-      },
-    });
-    const result = client.print();
-    const aliases = result.match(/type (Input|Response)Type\d\s?=/g);
-    expect(aliases?.length).toBe(4);
-  });
+      });
+      const lazy = z.lazy(() => z.string()); // ensures the lastIndex increments correctly
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          v1: {
+            tree: defaultEndpointsFactory.build({
+              method: "post",
+              input: z.object({ lazy, node }),
+              output: z.object({ lazy, node }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      expect(client.print()).toMatchSnapshot();
+    },
+  );
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
