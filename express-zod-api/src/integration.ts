@@ -76,12 +76,13 @@ interface FormattedPrintingOptions {
   format?: (program: string) => Promise<string>;
 }
 
-type DirectionalDict = Map<boolean, string>; // isResponse:name
-
 export class Integration extends IntegrationBase {
   readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
     [];
-  readonly #aliases = new Map<object, DirectionalDict>();
+  readonly #aliases = new Map<boolean, Map<object, string>>([
+    [false, new Map()], // input aliases
+    [true, new Map()], // response aliases
+  ]);
   #usage?: string;
 
   #makeAlias(
@@ -89,12 +90,11 @@ export class Integration extends IntegrationBase {
     key: object,
     produce: () => ts.TypeNode,
   ): ts.TypeNode {
-    const dict: DirectionalDict = this.#aliases.get(key) ?? new Map();
-    let name = dict.get(isResponse);
+    const dict = this.#aliases.get(isResponse)!; // ensured by prop init
+    let name = dict.get(key);
     if (!name) {
-      name = `${isResponse ? "Response" : "Input"}Type${this.#aliases.size + 1}`;
-      dict.set(isResponse, name);
-      this.#aliases.set(key, dict);
+      name = `${isResponse ? "Response" : "Input"}Type${dict.size + 1}`;
+      dict.set(key, name);
       const node = produce();
       this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
     }

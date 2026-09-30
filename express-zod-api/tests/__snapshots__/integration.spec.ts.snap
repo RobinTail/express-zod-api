@@ -619,19 +619,19 @@ type PostV1TreeInput = {
     node: InputType2;
 };
 
-type ResponseType3 = string;
+type ResponseType1 = string;
 
-type ResponseType3 = {
+type ResponseType2 = {
     label: string;
-    children?: ResponseType3[] | undefined;
+    children?: ResponseType2[] | undefined;
 };
 
 /** post /v1/tree */
 type PostV1TreePositiveVariant1 = {
     status: "success";
     data: {
-        lazy: ResponseType3;
-        node: ResponseType3;
+        lazy: ResponseType1;
+        node: ResponseType2;
     };
 };
 
@@ -696,19 +696,19 @@ type PostV1TreeInput = {
     node: InputType2;
 };
 
-type ResponseType3 = string;
+type ResponseType1 = string;
 
-type ResponseType3 = {
+type ResponseType2 = {
     label: string;
-    children?: ResponseType3[] | undefined;
+    children?: ResponseType2[] | undefined;
 };
 
 /** post /v1/tree */
 type PostV1TreePositiveVariant1 = {
     status: "success";
     data: {
-        lazy: ResponseType3;
-        node: ResponseType3;
+        lazy: ResponseType1;
+        node: ResponseType2;
     };
 };
 
