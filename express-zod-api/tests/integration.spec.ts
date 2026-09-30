@@ -45,6 +45,34 @@ describe("Integration", () => {
     },
   );
 
+  test.each([z.string().default("untitled"), z.string()])(
+    "should declare directional aliases",
+    (label) => {
+      const node = z.object({
+        label,
+        get children() {
+          return z.array(node).optional();
+        },
+      });
+      const lazy = z.lazy(() => z.string()); // ensures the lastIndex increments correctly
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          v1: {
+            tree: defaultEndpointsFactory.build({
+              method: "post",
+              input: z.object({ lazy, node }),
+              output: z.object({ lazy, node }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      expect(client.print()).toMatchSnapshot();
+    },
+  );
+
   test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
       config: configMock,

@@ -2,11 +2,22 @@
 
 ## Version 29
 
+### v29.9.0
+
+- Integration generator improvement:
+  - Consolidated the production of aliases for traversing lazy and recursive schemas included custom `brandHandling`;
+  - If your branded schema is `z.lazy()` or a recursive object, then the generator will make an alias for it, so you
+    no longer need to call `makeAlias()` from the `brandHandling` context in such cases;
+  - Suggested and implemented by [@giovio](https://github.com/giovio).
+
 ### v29.8.2
 
-- Integration generator refactoring:
-  - Consolidated the production of aliases for traversing lazy and recursive schemas;
-  - Suggested and implemented by [@giovio](https://github.com/giovio).
+- Fixed alias production for Integration generator:
+  - Recursive and lazy schemas that are reused both for input and output used to get the same alias;
+  - In certain cases the direction affects the generated type, for example for schemas having `.default()`;
+  - This version emits an alias for each direction for such schemas (even if they are the same);
+  - An alias that used to be named `Type1` will now be either `InputType1` or `ResponseType1` or both;
+  - The issue was found and reported by [@giovio](https://github.com/giovio).
 
 ### v29.8.1
 

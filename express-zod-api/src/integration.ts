@@ -79,14 +79,22 @@ interface FormattedPrintingOptions {
 export class Integration extends IntegrationBase {
   readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
     [];
-  readonly #aliases = new Map<object, string>();
+  readonly #aliases = new Map<boolean, Map<object, string>>([
+    [false, new Map()], // input aliases
+    [true, new Map()], // response aliases
+  ]);
   #usage?: string;
 
-  #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
-    let name = this.#aliases.get(key);
+  #makeAlias(
+    isResponse: boolean, // bound, @todo unbind in v30, replace with a proposed name (suffix) argument
+    key: object,
+    produce: () => ts.TypeNode,
+  ): ts.TypeNode {
+    const dict = this.#aliases.get(isResponse)!; // ensured by prop init
+    let name = dict.get(key);
     if (!name) {
-      name = `Type${this.#aliases.size + 1}`;
-      this.#aliases.set(key, name);
+      name = `${isResponse ? "Response" : "Input"}Type${dict.size + 1}`;
+      dict.set(key, name);
       const node = produce();
       this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
     }
@@ -106,9 +114,14 @@ export class Integration extends IntegrationBase {
     hasCredentials = false,
   }: IntegrationParams) {
     super(serverUrl);
-    const commons = { makeAlias: this.#makeAlias.bind(this) };
-    const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
-    const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
+    const ctxIn = {
+      brandHandling,
+      ctx: { isResponse: false, makeAlias: this.#makeAlias.bind(this, false) },
+    };
+    const ctxOut = {
+      brandHandling,
+      ctx: { isResponse: true, makeAlias: this.#makeAlias.bind(this, true) },
+    };
     let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path);
