@@ -282,9 +282,9 @@ export const zodToTs = (
   const rules: HandlingRules<ts.TypeNode, ZTSContext> = {
     ...brandHandling,
     ...producers,
-  };
-  for (const key of Reflect.ownKeys(rules))
-    rules[key] = withAliases(rules[key]!); // brands can be symbols
+  }; // ez-brands only, keys can be symbols so using Reflect.ownKeys():
+  for (const key of Reflect.ownKeys(producers))
+    rules[key] = withAliases(rules[key]!);
   return walkSchema(schema, {
     rules,
     onMissing: ({}, { isResponse }) => getFallback(isResponse),

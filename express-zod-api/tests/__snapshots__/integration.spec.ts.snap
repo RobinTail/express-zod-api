@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Integration > Feature #1470: Custom brands > should by handled accordingly 1`] = `
-"type InputType1 = InputType1;
+"type InputType1 = string;
 
 /** post /v1/custom */
 type PostV1CustomInput = {
