@@ -230,10 +230,6 @@ describe("Integration", () => {
   });
 
   describe("Named types", () => {
-    const customer = z.object({ name: z.string() }).meta({ id: "Customer" });
-    const booking = z
-      .object({ id: z.string(), customer, notes: z.string().optional() })
-      .meta({ id: "Booking" });
     // @todo replace with default one in v30:
     const asIsFactory = new EndpointsFactory(
       new ResultHandler({
@@ -244,6 +240,10 @@ describe("Integration", () => {
     );
 
     test("should declare the schemas having id and refer them", async () => {
+      const customer = z.object({ name: z.string() }).meta({ id: "Customer" });
+      const booking = z
+        .object({ id: z.string(), customer, notes: z.string().optional() })
+        .meta({ id: "Booking" });
       const client = new Integration({
         config: configMock,
         variant: "types",
