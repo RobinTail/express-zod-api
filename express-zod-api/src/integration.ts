@@ -88,7 +88,7 @@ export class Integration extends IntegrationBase {
 
   #makeName(prefix: string, idx = 0) {
     let name: string;
-    do name = `${prefix}${idx++ === 0 ? "" : idx}`;
+    do name = `${prefix}${idx++ || ""}`;
     while (this.#taken.has(name));
     this.#taken.add(name);
     return name;
@@ -103,10 +103,12 @@ export class Integration extends IntegrationBase {
     const dict = this.#aliases.get(isResponse)!; // ensured by prop init
     let name = dict.get(key);
     if (!name) {
-      name = this.#makeName(
-        proposedName ?? `${isResponse ? "Response" : "Input"}Type`,
-        proposedName ? 0 : dict.size + 1,
-      );
+      name = proposedName
+        ? this.#makeName(proposedName, this.#taken.has(proposedName) ? 2 : 0)
+        : this.#makeName(
+            `${isResponse ? "Response" : "Input"}Type`,
+            dict.size + 1,
+          );
       dict.set(key, name);
       const node = produce();
       this.#program.push(
