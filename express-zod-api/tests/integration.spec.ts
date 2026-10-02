@@ -339,6 +339,29 @@ describe("Integration", () => {
       expect(code).toMatch(/one: Duplicate;/);
       expect(code).toMatch(/two: Duplicate2;/);
     });
+
+    test("should name the lazy schema having id", () => {
+      const tree: z.ZodType = z
+        .lazy(() => z.object({ name: z.string(), kids: z.array(tree) }))
+        .meta({ id: "Tree" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          v1: {
+            tree: asIsFactory.build({
+              output: z.object({ tree }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      const code = client.print();
+      expect(code).toMatch(
+        /export type Tree = \{\s+name: string;\s+kids: Tree\[];\s+};/,
+      );
+      expect(code).not.toMatch("Type1");
+    });
   });
 
   test("Producer type should be satisfied", () => {
