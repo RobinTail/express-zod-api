@@ -295,6 +295,29 @@ describe("Integration", () => {
         );
       },
     );
+
+    test.each(["not-valid", "string", "Client", "Response", "PostV1TestInput"])(
+      "should avoid reserved name %s",
+      (id) => {
+        const client = new Integration({
+          config: configMock,
+          variant: "types",
+          routing: {
+            v1: {
+              test: asIsFactory.buildVoid({
+                method: "post",
+                input: z.object({ name: z.string() }).meta({ id }),
+                handler: vi.fn(),
+              }),
+            },
+          },
+        });
+        const code = client.print();
+        console.log(code);
+        expect(code).not.toContain(`type ${id} = {`);
+        expect(code).not.toContain(`type PostV1TestInput = ${id};`);
+      },
+    );
   });
 
   test("Producer type should be satisfied", () => {
