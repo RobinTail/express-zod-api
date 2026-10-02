@@ -49,6 +49,102 @@ export type Request = keyof Input;
 "
 `;
 
+exports[`Integration > Named types > should declare the schemas having id and refer them 1`] = `
+"/** get /v1/list */
+type GetV1ListInput = {};
+
+export type Customer = {
+  name: string;
+};
+
+export type Booking = {
+  id: string;
+  customer: Customer;
+  notes?: string | undefined;
+};
+
+/** get /v1/list */
+type GetV1ListPositiveVariant1 = {
+  items: Booking[];
+};
+
+/** get /v1/list */
+interface GetV1ListPositiveResponseVariants {
+  200: GetV1ListPositiveVariant1;
+}
+
+/** get /v1/list */
+type GetV1ListNegativeVariant1 = {
+  message: string;
+};
+
+/** get /v1/list */
+interface GetV1ListNegativeResponseVariants {
+  400: GetV1ListNegativeVariant1;
+}
+
+export type Customer2 = {
+  name: string;
+};
+
+/** post /v1/save */
+type PostV1SaveInput = {
+  customer: Customer2;
+};
+
+/** post /v1/save */
+type PostV1SavePositiveVariant1 = Booking;
+
+/** post /v1/save */
+interface PostV1SavePositiveResponseVariants {
+  200: PostV1SavePositiveVariant1;
+}
+
+/** post /v1/save */
+type PostV1SaveNegativeVariant1 = {
+  message: string;
+};
+
+/** post /v1/save */
+interface PostV1SaveNegativeResponseVariants {
+  400: PostV1SaveNegativeVariant1;
+}
+
+type SomeOf<T> = T[keyof T];
+
+export type Path = "/v1/list" | "/v1/save";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "head";
+
+export interface Input {
+  "get /v1/list": GetV1ListInput;
+  "post /v1/save": PostV1SaveInput;
+}
+
+export interface PositiveResponse {
+  "get /v1/list": SomeOf<GetV1ListPositiveResponseVariants>;
+  "post /v1/save": SomeOf<PostV1SavePositiveResponseVariants>;
+}
+
+export interface NegativeResponse {
+  "get /v1/list": SomeOf<GetV1ListNegativeResponseVariants>;
+  "post /v1/save": SomeOf<PostV1SaveNegativeResponseVariants>;
+}
+
+export interface EncodedResponse {
+  "get /v1/list": GetV1ListPositiveResponseVariants & GetV1ListNegativeResponseVariants;
+  "post /v1/save": PostV1SavePositiveResponseVariants & PostV1SaveNegativeResponseVariants;
+}
+
+export interface Response {
+  "get /v1/list": PositiveResponse["get /v1/list"] | NegativeResponse["get /v1/list"];
+  "post /v1/save": PositiveResponse["post /v1/save"] | NegativeResponse["post /v1/save"];
+}
+
+export type Request = keyof Input;
+"
+`;
+
 exports[`Integration > Should support HEAD method by default 0 1`] = `
 "/** get /v1/path */
 type GetV1PathInput = Omit<

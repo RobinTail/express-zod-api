@@ -229,6 +229,47 @@ describe("Integration", () => {
     });
   });
 
+  describe("Named types", () => {
+    const customer = z.object({ name: z.string() }).meta({ id: "Customer" });
+    const booking = z
+      .object({ id: z.string(), customer, notes: z.string().optional() })
+      .meta({ id: "Booking" });
+    // @todo replace with default one in v30:
+    const asIsFactory = new EndpointsFactory(
+      new ResultHandler({
+        positive: (data) => data,
+        negative: z.object({ message: z.string() }),
+        handler: vi.fn(),
+      }),
+    );
+
+    test("should declare the schemas having id and refer them", async () => {
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        hasHeadMethod: false,
+        routing: {
+          v1: {
+            list: asIsFactory.build({
+              output: z.object({ items: z.array(booking) }),
+              handler: vi.fn(),
+            }),
+            save: asIsFactory.build({
+              method: "post",
+              input: z.object({ customer }), //.meta({ id: "SaveBookingRequest" }),
+              output: booking,
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      const code = await client.printFormatted();
+      expect(code.match(/export type Booking/g)).toHaveLength(1);
+      expect(code.match(/export type Customer/g)).toHaveLength(2); // @todo consider merging
+      expect(code).toMatchSnapshot();
+    });
+  });
+
   test("Producer type should be satisfied", () => {
     expectTypeOf(() =>
       ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
