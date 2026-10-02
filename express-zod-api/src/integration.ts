@@ -88,7 +88,7 @@ export class Integration extends IntegrationBase {
 
   #makeName(prefix: string, idx = 0) {
     let name: string;
-    do name = `${prefix}${idx === 0 ? "" : idx++}`;
+    do name = `${prefix}${idx++ === 0 ? "" : idx}`;
     while (this.#taken.has(name));
     this.#taken.add(name);
     return name;
