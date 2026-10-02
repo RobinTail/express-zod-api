@@ -83,20 +83,36 @@ export class Integration extends IntegrationBase {
     [false, new Map()], // input aliases
     [true, new Map()], // response aliases
   ]);
+  readonly #taken = new Set<string>();
   #usage?: string;
 
+  #makeName(prefix: string, idx = 0) {
+    let name: string;
+    do name = `${prefix}${idx === 0 ? "" : idx++}`;
+    while (this.#taken.has(name));
+    this.#taken.add(name);
+    return name;
+  }
+
   #makeAlias(
-    isResponse: boolean, // bound, @todo unbind in v30, replace with a proposed name (suffix) argument
+    isResponse: boolean, // bound, @todo unbind in v30
     key: object,
     produce: () => ts.TypeNode,
+    proposedName?: string,
   ): ts.TypeNode {
     const dict = this.#aliases.get(isResponse)!; // ensured by prop init
     let name = dict.get(key);
     if (!name) {
-      name = `${isResponse ? "Response" : "Input"}Type${dict.size + 1}`;
+      name = this.#makeName(
+        proposedName ?? `${isResponse ? "Response" : "Input"}Type`,
+        proposedName ? 0 : dict.size + 1,
+      );
       dict.set(key, name);
       const node = produce();
-      this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
+      this.#program.push(
+        (opts) =>
+          `${proposedName ? "export " : ""}type ${name} = ${printNode(node, opts)};`,
+      );
     }
     return ensureTypeNode(name);
   }
