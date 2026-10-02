@@ -24,7 +24,7 @@ import {
   makeCleanId,
   normalizeParams,
 } from "./common-helpers";
-import type { CommonConfig } from "./config-type";
+import type { CommonConfig, ServerConfig } from "./config-type";
 import { processContainers } from "./logical-container";
 import type { ClientMethod } from "./method";
 import {
@@ -39,6 +39,7 @@ import {
   nonEmpty,
   depictRequest,
   makeParamLocator,
+  makeParamStyler,
   type ParamRecognizer,
   type BrandHandling,
   excludeParamsFromDepiction,
@@ -87,7 +88,7 @@ interface DocumentationParams {
    * */
   server?: string | ServerObject | Array<string | ServerObject>;
   routing: Routing;
-  config: CommonConfig;
+  config: CommonConfig | ServerConfig;
   /**
    * @desc Descriptions of various components based on their properties (method, path, operationId).
    * @desc When composition set to "components", component name is generated from this description
@@ -268,6 +269,8 @@ export class Documentation extends OpenApiBuilder {
       makeRef: this.#makeRef.bind(this),
       seenIds: new Map<string, z.core.$ZodType>(),
     };
+    const getParamStyle =
+      "queryParser" in config ? makeParamStyler(config) : undefined;
     return (method, path, endpoint) => {
       this.#checkDuplicate(method, path);
       const commons = { ...shared, path, method, endpoint };
@@ -293,6 +296,7 @@ export class Documentation extends OpenApiBuilder {
       const depictedParams = depictRequestParams({
         ...commons,
         getLocation,
+        getParamStyle,
         flatRequest,
         description: descriptions?.requestParameter?.({
           method,

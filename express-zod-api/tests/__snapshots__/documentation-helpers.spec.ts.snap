@@ -336,6 +336,104 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
 ]
 `;
 
+exports[`Documentation helpers > depictRequestParams() > should depict the style of query params for queryParser=extended 1`] = `
+[
+  {
+    "deprecated": undefined,
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
+    "in": "path",
+    "name": "id",
+    "required": true,
+    "schema": {
+      "type": "string",
+    },
+  },
+  {
+    "deprecated": undefined,
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
+    "explode": true,
+    "in": "query",
+    "name": "ids",
+    "required": true,
+    "schema": {
+      "items": {
+        "type": "string",
+      },
+      "type": "array",
+    },
+    "style": "form",
+  },
+  {
+    "deprecated": undefined,
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
+    "explode": true,
+    "in": "query",
+    "name": "filter",
+    "required": true,
+    "schema": {
+      "properties": {
+        "name": {
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+    "style": "deepObject",
+  },
+]
+`;
+
+exports[`Documentation helpers > depictRequestParams() > should depict the style of query params for queryParser=simple 1`] = `
+[
+  {
+    "deprecated": undefined,
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
+    "in": "path",
+    "name": "id",
+    "required": true,
+    "schema": {
+      "type": "string",
+    },
+  },
+  {
+    "deprecated": undefined,
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
+    "explode": true,
+    "in": "query",
+    "name": "ids",
+    "required": true,
+    "schema": {
+      "items": {
+        "type": "string",
+      },
+      "type": "array",
+    },
+    "style": "form",
+  },
+  {
+    "deprecated": undefined,
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
+    "in": "query",
+    "name": "filter",
+    "required": true,
+    "schema": {
+      "properties": {
+        "name": {
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+  },
+]
+`;
+
 exports[`Documentation helpers > depictSecurity() > should add scopes when missing 1`] = `
 [
   [
@@ -799,3 +897,144 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 `;
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 3 2`] = `false`;
+
+exports[`Documentation helpers > makeParamStyler() > depends on queryParser 0 1`] = `
+[
+  {
+    "explode": true,
+    "style": "form",
+  },
+  undefined,
+  undefined,
+  {
+    "explode": true,
+    "style": "form",
+  },
+]
+`;
+
+exports[`Documentation helpers > makeParamStyler() > depends on queryParser 1 1`] = `
+[
+  {
+    "explode": true,
+    "style": "form",
+  },
+  undefined,
+  undefined,
+  {
+    "explode": true,
+    "style": "form",
+  },
+]
+`;
+
+exports[`Documentation helpers > makeParamStyler() > depends on queryParser 2 1`] = `
+[
+  {
+    "explode": true,
+    "style": "form",
+  },
+  {
+    "explode": true,
+    "style": "deepObject",
+  },
+  undefined,
+  {
+    "explode": true,
+    "style": "form",
+  },
+]
+`;
+
+exports[`Documentation helpers > makeParamStyler() > depends on queryParser 3 1`] = `
+[
+  {
+    "explode": true,
+    "style": "form",
+  },
+  undefined,
+  undefined,
+  {
+    "explode": true,
+    "style": "form",
+  },
+]
+`;
+
+exports[`Documentation helpers > makeParamStyler() > depends on queryParser 4 1`] = `
+[
+  {
+    "explode": false,
+    "style": "form",
+  },
+  undefined,
+  undefined,
+  {
+    "explode": false,
+    "style": "form",
+  },
+]
+`;
+
+exports[`Documentation helpers > makeParamStyler() > depends on queryParser 5 1`] = `
+[
+  {
+    "explode": false,
+    "style": "pipeDelimited",
+  },
+  undefined,
+  undefined,
+  {
+    "explode": false,
+    "style": "pipeDelimited",
+  },
+]
+`;
+
+exports[`Documentation helpers > makeParamStyler() > depends on queryParser 6 1`] = `
+[
+  {
+    "explode": false,
+    "style": "spaceDelimited",
+  },
+  undefined,
+  undefined,
+  {
+    "explode": false,
+    "style": "spaceDelimited",
+  },
+]
+`;
+
+exports[`Documentation helpers > makeParamStyler() > depends on queryParser 7 1`] = `
+[
+  {
+    "explode": true,
+    "style": "form",
+  },
+  {
+    "explode": true,
+    "style": "deepObject",
+  },
+  undefined,
+  {
+    "explode": true,
+    "style": "form",
+  },
+]
+`;
+
+exports[`Documentation helpers > makeParamStyler() > depends on queryParser 8 1`] = `
+[
+  {
+    "explode": true,
+    "style": "form",
+  },
+  undefined,
+  undefined,
+  {
+    "explode": true,
+    "style": "form",
+  },
+]
+`;
