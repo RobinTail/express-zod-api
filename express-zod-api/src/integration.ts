@@ -9,7 +9,12 @@ import { IntegrationBase, interfaces } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
-import { ensureTypeNode, printNode, ts } from "./typescript-api";
+import {
+  ensureTypeNode,
+  isValidTypeName,
+  printNode,
+  ts,
+} from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
@@ -103,12 +108,13 @@ export class Integration extends IntegrationBase {
     const dict = this.#aliases.get(isResponse)!; // ensured by prop init
     let name = dict.get(key);
     if (!name) {
-      name = proposedName
-        ? this.#makeName(proposedName, this.#taken.has(proposedName) ? 2 : 0)
-        : this.#makeName(
-            `${isResponse ? "Response" : "Input"}Type`,
-            dict.size + 1,
-          );
+      name =
+        proposedName && isValidTypeName(proposedName)
+          ? this.#makeName(proposedName, this.#taken.has(proposedName) ? 2 : 0)
+          : this.#makeName(
+              `${isResponse ? "Response" : "Input"}Type`,
+              dict.size + 1,
+            );
       dict.set(key, name);
       const node = produce();
       this.#program.push(
@@ -132,6 +138,25 @@ export class Integration extends IntegrationBase {
     hasCredentials = false,
   }: IntegrationParams) {
     super(serverUrl);
+    const reserved = this.getReservedNames(
+      clientClassName,
+      subscriptionClassName,
+    );
+    for (const name of reserved) this.#taken.add(name);
+    walkRouting({
+      routing,
+      config,
+      onEndpoint: (method, path) => {
+        // @todo DNRY, extract these naming helpers
+        const entitle = makeCleanId.bind(null, method, path);
+        this.#taken.add(entitle("input"));
+        for (const responseVariant of responseVariants) {
+          this.#taken.add(entitle(responseVariant, "response", "variants"));
+          for (let idx = 1; idx <= 10; idx++)
+            this.#taken.add(entitle(responseVariant, `variant${idx}`)); // @todo consider calling responses once
+        }
+      },
+    });
     const ctxIn = {
       brandHandling,
       ctx: { isResponse: false, makeAlias: this.#makeAlias.bind(this, false) },
