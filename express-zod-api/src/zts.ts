@@ -282,8 +282,8 @@ export const zodToTs = (
   const rules: HandlingRules<ts.TypeNode, ZTSContext> = {
     ...brandHandling,
     ...producers,
-  }; // ez-brands only, keys can be symbols so using Reflect.ownKeys():
-  for (const key of Reflect.ownKeys(producers))
+  }; // @todo iterate Reflect.ownKeys(producers) in v30 for featuring named aliases
+  for (const key of ["object", "lazy"] satisfies FirstPartyKind[])
     rules[key] = withAliases(rules[key]!);
   return walkSchema(schema, {
     rules,
