@@ -73,32 +73,25 @@ const onTemplateLiteral: Producer = (
   return f.createTemplateLiteralType(head, spans);
 };
 
-const onObject: Producer = (
-  obj: z.core.$ZodObject,
-  { isResponse, next, makeAlias },
-) => {
-  const produce = () => {
-    const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
-      ([key, value]) => {
-        const { description: comment, deprecated: isDeprecated } =
-          globalRegistry.get(value) || {};
-        const isOptional =
-          (isResponse ? value._zod.optout : value._zod.optin) !== undefined;
-        const hasUndefined =
-          isOptional && !(value instanceof z.core.$ZodExactOptional);
-        return makeInterfaceProp(key, next(value), {
-          comment,
-          isDeprecated,
-          isOptional,
-          hasUndefined,
-        });
-      },
-    );
-    return f.createTypeLiteralNode(members);
-  };
-  return hasCycle(obj, { io: isResponse ? "output" : "input" })
-    ? makeAlias(obj, produce)
-    : produce();
+/** @see withAliases */
+const onObject: Producer = (obj: z.core.$ZodObject, { isResponse, next }) => {
+  const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
+    ([key, value]) => {
+      const { description: comment, deprecated: isDeprecated } =
+        globalRegistry.get(value) || {};
+      const isOptional =
+        (isResponse ? value._zod.optout : value._zod.optin) !== undefined;
+      const hasUndefined =
+        isOptional && !(value instanceof z.core.$ZodExactOptional);
+      return makeInterfaceProp(key, next(value), {
+        comment,
+        isDeprecated,
+        isOptional,
+        hasUndefined,
+      });
+    },
+  );
+  return f.createTypeLiteralNode(members);
 };
 
 const onArray: Producer = ({ _zod: { def } }: z.core.$ZodArray, { next }) =>
@@ -214,10 +207,9 @@ const onPipeline: Producer = (
 
 const onNull: Producer = () => makeLiteralType(null);
 
-const onLazy: Producer = (
-  { _zod: { def } }: z.core.$ZodLazy,
-  { makeAlias, next },
-) => makeAlias(def.getter, () => next(def.getter()));
+/** @see withAliases */
+const onLazy: Producer = ({ _zod: { def } }: z.core.$ZodLazy, { next }) =>
+  next(def.getter());
 
 const onBuffer: Producer = () => ensureTypeNode("Blob");
 
@@ -262,6 +254,21 @@ const producers: HandlingRules<
   [ezRawBrand]: onRaw,
 };
 
+/** Declares aliases for lazy ones and objects having cycles, @todo - use it for custom names in v30 */
+const withAliases =
+  (handler: Producer): Producer =>
+  (schema: z.core.$ZodType, ctx) => {
+    const produce = () => handler(schema, ctx);
+    if (isSchema<z.core.$ZodLazy>(schema, "lazy"))
+      return ctx.makeAlias(schema._zod.def.getter, produce);
+    if (
+      isSchema<z.core.$ZodObject>(schema, "object") &&
+      hasCycle(schema, { io: ctx.isResponse ? "output" : "input" })
+    )
+      return ctx.makeAlias(schema, produce);
+    return produce();
+  };
+
 export const zodToTs = (
   schema: z.ZodType,
   {
@@ -271,9 +278,16 @@ export const zodToTs = (
     brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
     ctx: ZTSContext;
   },
-) =>
-  walkSchema(schema, {
-    rules: { ...brandHandling, ...producers },
+) => {
+  const rules: HandlingRules<ts.TypeNode, ZTSContext> = {
+    ...brandHandling,
+    ...producers,
+  }; // @todo iterate Reflect.ownKeys(producers) in v30 for featuring named aliases
+  for (const key of ["object", "lazy"] satisfies FirstPartyKind[])
+    rules[key] = withAliases(rules[key]!);
+  return walkSchema(schema, {
+    rules,
     onMissing: ({}, { isResponse }) => getFallback(isResponse),
     ctx,
   });
+};
