@@ -21,6 +21,7 @@ import {
   ts,
 } from "./typescript-api";
 import type { Producer, ZTSContext } from "./zts-helpers";
+import { findIdentified } from "./metadata.ts";
 
 const nodePath = {
   name: R.path([
@@ -259,6 +260,9 @@ const withAliases =
   (handler: Producer): Producer =>
   (schema: z.core.$ZodType, ctx) => {
     const produce = () => handler(schema, ctx);
+    const identified = findIdentified(schema); // origin is the key for clones
+    if (identified)
+      return ctx.makeAlias(identified.schema, produce, identified.id);
     if (isSchema<z.core.$ZodLazy>(schema, "lazy"))
       return ctx.makeAlias(schema._zod.def.getter, produce);
     if (
