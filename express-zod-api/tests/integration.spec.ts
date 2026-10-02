@@ -268,6 +268,33 @@ describe("Integration", () => {
       expect(code.match(/export type Customer/g)).toHaveLength(2); // @todo consider merging
       expect(code).toMatchSnapshot();
     });
+
+    test.each(["input", "output", "both"] as const)(
+      "should always assign alias, schema in %s",
+      async (usage) => {
+        const draft = z
+          .object({ status: z.string().default("new") })
+          .meta({ id: "Draft" });
+        const client = new Integration({
+          config: configMock,
+          variant: "types",
+          routing: {
+            v1: {
+              draft: asIsFactory.build({
+                method: "post",
+                input: z.object(usage === "output" ? {} : { draft }),
+                output: z.object(usage === "input" ? {} : { draft }),
+                handler: vi.fn(),
+              }),
+            },
+          },
+        });
+        const code = client.print();
+        expect(code.match(/export type Draft/g)).toHaveLength(
+          usage === "both" ? 2 : 1,
+        );
+      },
+    );
   });
 
   test("Producer type should be satisfied", () => {
