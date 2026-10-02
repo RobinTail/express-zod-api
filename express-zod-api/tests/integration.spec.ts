@@ -313,11 +313,32 @@ describe("Integration", () => {
           },
         });
         const code = client.print();
-        console.log(code);
         expect(code).not.toContain(`type ${id} = {`);
         expect(code).not.toContain(`type PostV1TestInput = ${id};`);
       },
     );
+
+    test("should avoid duplicate aliases even for duplicate ids", () => {
+      const one = z.object({ a: z.string() }).meta({ id: "Duplicate" });
+      const two = z.object({ b: z.string() }).meta({ id: "Duplicate" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          v1: {
+            test: asIsFactory.build({
+              method: "post",
+              input: z.object({ one }),
+              output: z.object({ two }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      const code = client.print();
+      expect(code).toMatch(/one: Duplicate;/);
+      expect(code).toMatch(/two: Duplicate2;/);
+    });
   });
 
   test("Producer type should be satisfied", () => {
