@@ -125,6 +125,15 @@ export class Integration extends IntegrationBase {
     return ensureTypeNode(name);
   }
 
+  #makeEntitle(method: ClientMethod, path: string) {
+    const base = makeCleanId.bind(null, method, path);
+    return {
+      input: () => base("input"),
+      variant: (responseVariant: ResponseVariant, nmb: number) =>
+        base(responseVariant, `variant${nmb}`),
+    };
+  }
+
   public constructor({
     routing,
     config,
@@ -147,13 +156,11 @@ export class Integration extends IntegrationBase {
       routing,
       config,
       onEndpoint: (method, path) => {
-        // @todo DNRY, extract these naming helpers
-        const entitle = makeCleanId.bind(null, method, path);
-        this.#taken.add(entitle("input"));
+        const entitle = this.#makeEntitle(method, path);
+        this.#taken.add(entitle.input());
         for (const responseVariant of responseVariants) {
-          this.#taken.add(entitle(responseVariant, "response", "variants"));
           for (let idx = 1; idx <= 10; idx++)
-            this.#taken.add(entitle(responseVariant, `variant${idx}`)); // @todo consider calling responses once
+            this.#taken.add(entitle.variant(responseVariant, idx)); // @todo consider calling responses once
         }
       },
     });
@@ -167,10 +174,10 @@ export class Integration extends IntegrationBase {
     };
     let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
-      const entitle = makeCleanId.bind(null, method, path);
+      const entitle = this.#makeEntitle(method, path);
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const inputTypeName = entitle("input");
+      const inputTypeName = entitle.input();
       const cookies = getSecurityNames(endpoint.security, "cookie");
       if (cookies.size) hasCookies = true;
       const inputTypeNode = zodToTs(inputSchema, ctxIn);
@@ -193,7 +200,7 @@ export class Integration extends IntegrationBase {
           { schema, mimeTypes, statusCodes },
         ] of responses.entries()) {
           const hasBody = shouldHaveContent(method, mimeTypes);
-          const variantName = entitle(responseVariant, "variant", `${idx + 1}`);
+          const variantName = entitle.variant(responseVariant, idx + 1);
           const variantTypeNode = zodToTs(
             hasBody ? schema : noBodySchema,
             ctxOut,
