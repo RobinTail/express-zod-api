@@ -77,10 +77,12 @@ export type Customer2 = {
   name: string;
 };
 
-/** post /v1/save */
-type PostV1SaveInput = {
+export type SaveBookingRequest = {
   customer: Customer2;
 };
+
+/** post /v1/save */
+type PostV1SaveInput = SaveBookingRequest;
 
 /** post /v1/save */
 type PostV1SavePositiveVariant1 = Booking;

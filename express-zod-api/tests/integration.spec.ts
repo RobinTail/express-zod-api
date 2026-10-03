@@ -247,7 +247,7 @@ describe("Integration", () => {
             }),
             save: defaultEndpointsFactory.build({
               method: "post",
-              input: z.object({ customer }), //.meta({ id: "SaveBookingRequest" }),
+              input: z.object({ customer }).meta({ id: "SaveBookingRequest" }),
               output: booking,
               handler: vi.fn(),
             }),
