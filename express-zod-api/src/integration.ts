@@ -89,6 +89,7 @@ export class Integration extends IntegrationBase {
     [true, new Map()], // response aliases
   ]);
   readonly #taken = new Set<string>();
+  readonly #forbidden = [/^InputType\d+$/, /^ResponseType\d+$/]; // auto naming by #makeAlias()
   #usage?: string;
 
   #makeName(prefix: string, idx = 0) {
@@ -109,7 +110,9 @@ export class Integration extends IntegrationBase {
     let name = dict.get(key);
     if (!name) {
       name =
-        proposedName && isValidTypeName(proposedName)
+        proposedName &&
+        isValidTypeName(proposedName) &&
+        !this.#forbidden.some((pattern) => pattern.test(proposedName))
           ? this.#makeName(proposedName, this.#taken.has(proposedName) ? 2 : 0)
           : this.#makeName(
               `${isResponse ? "Response" : "Input"}Type`,
@@ -129,8 +132,8 @@ export class Integration extends IntegrationBase {
     const base = makeCleanId.bind(null, method, path);
     return {
       input: () => base("input"),
-      variant: (responseVariant: ResponseVariant, nmb: number) =>
-        base(responseVariant, `variant${nmb}`),
+      variant: (responseVariant: ResponseVariant, nmb?: number) =>
+        base(responseVariant, `variant${nmb ?? ""}`),
     };
   }
 
@@ -155,10 +158,8 @@ export class Integration extends IntegrationBase {
     const probe: OnEndpoint<ClientMethod> = (method, path) => {
       const entitle = this.#makeEntitle(method, path);
       this.#taken.add(entitle.input());
-      for (const responseVariant of responseVariants) {
-        for (let idx = 1; idx <= 10; idx++)
-          this.#taken.add(entitle.variant(responseVariant, idx)); // @todo consider calling responses once
-      }
+      for (const dir of responseVariants)
+        this.#forbidden.push(new RegExp(`^${entitle.variant(dir)}\\d+$`));
     };
     walkRouting({
       routing,
