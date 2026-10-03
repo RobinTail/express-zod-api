@@ -103,7 +103,7 @@ export class Integration extends IntegrationBase {
   }
 
   #makeAlias(
-    isResponse: boolean, // bound, @todo unbind in v30
+    isResponse: boolean, // bound
     key: object,
     produce: () => ts.TypeNode,
     proposedName?: string,
