@@ -1,6 +1,8 @@
 import createHttpError from "http-errors";
 import {
   combinations,
+  compileOnce,
+  isCompiled,
   defaultInputSources,
   getInput,
   getMessageFromError,
@@ -17,6 +19,7 @@ import {
   type FlatObject,
 } from "../src/common-helpers";
 import { z } from "zod";
+import * as R from "ramda";
 import { makeRequestMock } from "../src/testing";
 import { methods } from "../src/method";
 import type { CommonConfig, InputSources } from "../src/config-type";
@@ -31,6 +34,48 @@ describe("Common Helpers", () => {
   describe("EmptySchema", () => {
     test("should be the type of emptySchema", () => {
       expectTypeOf<EmptySchema>().toEqualTypeOf(emptySchema);
+    });
+  });
+
+  describe("isCompiled()", () => {
+    test("should return false for a plain schema", () => {
+      expect(isCompiled(z.object({ num: z.number() }))).toBe(false);
+    });
+
+    test("should return true for a schema compiled by z.compile()", () => {
+      const schema = z.compile(z.object({ num: z.number() }));
+      expect(schema._zod.run).toHaveProperty("__originalRun");
+      expect(isCompiled(schema)).toBe(true);
+    });
+
+    describe("should return true for a schema having a compilation marker", () => {
+      test.each([
+        "_zod|bag|validator",
+        "_zod|bag|fallbackRun",
+        "_zod|run|__originalRun",
+      ])("at %s", (path) => {
+        const schema = R.assocPath(
+          path.split("|"),
+          vi.fn(),
+          z.object({ num: z.number() }),
+        );
+        expect(isCompiled(schema)).toBe(true);
+      });
+    });
+  });
+
+  describe("compileOnce()", () => {
+    test("should pass through a schema already compiled", () => {
+      const schema = z.compile(z.object({ num: z.number() }));
+      expect(compileOnce(schema)).toBe(schema);
+    });
+
+    test("should compile and cache the clone per schema instance", () => {
+      const schema = z.object({ num: z.number() });
+      const compiled = compileOnce(schema);
+      expect(compiled).not.toBe(schema);
+      expect(isCompiled(compiled)).toBe(true);
+      expect(compileOnce(schema)).toBe(compiled);
     });
   });
 
@@ -406,6 +451,7 @@ describe("Common Helpers", () => {
     test.each([
       ["sync", { trySyncValidation: true }],
       ["async", { trySyncValidation: false }],
+      ["sync by default", {}],
     ])("should parse %s depending on config", async (variant, cfg) => {
       const schema = z.object({ num: z.number() });
       const parseSpy = vi.spyOn(schema, "parse");
@@ -413,7 +459,7 @@ describe("Common Helpers", () => {
       const result = await parseMaybeAsync(schema, { num: 123 }, cfg);
       expectTypeOf(result).toEqualTypeOf<{ num: number }>();
       expect(result).toEqual({ num: 123 });
-      expect(variant === "sync" ? asyncSpy : parseSpy).not.toHaveBeenCalled();
+      expect(variant === "async" ? parseSpy : asyncSpy).not.toHaveBeenCalled();
     });
 
     test.each([
