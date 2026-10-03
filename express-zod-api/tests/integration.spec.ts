@@ -230,15 +230,6 @@ describe("Integration", () => {
   });
 
   describe("Named types", () => {
-    // @todo replace with default one in v30:
-    const asIsFactory = new EndpointsFactory(
-      new ResultHandler({
-        positive: (data) => data,
-        negative: z.object({ message: z.string() }),
-        handler: vi.fn(),
-      }),
-    );
-
     test("should declare the schemas having id and refer them", async () => {
       const customer = z.object({ name: z.string() }).meta({ id: "Customer" });
       const booking = z
@@ -250,11 +241,11 @@ describe("Integration", () => {
         hasHeadMethod: false,
         routing: {
           v1: {
-            list: asIsFactory.build({
+            list: defaultEndpointsFactory.build({
               output: z.object({ items: z.array(booking) }),
               handler: vi.fn(),
             }),
-            save: asIsFactory.build({
+            save: defaultEndpointsFactory.build({
               method: "post",
               input: z.object({ customer }), //.meta({ id: "SaveBookingRequest" }),
               output: booking,
@@ -280,7 +271,7 @@ describe("Integration", () => {
           variant: "types",
           routing: {
             v1: {
-              draft: asIsFactory.build({
+              draft: defaultEndpointsFactory.build({
                 method: "post",
                 input: z.object(usage === "output" ? {} : { draft }),
                 output: z.object(usage === "input" ? {} : { draft }),
@@ -304,7 +295,7 @@ describe("Integration", () => {
           variant: "types",
           routing: {
             v1: {
-              test: asIsFactory.buildVoid({
+              test: defaultEndpointsFactory.buildVoid({
                 method: "post",
                 input: z.object({ name: z.string() }).meta({ id }),
                 handler: vi.fn(),
@@ -326,7 +317,7 @@ describe("Integration", () => {
         variant: "types",
         routing: {
           v1: {
-            test: asIsFactory.build({
+            test: defaultEndpointsFactory.build({
               method: "post",
               input: z.object({ one }),
               output: z.object({ two }),
@@ -349,7 +340,7 @@ describe("Integration", () => {
         variant: "types",
         routing: {
           v1: {
-            tree: asIsFactory.build({
+            tree: defaultEndpointsFactory.build({
               output: z.object({ tree }),
               handler: vi.fn(),
             }),
