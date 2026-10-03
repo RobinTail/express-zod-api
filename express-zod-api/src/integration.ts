@@ -214,16 +214,19 @@ export class Integration extends IntegrationBase {
           idx,
           { schema, mimeTypes, statusCodes },
         ] of responses.entries()) {
-          const hasBody = shouldHaveContent(method, mimeTypes);
-          const variantName = entitle.variant(responseVariant, idx + 1);
-          const variantTypeNode = zodToTs(
-            hasBody ? schema : noBodySchema,
-            ctxOut,
-          );
-          this.#program.push(
-            (opts) =>
-              `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
-          );
+          const subject = shouldHaveContent(method, mimeTypes)
+            ? schema
+            : noBodySchema;
+          const variantTypeNode = zodToTs(subject, ctxOut);
+          const namedVariant = this.#getNamed(subject, true);
+          const variantName =
+            namedVariant ?? entitle.variant(responseVariant, idx + 1);
+          if (!namedVariant) {
+            this.#program.push(
+              (opts) =>
+                `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
+            );
+          }
           names[responseVariant].add(variantName);
           names.encoded.add(
             this.makeDiscriminator(statusCodes, responseVariant, variantName),

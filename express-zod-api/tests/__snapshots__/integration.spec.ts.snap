@@ -82,9 +82,6 @@ export type SaveBookingRequest = {
 };
 
 /** post /v1/save */
-type PostV1SavePositiveVariant1 = Booking;
-
-/** post /v1/save */
 type PostV1SaveNegativeVariant1 = {
   message: string;
 };
@@ -100,7 +97,7 @@ export interface Input {
 
 export interface PositiveResponse {
   "get /v1/list": GetV1ListPositiveVariant1;
-  "post /v1/save": PostV1SavePositiveVariant1;
+  "post /v1/save": Booking;
 }
 
 export interface NegativeResponse {
@@ -113,7 +110,7 @@ export interface EncodedResponse {
     | { status: 200; discriminator: "success"; data: GetV1ListPositiveVariant1 }
     | { status: 400; discriminator: "error"; data: GetV1ListNegativeVariant1 };
   "post /v1/save":
-    | { status: 200; discriminator: "success"; data: PostV1SavePositiveVariant1 }
+    | { status: 200; discriminator: "success"; data: Booking }
     | { status: 400; discriminator: "error"; data: PostV1SaveNegativeVariant1 };
 }
 
