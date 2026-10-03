@@ -287,27 +287,32 @@ describe("Integration", () => {
       },
     );
 
-    test.each(["not-valid", "string", "Client", "Response", "PostV1TestInput"])(
-      "should avoid reserved name %s",
-      (id) => {
-        const client = new Integration({
-          config: configMock,
-          variant: "types",
-          routing: {
-            v1: {
-              test: defaultEndpointsFactory.buildVoid({
-                method: "post",
-                input: z.object({ name: z.string() }).meta({ id }),
-                handler: vi.fn(),
-              }),
-            },
+    test.each([
+      "not-valid",
+      "string",
+      "Client",
+      "Response",
+      "PostV1TestInput",
+      "PostV1TestPositiveVariant4",
+      "InputType4",
+    ])("should avoid reserved name %s", (id) => {
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          v1: {
+            test: defaultEndpointsFactory.buildVoid({
+              method: "post",
+              input: z.object({ name: z.string() }).meta({ id }),
+              handler: vi.fn(),
+            }),
           },
-        });
-        const code = client.print();
-        expect(code).not.toContain(`type ${id} = {`);
-        expect(code).not.toContain(`type PostV1TestInput = ${id};`);
-      },
-    );
+        },
+      });
+      const code = client.print();
+      expect(code).not.toContain(`type ${id} = {`);
+      expect(code).not.toContain(`type PostV1TestInput = ${id};`);
+    });
 
     test("should avoid duplicate aliases even for duplicate ids", () => {
       const one = z.object({ a: z.string() }).meta({ id: "Duplicate" });
