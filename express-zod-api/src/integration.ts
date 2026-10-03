@@ -152,17 +152,18 @@ export class Integration extends IntegrationBase {
       subscriptionClassName,
     );
     for (const name of reserved) this.#taken.add(name);
+    const probe: OnEndpoint<ClientMethod> = (method, path) => {
+      const entitle = this.#makeEntitle(method, path);
+      this.#taken.add(entitle.input());
+      for (const responseVariant of responseVariants) {
+        for (let idx = 1; idx <= 10; idx++)
+          this.#taken.add(entitle.variant(responseVariant, idx)); // @todo consider calling responses once
+      }
+    };
     walkRouting({
       routing,
       config,
-      onEndpoint: (method, path) => {
-        const entitle = this.#makeEntitle(method, path);
-        this.#taken.add(entitle.input());
-        for (const responseVariant of responseVariants) {
-          for (let idx = 1; idx <= 10; idx++)
-            this.#taken.add(entitle.variant(responseVariant, idx)); // @todo consider calling responses once
-        }
-      },
+      onEndpoint: hasHeadMethod ? withHead(probe) : probe,
     });
     const ctxIn = {
       brandHandling,
