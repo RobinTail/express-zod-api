@@ -2,6 +2,8 @@
  * @fileOverview The entrypoint for generating Integration code
  * @requires typescript
  * */
+import { findIdentified } from "./metadata.ts";
+
 export type { Producer } from "./zts-helpers";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
@@ -137,6 +139,12 @@ export class Integration extends IntegrationBase {
     };
   }
 
+  /** @desc Returns the name assigned to the schema after its id */
+  #getNamed(schema: z.core.$ZodType, isResponse: boolean) {
+    const identified = findIdentified(schema);
+    return identified && this.#aliases.get(isResponse)?.get(identified.schema);
+  }
+
   public constructor({
     routing,
     config,
@@ -179,17 +187,22 @@ export class Integration extends IntegrationBase {
       const entitle = this.#makeEntitle(method, path);
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const inputTypeName = entitle.input();
       const cookies = getSecurityNames(endpoint.security, "cookie");
       if (cookies.size) hasCookies = true;
       const inputTypeNode = zodToTs(inputSchema, ctxIn);
-      this.#program.push((opts) => {
-        const printed = printNode(inputTypeNode, opts);
-        return [
-          `/** ${request} */`,
-          `type ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies, "security cookies") : printed};`,
-        ].join("\n");
-      });
+      const namedInput = cookies.size
+        ? undefined // requires Omit
+        : this.#getNamed(inputSchema, false);
+      const inputTypeName = namedInput ?? entitle.input();
+      if (!namedInput) {
+        this.#program.push((opts) => {
+          const printed = printNode(inputTypeNode, opts);
+          return [
+            `/** ${request} */`,
+            `type ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies, "security cookies") : printed};`,
+          ].join("\n");
+        });
+      }
       const names: Record<ResponseVariant | "encoded", Set<string>> = {
         positive: new Set(),
         negative: new Set(),
