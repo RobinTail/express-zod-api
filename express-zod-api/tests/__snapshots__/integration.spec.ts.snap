@@ -82,9 +82,6 @@ export type SaveBookingRequest = {
 };
 
 /** post /v1/save */
-type PostV1SaveInput = SaveBookingRequest;
-
-/** post /v1/save */
 type PostV1SavePositiveVariant1 = Booking;
 
 /** post /v1/save */
@@ -98,7 +95,7 @@ export type Method = "get" | "post" | "put" | "delete" | "patch" | "query" | "he
 
 export interface Input {
   "get /v1/list": GetV1ListInput;
-  "post /v1/save": PostV1SaveInput;
+  "post /v1/save": SaveBookingRequest;
 }
 
 export interface PositiveResponse {
