@@ -113,6 +113,38 @@ describe("Integration", () => {
     ).toHaveLength(2);
   });
 
+  test("should not merge a cycle when its outermost member differs", () => {
+    const employee = z.object({
+      name: z.string().default("anonymous"),
+      get employer() {
+        return employer.optional();
+      },
+    });
+    const employer = z.object({
+      title: z.string(),
+      get staff() {
+        return z.array(employee);
+      },
+    });
+    const client = new Integration({
+      config: configMock,
+      variant: "types",
+      routing: {
+        v1: {
+          test: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({ item: employee }),
+            output: z.object({ item: employee }),
+            handler: vi.fn(),
+          }),
+        },
+      },
+    });
+    expect(
+      client.print().match(/type (Input|Response)Type\d+ =/g),
+    ).toHaveLength(4);
+  });
+
   test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
       config: configMock,
