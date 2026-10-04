@@ -138,17 +138,14 @@ export class Integration extends IntegrationBase {
     const dict = this.#aliases.get(isResponse)!; // ensured by prop init
     const existing = dict.get(key);
     if (existing) return ensureTypeNode(existing);
-    const name =
-      proposedName &&
+    const hasCustomName =
+      !!proposedName &&
       isValidTypeName(proposedName) &&
       !this.#forbidden.strings.has(proposedName) &&
-      !this.#forbidden.patterns.some((pattern) => pattern.test(proposedName))
-        ? this.#makeName(
-            proposedName,
-            key,
-            this.#taken.has(proposedName) ? 2 : 0,
-          )
-        : this.#makeName(defaultAlias.get(isResponse)!, key);
+      !this.#forbidden.patterns.some((pattern) => pattern.test(proposedName));
+    const name = hasCustomName
+      ? this.#makeName(proposedName, key, this.#taken.has(proposedName) ? 2 : 0)
+      : this.#makeName(defaultAlias.get(isResponse)!, key);
     dict.set(key, name);
     this.#depth++;
     const node = produce();
@@ -163,7 +160,7 @@ export class Integration extends IntegrationBase {
       const ensured = replaceRefs(node, (ref) => merged.get(ref));
       this.#program.push(
         (opts) =>
-          `${proposedName ? "export " : ""}type ${name} = ${printNode(ensured, opts)};`,
+          `${hasCustomName ? "export " : ""}type ${name} = ${printNode(ensured, opts)};`,
       );
     });
     if (this.#depth) return ensureTypeNode(name); // cycles can only be judged once the outermost is produced
