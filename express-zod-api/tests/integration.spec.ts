@@ -327,6 +327,28 @@ describe("Integration", () => {
       },
     );
 
+    test("should not merge bidirectional schemas when they differ deep in recursion", () => {
+      const inner = z
+        .object({ cause: z.string().default("some") })
+        .meta({ id: "Inner" });
+      const outer = z.object({ inner }).meta({ id: "Outer" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        hasHeadMethod: false,
+        routing: {
+          one: defaultEndpointsFactory.build({
+            input: outer,
+            output: outer,
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code.match(/export type Inner/g)).toHaveLength(2);
+      expect(code.match(/export type Outer/g)).toHaveLength(2);
+    });
+
     test.each([
       "not-valid",
       "string",

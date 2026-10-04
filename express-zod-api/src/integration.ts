@@ -105,6 +105,11 @@ export class Integration extends IntegrationBase {
       .toArray(),
   };
   readonly #produced = new Map<string, ts.TypeNode>(); // alias name to original node
+  readonly #undecided = new Map<
+    string,
+    (merged: Map<string, string>) => void
+  >(); // nested aliases awaiting the outermost
+  #depth = 0; // of nested alias production
   #usage?: string;
 
   #makeName(prefix: string, key: object, idx = 1) {
@@ -115,26 +120,16 @@ export class Integration extends IntegrationBase {
     return name;
   }
 
-  #isBidirectional(
-    name: string,
-    key: object,
-    node: ts.TypeNode,
-    isResponse: boolean,
-  ): boolean {
+  /** @desc Compares the alias to its opposite counterpart assuming the candidates are the same as their opposites */
+  #isBidirectional(name: string, isResponse: boolean, candidates: Set<string>) {
     const reverseMap = this.#aliases.get(!isResponse)!; // ensured by prop init
-    const oppositeName = reverseMap.get(key);
-    if (!oppositeName) return false;
-    const oppositeNode = this.#produced.get(oppositeName);
+    const oppositeName = reverseMap.get(this.#taken.get(name)!); // ensured by #makeName()
+    const oppositeNode = oppositeName && this.#produced.get(oppositeName);
     if (!oppositeNode) return false;
-    const flippedNode = replaceRefs(node, (ref) => {
-      if (ref === name) return oppositeName;
-      const refKey = this.#taken.get(ref);
-      if (!refKey) return;
-      return reverseMap.get(refKey);
-    });
-    const oppositeSnapshot = printNode(oppositeNode);
-    const flippedSnapshot = printNode(flippedNode);
-    return flippedSnapshot === oppositeSnapshot;
+    const flippedNode = replaceRefs(this.#produced.get(name)!, (ref) =>
+      candidates.has(ref) ? reverseMap.get(this.#taken.get(ref)!) : undefined,
+    );
+    return printNode(flippedNode) === printNode(oppositeNode);
   }
 
   #makeAlias(
@@ -144,33 +139,59 @@ export class Integration extends IntegrationBase {
     proposedName?: string,
   ): ts.TypeNode {
     const dict = this.#aliases.get(isResponse)!; // ensured by prop init
-    let name = dict.get(key);
-    if (!name) {
-      name =
-        proposedName &&
-        isValidTypeName(proposedName) &&
-        !this.#forbidden.strings.has(proposedName) &&
-        !this.#forbidden.patterns.some((pattern) => pattern.test(proposedName))
-          ? this.#makeName(
-              proposedName,
-              key,
-              this.#taken.has(proposedName) ? 2 : 0,
-            )
-          : this.#makeName(defaultAlias.get(isResponse)!, key);
-      dict.set(key, name);
-      const node = produce();
-      if (this.#isBidirectional(name, key, node, isResponse)) {
+    const existing = dict.get(key);
+    if (existing) return ensureTypeNode(existing);
+    const name =
+      proposedName &&
+      isValidTypeName(proposedName) &&
+      !this.#forbidden.strings.has(proposedName) &&
+      !this.#forbidden.patterns.some((pattern) => pattern.test(proposedName))
+        ? this.#makeName(
+            proposedName,
+            key,
+            this.#taken.has(proposedName) ? 2 : 0,
+          )
+        : this.#makeName(defaultAlias.get(isResponse)!, key);
+    dict.set(key, name);
+    this.#depth++;
+    const node = produce();
+    this.#depth--;
+    this.#produced.set(name, node);
+    this.#undecided.set(name, (merged) => {
+      if (merged.has(name)) {
         dict.delete(key);
         this.#taken.delete(name);
-        return ensureTypeNode(this.#aliases.get(!isResponse)!.get(key)!);
+        this.#produced.delete(name);
+      } else {
+        const ensured = replaceRefs(node, (ref) => merged.get(ref));
+        this.#program.push(
+          (opts) =>
+            `${proposedName ? "export " : ""}type ${name} = ${printNode(ensured, opts)};`,
+        );
       }
-      this.#produced.set(name, node);
-      this.#program.push(
-        (opts) =>
-          `${proposedName ? "export " : ""}type ${name} = ${printNode(node, opts)};`,
-      );
+    });
+    if (this.#depth) return ensureTypeNode(name); // cycles can only be judged once the outermost is produced
+    const candidates = new Set(this.#undecided.keys());
+    for (let isStable = false; !isStable;) {
+      isStable = true;
+      for (const candidate of candidates) {
+        if (this.#isBidirectional(candidate, isResponse, candidates)) continue;
+        candidates.delete(candidate);
+        isStable = false;
+      }
     }
-    return ensureTypeNode(name);
+    const reverseMap = this.#aliases.get(!isResponse)!; // ensured by prop init
+    const merged = new Map(
+      candidates
+        .values()
+        .map((candidate) => [
+          candidate,
+          reverseMap.get(this.#taken.get(candidate)!)!,
+        ]),
+    );
+    for (const settle of this.#undecided.values()) settle(merged);
+    this.#undecided.clear();
+    return ensureTypeNode(merged.get(name) ?? name);
   }
 
   #makeEntitle(method: ClientMethod, path: string) {
