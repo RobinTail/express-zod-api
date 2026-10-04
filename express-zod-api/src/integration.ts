@@ -3,21 +3,20 @@
  * @requires typescript
  * */
 import { findIdentified } from "./metadata.ts";
-
-export type { Producer } from "./zts-helpers";
 import { z } from "zod";
-import { responseVariants, type ResponseVariant } from "./api-response";
+import { type ResponseVariant, responseVariants } from "./api-response";
 import { IntegrationBase, interfaces } from "./integration-base";
-import { shouldHaveContent, makeCleanId } from "./common-helpers";
+import { makeCleanId, shouldHaveContent } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
 import {
   ensureTypeNode,
   isValidTypeName,
   printNode,
+  replaceRefs,
   ts,
 } from "./typescript-api";
-import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
+import { type OnEndpoint, walkRouting, withHead } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import type { ZTSContext } from "./zts-helpers";
@@ -25,6 +24,8 @@ import type * as OxFmt from "oxfmt";
 import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 import { getSecurityNames } from "./security";
+
+export type { Producer } from "./zts-helpers";
 
 interface IntegrationParams {
   routing: Routing;
@@ -92,6 +93,7 @@ export class Integration extends IntegrationBase {
   ]);
   readonly #taken = new Set<string>();
   readonly #forbidden = [/^InputType\d+$/, /^ResponseType\d+$/]; // auto naming by #makeAlias()
+  readonly #produced = new Map<string, ts.TypeNode>();
   #usage?: string;
 
   #makeName(prefix: string, idx = 0) {
@@ -100,6 +102,36 @@ export class Integration extends IntegrationBase {
     while (this.#taken.has(name));
     this.#taken.add(name);
     return name;
+  }
+
+  // @todo this is expensive, reconsider this approach
+  #getAliasKey(subject: string, isResponse: boolean) {
+    return this.#aliases
+      .get(isResponse)
+      ?.entries()
+      .find(([, name]) => name === subject)?.[0];
+  }
+
+  #isBidirectional(
+    name: string,
+    key: object,
+    node: ts.TypeNode,
+    isResponse: boolean,
+  ): boolean {
+    const reverseMap = this.#aliases.get(!isResponse)!; // ensured by prop init
+    const oppositeName = reverseMap.get(key);
+    if (!oppositeName) return false;
+    const oppositeNode = this.#produced.get(oppositeName);
+    if (!oppositeNode) return false;
+    const flippedNode = replaceRefs(node, (ref) => {
+      if (ref === name) return oppositeName;
+      const refKey = this.#getAliasKey(ref, isResponse);
+      if (!refKey) return;
+      return reverseMap.get(refKey);
+    });
+    const oppositeSnapshot = printNode(oppositeNode);
+    const flippedSnapshot = printNode(flippedNode);
+    return flippedSnapshot === oppositeSnapshot;
   }
 
   #makeAlias(
@@ -122,6 +154,9 @@ export class Integration extends IntegrationBase {
             );
       dict.set(key, name);
       const node = produce();
+      this.#produced.set(name, node);
+      if (this.#isBidirectional(name, key, node, isResponse))
+        return ensureTypeNode(this.#aliases.get(!isResponse)!.get(key)!); // @todo undo maps before returning
       this.#program.push(
         (opts) =>
           `${proposedName ? "export " : ""}type ${name} = ${printNode(node, opts)};`,

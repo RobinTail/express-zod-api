@@ -73,6 +73,46 @@ describe("Integration", () => {
     },
   );
 
+  const category: z.ZodType = z.object({
+    name: z.string(),
+    sub: z.lazy(() => z.array(category)),
+  });
+  const person = z.object({
+    name: z.string(),
+    get company() {
+      return company.optional();
+    },
+  });
+  const company = z.object({
+    title: z.string(),
+    get staff() {
+      return z.array(person);
+    },
+  });
+
+  test.each([
+    { name: "mutual recursion", schema: person },
+    { name: "recursion through lazy", schema: category },
+  ])("should declare a bidirectional cycle once: $name", ({ schema }) => {
+    const client = new Integration({
+      config: configMock,
+      variant: "types",
+      routing: {
+        v1: {
+          test: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({ item: schema }),
+            output: z.object({ item: schema }),
+            handler: vi.fn(),
+          }),
+        },
+      },
+    });
+    expect(
+      client.print().match(/type (Input|Response)Type\d+ =/g),
+    ).toHaveLength(2);
+  });
+
   test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
       config: configMock,
@@ -230,7 +270,7 @@ describe("Integration", () => {
   });
 
   describe("Named types", () => {
-    test("should declare the schemas having id and refer them", async () => {
+    test("should declare the schemas having id once and refer them", async () => {
       const customer = z.object({ name: z.string() }).meta({ id: "Customer" });
       const booking = z
         .object({ id: z.string(), customer, notes: z.string().optional() })
@@ -256,12 +296,12 @@ describe("Integration", () => {
       });
       const code = await client.printFormatted();
       expect(code.match(/export type Booking/g)).toHaveLength(1);
-      expect(code.match(/export type Customer/g)).toHaveLength(2); // @todo consider merging
+      expect(code.match(/export type Customer/g)).toHaveLength(1);
       expect(code).toMatchSnapshot();
     });
 
     test.each(["input", "output", "both"] as const)(
-      "should always assign alias, schema in %s",
+      "should name the type unless it differs for request and response: %s",
       async (usage) => {
         const draft = z
           .object({ status: z.string().default("new") })
@@ -295,7 +335,7 @@ describe("Integration", () => {
       "PostV1TestInput",
       "PostV1TestPositiveVariant4",
       "InputType4",
-    ])("should avoid reserved name %s", (id) => {
+    ])("should not name the type after the unsuitable id %s", (id) => {
       const client = new Integration({
         config: configMock,
         variant: "types",
@@ -314,7 +354,7 @@ describe("Integration", () => {
       expect(code).not.toContain(`type PostV1TestInput = ${id};`);
     });
 
-    test("should avoid duplicate aliases even for duplicate ids", () => {
+    test("should not name the types after the id of different schemas", () => {
       const one = z.object({ a: z.string() }).meta({ id: "Duplicate" });
       const two = z.object({ b: z.string() }).meta({ id: "Duplicate" });
       const client = new Integration({
@@ -357,6 +397,27 @@ describe("Integration", () => {
         /export type Tree = \{\s+name: string;\s+kids: Tree\[];\s+};/,
       );
       expect(code).not.toMatch("Type1");
+    });
+
+    test("should keep the input type of the endpoint omitting cookies", () => {
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          v1: {
+            "get path": defaultEndpointsFactory
+              .addMiddleware({
+                security: { type: "cookie", name: "session" },
+                handler: vi.fn(),
+              })
+              .buildVoid({
+                input: z.object({ some: z.string() }).meta({ id: "Some" }),
+                handler: vi.fn(),
+              }),
+          },
+        },
+      });
+      expect(client.print()).toMatch(/type GetV1PathInput = Omit<Some,/);
     });
   });
 
