@@ -128,6 +128,31 @@ export class Integration extends IntegrationBase {
     return printNode(flippedNode) === printNode(oppositeNode);
   }
 
+  /**
+   * @desc Excludes the pending aliases differing from their opposites until no more exclusions occur.
+   * @returns pending alias name to the opposite one it can be merged into
+   * */
+  #findMergeable(isResponse: boolean) {
+    const candidates = new Set(this.#pending.keys());
+    let lastSize: number | undefined;
+    while (candidates.size !== lastSize) {
+      lastSize = candidates.size;
+      for (const candidate of candidates) {
+        if (!this.#isBidirectional(candidate, isResponse, candidates))
+          candidates.delete(candidate);
+      }
+    }
+    const reverseMap = this.#aliases.get(!isResponse)!; // ensured by prop init
+    return new Map(
+      candidates
+        .values()
+        .map((candidate) => [
+          candidate,
+          reverseMap.get(this.#taken.get(candidate)!)!,
+        ]),
+    );
+  }
+
   #makeAlias(
     isResponse: boolean, // bound
     key: object,
@@ -163,24 +188,7 @@ export class Integration extends IntegrationBase {
       );
     });
     if (this.#depth) return ensureTypeNode(name); // cycles can only be judged once the outermost is produced
-    const candidates = new Set(this.#pending.keys());
-    for (let isStable = false; !isStable;) {
-      isStable = true;
-      for (const candidate of candidates) {
-        if (this.#isBidirectional(candidate, isResponse, candidates)) continue;
-        candidates.delete(candidate);
-        isStable = false;
-      }
-    }
-    const reverseMap = this.#aliases.get(!isResponse)!; // ensured by prop init
-    const merged = new Map(
-      candidates
-        .values()
-        .map((candidate) => [
-          candidate,
-          reverseMap.get(this.#taken.get(candidate)!)!,
-        ]),
-    );
+    const merged = this.#findMergeable(isResponse);
     for (const settle of this.#pending.values()) settle(merged);
     this.#pending.clear();
     return ensureTypeNode(merged.get(name) ?? name);
