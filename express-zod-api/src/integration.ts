@@ -154,9 +154,11 @@ export class Integration extends IntegrationBase {
             );
       dict.set(key, name);
       const node = produce();
+      if (this.#isBidirectional(name, key, node, isResponse)) {
+        dict.delete(key);
+        return ensureTypeNode(this.#aliases.get(!isResponse)!.get(key)!);
+      }
       this.#produced.set(name, node);
-      if (this.#isBidirectional(name, key, node, isResponse))
-        return ensureTypeNode(this.#aliases.get(!isResponse)!.get(key)!); // @todo undo maps before returning
       this.#program.push(
         (opts) =>
           `${proposedName ? "export " : ""}type ${name} = ${printNode(node, opts)};`,
