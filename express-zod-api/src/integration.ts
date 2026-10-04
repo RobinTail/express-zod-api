@@ -84,6 +84,11 @@ interface FormattedPrintingOptions {
   format?: (program: string) => Promise<string>;
 }
 
+const defaultAlias = new Map<boolean, string>([
+  [false, "InputType"],
+  [true, "ResponseType"],
+]);
+
 export class Integration extends IntegrationBase {
   readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
     [];
@@ -94,9 +99,12 @@ export class Integration extends IntegrationBase {
   readonly #taken = new Map<string, object>(); // has name-to-schema back reference
   readonly #forbidden = {
     strings: new Set<string>(),
-    patterns: [/^InputType\d+$/, /^ResponseType\d+$/], // auto naming by #makeAlias()
+    patterns: defaultAlias
+      .values() // auto naming by #makeAlias():
+      .map((name) => new RegExp(`^${name}\\d+$`))
+      .toArray(),
   };
-  readonly #produced = new Map<string, ts.TypeNode>();
+  readonly #produced = new Map<string, ts.TypeNode>(); // alias name to original node
   #usage?: string;
 
   #makeName(prefix: string, key: object, idx = 1) {
@@ -148,7 +156,7 @@ export class Integration extends IntegrationBase {
               key,
               this.#taken.has(proposedName) ? 2 : 0,
             )
-          : this.#makeName(`${isResponse ? "Response" : "Input"}Type`, key);
+          : this.#makeName(defaultAlias.get(isResponse)!, key);
       dict.set(key, name);
       const node = produce();
       if (this.#isBidirectional(name, key, node, isResponse)) {
