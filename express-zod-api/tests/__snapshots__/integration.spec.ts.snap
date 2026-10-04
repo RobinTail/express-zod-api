@@ -49,7 +49,7 @@ export type Request = keyof Input;
 "
 `;
 
-exports[`Integration > Named types > should declare the schemas having id and refer them 1`] = `
+exports[`Integration > Named types > should declare the schemas having id once and refer them 1`] = `
 "/** get /v1/list */
 type GetV1ListInput = {};
 
@@ -73,12 +73,8 @@ type GetV1ListNegativeVariant1 = {
   message: string;
 };
 
-export type Customer2 = {
-  name: string;
-};
-
 export type SaveBookingRequest = {
-  customer: Customer2;
+  customer: Customer;
 };
 
 /** post /v1/save */
@@ -589,8 +585,6 @@ type PostV1TreeInput = {
     node: InputType2;
 };
 
-type ResponseType1 = string;
-
 type ResponseType2 = {
     label: string;
     children?: ResponseType2[] | undefined;
@@ -598,7 +592,7 @@ type ResponseType2 = {
 
 /** post /v1/tree */
 type PostV1TreePositiveVariant1 = {
-    lazy: ResponseType1;
+    lazy: InputType1;
     node: ResponseType2;
 };
 
@@ -648,17 +642,10 @@ type PostV1TreeInput = {
     node: InputType2;
 };
 
-type ResponseType1 = string;
-
-type ResponseType2 = {
-    label: string;
-    children?: ResponseType2[] | undefined;
-};
-
 /** post /v1/tree */
 type PostV1TreePositiveVariant1 = {
-    lazy: ResponseType1;
-    node: ResponseType2;
+    lazy: InputType1;
+    node: InputType2;
 };
 
 /** post /v1/tree */
