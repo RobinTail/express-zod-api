@@ -153,6 +153,13 @@ export class Integration extends IntegrationBase {
     );
   }
 
+  /**
+   * @desc Declares the type alias for the schema (key) once, using its id for naming when possible.
+   * @desc Nested aliases remain pending until the outermost one is produced, so that cycles are complete to compare.
+   * @desc Then the pending ones remaining the same as their opposite (input vs response) counterparts merge into them,
+   * @desc while the rest are emitted having the references to the merged ones replaced.
+   * @returns reference to the alias, or to its opposite counterpart once merged
+   * */
   #makeAlias(
     isResponse: boolean, // bound
     key: object,
