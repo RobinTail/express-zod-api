@@ -143,14 +143,10 @@ export class Integration extends IntegrationBase {
       }
     }
     const reverseMap = this.#aliases.get(!isResponse)!; // ensured by prop init
-    return new Map(
-      candidates
-        .values()
-        .map((candidate) => [
-          candidate,
-          reverseMap.get(this.#taken.get(candidate)!)!,
-        ]),
-    );
+    const merged = new Map<string, string>();
+    for (const candidate of candidates)
+      merged.set(candidate, reverseMap.get(this.#taken.get(candidate)!)!);
+    return merged;
   }
 
   /**
