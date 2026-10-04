@@ -105,10 +105,7 @@ export class Integration extends IntegrationBase {
       .toArray(),
   };
   readonly #produced = new Map<string, ts.TypeNode>(); // alias name to original node
-  readonly #undecided = new Map<
-    string,
-    (merged: Map<string, string>) => void
-  >(); // nested aliases awaiting the outermost
+  readonly #pending = new Map<string, (merged: Map<string, string>) => void>(); // nested aliases awaiting the outermost
   #depth = 0; // of nested alias production
   #usage?: string;
 
@@ -157,7 +154,7 @@ export class Integration extends IntegrationBase {
     const node = produce();
     this.#depth--;
     this.#produced.set(name, node);
-    this.#undecided.set(name, (merged) => {
+    this.#pending.set(name, (merged) => {
       if (merged.has(name)) {
         dict.delete(key);
         this.#taken.delete(name);
@@ -170,7 +167,7 @@ export class Integration extends IntegrationBase {
       );
     });
     if (this.#depth) return ensureTypeNode(name); // cycles can only be judged once the outermost is produced
-    const candidates = new Set(this.#undecided.keys());
+    const candidates = new Set(this.#pending.keys());
     for (let isStable = false; !isStable;) {
       isStable = true;
       for (const candidate of candidates) {
@@ -188,8 +185,8 @@ export class Integration extends IntegrationBase {
           reverseMap.get(this.#taken.get(candidate)!)!,
         ]),
     );
-    for (const settle of this.#undecided.values()) settle(merged);
-    this.#undecided.clear();
+    for (const settle of this.#pending.values()) settle(merged);
+    this.#pending.clear();
     return ensureTypeNode(merged.get(name) ?? name);
   }
 
