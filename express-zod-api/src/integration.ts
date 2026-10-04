@@ -2,11 +2,12 @@
  * @fileOverview The entrypoint for generating Integration code
  * @requires typescript
  * */
-import { findIdentified } from "./metadata.ts";
+export type { Producer } from "./zts-helpers";
+import { findIdentified } from "./metadata";
 import { z } from "zod";
-import { type ResponseVariant, responseVariants } from "./api-response";
+import { responseVariants, type ResponseVariant } from "./api-response";
 import { IntegrationBase, interfaces } from "./integration-base";
-import { makeCleanId, shouldHaveContent } from "./common-helpers";
+import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
 import {
@@ -16,7 +17,7 @@ import {
   replaceRefs,
   ts,
 } from "./typescript-api";
-import { type OnEndpoint, walkRouting, withHead } from "./routing-walker";
+import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import type { ZTSContext } from "./zts-helpers";
@@ -24,8 +25,6 @@ import type * as OxFmt from "oxfmt";
 import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 import { getSecurityNames } from "./security";
-
-export type { Producer } from "./zts-helpers";
 
 interface IntegrationParams {
   routing: Routing;
