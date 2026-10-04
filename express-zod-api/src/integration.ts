@@ -91,25 +91,20 @@ export class Integration extends IntegrationBase {
     [false, new Map()], // input aliases
     [true, new Map()], // response aliases
   ]);
-  readonly #taken = new Set<string>();
-  readonly #forbidden = [/^InputType\d+$/, /^ResponseType\d+$/]; // auto naming by #makeAlias()
+  readonly #taken = new Map<string, object>(); // has name-to-schema back reference
+  readonly #forbidden = {
+    strings: new Set<string>(),
+    patterns: [/^InputType\d+$/, /^ResponseType\d+$/], // auto naming by #makeAlias()
+  };
   readonly #produced = new Map<string, ts.TypeNode>();
   #usage?: string;
 
-  #makeName(prefix: string, idx = 0) {
+  #makeName(prefix: string, key: object, idx = 1) {
     let name: string;
     do name = `${prefix}${idx++ || ""}`;
     while (this.#taken.has(name));
-    this.#taken.add(name);
+    this.#taken.set(name, key);
     return name;
-  }
-
-  // @todo this is expensive, reconsider this approach
-  #getAliasKey(subject: string, isResponse: boolean) {
-    return this.#aliases
-      .get(isResponse)
-      ?.entries()
-      .find(([, name]) => name === subject)?.[0];
   }
 
   #isBidirectional(
@@ -125,7 +120,7 @@ export class Integration extends IntegrationBase {
     if (!oppositeNode) return false;
     const flippedNode = replaceRefs(node, (ref) => {
       if (ref === name) return oppositeName;
-      const refKey = this.#getAliasKey(ref, isResponse);
+      const refKey = this.#taken.get(ref);
       if (!refKey) return;
       return reverseMap.get(refKey);
     });
@@ -146,12 +141,14 @@ export class Integration extends IntegrationBase {
       name =
         proposedName &&
         isValidTypeName(proposedName) &&
-        !this.#forbidden.some((pattern) => pattern.test(proposedName))
-          ? this.#makeName(proposedName, this.#taken.has(proposedName) ? 2 : 0)
-          : this.#makeName(
-              `${isResponse ? "Response" : "Input"}Type`,
-              dict.size + 1,
-            );
+        !this.#forbidden.strings.has(proposedName) &&
+        !this.#forbidden.patterns.some((pattern) => pattern.test(proposedName))
+          ? this.#makeName(
+              proposedName,
+              key,
+              this.#taken.has(proposedName) ? 2 : 0,
+            )
+          : this.#makeName(`${isResponse ? "Response" : "Input"}Type`, key);
       dict.set(key, name);
       const node = produce();
       if (this.#isBidirectional(name, key, node, isResponse)) {
@@ -200,12 +197,15 @@ export class Integration extends IntegrationBase {
       clientClassName,
       subscriptionClassName,
     );
-    for (const name of reserved) this.#taken.add(name);
+    for (const name of reserved) this.#forbidden.strings.add(name);
     const probe: OnEndpoint<ClientMethod> = (method, path) => {
       const entitle = this.#makeEntitle(method, path);
-      this.#taken.add(entitle.input());
-      for (const dir of responseVariants)
-        this.#forbidden.push(new RegExp(`^${entitle.variant(dir)}\\d+$`));
+      this.#forbidden.strings.add(entitle.input());
+      for (const responseVariant of responseVariants) {
+        this.#forbidden.patterns.push(
+          new RegExp(`^${entitle.variant(responseVariant)}\\d+$`),
+        );
+      }
     };
     walkRouting({
       routing,
