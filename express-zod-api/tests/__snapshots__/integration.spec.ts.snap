@@ -585,15 +585,15 @@ type PostV1TreeInput = {
     node: InputType2;
 };
 
-type ResponseType2 = {
+type ResponseType1 = {
     label: string;
-    children?: ResponseType2[] | undefined;
+    children?: ResponseType1[] | undefined;
 };
 
 /** post /v1/tree */
 type PostV1TreePositiveVariant1 = {
     lazy: InputType1;
-    node: ResponseType2;
+    node: ResponseType1;
 };
 
 /** post /v1/tree */

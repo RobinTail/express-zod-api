@@ -156,6 +156,7 @@ export class Integration extends IntegrationBase {
       const node = produce();
       if (this.#isBidirectional(name, key, node, isResponse)) {
         dict.delete(key);
+        this.#taken.delete(name);
         return ensureTypeNode(this.#aliases.get(!isResponse)!.get(key)!);
       }
       this.#produced.set(name, node);
