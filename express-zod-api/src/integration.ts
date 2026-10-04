@@ -161,14 +161,13 @@ export class Integration extends IntegrationBase {
       if (merged.has(name)) {
         dict.delete(key);
         this.#taken.delete(name);
-        this.#produced.delete(name);
-      } else {
-        const ensured = replaceRefs(node, (ref) => merged.get(ref));
-        this.#program.push(
-          (opts) =>
-            `${proposedName ? "export " : ""}type ${name} = ${printNode(ensured, opts)};`,
-        );
+        return void this.#produced.delete(name);
       }
+      const ensured = replaceRefs(node, (ref) => merged.get(ref));
+      this.#program.push(
+        (opts) =>
+          `${proposedName ? "export " : ""}type ${name} = ${printNode(ensured, opts)};`,
+      );
     });
     if (this.#depth) return ensureTypeNode(name); // cycles can only be judged once the outermost is produced
     const candidates = new Set(this.#undecided.keys());
