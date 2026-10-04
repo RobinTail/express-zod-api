@@ -330,6 +330,11 @@ describe("Integration", () => {
     test.each([
       "not-valid",
       "string",
+      "",
+      "1st",
+      "with space",
+      "type",
+      "null",
       "Client",
       "Response",
       "PostV1TestInput",
