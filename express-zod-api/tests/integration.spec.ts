@@ -180,7 +180,9 @@ describe("Integration", () => {
               method: "post",
               input: z.object({
                 string: z.string().meta({ [brandProperty]: "CUSTOM" }),
-                regular: z.string().meta({ [brandProperty]: "DEEP" }),
+                regular: z
+                  .lazy(() => z.string())
+                  .meta({ [brandProperty]: "DEEP" }),
               }),
               output: z.object({
                 number: z.number().meta({ [brandProperty]: "CUSTOM" }),
