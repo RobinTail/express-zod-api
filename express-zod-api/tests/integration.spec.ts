@@ -381,6 +381,35 @@ describe("Integration", () => {
       expect(code.match(/export type Outer/g)).toHaveLength(2);
     });
 
+    test("should refer the merged type directly from the following endpoints", () => {
+      const foo = z.object({ name: z.string() }).meta({ id: "Foo" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        hasHeadMethod: false,
+        routing: {
+          consume: defaultEndpointsFactory.buildVoid({
+            method: "post",
+            input: foo,
+            handler: vi.fn(),
+          }),
+          produce: defaultEndpointsFactory.build({
+            output: foo,
+            handler: vi.fn(),
+          }),
+          reproduce: defaultEndpointsFactory.build({
+            output: foo,
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code.match(/export type Foo/g)).toHaveLength(1);
+      expect(code).not.toMatch(/ = Foo;/);
+      expect(code).toMatch(/"get \/produce": Foo;/);
+      expect(code).toMatch(/"get \/reproduce": Foo;/);
+    });
+
     test.each([
       "not-valid",
       "string",

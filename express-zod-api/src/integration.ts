@@ -180,7 +180,7 @@ export class Integration extends IntegrationBase {
     this.#produced.set(name, node);
     this.#pending.set(name, (merged) => {
       if (merged.has(name)) {
-        dict.delete(key);
+        dict.set(key, merged.get(name)!);
         this.#taken.delete(name);
         return void this.#produced.delete(name);
       }
