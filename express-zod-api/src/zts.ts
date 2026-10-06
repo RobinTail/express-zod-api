@@ -21,7 +21,7 @@ import {
   ts,
 } from "./typescript-api";
 import type { Producer, ZTSContext } from "./zts-helpers";
-import { findIdentified } from "./metadata.ts";
+import { findIdentified } from "./metadata";
 
 const nodePath = {
   name: R.path([
