@@ -54,6 +54,12 @@ else if (status === 400 || discriminator === "error")
 
 ## Version 29
 
+### v29.8.3
+
+- Integration generator refactoring:
+  - Consolidated the production of aliases for traversing lazy and recursive schemas;
+  - Suggested and implemented by [@giovio](https://github.com/giovio).
+
 ### v29.8.2
 
 - Fixed alias production for Integration generator:
