@@ -3,13 +3,20 @@
  * @requires typescript
  * */
 export type { Producer } from "./zts-helpers";
+import { findIdentified } from "./metadata";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
 import { IntegrationBase, interfaces } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
-import { ensureTypeNode, printNode, ts } from "./typescript-api";
+import {
+  ensureTypeNode,
+  isValidTypeName,
+  printNode,
+  replaceRefs,
+  ts,
+} from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
@@ -76,6 +83,11 @@ interface FormattedPrintingOptions {
   format?: (program: string) => Promise<string>;
 }
 
+const defaultAlias = new Map<boolean, string>([
+  [false, "InputType"],
+  [true, "ResponseType"],
+]);
+
 export class Integration extends IntegrationBase {
   readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
     [];
@@ -83,22 +95,121 @@ export class Integration extends IntegrationBase {
     [false, new Map()], // input aliases
     [true, new Map()], // response aliases
   ]);
+  readonly #taken = new Map<string, object>(); // has name-to-schema back reference
+  readonly #forbidden = {
+    strings: new Set<string>(),
+    patterns: defaultAlias
+      .values() // auto naming by #makeAlias():
+      .map((name) => new RegExp(`^${name}\\d+$`))
+      .toArray(),
+  };
+  readonly #produced = new Map<string, ts.TypeNode>(); // alias name to original node
+  readonly #pending = new Map<string, (merged: Map<string, string>) => void>(); // nested aliases awaiting the outermost
+  #depth = 0; // of nested alias production
   #usage?: string;
 
+  #makeName(prefix: string, key: object, idx = 1) {
+    let name: string;
+    do name = `${prefix}${idx++ || ""}`;
+    while (this.#taken.has(name));
+    this.#taken.set(name, key);
+    return name;
+  }
+
+  /** @desc Compares the alias to its opposite counterpart assuming the candidates are the same as their opposites */
+  #isBidirectional(name: string, isResponse: boolean, candidates: Set<string>) {
+    const reverseMap = this.#aliases.get(!isResponse)!; // ensured by prop init
+    const oppositeName = reverseMap.get(this.#taken.get(name)!); // ensured by #makeName()
+    const oppositeNode = oppositeName && this.#produced.get(oppositeName);
+    if (!oppositeNode) return false;
+    const flippedNode = replaceRefs(this.#produced.get(name)!, (ref) =>
+      candidates.has(ref) ? reverseMap.get(this.#taken.get(ref)!) : undefined,
+    );
+    return printNode(flippedNode) === printNode(oppositeNode);
+  }
+
+  /**
+   * @desc Excludes the pending aliases differing from their opposites until no more exclusions occur.
+   * @returns pending alias name to the opposite one it can be merged into
+   * */
+  #findMergeable(isResponse: boolean) {
+    const candidates = new Set(this.#pending.keys());
+    let lastSize: number | undefined;
+    while (candidates.size !== lastSize) {
+      lastSize = candidates.size;
+      for (const candidate of candidates) {
+        if (!this.#isBidirectional(candidate, isResponse, candidates))
+          candidates.delete(candidate);
+      }
+    }
+    const reverseMap = this.#aliases.get(!isResponse)!; // ensured by prop init
+    const merged = new Map<string, string>();
+    for (const candidate of candidates)
+      merged.set(candidate, reverseMap.get(this.#taken.get(candidate)!)!);
+    return merged;
+  }
+
+  /**
+   * @desc Declares the type alias for the schema (key) once, using its id for naming when possible.
+   * @desc Nested aliases remain pending until the outermost one is produced, so that cycles are complete to compare.
+   * @desc Then the pending ones remaining the same as their opposite (input vs response) counterparts merge into them,
+   * @desc while the rest are emitted having the references to the merged ones replaced.
+   * @returns reference to the alias, or to its opposite counterpart once merged
+   * */
   #makeAlias(
-    isResponse: boolean, // bound, @todo unbind in v30, replace with a proposed name (suffix) argument
+    isResponse: boolean, // bound
     key: object,
     produce: () => ts.TypeNode,
+    proposedName?: string,
   ): ts.TypeNode {
     const dict = this.#aliases.get(isResponse)!; // ensured by prop init
-    let name = dict.get(key);
-    if (!name) {
-      name = `${isResponse ? "Response" : "Input"}Type${dict.size + 1}`;
-      dict.set(key, name);
-      const node = produce();
-      this.#program.push((opts) => `type ${name} = ${printNode(node, opts)};`);
-    }
-    return ensureTypeNode(name);
+    const existing = dict.get(key);
+    if (existing) return ensureTypeNode(existing);
+    const hasCustomName =
+      !!proposedName &&
+      isValidTypeName(proposedName) &&
+      !this.#forbidden.strings.has(proposedName) &&
+      !this.#forbidden.patterns.some((pattern) => pattern.test(proposedName));
+    const name = hasCustomName
+      ? this.#makeName(proposedName, key, this.#taken.has(proposedName) ? 2 : 0)
+      : this.#makeName(defaultAlias.get(isResponse)!, key);
+    dict.set(key, name);
+    this.#depth++;
+    const node = produce();
+    this.#depth--;
+    this.#produced.set(name, node);
+    this.#pending.set(name, (merged) => {
+      if (merged.has(name)) {
+        dict.set(key, merged.get(name)!);
+        this.#taken.delete(name);
+        return void this.#produced.delete(name);
+      }
+      const ensured = replaceRefs(node, (ref) => merged.get(ref));
+      this.#program.push(
+        (opts) =>
+          `${hasCustomName ? "export " : ""}type ${name} = ${printNode(ensured, opts)};`,
+      );
+    });
+    if (this.#depth) return ensureTypeNode(name); // cycles can only be judged once the outermost is produced
+    const merged = this.#findMergeable(isResponse);
+    for (const settle of this.#pending.values()) settle(merged);
+    this.#pending.clear();
+    return ensureTypeNode(merged.get(name) ?? name);
+  }
+
+  #makeEntitle(method: ClientMethod, path: string) {
+    const base = makeCleanId.bind(null, method, path);
+    return {
+      input: () => base("input"),
+      variant: (responseVariant: ResponseVariant, nmb?: number) =>
+        base(responseVariant, `variant${nmb ?? ""}`),
+    };
+  }
+
+  /** @desc Returns the name assigned to the schema after its id */
+  #getNamed(schema: z.core.$ZodType, isResponse: boolean) {
+    const identified = findIdentified(schema);
+    return identified && this.#aliases.get(isResponse)?.get(identified.schema);
   }
 
   public constructor({
@@ -114,6 +225,25 @@ export class Integration extends IntegrationBase {
     hasCredentials = false,
   }: IntegrationParams) {
     super(serverUrl);
+    const reserved = this.getReservedNames(
+      clientClassName,
+      subscriptionClassName,
+    );
+    for (const name of reserved) this.#forbidden.strings.add(name);
+    const probe: OnEndpoint<ClientMethod> = (method, path) => {
+      const entitle = this.#makeEntitle(method, path);
+      this.#forbidden.strings.add(entitle.input());
+      for (const responseVariant of responseVariants) {
+        this.#forbidden.patterns.push(
+          new RegExp(`^${entitle.variant(responseVariant)}\\d+$`),
+        );
+      }
+    };
+    walkRouting({
+      routing,
+      config,
+      onEndpoint: hasHeadMethod ? withHead(probe) : probe,
+    });
     const ctxIn = {
       brandHandling,
       ctx: { isResponse: false, makeAlias: this.#makeAlias.bind(this, false) },
@@ -124,20 +254,25 @@ export class Integration extends IntegrationBase {
     };
     let hasCookies = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
-      const entitle = makeCleanId.bind(null, method, path);
+      const entitle = this.#makeEntitle(method, path);
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const inputTypeName = entitle("input");
       const cookies = getSecurityNames(endpoint.security, "cookie");
       if (cookies.size) hasCookies = true;
       const inputTypeNode = zodToTs(inputSchema, ctxIn);
-      this.#program.push((opts) => {
-        const printed = printNode(inputTypeNode, opts);
-        return [
-          `/** ${request} */`,
-          `type ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies, "security cookies") : printed};`,
-        ].join("\n");
-      });
+      const namedInput = cookies.size
+        ? undefined // requires Omit
+        : this.#getNamed(inputSchema, false);
+      const inputTypeName = namedInput ?? entitle.input();
+      if (!namedInput) {
+        this.#program.push((opts) => {
+          const printed = printNode(inputTypeNode, opts);
+          return [
+            `/** ${request} */`,
+            `type ${inputTypeName} = ${cookies.size ? this.makeOmit(printed, cookies, "security cookies") : printed};`,
+          ].join("\n");
+        });
+      }
       const names: Record<ResponseVariant | "encoded", Set<string>> = {
         positive: new Set(),
         negative: new Set(),
@@ -149,16 +284,19 @@ export class Integration extends IntegrationBase {
           idx,
           { schema, mimeTypes, statusCodes },
         ] of responses.entries()) {
-          const hasBody = shouldHaveContent(method, mimeTypes);
-          const variantName = entitle(responseVariant, "variant", `${idx + 1}`);
-          const variantTypeNode = zodToTs(
-            hasBody ? schema : noBodySchema,
-            ctxOut,
-          );
-          this.#program.push(
-            (opts) =>
-              `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
-          );
+          const subject = shouldHaveContent(method, mimeTypes)
+            ? schema
+            : noBodySchema;
+          const variantTypeNode = zodToTs(subject, ctxOut);
+          const namedVariant = this.#getNamed(subject, true);
+          const variantName =
+            namedVariant ?? entitle.variant(responseVariant, idx + 1);
+          if (!namedVariant) {
+            this.#program.push(
+              (opts) =>
+                `/** ${request} */\ntype ${variantName} = ${printNode(variantTypeNode, opts)};`,
+            );
+          }
           names[responseVariant].add(variantName);
           names.encoded.add(
             this.makeDiscriminator(statusCodes, responseVariant, variantName),
