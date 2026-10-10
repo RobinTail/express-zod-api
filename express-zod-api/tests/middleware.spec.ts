@@ -78,6 +78,7 @@ describe("Middleware", () => {
           logger: makeLoggerMock(),
           request: makeRequestMock(),
           response: makeResponseMock(),
+          config: { cors: false },
         }),
       ).rejects.toThrow(InputValidationError);
     });
@@ -98,6 +99,7 @@ describe("Middleware", () => {
           logger: loggerMock,
           request: requestMock,
           response: responseMock,
+          config: { cors: false },
         }),
       ).toEqual({ result: "test" });
       expect(handlerMock).toHaveBeenCalledWith({

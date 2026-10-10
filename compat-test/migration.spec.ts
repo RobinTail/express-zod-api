@@ -4,6 +4,8 @@ import { describe, test, expect } from "vitest";
 describe("Migration", () => {
   test("should migrate", async () => {
     const fixed = await readFile("./sample.ts", "utf-8");
-    expect(fixed).toContain(`new Integration({});`);
+    expect(fixed).toContain(
+      `import { DocumentationError } from "express-zod-api/documentation"`,
+    );
   });
 });

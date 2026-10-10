@@ -4,6 +4,7 @@
 
 | Version | Code name     | Release |     Supported      |
 | ------: | :------------ | :------ | :----------------: |
+|  30.x.x | Rita          | 11.2026 | :white_check_mark: |
 |  29.x.x | Angie         | 08.2026 | :white_check_mark: |
 |  28.x.x | Koko          | 05.2026 | :white_check_mark: |
 |  27.x.x | Nikki         | 02.2026 | :white_check_mark: |
