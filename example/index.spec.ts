@@ -731,7 +731,7 @@ describe("Example", async () => {
     );
 
     test.each([100, 199, 200, 299, 300, 399, 400, 499, 500, 599])(
-      "::discriminate() should distinguish success from error",
+      "::discriminate(%i) should distinguish success from error",
       (code) => {
         expect(Client.discriminate(code)).toBe(
           code < 400 ? "success" : "error",
