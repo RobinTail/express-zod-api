@@ -201,6 +201,12 @@ export const responseOnlyHeaders: Record<
     reason:
       "The NEL (Network Error Logging) header is defined to be sent by servers in HTTP responses to instruct user agents to report network errors. It is not defined for use in HTTP requests in any RFC or extension, including WebSocket, WebDAV, EDIINT, or other HTTP-based protocols.",
   },
+  "no-vary-search": {
+    proof:
+      "RFC 9842 (Section 4, 10.1), IANA registration, and the example in the document all confirm it is a **response header** only.",
+    reason:
+      "The header is explicitly defined as a **response header** in RFC 9842. It is used to indicate query parameters to ignore for cache equivalence, as shown in the example in a response (e.g., `No-Vary-Search: key-order`). No part of the document or related specifications mention its use in **requests**.",
+  },
   "optional-www-authenticate": {
     proof: "Defined in RFC 8053, Section 3.",
     reason: "Allows a server to provide optional authentication mechanisms.",
