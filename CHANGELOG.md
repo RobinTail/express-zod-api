@@ -3423,9 +3423,9 @@ new Documentation({
 });
 
 // regular unformatted integration remains:
-new Integration(/*...*/).print();
+new Integration /*...*/().print();
 // featuring the formatted one, detects prettier automatically:
-await new Integration(/*...*/).printFormatted();
+await new Integration /*...*/().printFormatted();
 // featuring, splitted response types:
 new Integration({ splitResponse: true });
 ```
