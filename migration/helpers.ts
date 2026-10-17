@@ -4,6 +4,13 @@ export type NamedProp = ESTree.ObjectProperty & {
   key: ESTree.IdentifierName | ESTree.StringLiteral;
 };
 
+export const isNamedProp = (
+  node: ESTree.ObjectPropertyKind,
+): node is NamedProp =>
+  node.type === "Property" &&
+  (node.key.type === "Identifier" ||
+    (node.key.type === "Literal" && typeof node.key.value === "string"));
+
 export const queryNamedProp = (name: string) =>
   `Property[key.name="${name}"],Property[key.value="${name}"]`;
 
