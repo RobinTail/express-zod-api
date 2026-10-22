@@ -604,6 +604,27 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test.each(["simple", "extended"] as const)(
+      "should depict the style of query params for queryParser=%s",
+      (queryParser) => {
+        const spec = new Documentation({
+          config: createConfig({ ...sampleConfig, queryParser }),
+          routing: {
+            v1: {
+              getSomething: defaultEndpointsFactory.buildVoid({
+                input: z.object({
+                  ids: z.array(z.string()),
+                  filter: z.object({ name: z.string() }),
+                }),
+                handler: vi.fn(),
+              }),
+            },
+          },
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      },
+    );
+
     test("should ensure the uniq operation ids", () => {
       const spec = new Documentation({
         config: sampleConfig,
