@@ -9,10 +9,17 @@ import {
   weAreClosed,
 } from "./graceful-helpers";
 
+interface Monitor {
+  sockets: Set<Socket>;
+  add: (...subjects: Server[]) => Monitor;
+  shutdown: () => Promise<PromiseSettledResult<void>[]>;
+  readonly isShuttingDown: boolean;
+}
+
 export const monitor = ({
   timeout = 1e3,
   logger,
-}: { timeout?: number; logger?: ActualLogger } = {}) => {
+}: { timeout?: number; logger?: ActualLogger } = {}): Monitor => {
   let pending: Promise<PromiseSettledResult<void>[]> | undefined;
   const servers = new Set<Server>();
   const sockets = new Set<Socket>();
@@ -45,9 +52,9 @@ export const monitor = ({
     return Promise.allSettled(servers.values().map(closeAsync));
   };
 
-  const instance = {
+  const instance: Monitor = {
     sockets,
-    add: (...subjects: Server[]) => {
+    add: (...subjects) => {
       for (const server of subjects) {
         if (servers.has(server)) continue;
         servers.add(server);
