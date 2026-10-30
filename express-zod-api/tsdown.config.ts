@@ -23,7 +23,7 @@ export default defineConfig({
     dts: {
       neverBundle: ["express-serve-static-core", "qs"],
     },
-    neverBundle: [/@typescript\/native/], // @todo: remove when listed in peer dependencies or imported as typescript
+    neverBundle: [/tsgo/], // @todo: remove when listed in peer dependencies or imported as typescript
   },
   plugins: [fixDtsPlugin()],
   dts: {

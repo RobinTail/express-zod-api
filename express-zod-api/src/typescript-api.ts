@@ -1,12 +1,8 @@
 /* oxlint-disable allowed/dependencies -- experiment ⚠️*/
 import * as R from "ramda";
-import * as f from "@typescript/native-preview/unstable/ast/factory";
-import * as ts from "@typescript/native-preview/unstable/ast";
-import {
-  API,
-  type PrintNodeOptions,
-  type Printer,
-} from "@typescript/native-preview/unstable/sync";
+import * as f from "tsgo/ast/factory";
+import * as ts from "tsgo/ast";
+import { API, type PrintNodeOptions, type Printer } from "tsgo/sync";
 
 export { f, ts, type PrintNodeOptions };
 
