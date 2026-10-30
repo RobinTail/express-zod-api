@@ -28,7 +28,6 @@ export default defineConfig({
   dts: {
     generator: "tsgo",
     tsgo: { moduleUrl: import.meta.resolve("tsgo") },
-    tsconfig: "./tsconfig.build.json",
   },
   define: {
     "import.meta.TSDOWN_SELF": `"${manifest.name}"`, // used by localsID

@@ -19,7 +19,6 @@ export default defineConfig({
   dts: {
     generator: "tsgo",
     tsgo: { moduleUrl: import.meta.resolve("tsgo") },
-    tsconfig: "./tsconfig.build.json",
   },
   attw: { profile: "esm-only", level: "error" },
   plugins: [fixDtsPlugin()],
