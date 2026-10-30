@@ -27,7 +27,7 @@ export default defineConfig({
   plugins: [fixDtsPlugin()],
   dts: {
     generator: "tsgo",
-    tsconfig: "./tsconfig.build.json",
+    tsgo: { moduleUrl: import.meta.resolve("tsgo") },
   },
   define: {
     "import.meta.TSDOWN_SELF": `"${manifest.name}"`, // used by localsID
