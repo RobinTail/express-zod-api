@@ -19,6 +19,7 @@ export default defineConfig({
   inputOptions: { experimental: { attachDebugInfo: "none" } },
   dts: {
     generator: "tsgo",
+    tsgo: { moduleUrl: import.meta.resolve("tsgo") },
     tsconfig: "./tsconfig.build.json",
   },
   plugins: [fixDtsPlugin()],

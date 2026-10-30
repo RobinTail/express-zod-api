@@ -27,6 +27,7 @@ export default defineConfig({
   plugins: [fixDtsPlugin()],
   dts: {
     generator: "tsgo",
+    tsgo: { moduleUrl: import.meta.resolve("tsgo") },
     tsconfig: "./tsconfig.build.json",
   },
   define: {
