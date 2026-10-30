@@ -50,8 +50,8 @@
   },
   "devDependencies": {
     "@types/ramda": "catalog:dev",
-    "@typescript/native-preview": "catalog:dev",
     "camelize-ts": "catalog:dev",
+    "tsgo": "catalog:dev",
     "zod": "catalog:dev"
   },
   "keywords": [
