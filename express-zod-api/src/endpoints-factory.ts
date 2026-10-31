@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
 import {
+  compileOnce,
   emptySchema,
   type EmptyObject,
   type EmptySchema,
@@ -25,6 +26,7 @@ import {
   AbstractResultHandler,
   arrayResultHandler,
   defaultResultHandler,
+  legacyResultHandler,
 } from "./result-handler";
 import { FrozenSet } from "./frozen-set";
 import { createCacheMiddleware } from "./cache-middleware";
@@ -191,7 +193,7 @@ export class EndpointsFactory<
    * */
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
     input = emptySchema as unknown as BIN,
-    output: outputSchema,
+    output,
     operationId,
     scope,
     tag,
@@ -213,13 +215,13 @@ export class EndpointsFactory<
     return new Endpoint({
       ...rest,
       middlewares,
-      outputSchema,
       resultHandler,
       scopes,
       tags,
       methods,
       getOperationId,
       inputSchema: makeFinalInputSchema(this.schema, input),
+      outputSchema: compileOnce(output),
       statusCodes: this.statusCodes.union(
         new Set(
           typeof statusCode === "number" ? [statusCode] : statusCode || [],
@@ -254,6 +256,14 @@ export class EndpointsFactory<
 export const defaultEndpointsFactory = new EndpointsFactory(
   defaultResultHandler,
 );
+
+/**
+ * @deprecated Use defaultEndpointsFactory for new APIs.
+ * @desc For migration purposes only: preserves the response wrappers.
+ * @see legacyResultHandler
+ * @todo remove in v31
+ * */
+export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);
 
 /**
  * @deprecated Resist the urge of using it: this factory is designed only to simplify the migration of legacy APIs.

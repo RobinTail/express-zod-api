@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 7
+
+### v7.0.0
+
+- Supported Zod versions: `^4.5.4`.
+
 ## Version 6
 
 ### v6.0.1

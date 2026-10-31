@@ -21,7 +21,7 @@ import migration from "@express-zod-api/migration";
 
 export default [
   { languageOptions: { parser }, plugins: { migration } },
-  { files: ["**/*.ts"], rules: { "migration/v29": "error" } },
+  { files: ["**/*.ts"], rules: { "migration/v30": "error" } },
 ];
 ```
 
@@ -35,6 +35,6 @@ import { defineConfig } from "oxlint";
 
 export default defineConfig({
   jsPlugins: [{ name: "migration", specifier: "@express-zod-api/migration" }],
-  rules: { "migration/v29": "error" },
+  rules: { "migration/v30": "error" },
 });
 ```

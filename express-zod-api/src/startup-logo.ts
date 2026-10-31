@@ -3,7 +3,7 @@ import type { WriteStream } from "node:tty";
 
 export const printStartupLogo = (stream: WriteStream) => {
   if (stream.columns < 62) return;
-  const dedication = italic("for Angie".padStart(52));
+  const dedication = italic("for Rita".padStart(52));
 
   const pnk = hex("#F5A9B8");
   const blu = hex("#5BCEFA");
