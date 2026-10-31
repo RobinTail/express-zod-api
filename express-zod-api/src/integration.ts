@@ -86,7 +86,7 @@ export class Integration extends IntegrationBase {
   #usage?: string;
 
   #makeAlias(
-    isResponse: boolean, // bound, @todo unbind in v30, replace with a proposed name (suffix) argument
+    isResponse: boolean, // bound
     key: object,
     produce: () => ts.TypeNode,
   ): ts.TypeNode {
