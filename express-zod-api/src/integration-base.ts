@@ -83,6 +83,19 @@ export abstract class IntegrationBase {
   protected constructor(protected readonly serverUrl: string) {}
 
   /**
+   * @desc The type names declared by the generated code or referred by it globally, unavailable for the schemas
+   * @internal
+   * */
+  protected getReservedNames = (...classNames: string[]) =>
+    Object.values(interfaces).concat(
+      [ids.Path, ids.Implementation, ids.DefaultContext, ids.Method],
+      [ids.Request, ids.Pagination, ids.File, ids.FormData, Blob.name],
+      [MessageEvent.name, "RequestInit", "EventSource", "Promise"],
+      ["URL", "URLSearchParams", "Record", "Extract", "Omit"],
+      classNames,
+    );
+
+  /**
    * @example export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
    * @internal
    * */

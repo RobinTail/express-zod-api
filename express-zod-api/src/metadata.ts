@@ -20,3 +20,18 @@ export const getExamples = (subject: z.core.$ZodType): unknown[] => {
   if (Array.isArray(examples)) return examples;
   return [];
 };
+
+/** @desc Finds the ancestor schema having id — works for clones and compiled ones */
+export const findIdentified = (
+  subject: z.core.$ZodType,
+): { id: string; schema: z.core.$ZodType } | undefined => {
+  for (
+    let schema: z.core.$ZodType | undefined = subject;
+    schema;
+    schema = schema._zod.parent
+  ) {
+    if (!globalRegistry.has(schema)) continue; // get() walks the parents on its own but without id
+    const { id } = globalRegistry.get(schema) || {};
+    if (id) return { id, schema };
+  }
+};
