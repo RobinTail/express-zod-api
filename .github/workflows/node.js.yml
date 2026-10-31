@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master, v26, v27, v28 ]
+    branches: [ master, v27, v28, v29 ]
   pull_request:
-    branches: [ master, v26, v27, v28 ]
+    branches: [ master, v27, v28, v29 ]
 
 permissions:
   id-token: none
