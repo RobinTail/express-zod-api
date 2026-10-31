@@ -35,7 +35,7 @@ catalogs:
     "express-fileupload": "^1.5.2"
     "http-errors": "^2.0.1"
     "typescript": "npm:@typescript/typescript6@^6.0.2"
-    "tsgo": "npm:typescript@7.1.0-beta" # @todo rm in https://github.com/RobinTail/express-zod-api/pull/3549
+    "tsgo": "npm:typescript@7.1.0-dev.20261024.1" # @todo rm in https://github.com/RobinTail/express-zod-api/pull/3549
     "zod": "^4.6.0"
 overrides:
   "@scarf/scarf": "-"
