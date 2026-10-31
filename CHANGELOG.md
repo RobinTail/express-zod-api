@@ -47,8 +47,7 @@ const { status, discriminator, data } = await client.provide(
   "get /v1/user/retrieve",
   { id: "10" },
 );
-if (status === 200)
-  console.log(data.name); // success
+if (status === 200) console.log(data.name); // success
 else if (status === 400 || discriminator === "error")
   console.error(data.message); // error
 ```
@@ -3486,9 +3485,9 @@ new Documentation({
 });
 
 // regular unformatted integration remains:
-new Integration(/*...*/).print();
+new Integration().print();
 // featuring the formatted one, detects prettier automatically:
-await new Integration(/*...*/).printFormatted();
+await new Integration().printFormatted();
 // featuring, splitted response types:
 new Integration({ splitResponse: true });
 ```

@@ -17,7 +17,7 @@ export default defineConfig({
   inputOptions: { experimental: { attachDebugInfo: "none" } },
   dts: {
     generator: "tsgo",
-    tsconfig: "./tsconfig.build.json",
+    tsgo: { moduleUrl: import.meta.resolve("tsgo") },
   },
   attw: { profile: "esm-only", level: "error" },
   define: {

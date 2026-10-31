@@ -213,7 +213,7 @@ describe("Example", async () => {
       expect(response.headers.has("Content-type")).toBeTruthy();
       expect(response.headers.get("Content-type")).toBe("image/svg+xml");
       expect(response.headers.get("Content-Disposition")).toBe(
-        `attachment; filename="logo.svg"`,
+        `attachment; filename=logo.svg`,
       );
       expect(response.headers.has("Transfer-encoding")).toBeTruthy();
       expect(response.headers.get("Transfer-encoding")).toBe("chunked");
@@ -239,7 +239,7 @@ describe("Example", async () => {
       expect(response.headers.has("Content-type")).toBeTruthy();
       expect(response.headers.get("Content-type")).toBe("image/svg+xml");
       expect(response.headers.get("Content-Disposition")).toBe(
-        `attachment; filename="logo.svg"`,
+        `attachment; filename=logo.svg`,
       );
       expect(response.headers.has("Content-Length")).toBeTruthy();
       expect(response.headers.get("Content-Length")).toBe("48687");

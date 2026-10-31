@@ -1,6 +1,6 @@
 {
   "name": "@express-zod-api/migration",
-  "version": "30.0.0-beta.0",
+  "version": "30.0.0-beta.1",
   "license": "MIT",
   "description": "Migration scripts for express-zod-api",
   "repository": {
@@ -57,6 +57,6 @@
     "@oxlint/plugins": "^1.76.0"
   },
   "devDependencies": {
-    "@typescript/native-preview": "catalog:dev"
+    "tsgo": "catalog:dev"
   }
 }
