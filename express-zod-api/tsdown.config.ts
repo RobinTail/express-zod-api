@@ -1,6 +1,5 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
-import { fixDtsPlugin } from "../tools/fixDts.ts";
 
 declare global {
   interface ImportMeta {
@@ -24,10 +23,9 @@ export default defineConfig({
       neverBundle: ["express-serve-static-core", "qs"],
     },
   },
-  plugins: [fixDtsPlugin()],
   dts: {
     generator: "tsgo",
-    tsconfig: "./tsconfig.build.json",
+    tsgo: { moduleUrl: import.meta.resolve("tsgo") },
   },
   define: {
     "import.meta.TSDOWN_SELF": `"${manifest.name}"`, // used by localsID

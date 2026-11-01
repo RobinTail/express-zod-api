@@ -496,10 +496,7 @@ describe("Routing", () => {
         logger: getLoggerMock.mock.results.pop()!.value,
       });
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(responseMock._getJSONData()).toEqual({
-        status: "success",
-        data: { result: true },
-      });
+      expect(responseMock._getJSONData()).toEqual({ result: true });
     });
 
     const circular: z.ZodType = z.lazy(() => z.tuple([circular, z.function()]));

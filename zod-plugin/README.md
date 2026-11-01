@@ -19,7 +19,7 @@ This module extends Zod functionality when it's imported:
 
 ## Requirements
 
-- Compatible with Zod versions `^4.3.4` (including 4.4+);
+- Compatible with Zod versions `^4.5.4`;
 
 ## Basic usage
 

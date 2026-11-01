@@ -254,7 +254,7 @@ const producers: HandlingRules<
   [ezRawBrand]: onRaw,
 };
 
-/** Declares aliases for lazy ones and objects having cycles, @todo - use it for custom names in v30 */
+/** Declares aliases for lazy ones and objects having cycles, @todo - use it for custom names in #3738 */
 const withAliases =
   (handler: Producer): Producer =>
   (schema: z.core.$ZodType, ctx) => {
@@ -282,7 +282,7 @@ export const zodToTs = (
   const rules: HandlingRules<ts.TypeNode, ZTSContext> = {
     ...brandHandling,
     ...producers,
-  }; // @todo iterate Reflect.ownKeys(producers) in v30 for featuring named aliases
+  }; // @todo iterate Reflect.ownKeys(producers) in #3738 for featuring named aliases
   for (const key of ["object", "lazy"] satisfies FirstPartyKind[])
     rules[key] = withAliases(rules[key]!);
   return walkSchema(schema, {

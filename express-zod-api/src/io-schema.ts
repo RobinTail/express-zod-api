@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { compileOnce } from "./common-helpers";
 
 type Base = object & { [Symbol.iterator]?: never };
 
@@ -42,6 +43,6 @@ export const makeFinalInputSchema = <
   factorySchema: FIN,
   buildSchema: BIN,
 ) =>
-  (factorySchema
-    ? factorySchema.and(buildSchema)
-    : buildSchema) as FinalInputSchema<FIN, BIN>;
+  compileOnce(
+    factorySchema ? factorySchema.and(buildSchema) : buildSchema,
+  ) as FinalInputSchema<FIN, BIN>;
