@@ -1,6 +1,5 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
-import { fixDtsPlugin } from "../tools/fixDts.ts";
 
 declare global {
   interface ImportMeta {
@@ -25,7 +24,6 @@ export default defineConfig({
     },
     neverBundle: [/tsgo/], // @todo: remove when listed in peer dependencies or imported as typescript
   },
-  plugins: [fixDtsPlugin()],
   dts: {
     generator: "tsgo",
     tsgo: { moduleUrl: import.meta.resolve("tsgo") },

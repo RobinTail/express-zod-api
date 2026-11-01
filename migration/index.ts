@@ -2,52 +2,24 @@ import {
   type ESTree,
   eslintCompatPlugin,
   type Rule,
+  type Scope,
+  type Variable,
   type Visitor,
 } from "@oxlint/plugins";
-import {
-  queryNamedProp,
-  type NamedProp,
-  getPropName,
-  removeProp,
-} from "./helpers.ts";
+import { getPropName, isNamedProp } from "./helpers.ts";
 
 interface Queries {
-  integrationCreate: ESTree.CallExpression;
-  createServerAwait: ESTree.CallExpression;
-  asyncLifecycleHook: NamedProp;
-  documentationConfig: ESTree.ObjectExpression;
-  corsConfig: NamedProp;
   expressZodApiImport: ESTree.ImportDeclaration;
-  integrationNewTypescript: NamedProp;
+  defaultId: ESTree.IdentifierName;
+  createConfigCall: ESTree.ObjectExpression;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  integrationCreate:
-    `AwaitExpression > ` +
-    `CallExpression[callee.object.name="Integration"][callee.property.name="create"]`,
-  createServerAwait:
-    `AwaitExpression > ` + `CallExpression[callee.name="createServer"]`,
-  asyncLifecycleHook:
-    `CallExpression[callee.name="createConfig"] > ` +
-    `ObjectExpression > ` +
-    queryNamedProp("beforeRouting") +
-    "," +
-    `CallExpression[callee.name="createConfig"] > ` +
-    `ObjectExpression > ` +
-    queryNamedProp("afterRouting"),
-  documentationConfig:
-    `NewExpression[callee.name="Documentation"] > ` + `ObjectExpression`,
-  corsConfig:
-    `CallExpression[callee.name="createConfig"] > ` +
-    `ObjectExpression > ` +
-    queryNamedProp("cors"),
   expressZodApiImport: `ImportDeclaration[source.value="express-zod-api"]`,
-  integrationNewTypescript:
-    `NewExpression[callee.name="Integration"] > ` +
-    `ObjectExpression > ` +
-    queryNamedProp("typescript"),
+  defaultId: `Identifier[name]`,
+  createConfigCall: `CallExpression[callee.name="createConfig"] > ObjectExpression`,
 };
 
 const listen = <S extends { [K in Listener]: (node: Queries[K]) => void }>(
@@ -62,9 +34,27 @@ const listen = <S extends { [K in Listener]: (node: Queries[K]) => void }>(
   );
 
 const moveTargets = new Map<string, string[]>([
-  ["express-zod-api/integration", ["Integration", "Producer"]],
-  ["express-zod-api/documentation", ["Documentation", "Depicter"]],
+  ["express-zod-api/documentation", ["DocumentationError"]],
 ]);
+
+const moveNames = new Set([...moveTargets.values()].flat());
+
+const renameTargets = new Map([
+  ["defaultResultHandler", "legacyResultHandler"],
+  ["defaultEndpointsFactory", "legacyEndpointsFactory"],
+]);
+
+const importedName = (spec: ESTree.ImportSpecifier): string =>
+  spec.imported.type === "Identifier"
+    ? spec.imported.name
+    : spec.imported.value;
+
+const findVariable = (scope: Scope, name: string): Variable | undefined => {
+  for (let current: Scope | null = scope; current; current = current.upper) {
+    const variable = current.set.get(name);
+    if (variable) return variable;
+  }
+};
 
 const ruleName = `v${import.meta.TSDOWN_VERSION.split(".")[0]}`;
 
@@ -83,148 +73,6 @@ const theRule: Rule = {
   },
   create: (ctx) =>
     listen({
-      integrationCreate: (node) => {
-        const parent = node.parent;
-        if (!parent || parent.type !== "AwaitExpression") return;
-        ctx.report({
-          node,
-          messageId: "change",
-          data: {
-            subject: "Integration.create()",
-            from: "await Integration.create()",
-            to: "new Integration()",
-          },
-          fix: (fixer) => {
-            const args = node.arguments
-              .map((a) => ctx.sourceCode.getText(a))
-              .join(", ");
-            return fixer.replaceText(parent, `new Integration(${args})`);
-          },
-        });
-      },
-      createServerAwait: (node) => {
-        const parent = node.parent;
-        if (!parent || parent.type !== "AwaitExpression") return;
-        ctx.report({
-          node,
-          messageId: "remove",
-          data: { subject: "await from createServer()" },
-          fix: (fixer) => {
-            const text = ctx.sourceCode.getText(node);
-            return fixer.replaceText(parent, text);
-          },
-        });
-      },
-      asyncLifecycleHook: (node) => {
-        const value = node.value;
-        const isAsync =
-          (value.type === "ArrowFunctionExpression" ||
-            value.type === "FunctionExpression") &&
-          value.async;
-        if (!isAsync) return;
-        const propName = getPropName(node);
-        ctx.report({
-          node,
-          messageId: "remove",
-          data: { subject: `async from ${propName}` },
-          fix: (fixer) => {
-            const firstToken = ctx.sourceCode.getFirstToken(value);
-            if (!firstToken || firstToken.value !== "async") return null;
-            const nextToken = ctx.sourceCode.getTokenAfter(firstToken);
-            const end = nextToken
-              ? nextToken.range[0]
-              : firstToken.range[0] + 5;
-            return fixer.removeRange([firstToken.range[0], end]);
-          },
-        });
-      },
-      corsConfig: (node) => {
-        const { value } = node;
-        const isFunc =
-          value.type === "ArrowFunctionExpression" ||
-          value.type === "FunctionExpression";
-        if (!isFunc) return;
-        const { body, async } = value;
-        if (!body) return;
-        const asyncPrefix = async ? "async " : "";
-        let newFunc: string | null = null;
-        if (body.type === "ObjectExpression") {
-          newFunc = `${asyncPrefix}(req, res, next) => { res.set(${ctx.sourceCode.getText(body)}); next(); }`;
-        } else if (body.type === "BlockStatement") {
-          const returnIndex = body.body.findIndex(
-            (s) => s.type === "ReturnStatement",
-          );
-          if (returnIndex < 0) return;
-          const ret = body.body[returnIndex] as ESTree.ReturnStatement;
-          if (!ret.argument || ret.argument.type !== "ObjectExpression") return;
-          const parts: string[] = [];
-          for (let i = 0; i < body.body.length; i++) {
-            if (i === returnIndex) {
-              parts.push(`res.set(${ctx.sourceCode.getText(ret.argument)});`);
-              parts.push(`next();`);
-            } else if (body.body[i]!.type !== "ReturnStatement") {
-              parts.push(ctx.sourceCode.getText(body.body[i]!));
-            }
-          }
-          newFunc = `${asyncPrefix}(req, res, next) => {\n${parts.join("\n")}\n}`;
-        }
-        if (!newFunc) return;
-        ctx.report({
-          node,
-          messageId: "change",
-          data: {
-            subject: "cors headers provider",
-            from: "function returning object",
-            to: "request handler",
-          },
-          fix: (fixer) => fixer.replaceText(value, newFunc),
-        });
-      },
-      documentationConfig: (node) => {
-        const parts: string[] = [];
-        let infoItems: string[] | undefined = [];
-        const changelog: Record<string, string> = {};
-
-        for (const prop of node.properties) {
-          if (prop.type !== "Property" || prop.computed) {
-            parts.push(ctx.sourceCode.getText(prop));
-            continue;
-          }
-          const propName = getPropName(prop as NamedProp);
-          if (propName === "info") {
-            parts.push(ctx.sourceCode.getText(prop));
-            infoItems = undefined;
-          } else if (propName === "title" || propName === "version") {
-            changelog["title, version"] = infoItems ? "info" : "";
-            infoItems?.push(ctx.sourceCode.getText(prop));
-          } else if (propName === "serverUrl") {
-            parts.push(`server: ${ctx.sourceCode.getText(prop.value)}`);
-            changelog.serverUrl = "server";
-          } else {
-            parts.push(ctx.sourceCode.getText(prop));
-          }
-        }
-
-        const entries = Object.entries(changelog);
-        if (!entries.length) return;
-
-        if (infoItems?.length)
-          parts.unshift(`info: { ${infoItems.join(", ")} }`);
-
-        const oldText = ctx.sourceCode.getText(node);
-        const newText = `{ ${parts.join(", ")} }`;
-        if (oldText === newText) return;
-        ctx.report({
-          node,
-          messageId: "change",
-          data: {
-            subject: "Documentation",
-            from: entries.map(([k]) => k).join(", "),
-            to: entries.map(([, v]) => v).join(", "),
-          },
-          fix: (fixer) => fixer.replaceText(node, newText),
-        });
-      },
       expressZodApiImport: (node) => {
         const groups = new Map<string, ESTree.ImportSpecifier[]>();
         const remaining: ESTree.ImportSpecifier[] = [];
@@ -234,10 +82,7 @@ const theRule: Rule = {
             nonNamed.push(spec);
             continue;
           }
-          const name =
-            spec.imported.type === "Identifier"
-              ? spec.imported.name
-              : spec.imported.value;
+          const name = importedName(spec);
           let found = false;
           for (const [target, names] of moveTargets) {
             if (names.includes(name)) {
@@ -252,10 +97,19 @@ const theRule: Rule = {
         if (groups.size === 0) return;
         const importKind = node.importKind === "type" ? "type " : "";
         const first = groups.entries().next().value!;
-        const firstName =
-          first[1][0]!.imported.type === "Identifier"
-            ? first[1][0]!.imported.name
-            : first[1][0]!.imported.value;
+        const firstName = importedName(first[1][0]!);
+        const getSpecText = (spec: ESTree.ImportSpecifier): string => {
+          const name = importedName(spec);
+          const replacement = renameTargets.get(name);
+          if (!replacement) return ctx.sourceCode.getText(spec);
+          const importedText =
+            spec.imported.type === "Identifier"
+              ? replacement
+              : JSON.stringify(replacement);
+          return spec.local.name === name
+            ? importedText
+            : `${importedText} as ${spec.local.name}`;
+        };
         ctx.report({
           node,
           messageId: "move",
@@ -265,7 +119,11 @@ const theRule: Rule = {
             const allMain = [...nonNamed, ...remaining];
             if (allMain.length > 0) {
               const text = allMain
-                .map((s) => ctx.sourceCode.getText(s))
+                .map((s) =>
+                  s.type === "ImportSpecifier"
+                    ? getSpecText(s)
+                    : ctx.sourceCode.getText(s),
+                )
                 .join(", ");
               parts.push(
                 `import ${importKind}{ ${text} } from "express-zod-api"`,
@@ -277,11 +135,67 @@ const theRule: Rule = {
                 .join(", ");
               parts.push(`import ${importKind}{ ${text} } from "${target}"`);
             }
-            return fixer.replaceText(node, parts.join("\n"));
+            const semicolon = /;\s*$/.test(ctx.sourceCode.getText(node))
+              ? ";"
+              : "";
+            return fixer.replaceText(node, parts.join("\n") + semicolon);
           },
         });
       },
-      integrationNewTypescript: (node) => removeProp({ ctx, node }),
+      defaultId: (node) => {
+        const replacement = renameTargets.get(node.name);
+        if (!replacement) return;
+        const variable = findVariable(ctx.sourceCode.getScope(node), node.name);
+        const definition = variable?.defs[0];
+        if (
+          !variable ||
+          definition?.type !== "ImportBinding" ||
+          definition.parent?.type !== "ImportDeclaration" ||
+          definition.parent.source.value !== "express-zod-api"
+        )
+          return;
+        const declaration = definition.parent;
+        const isSpecifier = definition.node === node.parent;
+        const declarationHasMove = declaration.specifiers.some(
+          (spec) =>
+            spec.type === "ImportSpecifier" &&
+            moveNames.has(importedName(spec)),
+        );
+        if (isSpecifier && declarationHasMove) return;
+        const isReference = variable.references.some(
+          (ref) => ref.identifier === node,
+        );
+        if (!isSpecifier && !isReference) return;
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "entity", from: node.name, to: replacement },
+          fix: (fixer) => fixer.replaceText(node, replacement),
+        });
+      },
+      createConfigCall: (node) => {
+        const hasTrySyncValidation = node.properties.some(
+          (property) =>
+            isNamedProp(property) &&
+            getPropName(property) === "trySyncValidation",
+        );
+        if (hasTrySyncValidation) return;
+        ctx.report({
+          node,
+          messageId: "add",
+          data: { subject: "trySyncValidation: false", to: "createConfig()" },
+          fix: (fixer) => {
+            const openBrace = ctx.sourceCode.getFirstToken(node)!;
+            const comment =
+              "@todo remove it when made sure that async refinements " +
+              "of your schemas do not have side effects sensitive to the calls count";
+            return fixer.insertTextAfter(
+              openBrace,
+              `\n  // ${comment}\n  trySyncValidation: false,`,
+            );
+          },
+        });
+      },
     }),
 };
 

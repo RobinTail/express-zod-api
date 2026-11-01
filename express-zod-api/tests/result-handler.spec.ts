@@ -5,6 +5,7 @@ import {
   InputValidationError,
   arrayResultHandler,
   defaultResultHandler,
+  legacyResultHandler,
   ResultHandler,
 } from "../src";
 import { ResultHandlerError } from "../src/errors";
@@ -76,6 +77,10 @@ describe("ResultHandler", () => {
     {
       subject: defaultResultHandler,
       name: "defaultResultHandler",
+    },
+    {
+      subject: legacyResultHandler,
+      name: "legacyResultHandler",
     },
     {
       subject: arrayResultHandler,
