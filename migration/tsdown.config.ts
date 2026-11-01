@@ -1,6 +1,5 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
-import { fixDtsPlugin } from "../tools/fixDts.ts";
 
 declare global {
   interface ImportMeta {
@@ -21,7 +20,6 @@ export default defineConfig({
     tsgo: { moduleUrl: import.meta.resolve("tsgo") },
   },
   attw: { profile: "esm-only", level: "error" },
-  plugins: [fixDtsPlugin()],
   define: {
     "import.meta.TSDOWN_VERSION": `"${manifest.version}"`, // used by ruleName
   },
