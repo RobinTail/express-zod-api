@@ -14,6 +14,8 @@ dedupePeers: true
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - eslint-plugin-allowed-dependencies # maintained by myself
+  # Renovate security update: node-forge@1.4.1
+  - node-forge@1.4.1
 publicHoistPattern:
   - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
   - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
