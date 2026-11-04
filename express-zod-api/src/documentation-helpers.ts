@@ -1,4 +1,5 @@
 import {
+  type BaseParameterObject,
   type ExamplesObject,
   type MediaTypeObject,
   type OAuthFlowObject,
@@ -32,7 +33,7 @@ import {
   routePathParamsRegex,
   ucFirst,
 } from "./common-helpers";
-import type { InputSource } from "./config-type";
+import type { InputSource, ServerConfig } from "./config-type";
 import { contentTypes } from "./content-type";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
@@ -318,12 +319,14 @@ export const depictRequestParams = ({
   makeRef,
   composition,
   getLocation,
+  getParamStyle,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResCommons & {
   composition: "inline" | "components";
   description?: string;
   flatRequest: FlattenObjectSchema;
   getLocation: (name: string) => ParameterLocation | undefined;
+  getParamStyle?: ParamStyler;
 }) => {
   const depictedParams: ParameterObject[] = [];
   for (const [name, jsonSchema] of Object.entries(flatRequest.properties)) {
@@ -344,6 +347,7 @@ export const depictRequestParams = ({
       in: location,
       deprecated: jsonSchema.deprecated,
       required: flatRequest.required?.includes(name) || location === "path", // issue #3600
+      ...(location === "query" && getParamStyle?.(jsonSchema.type)),
       description: depicted.description || description,
       schema: result,
       examples: enumerateExamples(
@@ -729,3 +733,46 @@ export const nonEmpty = <T>(subject: Iterable<T>) => {
   const copy = Array.from(subject);
   return copy.length ? copy : undefined;
 };
+
+/** @desc Checks what the custom parser makes of the given query string for the "a" key */
+const probeParser = (
+  parser: (query: string) => object,
+  query: string,
+  expected: unknown,
+) => {
+  try {
+    return R.equals(R.prop("a", parser(query) as FlatObject), expected);
+  } catch {
+    return false; // the custom parser failed on the probe
+  }
+};
+
+export const makeParamStyler = ({
+  queryParser = "simple",
+}: Pick<ServerConfig, "queryParser">) => {
+  const isCustom = typeof queryParser === "function";
+  const supports = {
+    deepObject:
+      queryParser === "extended" ||
+      (isCustom && probeParser(queryParser, "a[b]=1", { b: "1" })),
+    comma: isCustom && probeParser(queryParser, "a=1,2", ["1", "2"]),
+    pipe: isCustom && probeParser(queryParser, "a=1|2", ["1", "2"]),
+    space: isCustom && probeParser(queryParser, "a=1%202", ["1", "2"]),
+  };
+  return (
+    type?: z.core.JSONSchema.BaseSchema["type"],
+  ): Pick<BaseParameterObject, "style" | "explode"> | undefined => {
+    const types = R.flatten([type]);
+    if (types.includes("array")) {
+      if (supports.comma) return { style: "form", explode: false };
+      if (supports.pipe) return { style: "pipeDelimited", explode: false };
+      if (supports.space) return { style: "spaceDelimited", explode: false };
+      return { style: "form", explode: true }; // repeated keys: all built-in parsers accept them
+    }
+    if (types.includes("object") && supports.deepObject)
+      return { style: "deepObject", explode: true };
+    // primitives: the defaults (form, explode) are fine; objects unsupported by parser: nothing to declare
+  };
+};
+
+export type ParamStyler = ReturnType<typeof makeParamStyler>;
