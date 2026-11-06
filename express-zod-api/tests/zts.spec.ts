@@ -1,14 +1,13 @@
-import ts from "typescript";
 import { z } from "zod";
 import { ez } from "../src";
-import { printNode } from "../src/typescript-api";
+import { ensureTypeNode, printNode } from "../src/typescript-api";
 import { zodToTs } from "../src/zts";
 import type { ZTSContext } from "../src/zts-helpers";
 
 describe("zod-to-ts", () => {
   const ctx: ZTSContext = {
     isResponse: false,
-    makeAlias: vi.fn(() => ts.factory.createTypeReferenceNode("SomeType")),
+    makeAlias: vi.fn(() => ensureTypeNode("SomeType")),
   };
 
   describe("z.array()", () => {

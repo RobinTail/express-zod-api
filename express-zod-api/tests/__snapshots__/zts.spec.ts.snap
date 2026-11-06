@@ -282,7 +282,7 @@ exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to opti
     optional?: string | undefined;
     required: string;
     transform?: number | undefined;
-    or?: (number | string) | undefined;
+    or?: number | string | undefined;
     tuple?: [
         string,
         number,
