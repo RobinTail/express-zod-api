@@ -400,7 +400,7 @@ importers:
         version: 1.5.2
       express-rate-limit:
         specifier: ^8.5.2
-        version: 8.7.1(express@5.3.0)
+        version: 8.7.2(express@5.3.0)
       http-errors:
         specifier: catalog:dev
         version: 2.0.1
@@ -1375,8 +1375,8 @@ packages:
     resolution: {integrity: sha512-wxUJn2vTHvj/kZCVmc5/bJO15C7aSMyHeuXYY3geKpeKibaAoQGcEv5+sM6nHS2T7VF+QHS4hTWPiY2mKofEdg==}
     engines: {node: '>=12.0.0'}
 
-  express-rate-limit@8.7.1:
-    resolution: {integrity: sha512-2FXbqkygil3mZiXzEtM0IjE/UBmBNot0J1GEVrJT4JbrvwOSoEtqtO+wHbiMQELWe1eNvHoYRg2dkjOid+6JkA==}
+  express-rate-limit@8.7.2:
+    resolution: {integrity: sha512-U1ScocxDD9WI09LaBVypvNkOtNR5yWAmZLkuKJdAzIchA4YKFYF6GT5IKER7epG58oXtjvGlV0/6ii0F83EyZg==}
     engines: {node: '>= 16'}
     peerDependencies:
       express: '>= 4.11'
@@ -2623,7 +2623,7 @@ snapshots:
     dependencies:
       busboy: 1.6.0
 
-  express-rate-limit@8.7.1(express@5.3.0):
+  express-rate-limit@8.7.2(express@5.3.0):
     dependencies:
       debug: 4.4.3
       express: 5.3.0
