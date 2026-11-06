@@ -2,6 +2,19 @@
 
 ## Version 30
 
+### v30.1.0
+
+- Featuring named aliases by the `Integration` generator:
+  - Schemas having an `id` in metadata become types named by that `id` and are shared among the Endpoints, except:
+    - invalid type names, reserved names, colliding name — get automatic name;
+    - duplicate custom `id` — gets an index suffix but still exported.
+  - The custom `brandHandling` is out of the scope: such implementations can call `makeAlias()` on their own;
+  - The feature was suggested and partially implemented by [@giovio](https://github.com/giovio).
+- Alias deduplication:
+  - In certain cases the direction affects the generated type, for example for schemas having `.default()`;
+  - This version compares those types and emits a single type when they're equal (changed since v29.8.2);
+  - The feature was suggested and partially implemented by [@giovio](https://github.com/giovio).
+
 ### v30.0.0
 
 - Supported Zod versions: `^4.5.4`:
@@ -52,12 +65,6 @@ else if (status === 400 || discriminator === "error")
 ```
 
 ## Version 29
-
-### v29.8.3
-
-- Integration generator refactoring:
-  - Consolidated the production of aliases for traversing lazy and recursive schemas;
-  - Suggested and implemented by [@giovio](https://github.com/giovio).
 
 ### v29.8.2
 
