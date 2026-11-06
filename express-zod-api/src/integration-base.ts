@@ -91,7 +91,7 @@ export abstract class IntegrationBase {
       [ids.Path, ids.Implementation, ids.DefaultContext, ids.Method],
       [ids.Request, ids.Pagination, ids.File, ids.FormData, Blob.name],
       [MessageEvent.name, "RequestInit", "EventSource", "Promise"],
-      ["URL", "URLSearchParams", "Record", "Extract", "Omit"],
+      ["URL", "URLSearchParams", "Record", "PropertyKey", "Extract", "Omit"],
       classNames,
     );
 
