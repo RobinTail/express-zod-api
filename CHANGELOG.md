@@ -5,7 +5,9 @@
 ### v30.1.0
 
 - Featuring named aliases by the `Integration` generator:
-  - Schemas having an `id` in metadata become types named by that `id` and are shared among the Endpoints;
+  - Schemas having an `id` in metadata become types named by that `id` and are shared among the Endpoints, except:
+    - invalid type names, reserved names, colliding name — get automatic name;
+    - duplicate custom `id` — gets an index suffix but still exported.
   - The custom `brandHandling` is out of the scope: such implementations can call `makeAlias()` on their own;
   - The feature was suggested and partially implemented by [@giovio](https://github.com/giovio).
 - Alias deduplication:
