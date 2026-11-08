@@ -21,12 +21,12 @@
     "eslint-plugin-allowed-dependencies": "^3.1.0",
     "husky": "^9.1.7",
     "ollama": "^0.6.3",
-    "oxfmt": "0.74.0",
+    "oxfmt": "0.75.0",
     "oxlint": "^1.76.0",
     "oxlint-plugin-eslint": "^1.76.0",
     "tsdown": "^0.23.0",
     "vite": "^8.2.2",
     "vitest": "^5.0.0"
   },
-  "packageManager": "pnpm@12.15.0+sha512.b3951d6d6ff4a9f13dc7cf56cd28d2b8eb37dbcc9c68e52e1e1191873ea9f82a017287ab50baadc5ccc494f036c67c0e47eb13608c2fa36f47711b61ea128e61"
+  "packageManager": "pnpm@12.17.0+sha512.b8d223ebec04b580a89ed206daa71d1bccb6a1ee1d52efa95cc3b0db75271561df8f0d8e2c43add39c5ec08018af7a8a95108e7090f95a29f88727b7a40fd53d"
 }
