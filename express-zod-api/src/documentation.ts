@@ -407,15 +407,15 @@ export class Documentation extends OpenApiBuilder {
     const queue: unknown[] = [doc, components]; // everything but the schemas, including webhooks
     while (queue.length) {
       const entry = queue.pop();
-      if (!isObject(entry)) continue;
-      if (isReferenceObject(entry) && entry.$ref.startsWith(prefix)) {
-        const name = entry.$ref.slice(prefix.length);
+      // both $ref values and discriminator mappings are strings
+      if (typeof entry === "string" && entry.startsWith(prefix)) {
+        const name = entry.slice(prefix.length);
         if (!used.has(name)) {
           used.add(name);
           queue.push(schemas[name]);
         }
       }
-      queue.push(...Object.values(entry));
+      if (isObject(entry)) queue.push(...Object.values(entry));
     }
     for (const name of Object.keys(schemas))
       if (!used.has(name)) delete schemas[name];

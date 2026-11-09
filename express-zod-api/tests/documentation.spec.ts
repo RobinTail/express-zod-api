@@ -1885,6 +1885,20 @@ describe("Documentation", () => {
       },
     );
 
+    test("should not depict an empty request body having empty patternProperties", () => {
+      const spec = new Documentation({
+        ...commons,
+        routing: {
+          "patch /items/:id": defaultEndpointsFactory.buildVoid({
+            method: "patch",
+            input: z.object({ id: z.string() }).meta({ patternProperties: {} }),
+            handler: vi.fn(),
+          }),
+        },
+      }).getSpec();
+      expect(spec.paths!["/items/{id}"]!.patch!.requestBody).toBeUndefined();
+    });
+
     test.each([
       { path: "/items", input: undefined },
       { path: "/items/:id", input: z.looseObject({ id: z.string() }) },
@@ -1986,6 +2000,26 @@ describe("Documentation", () => {
       }).getSpec();
       expect(spec.paths).toEqual({});
       expect(spec.components?.schemas).toHaveProperty("SharedInput");
+    });
+
+    test("should keep the component referenced by a discriminator mapping only", () => {
+      class MappingDocumentation extends Documentation {
+        override addPath(path: string, item: PathItemObject) {
+          this.addSchema("Child", { type: "object" });
+          return super.addPath(path, {
+            ...item,
+            "x-discriminator": {
+              propertyName: "kind",
+              mapping: { child: "#/components/schemas/Child" },
+            },
+          });
+        }
+      }
+      const spec = new MappingDocumentation({
+        ...commons,
+        routing: { "put /items": build() },
+      }).getSpec();
+      expect(spec.components?.schemas).toHaveProperty("Child");
     });
   });
 

@@ -488,7 +488,7 @@ const isEmptyObjectDepiction = ({
   type === "object" &&
   R.isEmpty(properties) &&
   !additionalProperties &&
-  !patternProperties &&
+  R.isEmpty(patternProperties ?? {}) &&
   !allOf &&
   !oneOf &&
   !anyOf;
