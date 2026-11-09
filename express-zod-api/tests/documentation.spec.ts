@@ -21,7 +21,11 @@ import { z } from "zod";
 import { givePort } from "../../tools/ports";
 import * as R from "ramda";
 import { brandProperty } from "../src/metadata";
-import type { OpenAPIObject, ReferenceObject } from "openapi3-ts/oas32";
+import type {
+  OpenAPIObject,
+  PathItemObject,
+  ReferenceObject,
+} from "openapi3-ts/oas32";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({
@@ -1890,6 +1894,12 @@ describe("Documentation", () => {
           .object({ id: z.string() })
           .or(z.object({ id: z.string(), x: z.number() })),
       },
+      {
+        path: "/items/:id",
+        input: z
+          .object({ id: z.string() })
+          .meta({ patternProperties: { "^x-": { type: "string" } } }),
+      },
     ])(
       "should keep the request body when it is not entirely made of path params %#",
       ({ path, input }) => {
@@ -1964,6 +1974,19 @@ describe("Documentation", () => {
         );
       },
     );
+    test("should keep the component referenced by a webhook only", () => {
+      class WebhookDocumentation extends Documentation {
+        override addPath(path: string, item: PathItemObject) {
+          return this.addWebhook(path, item);
+        }
+      }
+      const spec = new WebhookDocumentation({
+        ...commons,
+        routing: { "put /items": build() },
+      }).getSpec();
+      expect(spec.paths).toEqual({});
+      expect(spec.components?.schemas).toHaveProperty("SharedInput");
+    });
   });
 
   describe("::resolve()", () => {

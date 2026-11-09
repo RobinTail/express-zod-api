@@ -399,11 +399,12 @@ export class Documentation extends OpenApiBuilder {
    * @desc from the body, the operation refers to the stripped copy instead, leaving the original one unreferenced.
    * */
   #removeUnusedSchemas() {
-    const schemas = this.rootDoc.components?.schemas;
+    const { components: { schemas, ...components } = {}, ...doc } =
+      this.rootDoc;
     if (!schemas) return;
     const prefix = "#/components/schemas/";
     const used = new Set<string>();
-    const queue: unknown[] = [this.rootDoc.paths];
+    const queue: unknown[] = [doc, components]; // everything but the schemas, including webhooks
     while (queue.length) {
       const entry = queue.pop();
       if (!isObject(entry)) continue;

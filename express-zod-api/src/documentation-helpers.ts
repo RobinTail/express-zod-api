@@ -480,6 +480,7 @@ const isEmptyObjectDepiction = ({
   type,
   properties = {},
   additionalProperties,
+  patternProperties,
   allOf,
   oneOf,
   anyOf,
@@ -487,6 +488,7 @@ const isEmptyObjectDepiction = ({
   type === "object" &&
   R.isEmpty(properties) &&
   !additionalProperties &&
+  !patternProperties &&
   !allOf &&
   !oneOf &&
   !anyOf;
