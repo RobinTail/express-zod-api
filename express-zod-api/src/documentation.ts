@@ -23,6 +23,7 @@ import {
   getInputSources,
   makeCleanId,
   normalizeParams,
+  isObject,
 } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
@@ -390,5 +391,32 @@ export class Documentation extends OpenApiBuilder {
     const handler = this.#makeEndpointHandler(rest);
     const onEndpoint = hasHeadMethod ? withHead(handler) : handler;
     walkRouting({ ...rest, onEndpoint });
+    this.#removeUnusedSchemas();
+  }
+
+  /**
+   * @desc Schemas having .meta({ id }) are registered while depicting the request, but when path params are stripped
+   * @desc from the body, the operation refers to the stripped copy instead, leaving the original one unreferenced.
+   * */
+  #removeUnusedSchemas() {
+    const schemas = this.rootDoc.components?.schemas;
+    if (!schemas) return;
+    const prefix = "#/components/schemas/";
+    const used = new Set<string>();
+    const queue: unknown[] = [this.rootDoc.paths];
+    while (queue.length) {
+      const entry = queue.pop();
+      if (!isObject(entry)) continue;
+      if (isReferenceObject(entry) && entry.$ref.startsWith(prefix)) {
+        const name = entry.$ref.slice(prefix.length);
+        if (!used.has(name)) {
+          used.add(name);
+          queue.push(schemas[name]);
+        }
+      }
+      queue.push(...Object.values(entry));
+    }
+    for (const name of Object.keys(schemas))
+      if (!used.has(name)) delete schemas[name];
   }
 }

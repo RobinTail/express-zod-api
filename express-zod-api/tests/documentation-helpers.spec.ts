@@ -606,7 +606,7 @@ describe("Documentation helpers", () => {
         mimeType: "application/octet-stream", // raw content type
         paramNames: [],
       });
-      expect(body.required).toBe(true);
+      expect(body?.required).toBe(true);
     });
 
     test("should omit parameter fields from fallback flat.examples", () => {
@@ -630,7 +630,7 @@ describe("Documentation helpers", () => {
         paramNames: ["id", "name"],
       });
       const examples = (
-        body.content?.["application/json"] as Record<string, unknown>
+        body?.content["application/json"] as Record<string, unknown>
       )?.examples;
       expect(examples).toMatchSnapshot();
     });
