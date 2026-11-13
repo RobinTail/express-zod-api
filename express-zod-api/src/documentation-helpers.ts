@@ -475,6 +475,24 @@ export const excludeParamsFromDepiction = (
   return [result, hasRequired || Boolean(result.required?.length)];
 };
 
+/** @desc An object depiction having no properties left, for example after excluding path params from it */
+const isEmptyObjectDepiction = ({
+  type,
+  properties = {},
+  additionalProperties,
+  patternProperties,
+  allOf,
+  oneOf,
+  anyOf,
+}: z.core.JSONSchema.BaseSchema) =>
+  type === "object" &&
+  R.isEmpty(properties) &&
+  !additionalProperties &&
+  R.isEmpty(patternProperties ?? {}) &&
+  !allOf &&
+  !oneOf &&
+  !anyOf;
+
 export const depictResponse = ({
   method,
   path,
@@ -669,7 +687,9 @@ export const depictBody = ({
   flatRequest: FlattenObjectSchema;
   mimeType: string;
   paramNames: string[];
-}) => {
+}): RequestBodyObject | undefined => {
+  // not depicted when all the props went to path params, e.g. for PATCH /items/:id/toggle
+  if (paramNames.length && isEmptyObjectDepiction(bodyJsonSchema)) return;
   const pure = asOAS(bodyJsonSchema);
   const examples = [];
   if (isSchemaObject(pure) && pure.examples) {

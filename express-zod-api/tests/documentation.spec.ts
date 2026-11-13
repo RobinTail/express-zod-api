@@ -21,7 +21,11 @@ import { z } from "zod";
 import { givePort } from "../../tools/ports";
 import * as R from "ramda";
 import { brandProperty } from "../src/metadata";
-import type { OpenAPIObject, ReferenceObject } from "openapi3-ts/oas32";
+import type {
+  OpenAPIObject,
+  PathItemObject,
+  ReferenceObject,
+} from "openapi3-ts/oas32";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({
@@ -1850,6 +1854,172 @@ describe("Documentation", () => {
       expect(spec.components!.schemas!.PostUsersRequestBody).toEqual({
         $ref: "#/components/schemas/UserInput",
       });
+    });
+  });
+
+  describe("Path params only input", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Path params only", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+    };
+
+    test.each(["post", "put", "patch"] as const)(
+      "should not depict an empty request body for %s method",
+      (method) => {
+        const spec = new Documentation({
+          ...commons,
+          routing: {
+            [`${method} /items/:id/toggle`]: defaultEndpointsFactory.buildVoid({
+              method,
+              input: z.object({ id: z.string() }),
+              handler: vi.fn(),
+            }),
+          },
+        }).getSpec();
+        const operation = spec.paths!["/items/{id}/toggle"]![method]!;
+        expect(operation.requestBody).toBeUndefined();
+        expect(operation.parameters).toEqual([
+          expect.objectContaining({ name: "id", in: "path" }),
+        ]);
+      },
+    );
+
+    test("should not depict an empty request body having empty patternProperties", () => {
+      const spec = new Documentation({
+        ...commons,
+        routing: {
+          "patch /items/:id": defaultEndpointsFactory.buildVoid({
+            method: "patch",
+            input: z.object({ id: z.string() }).meta({ patternProperties: {} }),
+            handler: vi.fn(),
+          }),
+        },
+      }).getSpec();
+      expect(spec.paths!["/items/{id}"]!.patch!.requestBody).toBeUndefined();
+    });
+
+    test.each([
+      { path: "/items", input: undefined },
+      { path: "/items/:id", input: z.looseObject({ id: z.string() }) },
+      {
+        path: "/items/:id",
+        input: z
+          .object({ id: z.string() })
+          .or(z.object({ id: z.string(), x: z.number() })),
+      },
+      {
+        path: "/items/:id",
+        input: z
+          .object({ id: z.string() })
+          .meta({ patternProperties: { "^x-": { type: "string" } } }),
+      },
+    ])(
+      "should keep the request body when it is not entirely made of path params %#",
+      ({ path, input }) => {
+        const spec = new Documentation({
+          ...commons,
+          routing: {
+            [`post ${path}`]: defaultEndpointsFactory.buildVoid({
+              input,
+              handler: vi.fn(),
+            }),
+          },
+        }).getSpec();
+        expect(
+          spec.paths![path.replace(":id", "{id}")]!.post!.requestBody,
+        ).toBeDefined();
+      },
+    );
+  });
+
+  describe("Unused components", () => {
+    const commons = {
+      config: sampleConfig,
+      info: { title: "Unused components", version: "1.0.0" },
+      serverUrl: "http://localhost:8090",
+    };
+    const shared = z
+      .object({ id: z.string(), name: z.string() })
+      .meta({ id: "SharedInput" });
+    const build = () =>
+      defaultEndpointsFactory.buildVoid({
+        method: "put",
+        input: shared,
+        handler: vi.fn(),
+      });
+
+    test.each(["inline", "components"] as const)(
+      "should not keep the component of an input stripped of path params with composition=%s",
+      (composition) => {
+        const spec = new Documentation({
+          ...commons,
+          composition,
+          routing: { "put /items/:id": build() },
+        }).getSpec();
+        expect(spec.components?.schemas).not.toHaveProperty("SharedInput");
+      },
+    );
+
+    test.each(["inline", "components"] as const)(
+      "should keep the component still referenced by another operation with composition=%s",
+      (composition) => {
+        const doc = new Documentation({
+          ...commons,
+          composition,
+          routing: { "put /items/:id": build(), "put /items": build() },
+        });
+        const spec = doc.getSpec();
+        expect(spec.components?.schemas).toHaveProperty("SharedInput");
+        const body = R.path<ReferenceObject>(
+          [
+            "paths",
+            "/items",
+            "put",
+            "requestBody",
+            "content",
+            contentTypes.json,
+            "schema",
+          ],
+          spec,
+        );
+        expect(doc.resolve(body!)).toEqual(
+          spec.components!.schemas!.SharedInput,
+        );
+      },
+    );
+    test("should keep the component referenced by a webhook only", () => {
+      class WebhookDocumentation extends Documentation {
+        override addPath(path: string, item: PathItemObject) {
+          return this.addWebhook(path, item);
+        }
+      }
+      const spec = new WebhookDocumentation({
+        ...commons,
+        routing: { "put /items": build() },
+      }).getSpec();
+      expect(spec.paths).toEqual({});
+      expect(spec.components?.schemas).toHaveProperty("SharedInput");
+    });
+
+    test("should keep the component referenced by a discriminator mapping only", () => {
+      class MappingDocumentation extends Documentation {
+        override addPath(path: string, item: PathItemObject) {
+          this.addSchema("Child", { type: "object" });
+          return super.addPath(path, {
+            ...item,
+            "x-discriminator": {
+              propertyName: "kind",
+              mapping: { child: "#/components/schemas/Child" },
+            },
+          });
+        }
+      }
+      const spec = new MappingDocumentation({
+        ...commons,
+        routing: { "put /items": build() },
+      }).getSpec();
+      expect(spec.components?.schemas).toHaveProperty("Child");
     });
   });
 
