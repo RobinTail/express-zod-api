@@ -415,7 +415,8 @@ export class Documentation extends OpenApiBuilder {
           queue.push(schemas[name]);
         }
       }
-      if (isObject(entry)) queue.push(...Object.values(entry));
+      if (isObject(entry))
+        for (const value of Object.values(entry)) queue.push(value); // no spread: argument limit
     }
     for (const name of Object.keys(schemas))
       if (!used.has(name)) delete schemas[name];
