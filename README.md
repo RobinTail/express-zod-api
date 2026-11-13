@@ -1111,6 +1111,9 @@ to your custom express app.
 Besides that, if you're looking to include additional request parsers, or a middleware that establishes its own routes,
 install them on your custom `app` before calling `attachRouting()`.
 
+The `app` can also come from a framework compatible with Express 5, for example
+[fulmine.js](https://github.com/nigrosimone/fulmine.js) 5.33.3 or later, which has the Express 5 API on uWebSockets.js.
+
 ## Testing endpoints
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
