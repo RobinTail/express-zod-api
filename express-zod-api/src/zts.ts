@@ -110,14 +110,11 @@ const onNullable: Producer = (
   { next },
 ) => makeUnion([next(def.innerType), makeLiteralType(null)]);
 
-const onTuple: Producer = ({ _zod: { def } }: z.core.$ZodTuple, { next }) =>
-  f.createTupleTypeNode(
-    def.items
-      .map(next)
-      .concat(
-        def.rest === null ? [] : f.createRestTypeNode(next(z.array(def.rest))),
-      ),
-  );
+const onTuple: Producer = ({ _zod: { def } }: z.core.$ZodTuple, { next }) => {
+  const elements = def.items.map(next);
+  if (def.rest) elements.push(f.createRestTypeNode(next(z.array(def.rest))));
+  return f.createTupleTypeNode(elements);
+};
 
 const onRecord: Producer = ({ _zod: { def } }: z.core.$ZodRecord, { next }) => {
   const [keyNode, valueNode] = [def.keyType, def.valueType].map(next);
