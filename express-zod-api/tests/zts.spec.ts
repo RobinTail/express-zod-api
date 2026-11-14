@@ -233,6 +233,7 @@ describe("zod-to-ts", () => {
       const schema = z.object({
         "string-literal": z.string(),
         5: z.number(),
+        [-1]: z.string(),
       });
       const node = zodToTs(schema, { ctx });
       expect(printNode(node)).toMatchSnapshot();
@@ -378,6 +379,7 @@ describe("zod-to-ts", () => {
       z.literal(false),
       z.literal(123),
       z.literal(undefined),
+      z.literal(-1),
     ])("Should produce the correct typescript %#", (schema) => {
       expect(printNode(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
