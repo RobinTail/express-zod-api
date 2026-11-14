@@ -2,6 +2,11 @@
 
 ## Version 30
 
+### v30.0.1
+
+- Fixed the Integration generator to handle `z.literal()` with a negative numeric argument:
+  - The issue was found and reported by [@trackoor](https://github.com/trackoor).
+
 ### v30.0.0
 
 - Supported Zod versions: `^4.5.4`:
