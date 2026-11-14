@@ -114,7 +114,9 @@ const onTuple: Producer = ({ _zod: { def } }: z.core.$ZodTuple, { next }) =>
   f.createTupleTypeNode(
     def.items
       .map(next)
-      .concat(def.rest === null ? [] : f.createRestTypeNode(next(def.rest))),
+      .concat(
+        def.rest === null ? [] : f.createRestTypeNode(next(z.array(def.rest))),
+      ),
   );
 
 const onRecord: Producer = ({ _zod: { def } }: z.core.$ZodRecord, { next }) => {

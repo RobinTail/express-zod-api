@@ -41,7 +41,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     tupleRest: [
         string,
         number,
-        ...boolean
+        ...boolean[]
     ];
     record: Record<string, {
         object: {
