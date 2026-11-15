@@ -115,7 +115,10 @@ export const makeInterfacePropText = (
 ): DeferredCode => {
   const opt = isOptional ? "?" : "";
   const undef = hasUndefined ? " | undefined" : "";
-  const parts = [isDeprecated && "@deprecated", comment].filter(Boolean);
+  const parts = [
+    isDeprecated && "@deprecated",
+    comment?.replaceAll("*/", "*\\/"),
+  ].filter(Boolean);
   const jsdoc = parts.length ? `    /** ${parts.join(" ")} */\n` : "";
   return (opts) => {
     const keyText = printNode(makePropertyIdentifier(key), opts);

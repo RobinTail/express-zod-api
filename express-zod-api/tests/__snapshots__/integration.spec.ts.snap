@@ -469,34 +469,12 @@ export class Client<T extends Record<string, unknown> = DefaultContext> {
   }
 }
 
-export class Subscription<
-  K extends Extract<Request, \`get \${string}\`>,
-  R extends Extract<PositiveResponse[K], { event: string }>,
-> {
-  public source: EventSource;
-  public constructor(request: K, params: Input[K]) {
-    const [path, rest] = substitute(parseRequest(request)[1], params);
-    const searchParams = \`?\${new URLSearchParams(rest)}\`;
-    this.source = new EventSource(new URL(\`\${path}\${searchParams}\`, "https://example.com"), {
-      withCredentials: undefined,
-    });
-  }
-  public on<E extends R["event"]>(
-    event: E,
-    handler: (data: Extract<R, { event: E }>["data"]) => void | Promise<void>,
-  ) {
-    this.source.addEventListener(event, (msg) => handler(JSON.parse((msg as MessageEvent).data)));
-    return this;
-  }
-}
-
 // Usage example:
 /*
 const client = new Client();
 const { status, discriminator, data } = await client.provide("get /v1/user/retrieve", { id: "10" });
 if (status === 200) console.log(data.name); // success
 else if (status === 400 || discriminator === "error") console.error(data.message); // error
-new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
 */
 "
 `;

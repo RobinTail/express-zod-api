@@ -41,7 +41,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     tupleRest: [
         string,
         number,
-        ...boolean
+        ...boolean[]
     ];
     record: Record<string, {
         object: {
@@ -218,6 +218,8 @@ exports[`zod-to-ts > z.literal() > Should produce the correct typescript 3 1`] =
 
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 4 1`] = `"undefined"`;
 
+exports[`zod-to-ts > z.literal() > Should produce the correct typescript 5 1`] = `"-1"`;
+
 exports[`zod-to-ts > z.nullable() > outputs correct typescript 1`] = `
 "{
     username: string | null;
@@ -265,6 +267,7 @@ exports[`zod-to-ts > z.object() > supports string literal properties 1`] = `
 "{
     "5": number;
     "string-literal": string;
+    "-1": string;
 }"
 `;
 
@@ -274,6 +277,8 @@ exports[`zod-to-ts > z.object() > supports zod.describe() 1`] = `
     name: string;
     /** The price of the item */
     price: number;
+    /** glob, e.g. src/**\\/*.ts */
+    path: string;
 }"
 `;
 
