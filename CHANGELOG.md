@@ -15,6 +15,26 @@
   - This version compares those types and emits a single type when they're equal (changed since v29.8.2);
   - The feature was suggested and partially implemented by [@giovio](https://github.com/giovio).
 
+### v30.0.4
+
+- Fixed the Integration generator to include `Subscription` class only when having SSE endpoints:
+  - The issue was found and reported by [@trackoor](https://github.com/trackoor).
+
+### v30.0.3
+
+- Fixed the Integration generator to escape the `*/` sequence in JSDoc (from schema descriptions):
+  - The issue was found and reported by [@trackoor](https://github.com/trackoor).
+
+### v30.0.2
+
+- Fixed the Integration generator for tuples with a rest element (missing array type):
+  - The issue was found and reported by [@trackoor](https://github.com/trackoor).
+
+### v30.0.1
+
+- Fixed the Integration generator to handle `z.literal()` with a negative numeric argument:
+  - The issue was found and reported by [@trackoor](https://github.com/trackoor).
+
 ### v30.0.0
 
 - Supported Zod versions: `^4.5.4`:

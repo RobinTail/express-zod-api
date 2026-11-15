@@ -29,11 +29,13 @@ export type Typeable =
 
 // oxfmt-ignore
 export const literally = <T extends string | null | boolean | number | bigint>(subj: T) => (
-  typeof subj === "number" ? f.createNumericLiteral(subj)
+  typeof subj === "number" ? subj < 0
+      ? f.createPrefixUnaryExpression(ts.SyntaxKind.MinusToken, f.createNumericLiteral(-subj))
+      : f.createNumericLiteral(subj)
     : typeof subj === "bigint" ? f.createBigIntLiteral(subj.toString())
       : typeof subj === "boolean" ? subj ? f.createTrue() : f.createFalse()
         : subj === null ? f.createNull() : f.createStringLiteral(subj)
-) as T extends string ? ts.StringLiteral : T extends number ? ts.NumericLiteral
+) as T extends string ? ts.StringLiteral : T extends number ? ts.NumericLiteral | ts.PrefixUnaryExpression
   : T extends boolean ? ts.BooleanLiteral : T extends bigint ? ts.BigIntLiteral : ts.NullLiteral;
 
 export const makeId = (name: string) => f.createIdentifier(name);
@@ -46,7 +48,7 @@ export const isValidTypeName = (name: string) =>
 export const makePropertyIdentifier = (name: string | number) =>
   typeof name === "string" && safePropRegex.test(name)
     ? makeId(name)
-    : literally(name);
+    : literally(name.toString());
 
 /** @desc Replaces the type references by name, returning undefined from the replacer keeps the reference */
 export const replaceRefs = (
@@ -96,7 +98,7 @@ const addJsDoc = <T extends ts.Node>(node: T, text: string) =>
   ts.addSyntheticLeadingComment(
     node,
     ts.SyntaxKind.MultiLineCommentTrivia,
-    `* ${text} `,
+    `* ${text.replaceAll("*/", "*\\/")} `,
     true,
   );
 

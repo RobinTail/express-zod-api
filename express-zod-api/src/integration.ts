@@ -25,6 +25,7 @@ import type * as OxFmt from "oxfmt";
 import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 import { getSecurityNames } from "./security";
+import { contentTypes } from "./content-type";
 
 interface IntegrationParams {
   routing: Routing;
@@ -253,6 +254,7 @@ export class Integration extends IntegrationBase {
       ctx: { isResponse: true, makeAlias: this.#makeAlias.bind(this, true) },
     };
     let hasCookies = false;
+    let hasSSE = false;
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = this.#makeEntitle(method, path);
       const { isDeprecated, inputSchema, tags } = endpoint;
@@ -284,6 +286,7 @@ export class Integration extends IntegrationBase {
           idx,
           { schema, mimeTypes, statusCodes },
         ] of responses.entries()) {
+          if (!hasSSE && mimeTypes?.includes(contentTypes.sse)) hasSSE = true;
           const subject = shouldHaveContent(method, mimeTypes)
             ? schema
             : noBodySchema;
@@ -337,15 +340,19 @@ export class Integration extends IntegrationBase {
       this.makeDefaultContextType(),
       this.makeDefaultImplementation(hasCredentials && hasCookies),
       this.makeClientClass(clientClassName),
-      this.makeSubscriptionClass(
-        subscriptionClassName,
-        hasCredentials && hasCookies,
-      ),
     );
+    if (hasSSE) {
+      this.#program.push(
+        this.makeSubscriptionClass(
+          subscriptionClassName,
+          hasCredentials && hasCookies,
+        ),
+      );
+    }
 
     this.#usage = this.makeUsageStatements(
       clientClassName,
-      subscriptionClassName,
+      hasSSE ? subscriptionClassName : null,
     );
   }
 
