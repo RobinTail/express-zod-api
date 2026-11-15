@@ -277,6 +277,8 @@ exports[`zod-to-ts > z.object() > supports zod.describe() 1`] = `
     name: string;
     /** The price of the item */
     price: number;
+    /** glob, e.g. src/**\\/*.ts */
+    path: string;
 }"
 `;
 

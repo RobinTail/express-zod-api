@@ -73,7 +73,7 @@ const addJsDoc = <T extends ts.Node>(node: T, text: string) =>
   ts.addSyntheticLeadingComment(
     node,
     ts.SyntaxKind.MultiLineCommentTrivia,
-    `* ${text} `,
+    `* ${text.replaceAll("*/", "*\\/")} `,
     true,
   );
 

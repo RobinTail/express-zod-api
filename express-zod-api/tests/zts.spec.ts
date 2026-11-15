@@ -269,6 +269,7 @@ describe("zod-to-ts", () => {
       const schema = z.object({
         name: z.string().describe("The name of the item"),
         price: z.number().describe("The price of the item"),
+        path: z.string().describe("glob, e.g. src/**/*.ts"),
       });
       const node = zodToTs(schema, { ctx });
       expect(printNode(node)).toMatchSnapshot();
