@@ -214,7 +214,7 @@ export class Integration extends IntegrationBase {
 
     this.#usage = this.makeUsageStatements(
       clientClassName,
-      subscriptionClassName,
+      hasSSE ? subscriptionClassName : null,
     );
   }
 
