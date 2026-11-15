@@ -2,6 +2,11 @@
 
 ## Version 30
 
+### v30.0.3
+
+- Fixed the Integration generator to escape the `*/` sequence in JSDoc (from schema descriptions):
+  - The issue was found and reported by [@trackoor](https://github.com/trackoor).
+
 ### v30.0.2
 
 - Fixed the Integration generator for tuples with a rest element (missing array type):
