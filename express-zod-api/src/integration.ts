@@ -2,8 +2,6 @@
  * @fileOverview The entrypoint for generating Integration code
  * @requires typescript
  * */
-import { contentTypes } from "./content-type.ts";
-
 export type { Producer } from "./zts-helpers";
 import { z } from "zod";
 import { responseVariants, type ResponseVariant } from "./api-response";
@@ -20,6 +18,7 @@ import type * as OxFmt from "oxfmt";
 import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 import { getSecurityNames } from "./security";
+import { contentTypes } from "./content-type";
 
 interface IntegrationParams {
   routing: Routing;
