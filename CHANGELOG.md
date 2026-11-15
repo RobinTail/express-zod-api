@@ -2,6 +2,11 @@
 
 ## Version 30
 
+### v30.0.4
+
+- Fixed the Integration generator to include `Subscription` class only when having SSE endpoints:
+  - The issue was found and reported by [@trackoor](https://github.com/trackoor).
+
 ### v30.0.3
 
 - Fixed the Integration generator to escape the `*/` sequence in JSDoc (from schema descriptions):

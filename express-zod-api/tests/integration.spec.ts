@@ -4,6 +4,7 @@ import {
   EndpointsFactory,
   defaultEndpointsFactory,
   ResultHandler,
+  EventStreamFactory,
 } from "../src";
 import { Integration, type Producer } from "../src/integration";
 import { brandProperty } from "../src/metadata";
@@ -92,6 +93,20 @@ describe("Integration", () => {
       },
     });
     expect(await client.printFormatted()).toMatchSnapshot();
+  });
+
+  test("Should include Subscription class when SSE endpoints present", () => {
+    const client = new Integration({
+      config: configMock,
+      routing: {
+        v1: {
+          sub: new EventStreamFactory({ time: z.number() }).buildVoid({
+            handler: vi.fn(),
+          }),
+        },
+      },
+    });
+    expect(client.print()).toContain("class Subscription");
   });
 
   test.each([undefined, false])(
