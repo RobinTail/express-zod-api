@@ -1,5 +1,10 @@
 import { globalRegistry, z } from "zod";
-import { brandProperty, getBrand, getExamples } from "../src/metadata";
+import {
+  brandProperty,
+  findIdentified,
+  getBrand,
+  getExamples,
+} from "../src/metadata";
 
 describe("Metadata helpers", () => {
   describe("getBrand()", () => {
@@ -39,6 +44,29 @@ describe("Metadata helpers", () => {
         const subject = z.number();
         globalRegistry.add(subject, { examples });
         expect(getExamples(subject)).toEqual([]);
+      },
+    );
+  });
+
+  describe("findIdentified()", () => {
+    const origin = z.object({ name: z.string() }).meta({ id: "Origin" });
+
+    test.each([
+      origin,
+      origin.describe("clone"),
+      z.compile(origin),
+      z.compile(origin.describe("clone")), // two levels: compiled, described, origin
+    ])("should find the schema or its origin having the id %#", (subject) => {
+      expect(findIdentified(subject)).toEqual({
+        id: "Origin",
+        schema: origin,
+      });
+    });
+
+    test.each([origin.optional(), origin.extend({}), z.object({})])(
+      "should not find it for the derived or other schemas %#",
+      (subject) => {
+        expect(findIdentified(subject)).toBeUndefined();
       },
     );
   });

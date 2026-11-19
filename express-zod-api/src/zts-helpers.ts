@@ -4,7 +4,11 @@ import type { SchemaHandler } from "./schema-walker";
 
 export interface ZTSContext extends FlatObject {
   isResponse: boolean;
-  makeAlias: (key: object, produce: () => ts.TypeNode) => ts.TypeNode;
+  makeAlias: (
+    key: object,
+    produce: () => ts.TypeNode,
+    proposedName?: string,
+  ) => ts.TypeNode;
 }
 
 export type Producer = SchemaHandler<ts.TypeNode, ZTSContext>;
