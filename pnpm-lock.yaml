@@ -231,7 +231,7 @@ importers:
         version: 0.18.5
       '@tsconfig/node22':
         specifier: ^22.0.5
-        version: 22.0.6
+        version: 22.0.7
       '@types/node':
         specifier: ^26.0.1
         version: 26.6.6
@@ -878,8 +878,8 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@tsconfig/node22@22.0.6':
-    resolution: {integrity: sha512-/5thavHAnWDZwH2H6eEn/T8pBEBhtuKaWGMslsj82kJfvzQgOgEMK7X4goBbIUjgVtAzPTtM9Ml64LA0uxO6Iw==}
+  '@tsconfig/node22@22.0.7':
+    resolution: {integrity: sha512-xnYM5q+HTeLm+jRBIB7Mu61OyOmNpgzPmJuhwPODSyITDPIWVK2TXxn/+O5fJ4n/P0u/gPsgSyPw/Dl3Cz/L4g==}
 
   '@types/body-parser@1.19.6':
     resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
@@ -2199,7 +2199,7 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
-  '@tsconfig/node22@22.0.6': {}
+  '@tsconfig/node22@22.0.7': {}
 
   '@types/body-parser@1.19.6':
     dependencies:
