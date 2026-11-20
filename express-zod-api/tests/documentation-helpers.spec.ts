@@ -1,4 +1,5 @@
 import type { SchemaObjectValue } from "openapi3-ts/oas32";
+import { parse } from "node:querystring";
 import * as R from "ramda";
 import { z } from "zod";
 import {
@@ -26,6 +27,7 @@ import {
   depictDateOut,
   depictBody,
   depictRequest,
+  makeParamStyler,
 } from "../src/documentation-helpers";
 import type { InputSource } from "../src/config-type";
 
@@ -494,6 +496,8 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictRequestParams()", () => {
+    const getParamStyle = makeParamStyler({});
+
     test("should depict query and path params", () => {
       expect(
         depictRequestParams({
@@ -506,6 +510,7 @@ describe("Documentation helpers", () => {
             type: "object",
           },
           getLocation: (name) => (name === "id" ? "path" : "query"),
+          getParamStyle,
           composition: "inline",
           ...requestCtx,
         }),
@@ -522,6 +527,7 @@ describe("Documentation helpers", () => {
           type: "object",
         },
         getLocation: (name) => (name === "id" ? "path" : "query"),
+        getParamStyle,
         composition: "inline",
         ...requestCtx,
       });
@@ -543,6 +549,7 @@ describe("Documentation helpers", () => {
             type: "object",
           },
           getLocation: (name) => (name === "id" ? "path" : undefined),
+          getParamStyle,
           composition: "inline",
           ...requestCtx,
         }),
@@ -568,6 +575,7 @@ describe("Documentation helpers", () => {
               : name === "id"
                 ? "path"
                 : "query",
+          getParamStyle,
           composition: "inline",
           ...requestCtx,
         }),
@@ -588,11 +596,38 @@ describe("Documentation helpers", () => {
           },
           getLocation: (name) =>
             name === "session" ? "cookie" : name === "id" ? "path" : "query",
+          getParamStyle,
           composition: "inline",
           ...requestCtx,
         }),
       ).toMatchSnapshot();
     });
+
+    test.each(["simple", "extended"] as const)(
+      "should depict the style of query params for queryParser=%s",
+      (queryParser) => {
+        expect(
+          depictRequestParams({
+            flatRequest: {
+              properties: {
+                id: { type: "string" },
+                ids: { type: "array", items: { type: "string" } },
+                filter: {
+                  type: "object",
+                  properties: { name: { type: "string" } },
+                },
+              },
+              required: ["id", "ids", "filter"],
+              type: "object",
+            },
+            getLocation: (name) => (name === "id" ? "path" : "query"),
+            getParamStyle: makeParamStyler({ queryParser }),
+            composition: "inline",
+            ...requestCtx,
+          }),
+        ).toMatchSnapshot();
+      },
+    );
   });
 
   describe("depictBody", () => {
@@ -899,6 +934,42 @@ describe("Documentation helpers", () => {
       expect(trimSummary("this text is long enough", limit)).toHaveLength(
         limit > 0 ? limit : 1,
       );
+    });
+  });
+
+  describe("makeParamStyler()", () => {
+    const makeSplitter =
+      (separator: string) =>
+      (query: string): object =>
+        R.map(
+          (value) =>
+            typeof value === "string" && value.includes(separator)
+              ? value.split(separator)
+              : value,
+          parse(query),
+        );
+    test.each([
+      undefined,
+      "simple" as const,
+      "extended" as const,
+      parse,
+      makeSplitter(","),
+      makeSplitter("|"),
+      makeSplitter(" "),
+      (query: string) => (query === "a[b]=1" ? { a: { b: "1" } } : {}),
+      () => {
+        throw new Error("Unsupported");
+      },
+    ])("depends on queryParser %#", (queryParser) => {
+      const getStyle = makeParamStyler({ queryParser });
+      expect(
+        R.map(getStyle, [
+          "array",
+          "object",
+          "string",
+          ["array", "null"],
+        ] as const),
+      ).toMatchSnapshot();
     });
   });
 });
