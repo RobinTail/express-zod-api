@@ -112,7 +112,7 @@ export class Integration extends IntegrationBase {
   #makeName(prefix: string, key: object, idx = 1) {
     let name: string;
     do name = `${prefix}${idx++ || ""}`;
-    while (this.#taken.has(name));
+    while (this.#taken.has(name) || this.#forbidden.strings.has(name));
     this.#taken.set(name, key);
     return name;
   }
