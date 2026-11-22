@@ -414,6 +414,39 @@ describe("Integration", () => {
       expect(code.match(/export type Outer/g)).toHaveLength(2);
     });
 
+    test("should keep request and response aliases distinct when a merged name is reused", () => {
+      const shared = z.string().meta({ id: "Shared" });
+      const numeric = z.number().meta({ id: "Shared2" });
+      const outer = z
+        .object({
+          value: z.codec(numeric, shared, { decode: String, encode: Number }),
+        })
+        .meta({ id: "Outer" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          first: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({ shared }),
+            output: outer,
+            handler: vi.fn(),
+          }),
+          second: defaultEndpointsFactory.buildVoid({
+            method: "post",
+            input: outer,
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code).toContain("export type Shared = string;");
+      expect(code).toContain("export type Shared2 = number;");
+      expect(code).toMatch(/export type Outer = \{\s+value: Shared;/);
+      expect(code).toMatch(/export type Outer2 = \{\s+value: Shared2;/);
+      expect(code).toContain('"post /second": Outer2;');
+    });
+
     test("should refer the merged type directly from the following endpoints", () => {
       const foo = z.object({ name: z.string() }).meta({ id: "Foo" });
       const client = new Integration({
@@ -441,6 +474,32 @@ describe("Integration", () => {
       expect(code).not.toMatch(/ = Foo;/);
       expect(code).toMatch(/"get \/produce": Foo;/);
       expect(code).toMatch(/"get \/reproduce": Foo;/);
+    });
+
+    test("should infer a transform through an alias rewritten after merging", () => {
+      const raw = z.string().meta({ id: "Raw" });
+      const wrapped = raw.default("").meta({ id: "Wrapped" });
+      const length = wrapped.transform((value) => value.length);
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          first: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({ raw }),
+            output: z.object({ wrapped }),
+            handler: vi.fn(),
+          }),
+          second: defaultEndpointsFactory.build({
+            method: "post",
+            output: z.object({ length }),
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code).toContain("export type Wrapped = Raw;");
+      expect(code).toContain("length: number;");
     });
 
     test.each(["primitive", "wrapped"] as const)(

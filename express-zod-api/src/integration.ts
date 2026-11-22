@@ -104,7 +104,7 @@ export class Integration extends IntegrationBase {
       .map((name) => new RegExp(`^${name}\\d+$`))
       .toArray(),
   };
-  readonly #produced = new Map<string, ts.TypeNode>(); // alias name to original node
+  readonly #produced = new Map<string, ts.TypeNode>(); // alias name to current body
   readonly #aliasKinds = new WeakMap<ts.TypeNode, ts.SyntaxKind>(); // for transform sampling
   readonly #pending = new Map<string, (merged: Map<string, string>) => void>(); // nested aliases awaiting the outermost
   #depth = 0; // of nested alias production
@@ -205,10 +205,15 @@ export class Integration extends IntegrationBase {
         this.#taken.delete(name);
         return void this.#produced.delete(name);
       }
-      const ensured = replaceRefs(node, (ref) => merged.get(ref));
+      const settled = replaceRefs(node, (ref) => merged.get(ref));
+      if (settled !== node) {
+        this.#produced.set(name, settled);
+        const kind = this.#aliasKinds.get(node);
+        if (kind !== undefined) this.#aliasKinds.set(settled, kind);
+      }
       this.#program.push(
         (opts) =>
-          `${hasCustomName ? "export " : ""}type ${name} = ${printNode(ensured, opts)};`,
+          `${hasCustomName ? "export " : ""}type ${name} = ${printNode(settled, opts)};`,
       );
     });
     // Cycles can only be judged once the outermost is produced.
