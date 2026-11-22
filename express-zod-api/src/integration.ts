@@ -110,10 +110,20 @@ export class Integration extends IntegrationBase {
   #depth = 0; // of nested alias production
   #usage?: string;
 
-  #makeName(prefix: string, key: object, idx = 1) {
+  #matchesForbiddenPattern(name: string) {
+    return this.#forbidden.patterns.some((pattern) => pattern.test(name));
+  }
+
+  #makeName(prefix: string, key: object, custom = false) {
+    let idx = custom ? 0 : 1;
+    if (custom && this.#taken.has(prefix)) idx = 2;
     let name: string;
-    do name = `${prefix}${idx++ || ""}`;
-    while (this.#taken.has(name) || this.#forbidden.strings.has(name));
+    do {
+      const suffix = idx++ || "";
+      name = `${prefix}${suffix}`;
+      if (custom && this.#matchesForbiddenPattern(name))
+        name = `${prefix}_${suffix}`;
+    } while (this.#taken.has(name) || this.#forbidden.strings.has(name));
     this.#taken.set(name, key);
     return name;
   }
@@ -180,9 +190,9 @@ export class Integration extends IntegrationBase {
       !!proposedName &&
       isValidTypeName(proposedName) &&
       !this.#forbidden.strings.has(proposedName) &&
-      !this.#forbidden.patterns.some((pattern) => pattern.test(proposedName));
+      !this.#matchesForbiddenPattern(proposedName);
     const name = hasCustomName
-      ? this.#makeName(proposedName, key, this.#taken.has(proposedName) ? 2 : 0)
+      ? this.#makeName(proposedName, key, true)
       : this.#makeName(defaultAlias.get(isResponse)!, key);
     dict.set(key, name);
     this.#depth++;

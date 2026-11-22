@@ -548,6 +548,44 @@ describe("Integration", () => {
       expect(code).toMatch(/two: Duplicate2;/);
     });
 
+    test("should keep a suffixed schema alias distinct from an endpoint response variant", () => {
+      const id = "PostTestPositiveVariant";
+      const first = z.string().meta({ id });
+      const second = z.number().meta({ id });
+      const factory = new EndpointsFactory(
+        new ResultHandler({
+          positive: (schema) => [
+            { statusCode: 200, schema },
+            { statusCode: 201, schema },
+          ],
+          negative: z.object({ error: z.string() }),
+          handler: vi.fn(),
+        }),
+      );
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          test: factory.buildVoid({
+            method: "post",
+            input: z.object({ first }),
+            handler: vi.fn(),
+          }),
+          other: defaultEndpointsFactory.buildVoid({
+            method: "post",
+            input: z.object({ second }),
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code).toContain(`export type ${id} = string;`);
+      expect(code).toContain(`type ${id}2 = {};`);
+      expect(code.match(/\btype PostTestPositiveVariant2 =/g)).toHaveLength(1);
+      expect(code).toContain(`export type ${id}_2 = number;`);
+      expect(code).toContain(`second: ${id}_2;`);
+    });
+
     test("should name the lazy schema having id", () => {
       const tree: z.ZodType = z
         .lazy(() => z.object({ name: z.string(), kids: z.array(tree) }))
