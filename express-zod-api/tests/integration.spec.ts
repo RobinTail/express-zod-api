@@ -425,6 +425,57 @@ describe("Integration", () => {
       expect(code).toMatch(/"get \/reproduce": Foo;/);
     });
 
+    test.each(["primitive", "wrapped"] as const)(
+      "should infer the response transformation of a named %s",
+      (kind) => {
+        const raw = z.string().meta({ id: "Raw" });
+        const source =
+          kind === "primitive"
+            ? raw
+            : raw.optional().default("").meta({ id: "Wrapped" });
+        const length = source.transform((value) => value.length);
+        const client = new Integration({
+          config: configMock,
+          variant: "types",
+          routing: {
+            test: defaultEndpointsFactory.build({
+              method: "post",
+              input: z.object({ length }),
+              output: z.object({ length, again: length }),
+              handler: vi.fn(),
+            }),
+          },
+        });
+        const code = client.print();
+        expect(code).toContain("export type Raw = string;");
+        expect(code).toContain(
+          kind === "primitive"
+            ? "length: Raw;"
+            : "length?: Wrapped | undefined;",
+        );
+        expect(code).toContain("length: number;");
+        expect(code).toContain("again: number;");
+      },
+    );
+
+    test("should skip the client class name when allocating an automatic alias", () => {
+      const client = new Integration({
+        config: configMock,
+        clientClassName: "InputType1",
+        routing: {
+          test: defaultEndpointsFactory.buildVoid({
+            method: "post",
+            input: z.object({ name: z.string() }).meta({ id: "not-valid" }),
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code).toContain("export class InputType1");
+      expect(code).toContain("type InputType2 = {");
+      expect(code).not.toContain("type InputType1 =");
+    });
+
     test.each([
       "not-valid",
       "string",

@@ -105,6 +105,7 @@ export class Integration extends IntegrationBase {
       .toArray(),
   };
   readonly #produced = new Map<string, ts.TypeNode>(); // alias name to original node
+  readonly #aliasKinds = new WeakMap<ts.TypeNode, ts.SyntaxKind>(); // for transform sampling
   readonly #pending = new Map<string, (merged: Map<string, string>) => void>(); // nested aliases awaiting the outermost
   #depth = 0; // of nested alias production
   #usage?: string;
@@ -150,6 +151,16 @@ export class Integration extends IntegrationBase {
     return merged;
   }
 
+  #referenceAlias(name: string, proposedName?: string) {
+    const ref = ensureTypeNode(name);
+    // Metadata can hide a keyword behind several aliases, for example through wrappers.
+    const node =
+      proposedName === undefined ? undefined : this.#produced.get(name);
+    if (node)
+      this.#aliasKinds.set(ref, this.#aliasKinds.get(node) ?? node.kind);
+    return ref;
+  }
+
   /**
    * @desc Declares the type alias for the schema (key) once, using its id for naming when possible.
    * @desc Nested aliases remain pending until the outermost one is produced, so that cycles are complete to compare.
@@ -165,7 +176,7 @@ export class Integration extends IntegrationBase {
   ): ts.TypeNode {
     const dict = this.#aliases.get(isResponse)!; // ensured by prop init
     const existing = dict.get(key);
-    if (existing) return ensureTypeNode(existing);
+    if (existing) return this.#referenceAlias(existing, proposedName);
     const hasCustomName =
       !!proposedName &&
       isValidTypeName(proposedName) &&
@@ -191,11 +202,12 @@ export class Integration extends IntegrationBase {
           `${hasCustomName ? "export " : ""}type ${name} = ${printNode(ensured, opts)};`,
       );
     });
-    if (this.#depth) return ensureTypeNode(name); // cycles can only be judged once the outermost is produced
+    // Cycles can only be judged once the outermost is produced.
+    if (this.#depth) return this.#referenceAlias(name, proposedName);
     const merged = this.#findMergeable(isResponse);
     for (const settle of this.#pending.values()) settle(merged);
     this.#pending.clear();
-    return ensureTypeNode(merged.get(name) ?? name);
+    return this.#referenceAlias(merged.get(name) ?? name, proposedName);
   }
 
   #makeEntitle(method: ClientMethod, path: string) {
@@ -245,13 +257,22 @@ export class Integration extends IntegrationBase {
       config,
       onEndpoint: hasHeadMethod ? withHead(probe) : probe,
     });
+    const getAliasKind = (node: ts.TypeNode) => this.#aliasKinds.get(node);
     const ctxIn = {
       brandHandling,
-      ctx: { isResponse: false, makeAlias: this.#makeAlias.bind(this, false) },
+      ctx: {
+        isResponse: false,
+        makeAlias: this.#makeAlias.bind(this, false),
+        getAliasKind,
+      },
     };
     const ctxOut = {
       brandHandling,
-      ctx: { isResponse: true, makeAlias: this.#makeAlias.bind(this, true) },
+      ctx: {
+        isResponse: true,
+        makeAlias: this.#makeAlias.bind(this, true),
+        getAliasKind,
+      },
     };
     let hasCookies = false;
     let hasSSE = false;

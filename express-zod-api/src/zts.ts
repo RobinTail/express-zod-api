@@ -173,7 +173,7 @@ const getFallback = (isResponse: boolean) =>
 
 const onPipeline: Producer = (
   { _zod: { def } }: z.core.$ZodPipe,
-  { next, isResponse },
+  { next, isResponse, getAliasKind },
 ) => {
   const target = def[isResponse ? "out" : "in"];
   const opposite = def[isResponse ? "in" : "out"];
@@ -188,7 +188,8 @@ const onPipeline: Producer = (
     [ts.SyntaxKind.StringKeyword]: "",
     [ts.SyntaxKind.UndefinedKeyword]: undefined,
   } satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
-  const sample = samples[opposingType.kind as keyof typeof samples];
+  const kind = getAliasKind?.(opposingType) ?? opposingType.kind;
+  const sample = samples[kind as keyof typeof samples];
   const targetType = getTransformedType(target, sample);
   const resolutions: Partial<
     Record<NonNullable<typeof targetType>, ts.KeywordTypeSyntaxKind>
