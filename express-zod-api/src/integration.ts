@@ -151,11 +151,10 @@ export class Integration extends IntegrationBase {
     return merged;
   }
 
-  #referenceAlias(name: string, proposedName?: string) {
+  #referenceAlias(name: string) {
     const ref = ensureTypeNode(name);
-    // Metadata can hide a keyword behind several aliases, for example through wrappers.
-    const node =
-      proposedName === undefined ? undefined : this.#produced.get(name);
+    // Schema wrappers can hide a keyword behind several aliases.
+    const node = this.#produced.get(name);
     if (node)
       this.#aliasKinds.set(ref, this.#aliasKinds.get(node) ?? node.kind);
     return ref;
@@ -176,7 +175,7 @@ export class Integration extends IntegrationBase {
   ): ts.TypeNode {
     const dict = this.#aliases.get(isResponse)!; // ensured by prop init
     const existing = dict.get(key);
-    if (existing) return this.#referenceAlias(existing, proposedName);
+    if (existing) return this.#referenceAlias(existing);
     const hasCustomName =
       !!proposedName &&
       isValidTypeName(proposedName) &&
@@ -203,11 +202,11 @@ export class Integration extends IntegrationBase {
       );
     });
     // Cycles can only be judged once the outermost is produced.
-    if (this.#depth) return this.#referenceAlias(name, proposedName);
+    if (this.#depth) return this.#referenceAlias(name);
     const merged = this.#findMergeable(isResponse);
     for (const settle of this.#pending.values()) settle(merged);
     this.#pending.clear();
-    return this.#referenceAlias(merged.get(name) ?? name, proposedName);
+    return this.#referenceAlias(merged.get(name) ?? name);
   }
 
   #makeEntitle(method: ClientMethod, path: string) {

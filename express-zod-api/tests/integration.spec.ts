@@ -24,6 +24,24 @@ describe("Integration", () => {
   });
   const configMock = { cors: false };
 
+  test("should infer the response transformation of an unnamed lazy schema", () => {
+    const length = z.lazy(() => z.string()).transform((value) => value.length);
+    const client = new Integration({
+      config: configMock,
+      variant: "types",
+      routing: {
+        test: defaultEndpointsFactory.build({
+          method: "post",
+          output: z.object({ length }),
+          handler: vi.fn(),
+        }),
+      },
+    });
+    const code = client.print();
+    expect(code).toContain("type ResponseType1 = string;");
+    expect(code).toContain("length: number;");
+  });
+
   test.each([recursive1, recursive2])(
     "Should support types variant and handle recursive schemas %#",
     (recursiveSchema) => {
