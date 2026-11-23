@@ -1,4 +1,7 @@
-import { ensureTypeNode, f, replaceRefs, ts } from "../src/typescript-api";
+import ts from "typescript";
+import { ensureTypeNode, replaceRefs } from "../src/typescript-api";
+
+const f = ts.factory;
 
 /** The original implementation, kept here as the baseline. */
 const replaceRefsTransform = (
