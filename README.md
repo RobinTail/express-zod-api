@@ -89,8 +89,8 @@ Therefore, many basic tasks can be achieved faster and easier, in particular:
 
 These people contributed to the improvement of the framework by reporting bugs, making changes, and suggesting ideas:
 
-[<img src="https://github.com/trackoor.png" alt="@trackoor" width="50" />](https://github.com/trackoor)
 [<img src="https://github.com/giovio.png" alt="@giovio" width="50" />](https://github.com/giovio)
+[<img src="https://github.com/trackoor.png" alt="@trackoor" width="50" />](https://github.com/trackoor)
 [<img src="https://github.com/marco-carvalho.png" alt="@marco-carvalho" width="50" />](https://github.com/marco-carvalho)
 [<img src="https://github.com/BetterAndBetterII.png" alt="@BetterAndBetterII" width="50" />](https://github.com/BetterAndBetterII)
 [<img src="https://github.com/pycanis.png" alt="@pycanis" width="50" />](https://github.com/pycanis)

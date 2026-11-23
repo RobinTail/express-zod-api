@@ -23,6 +23,7 @@ import {
   customizations,
 } from "./typescript-api";
 import type { Producer, ZTSContext } from "./zts-helpers";
+import { findIdentified } from "./metadata";
 
 const nodePath = {
   name: R.path([
@@ -202,7 +203,7 @@ const getFallback = (isResponse: boolean) =>
 
 const onPipeline: Producer = (
   { _zod: { def } }: z.core.$ZodPipe,
-  { next, isResponse },
+  { next, isResponse, getAliasKind },
 ) => {
   const target = def[isResponse ? "out" : "in"];
   const opposite = def[isResponse ? "in" : "out"];
@@ -217,7 +218,8 @@ const onPipeline: Producer = (
     [ts.SyntaxKind.StringKeyword]: "",
     [ts.SyntaxKind.UndefinedKeyword]: undefined,
   } satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
-  const sample = samples[opposingType.kind as keyof typeof samples];
+  const kind = getAliasKind?.(opposingType) ?? opposingType.kind;
+  const sample = samples[kind as keyof typeof samples];
   const targetType = getTransformedType(target, sample);
   const resolutions: Partial<
     Record<NonNullable<typeof targetType>, ts.KeywordTypeSyntaxKind>
@@ -283,11 +285,14 @@ const producers: HandlingRules<
   [ezRawBrand]: onRaw,
 };
 
-/** Declares aliases for lazy ones and objects having cycles, @todo - use it for custom names in #3738 */
+/** Declares aliases for lazy ones and objects having cycles and schemas having ancestor with id */
 const withAliases =
   (handler: Producer): Producer =>
   (schema: z.core.$ZodType, ctx) => {
     const produce = () => handler(schema, ctx);
+    const identified = findIdentified(schema); // origin is the key for clones
+    if (identified)
+      return ctx.makeAlias(identified.schema, produce, identified.id);
     if (isSchema<z.core.$ZodLazy>(schema, "lazy"))
       return ctx.makeAlias(schema._zod.def.getter, produce);
     if (
@@ -311,8 +316,8 @@ export const zodToTs = (
   const rules: HandlingRules<ts.TypeNode, ZTSContext> = {
     ...brandHandling,
     ...producers,
-  }; // @todo iterate Reflect.ownKeys(producers) in #3738 for featuring named aliases
-  for (const key of ["object", "lazy"] satisfies FirstPartyKind[])
+  }; // ez-brands only, keys can be symbols so using Reflect:
+  for (const key of Reflect.ownKeys(producers))
     rules[key] = withAliases(rules[key]!);
   return walkSchema(schema, {
     rules,

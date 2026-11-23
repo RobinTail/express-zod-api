@@ -45,10 +45,29 @@ export const literally = <T extends string | null | boolean | number | bigint>(
 
 export const makeId = (name: string) => f.createIdentifier(name);
 
+/** @desc Checks the name to be a valid identifier that is not a keyword (such as "string" or "type") */
+export const isValidTypeName = (name: string) =>
+  safePropRegex.test(name) && ts.stringToToken(name) === undefined;
+
 export const makePropertyIdentifier = (name: string | number) =>
   typeof name === "string" && safePropRegex.test(name)
     ? makeId(name)
     : literally(name);
+
+/** @desc Replaces the type references by name, returning undefined from the replacer keeps the reference */
+export const replaceRefs = (
+  node: ts.TypeNode,
+  replacer: (name: string) => string | undefined,
+) => {
+  const visit = (subject: ts.Node): ts.Node => {
+    const name =
+      ts.isTypeReferenceNode(subject) && ts.isIdentifier(subject.typeName)
+        ? replacer(subject.typeName.text)
+        : undefined;
+    return name ? ensureTypeNode(name) : ts.visitEachChild(subject, visit);
+  };
+  return ts.visitNode(node, visit) as ts.TypeNode;
+};
 
 export const ensureTypeNode = (
   subject: Typeable,
