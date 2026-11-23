@@ -54,21 +54,18 @@ export const makePropertyIdentifier = (name: string | number) =>
 export const replaceRefs = (
   node: ts.TypeNode,
   replacer: (name: string) => string | undefined,
-) =>
-  ts.transform(node, [
-    (ctx) => (root) => {
-      const visit = (subject: ts.Node): ts.Node => {
-        const name =
-          ts.isTypeReferenceNode(subject) && ts.isIdentifier(subject.typeName)
-            ? replacer(subject.typeName.text)
-            : undefined;
-        return name
-          ? ensureTypeNode(name)
-          : ts.visitEachChild(subject, visit, ctx);
-      };
-      return ts.visitNode(root, visit) as ts.TypeNode;
-    },
-  ]).transformed[0]!; // single node given
+) => {
+  const visit = (subject: ts.Node): ts.Node => {
+    const name =
+      ts.isTypeReferenceNode(subject) && ts.isIdentifier(subject.typeName)
+        ? replacer(subject.typeName.text)
+        : undefined;
+    return name
+      ? ensureTypeNode(name)
+      : ts.visitEachChild(subject, visit, undefined);
+  };
+  return ts.visitNode(node, visit) as ts.TypeNode;
+};
 
 export const ensureTypeNode = (
   subject: Typeable,
