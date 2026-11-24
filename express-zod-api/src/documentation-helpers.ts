@@ -754,6 +754,10 @@ const probeParser = (
   }
 };
 
+/**
+ * @desc OAS requires the reserved bracket and pipe delimiters to be percent-encoded
+ * @see https://spec.openapis.org/oas/v3.2.0.html#percent-encoding-and-illegal-or-reserved-delimiters
+ */
 export const makeParamStyler = ({
   queryParser = "simple",
 }: Pick<ServerConfig, "queryParser">) => {
@@ -761,9 +765,9 @@ export const makeParamStyler = ({
   const supports = {
     deepObject:
       queryParser === "extended" ||
-      (isCustom && probeParser(queryParser, "a[b]=1", { b: "1" })),
+      (isCustom && probeParser(queryParser, "a%5Bb%5D=1", { b: "1" })),
     comma: isCustom && probeParser(queryParser, "a=1,2", ["1", "2"]),
-    pipe: isCustom && probeParser(queryParser, "a=1|2", ["1", "2"]),
+    pipe: isCustom && probeParser(queryParser, "a=1%7C2", ["1", "2"]),
     space: isCustom && probeParser(queryParser, "a=1%202", ["1", "2"]),
   };
   return (

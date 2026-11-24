@@ -956,7 +956,7 @@ describe("Documentation helpers", () => {
       makeSplitter(","),
       makeSplitter("|"),
       makeSplitter(" "),
-      (query: string) => (query === "a[b]=1" ? { a: { b: "1" } } : {}),
+      (query: string) => (query === "a%5Bb%5D=1" ? { a: { b: "1" } } : {}),
       () => {
         throw new Error("Unsupported");
       },
@@ -970,6 +970,17 @@ describe("Documentation helpers", () => {
           ["array", "null"],
         ] as const),
       ).toMatchSnapshot();
+    });
+
+    test.each([
+      ["brackets", "a[b]=1", { b: "1" }],
+      ["pipe", "a=1|2", ["1", "2"]],
+    ] as const)("should ignore raw %s delimiters", (_, query, expected) => {
+      const getStyle = makeParamStyler({
+        queryParser: (input) => (input === query ? { a: expected } : {}),
+      });
+      expect(getStyle("object")).toBeUndefined();
+      expect(getStyle("array")).toEqual({ style: "form", explode: true });
     });
   });
 });
