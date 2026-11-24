@@ -196,17 +196,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -215,27 +205,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   dataValue:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
@@ -320,17 +298,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -339,27 +307,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   dataValue:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
