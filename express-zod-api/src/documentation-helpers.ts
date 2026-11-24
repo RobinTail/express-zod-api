@@ -251,6 +251,20 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
       )
     : undefined;
 
+const depictParamExamples = (
+  name: string,
+  depicted: SchemaObjectValue | ReferenceObject,
+  flatRequest: FlattenObjectSchema,
+): ExamplesObject | undefined =>
+  enumerateExamples(
+    isSchemaObject(depicted) && depicted.examples?.length
+      ? depicted.examples // own examples or from the flat:
+      : R.pluck(
+          name,
+          flatRequest.examples?.filter(R.both(isObject, R.has(name))) || [],
+        ),
+  );
+
 export const defaultIsHeader = (
   name: string,
   familiar?: Set<string>,
@@ -350,14 +364,7 @@ export const depictRequestParams = ({
       ...(location === "query" && getParamStyle?.(jsonSchema.type)),
       description: depicted.description || description,
       schema: result,
-      examples: enumerateExamples(
-        isSchemaObject(depicted) && depicted.examples?.length
-          ? depicted.examples // own examples or from the flat:
-          : R.pluck(
-              name,
-              flatRequest.examples?.filter(R.both(isObject, R.has(name))) || [],
-            ),
-      ),
+      examples: depictParamExamples(name, depicted, flatRequest),
     });
   }
   return depictedParams;
