@@ -83,6 +83,19 @@ export abstract class IntegrationBase {
   protected constructor(protected readonly serverUrl: string) {}
 
   /**
+   * @desc The type names declared by the generated code or referred by it globally, unavailable for the schemas
+   * @internal
+   * */
+  protected getReservedNames = (...classNames: string[]) =>
+    Object.values(interfaces).concat(
+      [ids.Path, ids.Implementation, ids.DefaultContext, ids.Method],
+      [ids.Request, ids.Pagination, ids.File, ids.FormData, Blob.name],
+      [MessageEvent.name, "RequestInit", "EventSource", "Promise"],
+      ["URL", "URLSearchParams", "Record", "PropertyKey", "Extract", "Omit"],
+      classNames,
+    );
+
+  /**
    * @example export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
    * @internal
    * */
@@ -363,15 +376,21 @@ export abstract class IntegrationBase {
   /** @internal */
   protected makeUsageStatements = (
     clientClassName: string,
-    subscriptionClassName: string,
-  ) =>
-    [
+    subscriptionClassName: string | null,
+  ) => {
+    const lines = [
       `const ${ids.client} = new ${clientClassName}();`,
       `const { ${propOf<Response>("status")}, ${ids.discriminator}, ${ids.data} } = ` +
         `await ${ids.client}.${ids.provide}("get /v1/user/retrieve", { id: "10" });`,
       `if (${propOf<Response>("status")} === 200) console.log(${ids.data}.name); // success`,
       `else if (${propOf<Response>("status")} === 400 || ${ids.discriminator} === "${discriminators.error}") ` +
         `console.error(${ids.data}.message); // error`,
-      `new ${subscriptionClassName}("get /v1/events/stream", {}).${ids.on}("time", (time) => {});`,
-    ].join("\n");
+    ];
+    if (subscriptionClassName) {
+      lines.push(
+        `new ${subscriptionClassName}("get /v1/events/stream", {}).${ids.on}("time", (time) => {});`,
+      );
+    }
+    return lines.join("\n");
+  };
 }

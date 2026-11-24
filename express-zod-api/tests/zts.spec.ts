@@ -233,6 +233,7 @@ describe("zod-to-ts", () => {
       const schema = z.object({
         "string-literal": z.string(),
         5: z.number(),
+        [-1]: z.string(),
       });
       const node = zodToTs(schema, { ctx });
       expect(printNode(node)).toMatchSnapshot();
@@ -268,6 +269,7 @@ describe("zod-to-ts", () => {
       const schema = z.object({
         name: z.string().describe("The name of the item"),
         price: z.number().describe("The price of the item"),
+        path: z.string().describe("glob, e.g. src/**/*.ts"),
       });
       const node = zodToTs(schema, { ctx });
       expect(printNode(node)).toMatchSnapshot();
@@ -378,6 +380,7 @@ describe("zod-to-ts", () => {
       z.literal(false),
       z.literal(123),
       z.literal(undefined),
+      z.literal(-1),
     ])("Should produce the correct typescript %#", (schema) => {
       expect(printNode(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
@@ -436,5 +439,43 @@ describe("zod-to-ts", () => {
         ).toMatchSnapshot();
       });
     });
+  });
+
+  describe("Feature: Named aliases", () => {
+    const named = z.object({ name: z.string() }).meta({ id: "Named" });
+
+    test.each([named, named.describe("clone"), z.compile(named)])(
+      "should make alias the origin of the schema having id and propose that id it as its name %#",
+      (schema) => {
+        expect(printNode(zodToTs(schema, { ctx }))).toBe("SomeType");
+        expect(ctx.makeAlias).toHaveBeenLastCalledWith(
+          named,
+          expect.any(Function),
+          "Named",
+        );
+      },
+    );
+
+    test("should delegate producing the type of the alias", () => {
+      zodToTs(z.array(named), { ctx });
+      const [, produce] = vi.mocked(ctx.makeAlias).mock.lastCall!;
+      expect(printNode(produce())).toContain("name: string");
+    });
+
+    test.each([false, true])(
+      "should alias the objects having cycles without proposing a name %s",
+      (isResponse) => {
+        const schema = z.object({
+          get items() {
+            return z.array(schema);
+          },
+        });
+        zodToTs(schema, { ctx: { ...ctx, isResponse } });
+        expect(ctx.makeAlias).toHaveBeenLastCalledWith(
+          schema,
+          expect.any(Function),
+        );
+      },
+    );
   });
 });
