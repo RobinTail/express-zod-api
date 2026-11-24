@@ -2,6 +2,14 @@
 
 ## Version 30
 
+### v30.2.0
+
+- Documentation now depicts OpenAPI `style` and `explode` for query parameters based on the configured `queryParser`:
+  - Arrays use repeated keys (`form`, `explode: true`) by default and the matching delimited style when a custom parser
+    supports comma, pipe or space separators;
+  - Objects use `deepObject` for the `extended` parser and custom parsers that support bracket notation;
+  - To make this possible, the `config` option of `Documentation` now also accepts the full `ServerConfig`.
+
 ### v30.1.0
 
 - Featuring named aliases by the `Integration` generator:
