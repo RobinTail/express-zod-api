@@ -507,6 +507,7 @@ describe("Documentation helpers", () => {
           },
           getLocation: (name) => (name === "id" ? "path" : "query"),
           composition: "inline",
+          resolve: R.identity,
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -523,6 +524,7 @@ describe("Documentation helpers", () => {
         },
         getLocation: (name) => (name === "id" ? "path" : "query"),
         composition: "inline",
+        resolve: R.identity,
         ...requestCtx,
       });
       expect(result).toEqual([
@@ -544,6 +546,7 @@ describe("Documentation helpers", () => {
           },
           getLocation: (name) => (name === "id" ? "path" : undefined),
           composition: "inline",
+          resolve: R.identity,
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -569,6 +572,7 @@ describe("Documentation helpers", () => {
                 ? "path"
                 : "query",
           composition: "inline",
+          resolve: R.identity,
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -589,6 +593,7 @@ describe("Documentation helpers", () => {
           getLocation: (name) =>
             name === "session" ? "cookie" : name === "id" ? "path" : "query",
           composition: "inline",
+          resolve: R.identity,
           ...requestCtx,
         }),
       ).toMatchSnapshot();

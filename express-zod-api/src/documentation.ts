@@ -153,6 +153,7 @@ export class Documentation extends OpenApiBuilder {
     value: SchemaObjectValue | ReferenceObject,
     proposedName?: string,
   ): ReferenceObject {
+    if (isReferenceObject(value)) return value; // already named, avoiding an alias
     let name = this.#references.get(key); // search in the cache by the given key
     if (!name) {
       let inc = proposedName ? 0 : 1;
@@ -294,6 +295,7 @@ export class Documentation extends OpenApiBuilder {
         ...commons,
         getLocation,
         flatRequest,
+        resolve: this.resolve.bind(this),
         description: descriptions?.requestParameter?.({
           method,
           path,
