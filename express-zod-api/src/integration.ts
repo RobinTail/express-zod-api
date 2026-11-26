@@ -15,7 +15,9 @@ import {
   isValidTypeName,
   printNode,
   replaceRefs,
-  ts,
+  type ts,
+  type PrintNodeOptions,
+  type DeferredCode,
 } from "./typescript-api";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
@@ -76,7 +78,7 @@ interface IntegrationParams {
 
 interface FormattedPrintingOptions {
   /** @desc Typescript printer options */
-  printerOptions?: ts.PrinterOptions;
+  printerOptions?: PrintNodeOptions;
   /**
    * @desc Typescript code formatter
    * @default prettier.format | oxfmt.format
@@ -90,8 +92,7 @@ const defaultAlias = new Map<boolean, string>([
 ]);
 
 export class Integration extends IntegrationBase {
-  readonly #program: Array<string | ((opts?: ts.PrinterOptions) => string)> =
-    [];
+  readonly #program: Array<string | DeferredCode> = [];
   readonly #aliases = new Map<boolean, Map<object, string>>([
     [false, new Map()], // input aliases
     [true, new Map()], // response aliases
@@ -391,7 +392,7 @@ export class Integration extends IntegrationBase {
     );
   }
 
-  public print(printerOptions?: ts.PrinterOptions) {
+  public print(printerOptions?: PrintNodeOptions) {
     const parts = this.#program.map((entry) =>
       typeof entry === "function" ? entry(printerOptions) : entry,
     );
