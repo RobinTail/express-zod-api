@@ -24,6 +24,24 @@ describe("Integration", () => {
   });
   const configMock = { cors: false };
 
+  test("should infer the response transformation of an unnamed lazy schema", () => {
+    const length = z.lazy(() => z.string()).transform((value) => value.length);
+    const client = new Integration({
+      config: configMock,
+      variant: "types",
+      routing: {
+        test: defaultEndpointsFactory.build({
+          method: "post",
+          output: z.object({ length }),
+          handler: vi.fn(),
+        }),
+      },
+    });
+    const code = client.print();
+    expect(code).toContain("type ResponseType1 = string;");
+    expect(code).toContain("length: number;");
+  });
+
   test.each([recursive1, recursive2])(
     "Should support types variant and handle recursive schemas %#",
     (recursiveSchema) => {
@@ -73,6 +91,78 @@ describe("Integration", () => {
       expect(client.print()).toMatchSnapshot();
     },
   );
+
+  const category: z.ZodType = z.object({
+    name: z.string(),
+    sub: z.lazy(() => z.array(category)),
+  });
+  const person = z.object({
+    name: z.string(),
+    get company() {
+      return company.optional();
+    },
+  });
+  const company = z.object({
+    title: z.string(),
+    get staff() {
+      return z.array(person);
+    },
+  });
+
+  test.each([
+    { name: "mutual recursion", schema: person },
+    { name: "recursion through lazy", schema: category },
+  ])("should declare a bidirectional cycle once: $name", ({ schema }) => {
+    const client = new Integration({
+      config: configMock,
+      variant: "types",
+      routing: {
+        v1: {
+          test: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({ item: schema }),
+            output: z.object({ item: schema }),
+            handler: vi.fn(),
+          }),
+        },
+      },
+    });
+    expect(
+      client.print().match(/type (Input|Response)Type\d+ =/g),
+    ).toHaveLength(2);
+  });
+
+  test("should not merge a cycle when its outermost member differs", () => {
+    const employee = z.object({
+      name: z.string().default("anonymous"),
+      get employer() {
+        return employer.optional();
+      },
+    });
+    const employer = z.object({
+      title: z.string(),
+      get staff() {
+        return z.array(employee);
+      },
+    });
+    const client = new Integration({
+      config: configMock,
+      variant: "types",
+      routing: {
+        v1: {
+          test: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({ item: employee }),
+            output: z.object({ item: employee }),
+            handler: vi.fn(),
+          }),
+        },
+      },
+    });
+    expect(
+      client.print().match(/type (Input|Response)Type\d+ =/g),
+    ).toHaveLength(4);
+  });
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
@@ -241,6 +331,362 @@ describe("Integration", () => {
           ],
         }),
       );
+    });
+  });
+
+  describe("Named types", () => {
+    test("should declare the schemas having id once and refer them", async () => {
+      const customer = z.object({ name: z.string() }).meta({ id: "Customer" });
+      const booking = z
+        .object({ id: z.string(), customer, notes: z.string().optional() })
+        .meta({ id: "Booking" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        hasHeadMethod: false,
+        routing: {
+          v1: {
+            list: defaultEndpointsFactory.build({
+              output: z.object({ items: z.array(booking) }),
+              handler: vi.fn(),
+            }),
+            save: defaultEndpointsFactory.build({
+              method: "post",
+              input: z.object({ customer }).meta({ id: "SaveBookingRequest" }),
+              output: booking,
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      const code = await client.printFormatted();
+      expect(code.match(/export type Booking/g)).toHaveLength(1);
+      expect(code.match(/export type Customer/g)).toHaveLength(1);
+      expect(code).toMatchSnapshot();
+    });
+
+    test.each(["input", "output", "both"] as const)(
+      "should name the type unless it differs for request and response: %s",
+      async (usage) => {
+        const draft = z
+          .object({ status: z.string().default("new") })
+          .meta({ id: "Draft" });
+        const client = new Integration({
+          config: configMock,
+          variant: "types",
+          routing: {
+            v1: {
+              draft: defaultEndpointsFactory.build({
+                method: "post",
+                input: z.object(usage === "output" ? {} : { draft }),
+                output: z.object(usage === "input" ? {} : { draft }),
+                handler: vi.fn(),
+              }),
+            },
+          },
+        });
+        const code = client.print();
+        expect(code.match(/export type Draft/g)).toHaveLength(
+          usage === "both" ? 2 : 1,
+        );
+      },
+    );
+
+    test("should not merge bidirectional schemas when they differ deep in recursion", () => {
+      const inner = z
+        .object({ cause: z.string().default("some") })
+        .meta({ id: "Inner" });
+      const outer = z.object({ inner }).meta({ id: "Outer" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        hasHeadMethod: false,
+        routing: {
+          one: defaultEndpointsFactory.build({
+            input: outer,
+            output: outer,
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code.match(/export type Inner/g)).toHaveLength(2);
+      expect(code.match(/export type Outer/g)).toHaveLength(2);
+    });
+
+    test("should keep request and response aliases distinct when a merged name is reused", () => {
+      const shared = z.string().meta({ id: "Shared" });
+      const numeric = z.number().meta({ id: "Shared2" });
+      const outer = z
+        .object({
+          value: z.codec(numeric, shared, { decode: String, encode: Number }),
+        })
+        .meta({ id: "Outer" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          first: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({ shared }),
+            output: outer,
+            handler: vi.fn(),
+          }),
+          second: defaultEndpointsFactory.buildVoid({
+            method: "post",
+            input: outer,
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code).toContain("export type Shared = string;");
+      expect(code).toContain("export type Shared2 = number;");
+      expect(code).toMatch(/export type Outer = \{\s+value: Shared;/);
+      expect(code).toMatch(/export type Outer2 = \{\s+value: Shared2;/);
+      expect(code).toContain('"post /second": Outer2;');
+    });
+
+    test("should refer the merged type directly from the following endpoints", () => {
+      const foo = z.object({ name: z.string() }).meta({ id: "Foo" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        hasHeadMethod: false,
+        routing: {
+          consume: defaultEndpointsFactory.buildVoid({
+            method: "post",
+            input: foo,
+            handler: vi.fn(),
+          }),
+          produce: defaultEndpointsFactory.build({
+            output: foo,
+            handler: vi.fn(),
+          }),
+          reproduce: defaultEndpointsFactory.build({
+            output: foo,
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code.match(/export type Foo/g)).toHaveLength(1);
+      expect(code).not.toMatch(/ = Foo;/);
+      expect(code).toMatch(/"get \/produce": Foo;/);
+      expect(code).toMatch(/"get \/reproduce": Foo;/);
+    });
+
+    test("should infer a transform through an alias rewritten after merging", () => {
+      const raw = z.string().meta({ id: "Raw" });
+      const wrapped = raw.default("").meta({ id: "Wrapped" });
+      const length = wrapped.transform((value) => value.length);
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          first: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({ raw }),
+            output: z.object({ wrapped }),
+            handler: vi.fn(),
+          }),
+          second: defaultEndpointsFactory.build({
+            method: "post",
+            output: z.object({ length }),
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code).toContain("export type Wrapped = Raw;");
+      expect(code).toContain("length: number;");
+    });
+
+    test.each(["primitive", "wrapped"] as const)(
+      "should infer the response transformation of a named %s",
+      (kind) => {
+        const raw = z.string().meta({ id: "Raw" });
+        const source =
+          kind === "primitive"
+            ? raw
+            : raw.optional().default("").meta({ id: "Wrapped" });
+        const length = source.transform((value) => value.length);
+        const client = new Integration({
+          config: configMock,
+          variant: "types",
+          routing: {
+            test: defaultEndpointsFactory.build({
+              method: "post",
+              input: z.object({ length }),
+              output: z.object({ length, again: length }),
+              handler: vi.fn(),
+            }),
+          },
+        });
+        const code = client.print();
+        expect(code).toContain("export type Raw = string;");
+        expect(code).toContain(
+          kind === "primitive"
+            ? "length: Raw;"
+            : "length?: Wrapped | undefined;",
+        );
+        expect(code).toContain("length: number;");
+        expect(code).toContain("again: number;");
+      },
+    );
+
+    test("should skip the client class name when allocating an automatic alias", () => {
+      const client = new Integration({
+        config: configMock,
+        clientClassName: "InputType1",
+        routing: {
+          test: defaultEndpointsFactory.buildVoid({
+            method: "post",
+            input: z.object({ name: z.string() }).meta({ id: "not-valid" }),
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code).toContain("export class InputType1");
+      expect(code).toContain("type InputType2 = {");
+      expect(code).not.toContain("type InputType1 =");
+    });
+
+    test.each([
+      "not-valid",
+      "string",
+      "",
+      "1st",
+      "with space",
+      "type",
+      "null",
+      "Client",
+      "Response",
+      "PostV1TestInput",
+      "PostV1TestPositiveVariant4",
+      "InputType4",
+    ])("should not name the type after the unsuitable id %s", (id) => {
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          v1: {
+            test: defaultEndpointsFactory.buildVoid({
+              method: "post",
+              input: z.object({ name: z.string() }).meta({ id }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      const code = client.print();
+      expect(code).not.toContain(`type ${id} = {`);
+      expect(code).not.toContain(`type PostV1TestInput = ${id};`);
+    });
+
+    test("should not name the types after the id of different schemas", () => {
+      const one = z.object({ a: z.string() }).meta({ id: "Duplicate" });
+      const two = z.object({ b: z.string() }).meta({ id: "Duplicate" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          v1: {
+            test: defaultEndpointsFactory.build({
+              method: "post",
+              input: z.object({ one }),
+              output: z.object({ two }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      const code = client.print();
+      expect(code).toMatch(/one: Duplicate;/);
+      expect(code).toMatch(/two: Duplicate2;/);
+    });
+
+    test("should keep a suffixed schema alias distinct from an endpoint response variant", () => {
+      const id = "PostTestPositiveVariant";
+      const first = z.string().meta({ id });
+      const second = z.number().meta({ id });
+      const factory = new EndpointsFactory(
+        new ResultHandler({
+          positive: (schema) => [
+            { statusCode: 200, schema },
+            { statusCode: 201, schema },
+          ],
+          negative: z.object({ error: z.string() }),
+          handler: vi.fn(),
+        }),
+      );
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          test: factory.buildVoid({
+            method: "post",
+            input: z.object({ first }),
+            handler: vi.fn(),
+          }),
+          other: defaultEndpointsFactory.buildVoid({
+            method: "post",
+            input: z.object({ second }),
+            handler: vi.fn(),
+          }),
+        },
+      });
+      const code = client.print();
+      expect(code).toContain(`export type ${id} = string;`);
+      expect(code).toContain(`type ${id}2 = {};`);
+      expect(code.match(/\btype PostTestPositiveVariant2 =/g)).toHaveLength(1);
+      expect(code).toContain(`export type ${id}_2 = number;`);
+      expect(code).toContain(`second: ${id}_2;`);
+    });
+
+    test("should name the lazy schema having id", () => {
+      const tree: z.ZodType = z
+        .lazy(() => z.object({ name: z.string(), kids: z.array(tree) }))
+        .meta({ id: "Tree" });
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          v1: {
+            tree: defaultEndpointsFactory.build({
+              output: z.object({ tree }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      const code = client.print();
+      expect(code).toMatch(
+        /export type Tree = \{\s+name: string;\s+kids: Tree\[];\s+};/,
+      );
+      expect(code).not.toMatch("Type1");
+    });
+
+    test("should keep the input type of the endpoint omitting cookies", () => {
+      const client = new Integration({
+        config: configMock,
+        variant: "types",
+        routing: {
+          v1: {
+            "get path": defaultEndpointsFactory
+              .addMiddleware({
+                security: { type: "cookie", name: "session" },
+                handler: vi.fn(),
+              })
+              .buildVoid({
+                input: z.object({ some: z.string() }).meta({ id: "Some" }),
+                handler: vi.fn(),
+              }),
+          },
+        },
+      });
+      expect(client.print()).toMatch(/type GetV1PathInput = Omit<Some,/);
     });
   });
 
