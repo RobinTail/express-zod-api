@@ -1847,9 +1847,63 @@ describe("Documentation", () => {
         },
         required: ["id", "name"],
       });
-      expect(spec.components!.schemas!.PostUsersRequestBody).toEqual({
-        $ref: "#/components/schemas/UserInput",
-      });
+      expect(ref).toEqual({ $ref: "#/components/schemas/UserInput" });
+      expect(spec.components!.schemas).not.toHaveProperty(
+        "PostUsersRequestBody",
+      );
+    });
+  });
+
+  describe("Named schemas should be referenced directly, without alias components", () => {
+    const itemId = z.string().describe("The item id").meta({ id: "ItemId" });
+    const handler = vi.fn();
+    const spec = new Documentation({
+      config: sampleConfig,
+      info: { title: "Named refs", version: "1.0.0" },
+      composition: "components",
+      routing: {
+        "get /items/:id": defaultEndpointsFactory.build({
+          input: z.object({ id: itemId }),
+          output: z.object({ name: z.string() }).meta({ id: "ItemOutput" }),
+          handler,
+        }),
+        "put /items/:id": defaultEndpointsFactory.buildVoid({
+          input: z.object({ id: itemId }),
+          handler,
+        }),
+        "post /items": defaultEndpointsFactory.buildVoid({
+          input: z.object({ name: z.string() }).meta({ id: "ItemInput" }),
+          handler,
+        }),
+      },
+    }).getSpec();
+
+    test.each(["get", "put"] as const)(
+      "shared path param in %s operation",
+      (method) => {
+        expect(spec.paths!["/items/{id}"]![method]!.parameters).toEqual([
+          expect.objectContaining({
+            name: "id",
+            description: "The item id",
+            schema: { $ref: "#/components/schemas/ItemId" },
+          }),
+        ]);
+      },
+    );
+
+    test("request body", () => {
+      expect(
+        R.path(
+          ["requestBody", "content", contentTypes.json, "schema"],
+          spec.paths!["/items"]!.post,
+        ),
+      ).toEqual({ $ref: "#/components/schemas/ItemInput" });
+    });
+
+    test("no aliases", () => {
+      expect(
+        Object.values(spec.components!.schemas!).filter(R.has("$ref")),
+      ).toEqual([]);
     });
   });
 

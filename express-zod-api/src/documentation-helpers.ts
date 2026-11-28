@@ -318,12 +318,14 @@ export const depictRequestParams = ({
   makeRef,
   composition,
   getLocation,
+  resolve,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResCommons & {
   composition: "inline" | "components";
   description?: string;
   flatRequest: FlattenObjectSchema;
   getLocation: (name: string) => ParameterLocation | undefined;
+  resolve: <T extends SchemaObjectValue>(subject: T) => T;
 }) => {
   const depictedParams: ParameterObject[] = [];
   for (const [name, jsonSchema] of Object.entries(flatRequest.properties)) {
@@ -331,6 +333,7 @@ export const depictRequestParams = ({
     const location = getLocation(name);
     if (!location) continue;
     const depicted = asOAS(jsonSchema);
+    const own = resolve(depicted); // named schema is a reference by now
     const result =
       composition === "components"
         ? makeRef(
@@ -344,11 +347,11 @@ export const depictRequestParams = ({
       in: location,
       deprecated: jsonSchema.deprecated,
       required: flatRequest.required?.includes(name) || location === "path", // issue #3600
-      description: depicted.description || description,
+      description: own.description || description,
       schema: result,
       examples: enumerateExamples(
-        isSchemaObject(depicted) && depicted.examples?.length
-          ? depicted.examples // own examples or from the flat:
+        isSchemaObject(own) && own.examples?.length
+          ? own.examples // own examples or from the flat:
           : R.pluck(
               name,
               flatRequest.examples?.filter(R.both(isObject, R.has(name))) || [],
